@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-09-24
 
-> **Status:** In build — section 1 (foundation + Nav) is built and checked
+> **Status:** In build — batch 1 (Hero + Marquee) built and checked; waiting on the user's review
 
 **The one question:** Can they help me?
 
@@ -25,13 +25,14 @@ section and the footer.
 
 ## Current State
 
-Section 1 (foundation + Nav) is built: build, lint and tsc green; screens checked at 360/768/1440/3840.
-The code audit and re-audit are done. All should-fix items are fixed. `app/page.tsx` holds a
-temporary spacer until the hero lands. Next: the user reviews the Nav, then section 2 (Hero).
+Sections 1–3 (foundation + Nav, Hero, Marquee) are built statically: build, lint and screens are
+green at 360/768/1440/3840; the audit is done (0 HIGH, both SHOULDs fixed). `app/page.tsx` renders
+`HeroSection` and `MarqueeStrip`, plus a temporary spacer for the sections still to come. Next: the
+user reviews batch 1 (Hero + Marquee), then batch 2 (Agents both variants + Process).
 
 ## Key Files
 
-- `app/page.tsx` — temporary spacer only, until the hero lands
+- `app/page.tsx` — renders Hero and Marquee, plus a temporary spacer for the remaining sections
 - `app/layout.tsx` — renders `SiteHeader` and the skip link; no footer yet
 - `content/home.ts` — copy for the page's sections, written to the spec's slots
 - `content/shared.ts` — nav and footer copy, written (`footer.social`, `footer.copyrightName`)
@@ -50,6 +51,14 @@ temporary spacer until the hero lands. Next: the user reviews the Nav, then sect
 - `lib/styles.ts` — shared style helpers
 - `lib/routes.ts` — route/anchor targets
 - `lib/navItems.ts` — nav link data
+- `components/home/hero/HeroSection.tsx` — the hero section, `#top`
+- `components/home/hero/HeroGrid.tsx` — the hero's faint background grid
+- `components/home/hero/HeroPortrait.tsx` — the portrait, fading into the background at its bottom
+- `components/home/hero/HeroSideLine.tsx` — the "what I do" line with its violet dot
+- `components/home/hero/HeroName.tsx` — the MUHAMMAD/WAQAS h1
+- `components/home/hero/HeroActions.tsx` — the mono tag plus See proofs / Book a call row
+- `components/home/MarqueeStrip.tsx` — the marquee strip
+- `components/icons/AsteriskIcon.tsx` — the marquee's drawn asterisk separator
 
 ## Decisions
 
@@ -146,7 +155,7 @@ temporary spacer until the hero lands. Next: the user reviews the Nav, then sect
 - 2026-09-24 — Proofs takeover template, the same for every project: (1) top bar "PROOF 0n / 03 ·
   tag" plus a Close button; (2) big title; (3) three info rows WHAT IT IS / BUILT / IN USE, facts
   only; (4) one summary paragraph on what it does for its users; (5) shots, one big and two
-  details (skipped for MARWIX-SKILLS); (6) a Visit button (Exile: exile.marwix.dev, the only
+  details; (6) a Visit button (Exile: exile.marwix.dev, the only
   place it's linked; Design Vault and MARWIX-SKILLS: their GitHub links); (7) "Next project" at
   the bottom.
 - 2026-09-24 — Proofs takeover address: opening sets a hash (#exile, #design-vault,
@@ -216,12 +225,37 @@ temporary spacer until the hero lands. Next: the user reviews the Nav, then sect
 - 2026-09-24 — `BookCallLink` has only the `nav` and `hero` variants. The Contact row's Book a
   call (8.1) will come from a shared contact-row component built in section 8, which carries
   `data-track="book-call"`.
+- 2026-09-24 — The user approved the Nav (section 1). With the 2026-09-30 ship date six days out,
+  the static build now runs in batches of 2–3 sections, with one user review per batch instead of
+  per section. Batch 1: Hero + Marquee.
+- 2026-09-24 — Initial git commit made (1b25399) covering docs, content and section 1.
+- 2026-09-24 — Proofs: every project gets the same image set, a card shot plus three takeover
+  shots (one big, two details), MARWIX-SKILLS included. All three projects stay identical in
+  structure and are kept in sync. This replaces the earlier "skipped for MARWIX-SKILLS" in the
+  takeover template.
+- 2026-09-24 — Hero and Marquee built as static server components
+  (`components/home/hero/*`, `components/home/MarqueeStrip.tsx`) per ui-spec §2–§3, carrying every
+  `data-anim` hook for the GSAP pass; MUHAMMAD measured at 314.7px within 320 at 360px, so the 72px
+  token stands.
+- 2026-09-24 — Hero name lines carry `pb-[0.12em]` bottom padding (user's choice) so the Q tail in
+  WAQAS isn't clipped.
+- 2026-09-24 — Marquee separator is the SVG `AsteriskIcon` (`size-8`, `text-accent`), not a typed
+  `✳`, which can render as a colour emoji on Apple devices and ignore the accent colour.
+- 2026-09-24 — The home `meta.description` says "websites", matching `hero.sideLine`'s wording.
+- 2026-09-24 — User's choice: while scrolling past the hero, the transparent Nav's links overlap
+  the big name; this stays as is in the static build and is fixed by the GSAP pass's hero-text
+  fade on scroll (the Nav decision is unchanged).
 
 ## Open Questions
 
 - **Choice:** Agents: pick variant A (tabs) or B (all shown) after viewing.
 - **To build:** Hero — the user's new portrait (pending file); `hero.portraitAlt` needs a check
   once it arrives.
+- **To build:** Proofs — the "See proofs" hero button jumps to `#proofs`, which lands with
+  section 7; until then it does nothing.
+- **Ship check:** `public/images/portrait.png` is a grey stand-in with a real path in
+  `lib/images.ts`, so the null-image guard won't catch it; it must be swapped for the user's photo
+  (and `hero.portraitAlt` rechecked) before deploy.
 - **Fact:** the user is adding MARWIX-SKILLS details (BUILT / IN USE) to `docs/03-facts.md`; its
   rows show `[FILL]` until then and can't ship.
 - **To build:** Proofs — Exile, Design Vault and MARWIX-SKILLS screenshots (pending from the

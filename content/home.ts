@@ -6,7 +6,7 @@
 export const meta = {
   title: "Muhammad Waqas: AI Automation Engineer | MARWIX",
   description:
-    "I build AI agents that take repetitive work off your team, and the website around them. Book a call.",
+    "I build AI agents that take repetitive work off your team, and the websites around them. Book a call.",
 } as const;
 
 export const hero = {

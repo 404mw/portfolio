@@ -1,6 +1,6 @@
 # Home: UI spec
 
-**Last Updated:** 2026-09-24 (revised with the user's answers)
+**Last Updated:** 2026-09-24
 **Sources:** `docs/pages/home/page.md` (decisions 1–44, the source of truth), constitution §2–§9,
 `docs/01-design-system.md`, `app/globals.css`, v3 reference (layout and behaviour only),
 `docs/03-facts.md`, `docs/04-voice.md`.
@@ -62,7 +62,7 @@ and the markup hooks the GSAP pass needs. The spec never states page text; it na
 | `components/BookCallLink.tsx` | The one Book a call link (Cal.com, `links.bookCall`), built on `ExternalLink`, carrying `data-track="book-call"`: the single place clicks are counted (§11). Prop `variant`: `nav` (1.2) or `hero` (2.1). The Contact row (8.1) is built by the shared contact-row component, not a variant here |
 | `components/SiteImage.tsx` | Every image: reads `lib/images.ts`, renders `next/image` with `fill`, `sizes`, `alt`, and an object-position prop. Renders `ImagePlaceholder` when the entry's file is `null` |
 | `components/ImagePlaceholder.tsx` | Build-time stand-in: `grid size-full place-items-center border border-dashed` with a mono name label. On cream: `bg-ink/5 border-ink/20 text-cream-muted`; on dark: `bg-band border-line text-muted` |
-| `components/icons/{Menu,Close,ArrowRight,ArrowUpRight,Check,ChevronUp}Icon.tsx` | One glyph each: inline SVG, `currentColor`, `aria-hidden="true"`, `focusable="false"` |
+| `components/icons/{Menu,Close,ArrowRight,ArrowUpRight,Check,ChevronUp,Asterisk}Icon.tsx` | One glyph each: inline SVG, `currentColor`, `aria-hidden="true"`, `focusable="false"` |
 
 - `lib/images.ts`: each name → `{ dark: string | null }`. A `null` file fails the ship check, like
   a `[FILL]` marker. Names are listed per section below.
@@ -152,7 +152,8 @@ and the markup hooks the GSAP pass needs. The spec never states page text; it na
   with a dot `mt-1.5 size-2 shrink-0 rounded-full bg-accent` (`aria-hidden`, `data-anim="hero-dot"`).
   Phone: left-aligned (decision); md+: right, as v3.
 - Row 2, name: `<h1 class="flex flex-col justify-center font-display font-bold uppercase text-hero leading-[0.82] tracking-[-0.015em] text-accent {condensed}">`.
-  Each line is `<span class="block overflow-hidden pb-[0.04em]">` → `<span data-anim="hero-line" class="block">`.
+  Each line is `<span class="block overflow-hidden pb-[0.12em]">` → `<span data-anim="hero-line" class="block">`.
+  The 0.12em bottom padding keeps the Q tail in WAQAS inside the clip (user's choice, 2026-09-24).
   MUHAMMAD `text-right`, WAQAS `text-left`. A text space sits between the two wrappers so the
   accessible name reads "Muhammad Waqas". The name paints in front of the portrait.
 - Row 3: `flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end md:justify-between md:gap-5`
@@ -219,7 +220,9 @@ and the markup hooks the GSAP pass needs. The spec never states page text; it na
 - Visible strip, `aria-hidden="true"`: `<div data-anim="marquee-track" class="flex w-max">` holding
   **two identical sets**, each `<div data-anim="marquee-set" class="flex shrink-0 items-center gap-14 pr-14">`.
   Items: `font-display font-medium text-marquee leading-none tracking-[-0.02em] whitespace-nowrap text-muted/30 {condensed}`.
-  After each item, a separator `✳` in `text-accent`.
+  After each item, a separator `AsteriskIcon` (`components/icons/AsteriskIcon.tsx`, an eight-spoke
+  asterisk) with `size-8 shrink-0 text-accent`, `aria-hidden`. Drawn, not a typed `✳`, which can
+  show as a colour emoji on Apple devices and ignore the accent colour.
 - Screen readers get `<ul class="sr-only">` of the same five items instead.
 - Static: one still row starting at the left edge, clipped on the right. Never scrolls sideways.
 - Contrast: the strip is decorative (`aria-hidden`), so `muted/30` is exempt; the real list is hidden text.
