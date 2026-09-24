@@ -64,7 +64,7 @@ pre-digested brief. Never write site code or page text yourself.
 | Bug, rule and copy review | `code-auditor` |
 | Build, lint, screen-size check | The lead (you), never delegated; fixes go to `web-coder` / `copywriter` |
 | Deploy, domain, DNS | `deployer`, after the user confirms |
-| Motion (GSAP) | A GSAP agent, set up once the static page passes checks; loads the `gsap-*` skills |
+| Motion (GSAP) | `gsap-animator`, after the static page passes checks; loads the `gsap-*` skills |
 
 For standard page work, invoke the `page-workflow` skill before planning.
 

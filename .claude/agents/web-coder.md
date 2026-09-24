@@ -45,7 +45,8 @@ Never invent behaviour. If the brief is ambiguous where a wrong guess means rewo
    `lib/`.
 5. **Never repeat code.** Two components with the same markup become one.
 6. **Static and fast.** Pages are statically rendered. No client JavaScript unless an interaction
-   needs it. **No animation in v1**, and no animation library imported by any page.
+   needs it. **You don't write animation**: motion belongs to `gsap-animator`, which works only
+   through `data-anim` hooks. Keep those hooks intact and never add an animation library.
 7. **Phone first.** Build for 360px first, then scale up to 3840px. Nothing scrolls sideways.
    Tap targets are at least 44px.
 8. **Images go through one shared component**, so a light-theme version can be added later.
