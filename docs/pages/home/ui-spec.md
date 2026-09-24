@@ -44,12 +44,16 @@ and the markup hooks the GSAP pass needs. The spec never states page text; it na
 | `container` | `mx-auto w-full max-w-(--container-site)` | `--container-site` 1536px |
 | `focusRing` | `focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text` | on dark |
 | `focusRingOnCream` | same, with `focus-visible:outline-ink` | the takeover |
+| `focusRingCard` | `focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-text` | the cream proof cards, on dark |
 | `condensed` | `[font-variation-settings:'wdth'_80]` | display face |
+| `rowTitle` | `font-display text-row leading-none font-semibold tracking-[-0.035em]` + `condensed` | big-row titles: Agents rows, Web step rows |
 | `condensedMark` | `[font-variation-settings:'wdth'_75]` | footer wordmark only |
 | `monoLabel` | `font-mono text-nav uppercase tracking-[0.06em] text-muted` | section labels, hero tag |
 | `metaLabel` | `font-mono text-meta text-muted` | step, panel and card meta |
+| `metaLabelOnCream` | `font-mono text-meta text-cream-muted` | meta on cream (proof cards, the takeover) |
 | `pillPrimary` | `inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 text-body font-semibold text-on-accent hover:bg-text active:bg-muted` + `focusRing` | primary pill |
 | `pillOutline` | `inline-flex min-h-12 items-center justify-center rounded-full border border-line bg-bg/50 px-6 text-body text-text hover:border-accent hover:text-accent active:bg-band` + `focusRing` | secondary pill |
+| `pillInk` | `inline-flex items-center rounded-full bg-ink text-cream hover:bg-accent hover:text-on-accent active:bg-accent/80` + `focusRingOnCream` | ink pill on cream (takeover Close and Visit); height, padding, gap and type set where used |
 
 ### 0.4 Shared components (all server unless marked)
 
@@ -57,7 +61,7 @@ and the markup hooks the GSAP pass needs. The spec never states page text; it na
 |---|---|
 | `components/SkipLink.tsx` | "Skip to content" to `#main`: `sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-60` + `pillPrimary` when focused |
 | `components/SectionLabel.tsx` | Number, a 24px hairline (`h-px w-6 bg-muted`, `aria-hidden`), label text, in `monoLabel`. Prop `as` (`h2` for Agents, `p` elsewhere). The hairline replaces v3's em dash (voice rule 10) |
-| `components/SectionHeading.tsx` | `<h2>` = `lead` + `<span class="text-accent">accent</span>`. Size prop `heading-sm` / `heading` / `heading-xl`. Base: `font-display font-semibold text-balance text-text` + `condensed`; `heading-sm`/`heading`: `leading-[0.95] tracking-[-0.04em]`; `heading-xl`: `leading-[0.9] tracking-[-0.045em]` |
+| `components/SectionHeading.tsx` | `<h2>` = `lead` + `<span class="text-accent">accent</span>`. Size prop `heading-sm` / `heading` / `heading-xl`. Base: `font-display font-semibold text-balance text-text` + `condensed`; `heading-sm`/`heading`: `leading-[0.95] tracking-[-0.025em]`; `heading-xl`: `leading-[0.9] tracking-[-0.03em]` (loosened from −0.04/−0.045em by the user's choice, 2026-09-24: letters touched at desktop sizes) |
 | `components/ExternalLink.tsx` | `<a target="_blank" rel="noopener noreferrer">` plus a `sr-only` suffix from `a11y.newTab` |
 | `components/BookCallLink.tsx` | The one Book a call link (Cal.com, `links.bookCall`), built on `ExternalLink`, carrying `data-track="book-call"`: the single place clicks are counted (§11). Prop `variant`: `nav` (1.2) or `hero` (2.1). The Contact row (8.1) is built by the shared contact-row component, not a variant here |
 | `components/SiteImage.tsx` | Every image: reads `lib/images.ts`, renders `next/image` with `fill`, `sizes`, `alt`, and an object-position prop. Renders `ImagePlaceholder` when the entry's file is `null` |
@@ -168,7 +172,7 @@ and the markup hooks the GSAP pass needs. The spec never states page text; it na
 | Element | Phone 360 | Tablet 768 | Desktop 1440 | 4K 3840 |
 |---|---|---|---|---|
 | Section height | 100svh, min 640 | 100svh | 100svh (900) | capped 1200 |
-| Name (`text-hero`) | 72px | 100px | 187px | 220px |
+| Name (`text-hero`) | 72px | 117px | 192px | 220px |
 | Side line | 14px, left, max 280 | 14px, right | same | same |
 | Portrait box | 60% h × 83% w, max 448 (~300×444 on 740) | 88% h × 58vw (~445×901) | 620×792 | 620×1056 |
 | Tag | 13px mono | same | same | same |
@@ -248,49 +252,61 @@ and the markup hooks the GSAP pass needs. The spec never states page text; it na
 
 ## 4. Agents (the one question: what can their agents handle for my business?)
 
-Both variants are built; the user picks one, and the loser is deleted (page doc).
+The user picked variant A (tab list), 2026-09-24. Variant B's list (`AgentsStack`) ships only as A's `<noscript>` fallback.
 
 ### 4.1 Shared parts
 
-- `AgentsSection` (server): section frame, `id="agents"`, no `border-t`. Takes `variant: "tabs" | "stack"`.
+- `AgentsSection` (server): section frame, `id="agents"`, no `border-t`. Takes no props; it renders
+  the tabs layout (4.2) with `AgentsStack` (4.3) as the no-JS fallback.
 - `SectionLabel as="h2"` with `agents.number` and `agents.label`. There's no big heading here.
 - `AgentRowText`: `grid grid-cols-[1.25rem_minmax(0,1fr)] items-baseline gap-x-4 gap-y-2.5`:
   number `font-mono text-meta`; title `font-display font-semibold text-row leading-none tracking-[-0.035em] {condensed}`;
   line `col-start-2 text-lead leading-normal text-muted`.
-- `AgentDemoFrame` (the panel): `flex flex-col overflow-hidden rounded-3xl border border-line bg-band`.
-  - Header: `flex items-center justify-between border-b border-line px-5 py-4 {metaLabel}`: a status dot
+- `AgentDemoFrame` (the panel): `flex flex-col rounded-3xl border border-line bg-band`. No
+  `overflow-hidden`: the panel grows to fit its demo and never clips it. Prop `variant`: `tabs`
+  (A's panel) or `stack` (the fallback rows).
+  - Header: `flex items-center justify-between gap-4 border-b border-line px-5 py-4 {metaLabel}`: a status dot
     (`size-1.5 rounded-full bg-accent`, `aria-hidden`, `data-anim="demo-status-dot"`) with
     `agents.demoStatus`, and the slug on the right.
   - Body: `relative flex flex-1 flex-col justify-center p-5 md:p-8 xl:p-9`.
-  - Size: `min-h-96` below `lg`; `lg:aspect-[10/9] lg:min-h-0` in variant A,
-    `lg:aspect-[16/10] lg:min-h-0` in variant B.
+  - Size: `min-h-96` below `lg`; from `lg`, `lg:aspect-[10/9]` for `tabs` or `lg:aspect-[16/10]`
+    for `stack`, with `lg:min-h-auto`. The ratio is a minimum: a taller demo grows the panel
+    rather than clipping (it clipped at 1024px before).
 - Inner raised surfaces in panels (bubbles, rows, nodes, cards) use `bg-line/40`.
 
 ### 4.2 Variant A: tab list (`AgentsTabs`, client)
 
-- Layout: `grid gap-10 md:gap-12 lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-24`. Left:
+- Layout: `grid gap-10 noscript:block md:gap-12 lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-24`.
+  `noscript:block` drops the two columns without JS, so the fallback list takes the full width. Left:
   `flex flex-col gap-10` (label, tab list). Right: the four panels stacked in one cell. Phone and
   tablet: the list first, then the panel below.
 - Tab list: `<div role="tablist" aria-orientation="vertical" aria-labelledby={labelId}>`. Each row is
-  `<button role="tab" aria-selected aria-controls tabIndex={selected ? 0 : -1}>` with
-  `relative block w-full border-t border-line py-5 text-left` + `focusRing`, holding `AgentRowText`.
-  The row's one-line description renders on the selected row only.
+  `<button role="tab" aria-labelledby aria-selected aria-controls tabIndex={selected ? 0 : -1}>` with
+  `group relative block w-full cursor-pointer border-t border-line py-5 text-left` + `focusRing`, holding `AgentRowText`.
+  `group` drives the title's hover colour. The row's one-line description renders on the selected row only.
+- **Names:** each tab and its panel are named by the row's number and title only. Both take
+  `aria-labelledby` pointing at the number and title ids, built by `agentRowIds()` in
+  `lib/agents.ts` (`AgentRowText` takes a `labelId` and sets them). The description stays visible
+  in the selected tab but isn't part of the name.
 - Progress line per row: `<span aria-hidden data-anim="agent-progress" class="absolute inset-x-0 -top-px h-px origin-left bg-accent">`,
   full width on the selected row in static, `scale-x-0` on the others.
-- Panels: one `<div role="tabpanel" id aria-labelledby tabIndex={0}>` per offer; the three
+- Panels: one `<div role="tabpanel" id aria-labelledby tabIndex={0} class="rounded-3xl">` + `focusRing`
+  per offer (the radius matches the frame, so the ring follows its corners); the three
   unselected have `hidden`. First offer selected on load.
 - Keyboard (`hooks/useRovingTabs.ts`): Up/Down move and select, Home/End jump, Tab moves into the panel.
+  The hook has two paths: `select`, which never moves focus (clicks, and the GSAP pass's
+  auto-advance), and a keyboard path that selects and focuses the tab.
 - **No-JS fallback:** the tab list and panels take `noscript:hidden` (Tailwind ≥4.1,
   `@media (scripting: none)`), and a `<noscript>` renders variant B's list in their place.
 
 | Row part | Default (unselected) | Hover | Focus-visible | Selected |
 |---|---|---|---|---|
 | Number | `text-muted` | same | ring on row | `text-accent` |
-| Title | `text-muted/60` (3.2:1, large text) | `text-muted` | ring on row | `text-text` |
+| Title | `text-muted/60` (3.2:1, large text) | `group-hover:text-muted` | ring on row | `text-text` |
 | Line | not rendered | n/a | n/a | `text-muted`, visible |
 | Top line | `border-line` | same | same | accent progress line over it |
 
-### 4.3 Variant B: every row with its panel (`AgentsStack`, server)
+### 4.3 Variant B layout: A's no-JS fallback only (`AgentsStack`, server)
 
 - Label, then `<ol>` of four `<li class="grid gap-6 border-t border-line py-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-16 lg:py-14">`.
   Each holds `AgentRowText` (title as `<h3>`; number `text-accent`, title `text-text`, line always
@@ -300,7 +316,9 @@ Both variants are built; the user picks one, and the loser is deleted (page doc)
 
 - **ChatDemo** (`support-agent`): `flex flex-col gap-3.5`.
   - Customer bubble: `self-start max-w-[70%] rounded-xl rounded-bl-sm bg-line/40 px-4.5 py-3.5 text-body-lg text-text`.
-  - Typing dots: `hidden` in static (`data-anim="demo-typing"`: three `size-1.5 rounded-full bg-muted`).
+  - Typing dots: in their own agent-side bubble, `hidden items-center gap-1.5 self-end rounded-xl rounded-br-sm bg-line/40 px-4.5 py-4`
+    (`data-anim="demo-typing"`, `aria-hidden`), holding three `size-1.5 rounded-full bg-muted`.
+    Hidden in static; the GSAP pass shows it.
   - Agent reply: `self-end flex max-w-[72%] flex-col items-end gap-1.5` → bubble `rounded-xl rounded-br-sm bg-accent px-4.5 py-3.5 text-body-lg text-on-accent`, then meta `{metaLabel}`.
   - Second customer bubble as the first.
 - **LeadsDemo** (`lead-agent`): `flex flex-col gap-2.5`, three rows
@@ -309,8 +327,9 @@ Both variants are built; the user picks one, and the loser is deleted (page doc)
   - Right: status pill `DemoStatusPill` ("followed up"). The "new" pill (`rounded-full border border-line px-3 py-1.5 font-mono text-meta text-muted`) is in the markup with `hidden` (`data-anim="demo-before"`).
 - **ReportDemo** (`report-agent`): `flex h-full flex-col justify-end gap-5`.
   - Title row: `flex items-baseline justify-between`: title `font-display font-semibold text-summary tracking-[-0.02em]`, week `{metaLabel}`.
-  - Chart (`aria-hidden`): `flex min-h-40 flex-1 items-end gap-2.5 border-b border-line`; 8 bars
-    `flex-1 rounded-t-md bg-line`, the last `bg-accent`; heights from `report.bars` as inline `height: n%`.
+  - Chart (`aria-hidden`): `grid min-h-40 flex-1 auto-cols-fr grid-flow-col items-end gap-2.5 border-b border-line`;
+    8 bars `block rounded-t-md bg-line`, the last `bg-accent`; heights from `report.bars` as inline `height: n%`.
+    A grid, not a flex row with `flex-1` bars, so the percentage heights resolve below `lg`.
     `report.chartAlt` sits in `sr-only` beside it.
   - `DemoStatusPill` ("sent to team · Mon 09:00"), `self-start`.
 - **SyncDemo** (`sync-agent`): `flex flex-col gap-6 md:gap-9`.
@@ -326,12 +345,15 @@ Both variants are built; the user picks one, and the loser is deleted (page doc)
 
 | Element | Phone 360 | Tablet 768 | Desktop 1440 | 4K 3840 |
 |---|---|---|---|---|
-| Layout | stacked | stacked | A: 2 cols (616 each); B: rows 5/7 | A: 720 each; B: 5/7 of 1536 |
-| Row title (`text-row`) | 34px | 34px | 58px | 58px |
+| Layout | stacked | stacked | A: 2 cols (616 each); fallback: rows 5/7 | A: 720 each; fallback: 5/7 of 1536 |
+| Row title (`text-row`) | 34px | 44px | 58px | 58px |
 | Row line | 17px | 17px | 17px | 17px |
-| Panel | 320 wide, min 384 tall | 706 wide, min 384 | A: 616×554; B: ~737×460 | A: 720×648; B: ~840×525 |
+| Panel | 320 wide, min 384 tall | 706 wide, min 384 | A: min 616×554; fallback: min ~737×460 | A: min 720×648; fallback: min ~840×525 |
 | Panel padding | 20 | 32 | 36 | 36 |
 | Chat bubble text | 16px | 16px | 16px | 16px |
+
+- From `lg`, panel sizes are minimums: a taller demo grows the panel. The fallback (B) sizes apply
+  only without JS.
 
 ### 4.6 Content slots (`content/home.ts → agents`)
 
@@ -351,14 +373,16 @@ Both variants are built; the user picks one, and the loser is deleted (page doc)
 ### 4.7 Components, images, motion
 
 - **Components:** `components/home/agents/AgentsSection.tsx`, `AgentsTabs.tsx` (client, A),
-  `AgentsStack.tsx` (B), `AgentRowText.tsx`, `AgentDemoFrame.tsx`, `AgentDemo.tsx` (picks the demo
+  `AgentsStack.tsx` (fallback), `AgentRowText.tsx`, `AgentDemoFrame.tsx`, `AgentDemo.tsx` (picks the demo
   by kind), `ChatDemo.tsx`, `LeadsDemo.tsx`, `ReportDemo.tsx`, `SyncDemo.tsx`, `DemoStatusPill.tsx`;
-  `hooks/useRovingTabs.ts`. **Images:** none.
+  `hooks/useRovingTabs.ts`; `lib/agents.ts` (the demo kind per offer, its type tied to
+  `agents.items` so an offer can't be added or removed without its demo; the row ids from
+  `agentRowIds()`); `lib/listNumber.ts` (0 → "01", shared by numbered rows). **Images:** none.
 - **Motion (later):**
   - A: 6s auto-advance; the selected row's `agent-progress` grows `scaleX` 0→1 over 6s; paused on
     hover or focus-within; off under reduced motion. The line fades up when its row is selected.
   - Status dot: opacity blink loop.
-  - Each demo replays from the start when its panel shows (A: on select; B: on entering view, once):
+  - Each demo replays from the start when its panel shows (on select):
     parts pop in (`y 8px, scale .96 → none`) in `data-demo-order`. Chat: typing dots show, then hide
     before the reply. Leads: each `demo-before` pill swaps to "followed up", staggered. Report: bars
     grow `scaleY` from the bottom, staggered, then the pill pops. Sync: packets travel left→right
@@ -372,16 +396,21 @@ Both variants are built; the user picks one, and the loser is deleted (page doc)
 
 - Section frame, `id="process"`. Inner: `flex flex-col gap-14 md:gap-20 xl:grid xl:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] xl:items-center xl:gap-16 2xl:gap-24`.
 - Left: `flex flex-col gap-7`: `SectionLabel` (`process.number`, `process.label`), `SectionHeading size="heading"`.
-- Right: `ProcessLoop`: a `relative` wrapper holding the `<ol>` of four `ProcessStep`s and, from
+- Right: `ProcessLoop`: a `relative` wrapper (full class list in 5.2: `relative max-w-2xl xl:max-w-none`)
+  holding the `<ol>` of four `ProcessStep`s and, from
   `xl`, the `ProcessRing` behind them. **One set of steps in the DOM**; CSS moves them.
 - `ProcessStep` text: `STEP n` `{metaLabel} uppercase`, title `<h3 class="font-display font-semibold text-step leading-[1.05] tracking-tight text-balance text-text {condensed}">`,
   line `text-body-lg leading-normal text-muted max-w-70`. Gap `gap-2.5`.
 
 ### 5.2 Phone to `lg`: a column with a return line
 
-- `<ol class="grid max-w-2xl grid-cols-[3rem_minmax(0,1fr)]">`; each `<li class="col-span-2 grid grid-cols-subgrid pb-12 last:pb-0">`
+- `ProcessLoop` wrapper: `relative max-w-2xl xl:max-w-none`. The cap is on the wrapper, not the
+  `<ol>`, so the ring stays centred from `xl`.
+- `<ol class="grid grid-cols-[3rem_minmax(0,1fr)]">`; each `<li class="relative col-span-2 grid grid-cols-subgrid pb-12 last:pb-0">`
   (padding, not gap, so the rail runs unbroken).
-- Col 1 is the rail (`relative`, `aria-hidden` parts): dot `relative z-10 mx-auto mt-2 size-4 rounded-full bg-accent ring-8 ring-accent/15`
+- Col 1 is the rail (`aria-hidden` parts). Its parts are positioned against the `relative` `<li>`,
+  not the rail cell, so each segment spans the `li`'s `pb-12` and the loop line is unbroken.
+  Dot: `relative z-10 mx-auto mt-2 size-4 rounded-full bg-accent ring-8 ring-accent/15`
   (`data-anim="process-dot"`), dot centre at x 24, y 16. Loop segment per step, `absolute left-1.25 w-5 border-accent`:
 
 | Step | Segment classes | Draws |
@@ -393,22 +422,24 @@ Both variants are built; the user picks one, and the loser is deleted (page doc)
   The segments' right border (x 23–25) runs through the dot centres; the left border (x 5–7) is the
   return. Together they read as one closed loop. On steps 2 and 3, a `ChevronUpIcon`
   (`absolute left-1.5 top-1/2 size-3 -translate-1/2 text-accent`) sits on the return line to show direction.
-- After the list: `<p class="pl-12 pt-4 {metaLabel}">` with `process.loopLabel`.
+- After the list: `<p class="pl-12 pt-4 {metaLabel} xl:sr-only">` with `process.loopLabel`.
 - Below `xl` the ring is `hidden`.
 
 ### 5.3 From `xl`: the ring (`ProcessRing`, `aria-hidden`)
 
 - `<ol>` becomes `xl:grid xl:grid-cols-[minmax(0,1fr)_18rem_minmax(0,1fr)] xl:grid-rows-[1fr_18rem_1fr] xl:gap-8 2xl:grid-cols-[minmax(0,1fr)_20rem_minmax(0,1fr)] 2xl:grid-rows-[1fr_20rem_1fr]`.
   The `1fr` rows and columns size equally, so the ring cell sits exactly at the wrapper's centre.
-  Rails, the loop label and chevrons are `xl:hidden`; `li` padding resets with `xl:pb-0`.
-- Step placement, clockwise from the top:
+  Each `li` takes `xl:col-span-1 xl:block xl:pb-0`. Rails and chevrons are `xl:hidden`. The column
+  loop label is `xl:sr-only`, not hidden, so screen readers keep it at `xl`; the ring's copy stays decorative.
+- Step placement, clockwise from the top. The cell and `self-*` classes go on the `li`; the
+  `text-*` and `items-*` classes go on the step's text column (`flex flex-col gap-2.5`):
 
-| Step | Cell | Alignment |
+| Step | Cell (`li`) | Alignment (text column) |
 |---|---|---|
-| 1 | `xl:col-start-2 xl:row-start-1` | `xl:self-end xl:text-center xl:items-center` |
-| 2 | `xl:col-start-3 xl:row-start-2` | `xl:self-center xl:text-left` |
-| 3 | `xl:col-start-2 xl:row-start-3` | `xl:self-start xl:text-center xl:items-center` |
-| 4 | `xl:col-start-1 xl:row-start-2` | `xl:self-center xl:text-right xl:items-end` |
+| 1 | `xl:col-start-2 xl:row-start-1 xl:self-end` | `xl:text-center xl:items-center` |
+| 2 | `xl:col-start-3 xl:row-start-2 xl:self-center` | `xl:text-left` |
+| 3 | `xl:col-start-2 xl:row-start-3 xl:self-start` | `xl:text-center xl:items-center` |
+| 4 | `xl:col-start-1 xl:row-start-2 xl:self-center` | `xl:text-right xl:items-end` |
 
 - Ring: `<div class="pointer-events-none absolute inset-0 m-auto hidden size-72 xl:block 2xl:size-80">`, centred without transforms. Inside:
   - `<svg viewBox="0 0 100 100" class="size-full overflow-visible text-accent">`.
@@ -421,7 +452,7 @@ Both variants are built; the user picks one, and the loser is deleted (page doc)
     top `left-1/2 top-0 -translate-1/2`, right `right-0 top-1/2 translate-x-1/2 -translate-y-1/2`,
     bottom `left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2`, left `left-0 top-1/2 -translate-1/2`.
   - Centre: `process.loopLabel` in `absolute inset-0 m-auto grid max-w-32 place-items-center text-center {metaLabel} uppercase`
-    (decorative at `xl`; the same slot is the visible column label below `xl`).
+    (decorative at `xl`; the column label, `xl:sr-only` there, carries it for screen readers).
   - Runner for the GSAP pass: `<span data-anim="process-runner" class="absolute left-1/2 top-0 hidden size-3 -translate-1/2 rounded-full bg-text">`.
 - The 32px gap clears each dot's 8px radius plus its 8px halo, so text never touches a dot.
 
@@ -430,7 +461,7 @@ Both variants are built; the user picks one, and the loser is deleted (page doc)
 | Element | Phone 360 | Tablet 768 | Desktop 1440 | 4K 3840 |
 |---|---|---|---|---|
 | Layout | heading, then column | same, column max 672 | heading 4/12 beside a ring 8/12 | same |
-| Heading (`text-heading`) | 44px | 50px | 94px | 104px |
+| Heading (`text-heading`) | 44px | 64px | 96px | 104px |
 | Ring diameter | n/a | n/a | 288 (`xl`); 320 from 1536 | 320 |
 | Side step column | n/a | n/a | ~195 (at 1280) to 250 | ~288 |
 | Step title (`text-step`) | 32px | 32px | 32px | 32px |
@@ -452,9 +483,12 @@ Both variants are built; the user picks one, and the loser is deleted (page doc)
 - **Components:** `components/home/process/ProcessSection.tsx`, `ProcessLoop.tsx` (list plus
   placement), `ProcessStep.tsx`, `ProcessRail.tsx` (a step's dot and loop segment), `ProcessRing.tsx`.
   **Images:** none.
-- **Motion (later):** the heading and steps reveal on scroll (`data-anim="reveal"`). A runner travels
+- **Motion (later):** the heading and steps reveal on scroll (`data-anim="reveal"`). It sits on the
+  left wrapper (label and heading) and on each step's text column, never on the `li`, so the loop
+  line never fades. A runner travels
   the loop continuously (ring: along `process-path`; column: down the forward line and back up the
   return, a path built from the rail boxes); the dots dim to `bg-line` and light as it passes.
+  There are 8 `process-dot` elements (4 rail, 4 ring); the motion pass animates the visible set.
   Reduced motion: no runner, all dots lit (the static state).
 
 ---
@@ -480,9 +514,9 @@ Both variants are built; the user picks one, and the loser is deleted (page doc)
 | Element | Phone 360 | Tablet 768 | Desktop 1440 | 4K 3840 |
 |---|---|---|---|---|
 | Layout | stacked | stacked | 2 cols, left sticky at 120px | same, in 1536 |
-| Heading (`text-heading-sm`) | 40px | 40px | 72px | 80px |
+| Heading (`text-heading-sm`) | 40px | 53px | 75px | 80px |
 | Lead | 17px, max 384 | same | same | same |
-| Row title (`text-row`) | 34px | 34px | 58px | 58px |
+| Row title (`text-row`) | 34px | 44px | 58px | 58px |
 | Row line | 16px, max 448 | same | same | same |
 
 ### 6.3 Slots, components, images, motion
@@ -533,23 +567,31 @@ Both variants are built; the user picks one, and the loser is deleted (page doc)
 ### 7.3 Takeover (`ProjectTakeover`, server markup; `TakeoverController`, client)
 
 - **Element:** one `<dialog id="exile" aria-labelledby={titleId}>` per project (ids from
-  `lib/routes.ts`), `hidden target:block fixed inset-0 z-50 m-0 h-dvh max-h-none w-full max-w-none overflow-y-auto overscroll-contain border-0 bg-cream p-0 text-ink`.
+  `lib/routes.ts`), `fixed inset-0 z-50 m-0 hidden h-dvh max-h-none w-full max-w-none overflow-y-auto overscroll-contain border-0 bg-cream p-0 text-ink open:block [:root:not([data-takeover-js])_&:target]:block`.
+  `TakeoverController` sets `data-takeover-js` on `<html>`, which switches the no-JS `:target`
+  display off, so with JS only the dialog's `open` state shows it.
 - **Behaviour:**
   - The card link sets the hash (a real history entry). `TakeoverController` (`hooks/useHashTakeover.ts`)
     reads the hash on load and on `hashchange`: a project hash calls `showModal()` on its dialog
     (native focus containment; the page behind is inert) and adds `overflow-hidden` to `<html>`.
+    The hash is compared raw against the ids, never decoded: a malformed hash means no project.
+  - **Every open takeover has a page entry beneath it.** A direct load on a project hash (a shared
+    link, `/#design-vault`) rewrites its entry to `#proofs` and pushes the project hash on top, once.
   - **Close** (button), **Esc** (the dialog's `cancel` event, default prevented) and the browser
-    **Back** button all end in the same place: if the takeover was opened from the page,
-    `history.back()`; if the page loaded straight on the hash, `location.replace("#proofs")`. The
-    hash change then closes the dialog, and focus returns to that project's card.
-  - A shared link (`/#design-vault`) opens straight to that takeover.
+    **Back** button all end in the same place: `history.back()`. The hash change then closes the
+    dialog, and focus returns to that project's card.
   - **Next project** replaces the hash (`location.replace`), so Back always closes rather than
     stepping through projects. It wraps from the last project to the first.
+  - Close and Next click handling lives in `lib/takeoverLinks.ts`: Close raises the dialog's
+    `cancel` (the Esc path); Next replaces the hash. A modified or non-primary click (new tab, new
+    window) keeps the browser default.
   - **No JS:** `:target` shows the dialog; the Close link (`href="#proofs"`) and Back close it,
     and every part is readable.
   - Static: it opens and closes instantly. Screen check: the page doesn't jump on open.
+  - The open takeover covers the nav (`z-50` over the header's `z-40`): accepted by the user.
 - **Template: seven parts, identical for all three projects, shots included** (inside `data-anim="takeover-content"`):
-  1. **Top bar**, `TakeoverTopBar`: `sticky top-0 z-10 flex items-center justify-between bg-cream/85 backdrop-blur-md px-gutter py-3 md:py-4.5 font-mono text-nav text-cream-muted`.
+  1. **Top bar**, `TakeoverTopBar`: `sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-ink/15 bg-cream px-gutter py-3 md:py-4.5 font-mono text-nav text-cream-muted`.
+     Solid `bg-cream`, no blur, so its text keeps 4.5:1 over the shots scrolling beneath.
      Left: "PROOF 0n / 03 · tag", uppercase. Right: `TakeoverCloseLink` (client),
      `<a href="#proofs">` with `inline-flex min-h-11 items-center gap-2.5 rounded-full bg-ink px-4 font-mono text-nav font-medium text-cream hover:bg-accent hover:text-on-accent active:bg-accent/80 {focusRingOnCream}`:
      `proofs.takeover.close`, `proofs.takeover.escHint` (`aria-hidden`, `hidden md:inline`), `CloseIcon`.
@@ -577,13 +619,13 @@ Both variants are built; the user picks one, and the loser is deleted (page doc)
 
 | Element | Phone 360 | Tablet 768 | Desktop 1440 | 4K 3840 |
 |---|---|---|---|---|
-| Heading (`text-heading`) | 44px | 50px | 94px | 104px |
+| Heading (`text-heading`) | 44px | 64px | 96px | 104px |
 | Cards | stacked, 320 wide | 2 across, 343 each; third on row 2 | 3 across, ~429 each | 3 across, ~499 each |
 | Card shot (16:10) | 300×188 | 323×202 | ~409×256 | ~479×299 |
-| Card title (`text-card`) | 30px | 30px | 43px | 44px |
-| Takeover title (`text-takeover`) | 56px | 77px | 144px | 168px |
-| IN USE numbers (Exile, `text-card`) | 30px | 30px | 43px | 44px |
-| Summary (`text-summary`) | 20px | 20px | 26px | 26px |
+| Card title (`text-card`) | 30px | 35px | 44px | 44px |
+| Takeover title (`text-takeover`) | 56px | 91px | 148px | 168px |
+| IN USE numbers (Exile, `text-card`) | 30px | 35px | 44px | 44px |
+| Summary (`text-summary`) | 20px | 22.6px | 26px | 26px |
 | Info rows | label col 88 + 20 gap, values 212 | 2 cols with summary | same | same |
 | Big shot | 320×160 | 706×353 | 1328×664 | 1536×768 |
 | Detail shots | stacked, 320×240 | 343×257 each | 654×490 each | 758×568 each |
@@ -617,16 +659,19 @@ Every project has the same four images: `{project}Card`, `{project}Shot1`, `{pro
 
 | Name (`lib/images.ts`) | Where | Ratio | Crop | `sizes` |
 |---|---|---|---|---|
-| `{project}Card` | Card shot | 16:10 | `object-cover object-top` | `(min-width:1024px) 33vw, (min-width:768px) 50vw, 100vw` |
+| `{project}Card` | Card shot | 16:10 | `object-cover object-top` | `(min-width:1536px) 500px, (min-width:1024px) 33vw, (min-width:768px) 50vw, 100vw` |
 | `{project}Shot1` | Takeover big | 2:1 | `object-cover object-top` | `min(100vw, 1536px)` |
-| `{project}Shot2`, `{project}Shot3` | Takeover details | 4:3 | `object-cover object-center` | `(min-width:640px) 50vw, 100vw` |
+| `{project}Shot2`, `{project}Shot3` | Takeover details | 4:3 | `object-cover object-center` | `(min-width:1536px) 760px, (min-width:640px) 50vw, 100vw` |
 
 ### 7.7 Components and motion
 
-- **Components:** `components/home/proofs/ProofsSection.tsx`, `ProofCard.tsx`, `ProjectTakeover.tsx`,
-  `TakeoverTopBar.tsx`, `TakeoverInfoRows.tsx`, `TakeoverStats.tsx`, `TakeoverShots.tsx`,
+- **Components:** `components/home/proofs/ProofsSection.tsx`, `ProofCard.tsx`, `ProjectTakeovers.tsx`
+  (renders the three dialogs and the controller), `ProjectTakeover.tsx`,
+  `TakeoverTopBar.tsx`, `TakeoverInfoRows.tsx`, `TakeoverInfoRow.tsx` (one `<dt>`/`<dd>` pair),
+  `TakeoverStats.tsx`, `TakeoverShots.tsx`, `ProjectVisitLink.tsx` (the Visit pill),
   `TakeoverCloseLink.tsx` (client), `TakeoverNextLink.tsx` (client), `TakeoverController.tsx`
-  (client, renders nothing); `hooks/useHashTakeover.ts`.
+  (client, renders nothing); `hooks/useHashTakeover.ts`; `lib/proofs.ts` (project order, ids,
+  image names, next project); `lib/takeoverLinks.ts` (Close and Next click handling).
 - **Motion (later):** cards reveal on scroll (stagger 0.12s); hover lifts a card −8px. Open: the
   dialog's `clip-path` expands from the card's rect (`data-proof-card`) to full screen (0.75s), and
   `takeover-content` rises 40px and fades in after 0.35s. Close: clip back to the card (0.6s), then
@@ -648,7 +693,7 @@ Every project has the same four images: `{project}Card`, `{project}Shot1`, `{pro
   2. Email: `links.email` (mailto); its label is `links.emailAddress`.
   3. WhatsApp: `ExternalLink` to `links.whatsapp` (click-to-chat).
 - Right, `BriefBuilder` (client), `data-anim="reveal"`: `<form aria-labelledby={headingId} class="flex flex-col gap-8 rounded-3xl border border-line bg-band p-6 md:p-8 lg:p-10">`,
-  `onSubmit` prevented; nothing is posted. `headingId` is an `sr-only` heading from `contact.brief.heading`.
+  `onSubmit` prevented; nothing is posted. `headingId` is an `sr-only` `<h3>` from `contact.brief.heading`.
 
 ### 8.2 Brief builder parts
 
@@ -658,11 +703,14 @@ Every project has the same four images: `{project}Card`, `{project}Shot1`, `{pro
   AI agents pressed on load. A pressed chip shows `CheckIcon` (`size-3.5`), so state isn't colour alone.
 - **(02) Timeline, single select** (`TimelineSegments`): `<fieldset>` + `<legend>`; track
   `grid grid-cols-3 rounded-xl border border-line bg-bg p-1`; each option is a native
-  `<input type="radio" name="timeline" class="peer sr-only">` inside its `<label class="grid min-h-11 cursor-pointer place-items-center rounded-lg px-2 text-center text-small">`.
+  `<input type="radio" name="timeline" class="peer sr-only">` inside its `<label class="grid cursor-pointer">`,
+  followed by a `<span class="grid min-h-11 place-items-center rounded-lg px-2 text-center text-small">` carrying the segment look.
   Arrow keys move between options natively. This month checked on load.
 - **(03) Repeat, textarea** (`RepeatField`): `<label for>` in `{metaLabel} uppercase`;
   `<textarea rows="4" class="min-h-30 w-full resize-y rounded-xl border border-muted/70 bg-bg px-4.5 py-4 text-body-lg leading-normal text-text placeholder:text-muted focus-visible:border-accent {focusRing}">`
-  with placeholder `contact.brief.placeholders[0]`.
+  with placeholder `contact.brief.placeholders[0]`. `maxLength` 500, so the mailto stays a safe length.
+- **Uncontrolled:** the radios and the textarea are uncontrolled; `hooks/useBriefState.ts` reads
+  them back from the form on mount, so a choice or text entered before hydration survives it.
 - **Send** (`SendBriefLink`): `<a href={mailto}>`
   `flex items-center justify-between gap-4 rounded-full bg-accent py-2 pr-2 pl-7 text-lead font-semibold text-on-accent hover:bg-text active:bg-muted {focusRing}`:
   the label plus `sr-only` `contact.brief.sendHint`, then `grid size-11 place-items-center rounded-full bg-bg text-accent` holding `ArrowRightIcon`.
@@ -671,11 +719,13 @@ Every project has the same four images: `{project}Card`, `{project}Shot1`, `{pro
   mailto, so it works without JS.
 - **Summary:** `<p aria-live="polite" class="text-center {metaLabel}">`: pressed needs joined by
   " + ", a " · ", then the timeline; `contact.brief.summaryEmpty` when no need is pressed.
+- **No JS:** the chips, timeline, textarea and summary take `noscript:hidden` (Send can't follow
+  them); Send keeps the default brief's mailto.
 
 | Control | Default | Hover | Focus-visible | Pressed / checked | Active |
 |---|---|---|---|---|---|
 | Chip | `border-line text-muted` | `border-muted text-text` | `focusRing` | `border-accent bg-accent text-on-accent` + check | `bg-line` (unpressed) |
-| Segment | `text-muted` | `text-text` | `peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-text` | `peer-checked:bg-text peer-checked:text-bg` | `bg-line` |
+| Segment | `text-muted` | `peer-not-checked:hover:text-text` (unchecked only) | `peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-text` | `peer-checked:bg-text peer-checked:text-bg` | `peer-not-checked:active:bg-line` (unchecked only) |
 | Textarea | `border-muted/70` | same | `border-accent` + `focusRing` | n/a | n/a |
 | Send | `bg-accent text-on-accent` | `bg-text` | `focusRing` | n/a | `bg-muted` |
 | Contact row | `text-text`, kind `text-muted` | label `text-accent` | `focusRing` | n/a | `bg-band` |
@@ -685,7 +735,7 @@ Every project has the same four images: `{project}Card`, `{project}Shot1`, `{pro
 | Element | Phone 360 | Tablet 768 | Desktop 1440 | 4K 3840 |
 |---|---|---|---|---|
 | Layout | stacked | stacked | 2 cols (616 each) | 2 cols (720 each) |
-| Heading (`text-heading-xl`) | 52px | 58px | 108px | 124px |
+| Heading (`text-heading-xl`) | 52px | 75px | 112px | 124px |
 | Lead / links | 17px / 15px, rows 48 tall, max 400 | same | same | same |
 | Builder padding | 24 | 32 | 40 | 40 |
 | Chips | 15px, 44 tall, wrap | same | same | same |
@@ -710,12 +760,15 @@ Every project has the same four images: `{project}Card`, `{project}Shot1`, `{pro
 | `contact.brief.send` / `.sendHint` | "Send brief"; hidden "opens your email app" | 2 / 5 words |
 | `contact.brief.summaryEmpty` | Shown when no need is picked | 5 words |
 | `contact.brief.mail.subjectPrefix` / `.need` / `.timeline` / `.repeat` / `.none` | Email subject and body labels (no em dashes) | 5 words each |
+| `contact.brief.mail.repeatEmpty` | Email body line when the textarea is empty ("Left blank") | 5 words |
 
 ### 8.5 Components, images, motion
 
 - **Components:** `components/home/contact/ContactSection.tsx`, `ContactLinks.tsx`,
+  `ContactRow.tsx` (the shared contact row: label, kind, optional new tab and tracking key),
   `BriefBuilder.tsx` (client), `NeedChips.tsx`, `TimelineSegments.tsx`, `RepeatField.tsx`,
-  `SendBriefLink.tsx`; `hooks/useBriefState.ts`; `lib/brief.ts` (mailto and summary, pure). **Images:** none.
+  `SendBriefLink.tsx`; `hooks/useBriefState.ts`; `lib/brief.ts` (mailto and summary, pure);
+  `lib/track.ts` (the one tracking key, `book-call`). **Images:** none.
 - **Motion (later):** the left column and the builder reveal on scroll (builder delayed 0.15s). The
   placeholder (`data-anim="brief-placeholder"`) rotates through `placeholders` every 2.4s, and stops
   on focus or once typed in; the first phrase stays under reduced motion.
@@ -759,10 +812,12 @@ Every project has the same four images: `{project}Card`, `{project}Shot1`, `{pro
 |---|---|---|
 | `footer.social.linkedin` / `.instagram` / `.discord` / `.whatsapp` | Link text: the platform name | 1 word |
 | `footer.copyrightName` | "Muhammad Waqas" (facts → Name); © and year come from code | fixed |
-| `footer.wordmark` | "MARWIX" (facts → Brand); the component splits the letters | fixed |
+| `footer.wordmark` `{lead, accent, tail}` | "MARWIX" (facts → Brand) as "MAR" / "W" / "IX"; `lib/wordmarkLetters.ts` splits the letters | fixed |
 | `links.emailAddress`, `links.email`, `links.*` | Addresses (facts) | fixed |
 
-- **Components:** `components/SiteFooter.tsx`, `FooterLinks.tsx`, `FooterWordmark.tsx`. **Images:** none.
+- **Components:** `components/SiteFooter.tsx`, `FooterLinks.tsx`, `FooterWordmark.tsx`;
+  `lib/wordmarkLetters.ts` (splits `footer.wordmark` into single letters: the first letter of
+  `lead` (M) and `accent` (W) are violet, the rest dim). **Images:** none.
 - **Motion (later):** when 35% of the footer is in view, M and W fade and rise from
   `translateY(18%) scale(.9)`; then A R I X open from `max-width: 0` to `1em` and fade in, staggered
   0.1s. Reduced motion: the full word, still.

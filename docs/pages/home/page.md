@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-09-24
 
-> **Status:** In build — batch 1 (Hero + Marquee) built and checked; waiting on the user's review
+> **Status:** Static build complete and counting wired; next: the GSAP motion pass, then deploy
 
 **The one question:** Can they help me?
 
@@ -25,15 +25,20 @@ section and the footer.
 
 ## Current State
 
-Sections 1–3 (foundation + Nav, Hero, Marquee) are built statically: build, lint and screens are
-green at 360/768/1440/3840; the audit is done (0 HIGH, both SHOULDs fixed). `app/page.tsx` renders
-`HeroSection` and `MarqueeStrip`, plus a temporary spacer for the sections still to come. Next: the
-user reviews batch 1 (Hero + Marquee), then batch 2 (Agents both variants + Process).
+All nine sections (foundation + Nav, Hero, Marquee, Agents, Process, Web, Proofs + takeover,
+Contact, Footer) are built statically. Agents ships variant A (the tab list) only;
+`AgentsSection` takes no props and `AgentsStack` is its no-JS `<noscript>`-style fallback (passed
+as `AgentsTabs`' `fallback`). Build, lint, tsc and screens are green at
+360/768/1024/1100/1280/1440/3840. Type tokens are rem-based (zoom-safe); lead checked 360–3840,
+nothing overflows. The takeover's history paths, its no-JS paths and the brief mailto have all
+been checked in a real browser. Every batch has been audited; all HIGH and SHOULD items are fixed
+or decided. Counting is wired (Umami Cloud). Next: the GSAP motion pass, then deploy.
 
 ## Key Files
 
-- `app/page.tsx` — renders Hero and Marquee, plus a temporary spacer for the remaining sections
-- `app/layout.tsx` — renders `SiteHeader` and the skip link; no footer yet
+- `app/page.tsx` — renders the nine sections in order: Hero, Marquee, Agents, Process, Web,
+  Proofs, Contact, then the takeover layer (`ProjectTakeovers`)
+- `app/layout.tsx` — renders the skip link, `SiteHeader` and `SiteFooter` around `children`
 - `content/home.ts` — copy for the page's sections, written to the spec's slots
 - `content/shared.ts` — nav and footer copy, written (`footer.social`, `footer.copyrightName`)
 - `docs/pages/home/ui-spec.md` — ui-designer's spec, written
@@ -59,6 +64,50 @@ user reviews batch 1 (Hero + Marquee), then batch 2 (Agents both variants + Proc
 - `components/home/hero/HeroActions.tsx` — the mono tag plus See proofs / Book a call row
 - `components/home/MarqueeStrip.tsx` — the marquee strip
 - `components/icons/AsteriskIcon.tsx` — the marquee's drawn asterisk separator
+- `components/home/agents/` — AgentsSection, AgentsTabs, AgentsStack (variant A's no-JS
+  fallback), AgentRowText, AgentDemoFrame, AgentDemo, ChatDemo, LeadsDemo, ReportDemo, SyncDemo,
+  DemoStatusPill
+- `hooks/useRovingTabs.ts` — roving-tabindex keyboard behaviour for variant A's tablist; `select`
+  never moves focus, only the keyboard path does
+- `lib/agents.ts` — the demo kind per offer (type-tied to `agents.items`), and the row ids a tab
+  and its panel share
+- `components/home/process/` — ProcessSection, ProcessLoop, ProcessStep, ProcessRail, ProcessRing
+- `lib/listNumber.ts` — a list row's two-digit number from its zero-based index (0 → "01"), shared
+  by numbered rows
+- `components/home/web/` — WebSection (sticky left column from `lg`), WebStepRow (the four
+  numbered rows)
+- `components/home/proofs/` — ProofsSection, ProofCard (all three identical), ProjectTakeovers
+  (the takeover layer, rendered once after Contact), ProjectTakeover (one project's `<dialog>`),
+  TakeoverController (runs `useHashTakeover`), TakeoverTopBar, TakeoverCloseLink,
+  TakeoverNextLink, TakeoverInfoRows, TakeoverInfoRow, TakeoverStats (Exile's IN USE numbers),
+  TakeoverShots, ProjectVisitLink
+- `hooks/useHashTakeover.ts` — opens/closes the takeover `<dialog>`s from the address hash with
+  `showModal()`; a direct load on a takeover hash rewrites the entry to `#proofs` and pushes the
+  project once, so Esc, Close and Back all resolve through `history.back()`; hash parsing never
+  decodes
+- `lib/proofs.ts` — the project order/keys, each project's dialog id, image names, two-digit
+  number and next-project wraparound
+- `lib/takeoverLinks.ts` — Close (raises `cancel`, same path as Esc) and Next (replaces the hash,
+  so Back still closes rather than stepping through projects) click handlers
+- `components/home/contact/` — ContactSection, ContactLinks, ContactRow (shared by all side rows
+  including Book a call), BriefBuilder (client), NeedChips, TimelineSegments, RepeatField,
+  SendBriefLink
+- `hooks/useBriefState.ts` — the brief's uncontrolled radios/textarea read back on mount, so a
+  choice made before hydration survives it
+- `lib/brief.ts` — the brief's default choices, the summary line and the mailto builder (surrogate-safe
+  encoding); `mail.repeatEmpty` covers an empty "what do you repeat" answer
+- `components/SiteFooter.tsx`, `components/FooterLinks.tsx`, `components/FooterWordmark.tsx` —
+  the footer row (email, filled socials, © + build-time year) and the full-bleed `aria-hidden`
+  MARWIX wordmark
+- `lib/wordmarkLetters.ts` — splits the wordmark into letters, marking M and W as accent
+- `lib/track.ts` — the one tracking key (`data-umami-event="book-call"`) every Book a call link
+  carries
+- `lib/analytics.ts` — the Umami Cloud settings (script src, `NEXT_PUBLIC_UMAMI_WEBSITE_ID`,
+  domain scope)
+- `components/Analytics.tsx` — loads the Umami script (rendered in `app/layout.tsx`); renders
+  nothing until the website ID is set
+- `lib/styles.ts` — shared style helpers, including the takeover's cream-side tokens
+  (`pillInk`, `focusRingOnCream`, `metaLabelOnCream`)
 
 ## Decisions
 
@@ -245,14 +294,65 @@ user reviews batch 1 (Hero + Marquee), then batch 2 (Agents both variants + Proc
 - 2026-09-24 — User's choice: while scrolling past the hero, the transparent Nav's links overlap
   the big name; this stays as is in the static build and is fixed by the GSAP pass's hero-text
   fade on scroll (the Nav decision is unchanged).
+- 2026-09-24 — The user approved batch 1 (Hero + Marquee). Batch 2 starts: Agents (both variants A
+  and B) + Process, built statically in parallel.
+- 2026-09-24 — For the Agents comparison, the page temporarily renders variant A at `#agents` and
+  variant B below it at `#agents-b`; the loser and the preview are deleted once the user picks.
+- 2026-09-24 — Agents built statically in both layouts on the page for the user to compare: A is
+  an accessible vertical tablist with one demo panel and variant B's list as the no-JS fallback;
+  B is a static list with a demo per row. Demos show their finished state with `data-demo-order`
+  and `data-anim` hooks for the GSAP pass.
+- 2026-09-24 — Process is built as one `<ol>` of four steps that CSS places as a column with a
+  bordered return loop below `xl`, or around an `aria-hidden` SVG ring from `xl`; static violet
+  lines, all dots lit, `data-anim` hooks in place.
+- 2026-09-24 — Audit fixes: the demo panel's aspect ratio is a minimum (it grows instead of
+  clipping; was clipping at 1024px); agent tabs and panels are named by number and title only; the
+  tab hook's select no longer moves focus (only the keyboard does), so the GSAP auto-advance can't
+  steal focus; demo kinds are type-tied to `agents.items`; the process loop label stays available
+  to screen readers at `xl` (`xl:sr-only`).
+- 2026-09-24 — The Agents Lead follow-up line is now "I set up agents that follow up on your new
+  leads.", replacing "so no new lead goes cold", which promised a result (constitution §7.3).
+- 2026-09-24 — Agents ships variant A (the tab list) only; `AgentsStack` stays as its no-JS
+  `<noscript>` fallback. The temporary variant-B preview at `#agents-b` is removed;
+  `AgentsSection` takes no props.
+- 2026-09-24 — The big section headings get slightly looser letter spacing (`heading-sm`/`heading`
+  -0.025em, `heading-xl` -0.03em; were -0.04em / -0.045em) because letters touched at desktop
+  sizes (user's choice).
+- 2026-09-24 — The 8 fluid type tokens now use rem bounds and a rem + vw middle, so text grows
+  with browser zoom and font-size settings (WCAG 1.4.4); sizes at 360px and at the max are
+  unchanged; mid widths are slightly larger (e.g. hero name 117px at 768, was 100).
+- 2026-09-24 — Web built: two columns from `lg` (left sticky at 120px, CSS only), four static step
+  rows; stacks below `lg`. No client JS.
+- 2026-09-24 — Proofs built: three identical `ProofCard`s and one native `<dialog>` takeover per
+  project, driven by the hash (`:target` without JS, `showModal` with JS). Every open takeover
+  has a page entry beneath it (a direct load rewrites its entry to #proofs and pushes the
+  project), so Back, Esc and Close all use `history.back()`; hash parsing never decodes, so a
+  malformed URL can't crash the page. The takeover top bar is solid `bg-cream` with an `ink/15`
+  hairline (the blurred 85% bar failed contrast).
+- 2026-09-24 — The user accepted that the full-screen takeover covers the nav's Book a call while
+  a project is open (Close is one tap away). The user will add this to the constitution §3
+  themselves; until then audits may flag it.
+- 2026-09-24 — Contact built: side links from one `ContactRow` (Book a call row counted), a client
+  brief builder whose radios and textarea are uncontrolled and read back on mount; without JS,
+  the controls Send can't carry are hidden and Send keeps the default brief mailto. Timeline
+  hover/active style only unchecked segments. An empty "what do you repeat" answer reads "Left
+  blank" (`mail.repeatEmpty`). Textarea capped at 500 characters.
+- 2026-09-24 — Footer built: email, filled socials, © + build-time year, then the full-bleed
+  aria-hidden MARWIX wordmark (M and W accent via `lib/wordmarkLetters.ts`, A R I X dim).
+- 2026-09-24 — Every Book a call link uses one tracking key (`lib/track.ts`).
+- 2026-09-24 — Web step 1 reads "First, I plan what your site needs to do." (first person).
+- 2026-09-24 — Visits and Book a call clicks are counted with Umami Cloud (cookieless):
+  `components/Analytics.tsx` loads `cloud.umami.is/script.js` only when
+  `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set and only counts on `marwix.dev`; every Book a call link
+  carries `data-umami-event="book-call"` from `lib/track.ts`.
 
 ## Open Questions
 
-- **Choice:** Agents: pick variant A (tabs) or B (all shown) after viewing.
+- **Note:** `AgentsStack` ships only as A's no-JS fallback; its markup is also in the page payload
+  for JS visitors (audit NIT, accepted for now).
+- **Review:** phone return-line arrows are barely visible — for the user to judge.
 - **To build:** Hero — the user's new portrait (pending file); `hero.portraitAlt` needs a check
   once it arrives.
-- **To build:** Proofs — the "See proofs" hero button jumps to `#proofs`, which lands with
-  section 7; until then it does nothing.
 - **Ship check:** `public/images/portrait.png` is a grey stand-in with a real path in
   `lib/images.ts`, so the null-image guard won't catch it; it must be swapped for the user's photo
   (and `hero.portraitAlt` rechecked) before deploy.
@@ -261,4 +361,8 @@ user reviews batch 1 (Hero + Marquee), then batch 2 (Agents both variants + Proc
 - **To build:** Proofs — Exile, Design Vault and MARWIX-SKILLS screenshots (pending from the
   user); 12 shot alt-text `[FILL]` markers (three projects × card + 3 shots) clear when the
   images arrive.
+- **To do (user):** create a free Umami Cloud account, add the website marwix.dev and send the
+  lead its website ID; it's set as `NEXT_PUBLIC_UMAMI_WEBSITE_ID` in Vercel and needs a redeploy.
+- **Note:** after Back on a direct-load takeover, focus isn't returned to the card (minor).
+- **Constitution:** the user to add the takeover/Book a call exception under §3.
 </content>

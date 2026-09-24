@@ -2,9 +2,9 @@
 import { condensed } from "@/lib/styles";
 
 const sizeClasses = {
-  "heading-sm": "text-heading-sm leading-[0.95] tracking-[-0.04em]",
-  heading: "text-heading leading-[0.95] tracking-[-0.04em]",
-  "heading-xl": "text-heading-xl leading-[0.9] tracking-[-0.045em]",
+  "heading-sm": "text-heading-sm leading-[0.95] tracking-[-0.025em]",
+  heading: "text-heading leading-[0.95] tracking-[-0.025em]",
+  "heading-xl": "text-heading-xl leading-[0.9] tracking-[-0.03em]",
 } as const;
 
 type SectionHeadingProps = {

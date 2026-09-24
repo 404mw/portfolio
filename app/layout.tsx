@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Analytics } from "@/components/Analytics";
+import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SkipLink } from "@/components/SkipLink";
 import { bricolage, geist, geistMono } from "@/lib/fonts";
@@ -25,6 +27,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main id={sectionIds.main} tabIndex={-1} className="focus:outline-none">
           {children}
         </main>
+        <SiteFooter />
+        <Analytics />
       </body>
     </html>
   );

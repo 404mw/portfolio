@@ -45,7 +45,9 @@ All three families are on Google Fonts; they load with `next/font` in `lib/fonts
 
 ### Text-size tokens
 
-Phone-first: each `clamp()` minimum is the 360px size, and the maximum caps it at 4K.
+Phone-first: each `clamp()` minimum is the 360px size, and the maximum caps it at 4K. Bounds are
+in rem (1rem = 16px at default settings), and the middle term mixes rem + vw, so the fluid tokens
+scale with browser zoom and the font-size setting; the fixed px tokens scale with zoom.
 
 | Token | Value | Use |
 |---|---|---|
@@ -55,16 +57,16 @@ Phone-first: each `clamp()` minimum is the 360px size, and the maximum caps it a
 | `--text-body` | `15px` | Body text, buttons |
 | `--text-body-lg` | `16px` | Descriptions under rows and steps, chat bubbles |
 | `--text-lead` | `17px` | Lead lines under headings |
-| `--text-summary` | `clamp(20px, 2vw, 26px)` | The takeover's summary paragraph |
+| `--text-summary` | `clamp(1.25rem, 1.106rem + 0.64vw, 1.625rem)` | The takeover's summary paragraph |
 | `--text-step` | `32px` | Process step titles |
-| `--text-card` | `clamp(30px, 3vw, 44px)` | Proof card titles |
-| `--text-row` | `clamp(34px, 4.2vw, 58px)` | Agent list rows and web step rows |
+| `--text-card` | `clamp(1.875rem, 1.589rem + 1.27vw, 2.75rem)` | Proof card titles |
+| `--text-row` | `clamp(2.125rem, 1.596rem + 2.35vw, 3.625rem)` | Agent list rows and web step rows |
 | `--text-marquee` | `40px` | The marquee strip |
-| `--text-heading-sm` | `clamp(40px, 5vw, 80px)` | The web section heading |
-| `--text-heading` | `clamp(44px, 6.5vw, 104px)` | Section headings (how I work, proofs) |
-| `--text-heading-xl` | `clamp(52px, 7.5vw, 124px)` | The contact heading |
-| `--text-takeover` | `clamp(56px, 10vw, 168px)` | The takeover's project title |
-| `--text-hero` | `clamp(72px, 13vw, 220px)` | The hero name |
+| `--text-heading-sm` | `clamp(2.5rem, 1.773rem + 3.23vw, 5rem)` | The web section heading |
+| `--text-heading` | `clamp(2.75rem, 1.661rem + 4.84vw, 6.5rem)` | Section headings (how I work, proofs) |
+| `--text-heading-xl` | `clamp(3.25rem, 1.997rem + 5.57vw, 7.75rem)` | The contact heading |
+| `--text-takeover` | `clamp(3.5rem, 1.592rem + 8.48vw, 10.5rem)` | The takeover's project title |
+| `--text-hero` | `clamp(4.5rem, 2rem + 11.11vw, 13.75rem)` | The hero name |
 | `--text-footer-mark` | `25vw` | The giant footer wordmark |
 
 ## Layout
@@ -99,3 +101,6 @@ Section-by-section layout lives in `docs/pages/home/ui-spec.md`.
 - 2026-09-24 — Added `--spacing-gutter: clamp(20px, 4vw, 56px)` and
   `--spacing-section: clamp(80px, 12vw, 160px)` (user's yes). Reason: the page gutter and
   section padding repeat on every section; the values were already set above.
+- 2026-09-24 — Fluid type tokens moved to rem bounds with a rem + vw middle (user's yes). Reason:
+  pure-vw type doesn't grow with browser zoom (WCAG 1.4.4). Sizes at 360px and at the max are
+  unchanged; mid widths are slightly larger.

@@ -1,9 +1,10 @@
-// The one Book a call link (Cal.com, new tab). `data-track="book-call"` makes it the single
-// place Book a call clicks are counted (constitution §11). Variants: `nav` (the nav pill) and
-// `hero` (the hero pill).
+// The Book a call pill (Cal.com, new tab). It spreads `bookCallTrackProps` from `lib/track.ts`, the one
+// event every Book a call link is counted under (constitution §11); the Contact row uses it too.
+// Variants: `nav` (the nav pill) and `hero` (the hero pill).
 import { ExternalLink } from "@/components/ExternalLink";
 import { links, nav } from "@/content/shared";
 import { pillPrimary } from "@/lib/styles";
+import { bookCallTrackProps } from "@/lib/track";
 
 // `!` so the nav size wins over the pill's default size, whatever the CSS order.
 const variantClasses = {
@@ -15,7 +16,11 @@ type BookCallLinkProps = { readonly variant: keyof typeof variantClasses };
 
 export function BookCallLink({ variant }: BookCallLinkProps) {
   return (
-    <ExternalLink href={links.bookCall} data-track="book-call" className={variantClasses[variant]}>
+    <ExternalLink
+      href={links.bookCall}
+      {...bookCallTrackProps}
+      className={variantClasses[variant]}
+    >
       {nav.bookCall}
     </ExternalLink>
   );

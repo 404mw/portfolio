@@ -41,7 +41,7 @@ export const agents = {
     },
     {
       title: "Lead follow-up",
-      line: "I set up follow-ups so no new lead goes cold.",
+      line: "I set up agents that follow up on your new leads.",
       slug: "lead-agent",
     },
     {
@@ -113,7 +113,7 @@ export const web = {
   heading: { lead: "Your website,", accent: "start to finish." },
   lead: "One person, from plan to launch: your website or web app, with your automations wired in from the start.",
   steps: [
-    { title: "Strategy", line: "First, we plan what your site needs to do." },
+    { title: "Strategy", line: "First, I plan what your site needs to do." },
     { title: "Design", line: "Layouts and visuals you review before anything is built." },
     { title: "Build", line: "Fast on phones and computers, and easy for you to update." },
     { title: "Launch & care", line: "Domain, hosting and analytics set up, then fixes after launch." },
@@ -242,6 +242,7 @@ export const contact = {
       timeline: "Timeline:",
       repeat: "What we repeat every week:",
       none: "Not picked yet",
+      repeatEmpty: "Left blank",
     },
   },
 } as const;
