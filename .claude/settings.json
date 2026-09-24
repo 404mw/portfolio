@@ -1,0 +1,94 @@
+{
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "opus"
+  },
+  "model": "opus",
+  "effortLevel": "medium",
+  "modelSettings": {
+    "claude-opus-5": {
+      "effortLevel": "medium"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    }
+  },
+  "permissions": {
+    "deny": [
+      "Bash(rm *)",
+      "Bash(rmdir *)",
+      "Bash(unlink *)",
+      "Bash(shred *)",
+      "Bash(del *)",
+      "Bash(erase *)",
+      "Bash(rd *)",
+      "Bash(rimraf *)",
+      "Bash(npx rimraf *)",
+      "Bash(find * -delete*)",
+      "Bash(git rm *)",
+      "Bash(git clean *)",
+      "Bash(git reset --hard *)",
+      "Bash(git checkout -- *)",
+      "Bash(git branch -d *)",
+      "Bash(git branch -D *)",
+      "Bash(git branch --delete *)",
+      "Bash(git tag -d *)",
+      "Bash(git push * --delete *)",
+      "Bash(git stash drop *)",
+      "Bash(git stash clear *)",
+      "Bash(git worktree remove *)",
+      "Bash(gh * delete *)",
+      "Bash(vercel rm *)",
+      "Bash(vercel remove *)",
+      "PowerShell(Remove-Item *)",
+      "PowerShell(Clear-Content *)",
+      "PowerShell(Clear-RecycleBin *)",
+      "PowerShell(git rm *)",
+      "PowerShell(git clean *)",
+      "PowerShell(git reset --hard *)",
+      "PowerShell(git checkout -- *)",
+      "PowerShell(git branch -d *)",
+      "PowerShell(git branch -D *)",
+      "PowerShell(git stash drop *)",
+      "PowerShell(git stash clear *)",
+      "Artifact(action:delete)",
+      "ArtifactData(action:delete)",
+      "mcp__claude_ai_Claude_Docs__delete"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -File \"$CLAUDE_PROJECT_DIR\\.claude\\hooks\\check-bom.ps1\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell|Artifact|ArtifactData|mcp__claude_ai_Claude_Docs__delete",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-deletes.mjs\""
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-raw-colors.mjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-money-figures.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}
