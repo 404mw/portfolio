@@ -34,7 +34,8 @@ type NetworkInput = {
 
 const SEED = 20260925;
 const POINT_COUNT = 96;
-const TEXT_PADDING = 16;
+/** CSS pixels around each text box that no node sits in (the drift keeps to it too). */
+export const TEXT_PADDING = 16;
 const LINKS_PER_NODE = 2;
 
 /** Node and agent counts by canvas width: the first matching `below` wins. */

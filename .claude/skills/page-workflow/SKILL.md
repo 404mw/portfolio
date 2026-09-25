@@ -43,13 +43,13 @@ Go to Phase 2 only once you can write a complete brief without guessing.
    - Spawn `page-doc-manager` (decision, template below) to record the decision line, sections,
      key files and open questions from the brief. It must not touch Current State or Status:
      the code isn't there yet.
-10. **After `web-coder` reports, in parallel, in one message:**
-    - Spawn `page-doc-manager` (current state) to write Current State and Status from the real
-      code, using the `Decision to record` line web-coder returned. When a round has several
-      web-coder passes (e.g. audit fixes), do this once at the end of the round.
-    - Spawn `code-auditor` on every changed file, including `content/`.
-11. Fix every HIGH audit finding (copy findings to `copywriter`, code findings to `web-coder`)
-    before going on.
+10. **After `web-coder` reports:** spawn `page-doc-manager` (current state) to write Current State
+    and Status from the real code, using the `Decision to record` line web-coder returned. When a
+    round has several web-coder passes, do this once at the end of the round.
+11. **Audit only on request or before a push.** Don't spawn `code-auditor` as a routine step.
+    Run it when the user asks, and once before any `git push`, on every file changed since the
+    last push (including `content/`). Fix every HIGH finding before pushing (copy findings to
+    `copywriter`, code findings to `web-coder`).
 
 **Parallel limits:** `copywriter` always finishes before `web-coder` starts. Two `web-coder`s may
 run at once only on files that don't overlap, or each in its own worktree (`isolation:
@@ -60,7 +60,7 @@ run at once only on files that don't overlap, or each in its own worktree (`isol
     list isn't empty, show the user what's left and don't deploy to production. Otherwise confirm
     with the user, then spawn `deployer`.
 
-**Skip steps 7, 11 and 12 for small, low-risk changes**, such as a spacing tweak, a link swap, or
+**Skip steps 7 and 12 for small, low-risk changes**, such as a spacing tweak, a link swap, or
 a one-line copy fix with no new claim. For these, read the diff yourself. When unsure, run them.
 
 **The user's copy edits:** the user may edit `content/` directly at any time. Those edits are

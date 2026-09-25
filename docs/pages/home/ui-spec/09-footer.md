@@ -47,4 +47,5 @@ Shared rules and parts (§0): [`../ui-spec.md`](../ui-spec.md). Page doc: [`../s
   `lead` (M) and `accent` (W) are violet, the rest dim). **Images:** none.
 - **Motion (later):** when 35% of the footer is in view, M and W fade and rise from
   `translateY(18%) scale(.9)`; then A R I X open from `max-width: 0` to `1em` and fade in, staggered
-  0.1s. Reduced motion: the full word, still.
+  0.1s. Reduced motion: no rise, scale or opening; the full word (all six letters at full width)
+  fades in on the same trigger. Without JS: the full word, still.

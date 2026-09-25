@@ -91,17 +91,18 @@ export const agents = {
   },
 } as const;
 
-// Facts → How the user works. No agent names, tools or counts.
+// Facts → How the user works; steps as the user worded them on 2026-09-25 (facts lines pending).
+// No agent names, tools or counts.
 export const process = {
   number: "02",
   label: "How I work",
   heading: { lead: "AI agents run", accent: "every job." },
   stepLabel: "Step",
   steps: [
-    { title: "Written rules", line: "Every job starts as clear, written instructions." },
-    { title: "Agents do the work", line: "AI agents do the work, following those rules." },
-    { title: "They check themselves", line: "The agents check their own work before you see it." },
-    { title: "Lessons update the rules", line: "What each job teaches goes back into the rules." },
+    { title: "Guardrails", line: "Every job starts with the rules enforced." },
+    { title: "The team", line: "Specialized agents follow them or work in a defined boundary." },
+    { title: "Independent check", line: "A separate agent verifies and validates their work." },
+    { title: "Lessons kept", line: "The workflow gets updated each cycle or session." },
   ],
   loopLabel: "Next job, better rules.",
 } as const;

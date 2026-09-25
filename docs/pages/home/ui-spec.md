@@ -93,9 +93,14 @@ file plus the one section you work on. The § numbers stay as they were (for exa
 
 ## 10. Motion hooks, summary
 
-Every `data-anim` element's static state is its final state. The GSAP pass uses `gsap.matchMedia()`
-and does nothing under `prefers-reduced-motion: reduce`. Generic scroll reveal: `data-anim="reveal"`,
-with an optional `data-anim-delay` (ms), from `y: 56, opacity: 0`.
+Every `data-anim` element's static state is its final state. The GSAP pass uses `gsap.matchMedia()`.
+Under `prefers-reduced-motion: reduce` (constitution §5) it keeps short opacity fades and turns off
+anything that moves: an entrance that slides, rises or scales becomes a short opacity fade;
+parallax, mouse drift, scale on scroll, hover lifts and indents, auto-advance, looping pulses and
+typing effects are off, leaving the static final state. Two exceptions: the marquee keeps looping
+(it pauses on hover in both modes), and the nav progress bar still tracks scroll position, set
+directly with no scrub smoothing (1.5). Generic scroll reveal: `data-anim="reveal"`,
+with an optional `data-anim-delay` (ms), from `y: 56, opacity: 0`; under reduce, from `opacity: 0` only.
 
 ## Tokens
 
@@ -125,6 +130,6 @@ until `lg` (each card about 600px tall at 768) or stretching the third card acro
 10. Report title `text-summary`; Send brief `text-lead`.
 11. Radii: 24px for panels and cards, 12px inside.
 12. New tab for Visit, WhatsApp and the footer socials, with a hidden hint.
-13. Static accents: the selected row's line full, sync packets at their midpoints, and the progress bar empty under reduced motion.
+13. Static accents: the selected row's line full and sync packets at their midpoints, also under reduced motion. The progress bar is empty without JS; under reduced motion it still tracks scroll position, set directly with no smoothing (constitution §5, amended 2026-09-25).
 14. Loop line 2px.
 15. Section labels use a hairline instead of v3's em dash.

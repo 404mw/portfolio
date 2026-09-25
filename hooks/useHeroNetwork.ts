@@ -5,14 +5,21 @@
 // coalesced to one frame, and a draw is skipped when the CSS size and ratio match the last one
 // drawn, so a notification landing just after a draw doesn't repeat it. The colour comes from
 // the `--color-accent` token; if it can't be read, nothing is drawn. Measuring lives in
-// lib/heroNetworkLayout.ts.
-import { useEffect, type RefObject } from "react";
+// lib/heroNetworkLayout.ts. It returns a ref to the scene last drawn (network, colour, scale and
+// the keep-outs it was built around), or null while the canvas holds none, so the motion
+// (hooks/useHeroNetworkMotion.ts) runs on the same network instance and restarts when a redraw
+// swaps it.
+import { useEffect, useRef, type RefObject } from "react";
 import { backingScale } from "@/lib/backingScale";
-import { drawHeroNetwork } from "@/lib/drawHeroNetwork";
+import { drawHeroNetwork, type HeroNetworkScene } from "@/lib/drawHeroNetwork";
 import { buildHeroNetwork } from "@/lib/heroNetwork";
 import { canvasLayoutSize, keepOutRects } from "@/lib/heroNetworkLayout";
 
-export function useHeroNetwork(canvasRef: RefObject<HTMLCanvasElement | null>) {
+export function useHeroNetwork(
+  canvasRef: RefObject<HTMLCanvasElement | null>,
+): RefObject<HeroNetworkScene | null> {
+  const sceneRef = useRef<HeroNetworkScene | null>(null);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
@@ -38,15 +45,14 @@ export function useHeroNetwork(canvasRef: RefObject<HTMLCanvasElement | null>) {
       canvas.width = Math.round(width * scale);
       canvas.height = Math.round(height * scale);
       lastDrawn = key;
+      sceneRef.current = null;
       if (!accent) return;
 
-      const network = buildHeroNetwork({
-        width,
-        height,
-        textRects: keepOutRects(root, "text", canvas),
-        agentRects: keepOutRects(root, "agents", canvas),
-      });
+      const textRects = keepOutRects(root, "text", canvas);
+      const agentRects = keepOutRects(root, "agents", canvas);
+      const network = buildHeroNetwork({ width, height, textRects, agentRects });
       drawHeroNetwork(ctx, network, { accent, scale });
+      sceneRef.current = { network, accent, scale, textRects, agentRects };
     };
 
     const schedule = () => {
@@ -76,6 +82,9 @@ export function useHeroNetwork(canvasRef: RefObject<HTMLCanvasElement | null>) {
       observer?.disconnect();
       resolution?.removeEventListener("change", onResolutionChange);
       if (frame !== 0) cancelAnimationFrame(frame);
+      sceneRef.current = null;
     };
   }, [canvasRef]);
+
+  return sceneRef;
 }

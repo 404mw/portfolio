@@ -32,4 +32,6 @@ Shared rules and parts (§0): [`../ui-spec.md`](../ui-spec.md). Page doc: [`../s
 | `marquee.items` (5) | Customer messages, lead follow-up, recurring reports, connected tools, websites end to end (facts: automation and build offers) | 4 words each |
 
 - **Component:** `components/home/MarqueeStrip.tsx`. **Images:** none.
-- **Motion (later):** `marquee-track` moves x 0 → −50% linearly (~28s), looping; still under reduced motion.
+- **Motion (later):** `marquee-track` moves x 0 → −50% linearly (~28s), looping. It keeps looping
+  under reduced motion (the one exception in constitution §5). In both modes it pauses while the
+  strip is hovered and resumes on leave.

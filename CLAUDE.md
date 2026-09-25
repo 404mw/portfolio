@@ -63,7 +63,7 @@ pre-digested brief. Never write site code or page text yourself.
 | Review a page doc (read-only) | `page-docs review` skill |
 | UI spec for a new section or page | `ui-designer` → `copywriter` → `web-coder` |
 | Tokens: setup, check, add | `design-tokens` skill (a new token needs the user's yes) |
-| Bug, rule and copy review | `code-auditor` |
+| Bug, rule and copy review | `code-auditor`, only when the user asks, or once before a `git push` (never as a routine step after a build or fix round) |
 | Build, lint, screen-size check | The lead (you), never delegated; fixes go to `web-coder` / `copywriter` |
 | Deploy, domain, DNS | `deployer`, after the user confirms |
 | Motion (GSAP) | `gsap-animator`, after the static page passes checks; loads the `gsap-*` skills |
@@ -78,10 +78,12 @@ Classify the task before routing any work:
 |---|---|---|
 | **1 — Tweak** | Existing component, small change (spacing, icon, link) | `web-coder` directly |
 | **1 — Copy tweak** | A line of copy in an existing slot | `copywriter` directly |
-| **2 — New section** | New UI element or a redesigned section | `ui-designer` → `copywriter` → [`web-coder` ‖ `page-doc-manager` (decision)] → [`page-doc-manager` (current state) ‖ `code-auditor`] |
-| **3 — New page / overhaul** | New route or full-page redesign | `page-doc-manager` (skeleton) → `ui-designer` → `copywriter` → [`web-coder` ‖ `page-doc-manager` (decision)] → [`page-doc-manager` (current state) ‖ `code-auditor`] |
+| **2 — New section** | New UI element or a redesigned section | `ui-designer` → `copywriter` → [`web-coder` ‖ `page-doc-manager` (decision)] → `page-doc-manager` (current state) |
+| **3 — New page / overhaul** | New route or full-page redesign | `page-doc-manager` (skeleton) → `ui-designer` → `copywriter` → [`web-coder` ‖ `page-doc-manager` (decision)] → `page-doc-manager` (current state) |
 
 `‖` means spawn together in one message. `copywriter` always finishes before `web-coder` starts.
+No tier includes `code-auditor`: it runs only when the user asks, or once before a `git push`
+(fix its HIGH findings before pushing).
 
 ### web-coder brief requirement
 

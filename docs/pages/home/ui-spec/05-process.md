@@ -104,4 +104,4 @@ Shared rules and parts (§0): [`../ui-spec.md`](../ui-spec.md). Page doc: [`../s
   the loop continuously (ring: along `process-path`; column: down the forward line and back up the
   return, a path built from the rail boxes); the dots dim to `bg-line` and light as it passes.
   There are 8 `process-dot` elements (4 rail, 4 ring); the motion pass animates the visible set.
-  Reduced motion: no runner, all dots lit (the static state).
+  Reduced motion: the reveals only fade (no rise); no runner, all dots lit (the static state).

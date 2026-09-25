@@ -26,7 +26,8 @@ scroll.
   strip; the strip is `aria-hidden`, with a visually hidden plain list of the same items exposed
   instead.
 - 2026-09-24 — Marquee static state: one clipped still row, with no sideways page scroll. Motion
-  (later): the GSAP pass loops it; under reduced motion it stays still.
+  (later): the GSAP pass loops it; per §5 the marquee is the one exception that keeps looping
+  under reduced motion, and it pauses on hover in both modes.
 - 2026-09-24 — Marquee separator is the SVG `AsteriskIcon` (`size-8`, `text-accent`), not a typed
   `✳`, which can render as a colour emoji on Apple devices and ignore the accent colour.
 

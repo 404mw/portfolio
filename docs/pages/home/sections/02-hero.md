@@ -1,6 +1,6 @@
 # Hero
 
-**Last Updated:** 2026-09-25 (portrait scaled 10% bigger at every breakpoint, user-approved)
+**Last Updated:** 2026-09-25 (network nodes drift; pulses ride the moving links)
 
 **The one question:** Who is this?
 
@@ -19,13 +19,36 @@ zoom change each draw once; the backing-store scale maths lives in `lib/backingS
 carries an `aria-label` built from the name keys. Build, lint and tsc are green; the audit found 0
 HIGH, and both SHOULDs (portrait alt, transform-proof keep-outs) plus its NITs are fixed.
 
+The hero now has its first GSAP motion pass (`HeroMotion`, rendered by `HeroSection`, renders
+nothing). Full motion: the portrait fades in; the two name lines rise from past their whole clip
+wrapper, staggered; the side line and bottom row fade up 14px; the side line's dot blinks between
+full and dim while the hero is in view; on scroll, `hero-text` wrappers move at 0.35× and fade out
+(plain `opacity`, so the side line, tag and buttons stay in the tab order and the accessibility
+tree; the lead checked this — opacity 0, visibility visible) by 75% of the viewport, and the portrait
+moves at 0.15× and scales to 1.06; the portrait also tilts subtly in 3D to face the pointer on fine
+pointers (up to ±3° `rotationY` left/right, ±2° `rotationX` up/down, 1100px perspective, smoothed
+over 0.7s, easing flat when the pointer leaves the window or the hero leaves the screen; it never
+moves, so it composes with the scroll parallax/scale). The canvas network's nodes each drift
+slowly and independently on `gsap.ticker` (seeded sine loops, 6–10px, 6–12s per axis, random
+phase, easing in over 1.5s), so every line moves on its own, clamped so nodes never enter the text
+boxes nor agents the portrait frame; travelling pulses (2px accent dots, ~1.5s per agent, 2–4 hops
+at 110px/s) ride the moving links. The whole network redraws each tick; off screen, with the tab
+hidden, or under reduced motion it shows the plain static drawing. Reduced motion keeps only short
+opacity fades; the blink, scroll parallax, pointer tilt and network motion are off. The lead
+screen-checked full and reduced motion at 1440×900 (`:3000`): both match spec, no sideways scroll,
+entrance clean; the lead also checked the tilt (corners 2.96°/1.96°, centre flat), combining with
+scroll with no errors; nodes moved about 10–15px independently over 3s with the lines following,
+at 145fps with no errors, and the canvas stayed identical across 6s under reduced motion.
+
 The portrait's positioner (`HeroPortrait`) is square at every width (the photo is 2464×2448). Below
 `lg` it's 220% of the frame, starting 19% above it, centred on WAQAS. From `lg` the frame is a
 square of side S = 1.1·min(column height, 66vw) pinned at the site column's bottom (`HeroStage` is
 `lg:static`, the `HeroSection` grid `lg:relative`), with its right edge 0.68S − 0.25em in from the
 column's right edge, so S — and the offset — grow with the section height; only the M's lower left
-tucks behind the right shoulder, from 1024 to 4K. The light pool (`HeroBackdrop`) follows the head
-at CR + 0.25em − 1.21S (CR = the column's right edge). The image's `sizes` hint tracks the rendered
+tucks behind the right shoulder, from 1024 to 4K. `HeroBackdrop` paints back to front: the network,
+then the light pool (glowing over the lines), then the vignette and grain; the pool scales with S
+so it stays centred on the head: `top` 100% − 0.77S, `left` CR + 0.25em − 1.331S (CR = the column's
+right edge). The image's `sizes` hint tracks the rendered
 width, including viewport height, scaled ×1.1. The portrait's inner box has only the bottom mask
 (`mask-b-from-75%`); left and right are not faded. The lead screen-checked this with the real photo
 (2464×2448, near-square) at 360×640, 768×1024, 1024×768, 1024×1366, 1440×900, 1920×1080, 1920×1200
@@ -38,12 +61,34 @@ the top of the hair now runs behind the nav links or touches the top edge.
 - `components/home/hero/HeroStage.tsx` — the name + portrait stage; imports `HeroName` and
   `HeroPortrait` itself
 - `components/home/hero/HeroBackdrop.tsx` — the light pool, agent network and vignette/grain
-- `components/home/hero/HeroNetwork.tsx` — the client canvas agent network
+- `components/home/hero/HeroNetwork.tsx` — the client canvas agent network; also runs the node
+  drift and travelling pulses over the static draw
 - `components/home/hero/HeroGrain.tsx` — the SVG grain overlay
+- `components/home/hero/HeroMotion.tsx` — client, renders nothing; runs the entrance, scroll
+  parallax and portrait pointer tilt on `#top`'s `data-anim` hooks
 - `hooks/useHeroNetwork.ts` — draws the seeded agent network on the canvas after fonts load, from
   the ResizeObserver's first notification, redrawing on resize or a device-pixel-ratio change but
   skipping a redraw when the canvas size and ratio match the last draw; keep-outs read from
-  `[data-network-avoid]` inside the section
+  `[data-network-avoid]` inside the section; returns a ref to the last drawn scene (network,
+  colour, scale and the keep-out rects) for the motion
+- `hooks/useHeroEntrance.ts` — the load entrance (portrait fade, name-line rise, fade-ups, dot
+  blink); reduced motion swaps it for short opacity fades
+- `hooks/useHeroScroll.ts` — the scroll parallax/fade on `hero-text` and the portrait; full motion
+  only
+- `hooks/usePointerTilt.ts` — shared 3D pointer-tilt (facing the pointer, never moves) for a
+  section's `data-anim` element; fine pointers, full motion only
+- `hooks/usePointerDrift.ts` — unused, awaiting the user's delete (replaced by
+  `usePointerTilt.ts`)
+- `hooks/useHeroNetworkMotion.ts` — runs the network's node drift and travelling pulses on
+  `gsap.ticker`, paused off screen or when the tab is hidden; full motion only; replaces
+  `useHeroPulses.ts`
+- `hooks/useHeroPulses.ts` — unused (emptied to a placeholder), awaiting the user's delete
+- `hooks/useElementById.ts` — shared: a ref to a DOM element by id, filled before other motion
+  hooks run
+- `lib/heroDrift.ts` — the network's per-node drift offsets: seeded sine loops clamped clear of the
+  keep-outs, eased in from rest
+- `lib/heroPulses.ts` — the pulses' pure walk/position data, following the current (drifted) link
+  endpoints; shared with `drawHeroNetwork.ts`
 - `lib/heroNetworkLayout.ts` — measures the canvas and keep-out boxes from untransformed layout
   offsets (so the motion pass's transforms can't move them); DOM measuring only
 - `lib/backingScale.ts` — the canvas backing-store scale maths (device pixel ratio, capped at 2 and
@@ -51,7 +96,8 @@ the top of the hair now runs behind the nav links or touches the top edge.
 - `lib/seededRandom.ts` — the seeded RNG shared by the network draw
 - `lib/heroNetwork.ts` — the network's node/edge layout data (agent nodes are the first seeded
   nodes outside the portrait frame and text keep-outs)
-- `lib/drawHeroNetwork.ts` — the canvas draw routine
+- `lib/drawHeroNetwork.ts` — the canvas draw routine, links/nodes/agents at given (or resting)
+  positions, then the pulse layer
 - `components/home/hero/HeroPortrait.tsx` — the portrait, edge-masked, sibling of the h1
 - `components/home/hero/HeroSideLine.tsx` — the "what I do" line with its violet dot
 - `components/home/hero/HeroName.tsx` — the MUHAMMAD/WAQAS h1
@@ -65,10 +111,6 @@ the top of the hair now runs behind the nav links or touches the top edge.
   at 72px, photo behind the lower half, mono tag above the buttons, buttons full width and
   stacked. It all fits one screen. (The photo-behind-the-lower-half part is superseded by the
   2026-09-25 hero redesign decision below: below `lg` the name sits above the photo.)
-- 2026-09-24 — Hero motion (later), for the GSAP pass: name lines rise from below, staggered;
-  side line and bottom row fade up; blinking dot; portrait parallax, scale and mouse drift; hero
-  text parallax and fade on scroll. Also: the canvas agent network's travelling pulses (2026-09-25),
-  off under reduced motion.
 - 2026-09-24 — Hero height is full screen, capped at 1200px.
 - 2026-09-24 — The hero side line is v3's: "I build AI agents that take repetitive work off your
   team, and the websites around them."
@@ -85,7 +127,7 @@ the top of the hair now runs behind the nav links or touches the top edge.
   photo with WAQAS over the hair top, never crossing the eyes.
   A canvas agent network
   (drawn once, seeded) with a CSS light pool, vignette and SVG grain replaces the 64px grid; the
-  GSAP pass adds travelling pulses, off under reduced motion. Spec: ui-spec §2.
+  GSAP pass adds travelling pulses, which turn off under reduced motion per §5. Spec: ui-spec §2.
 - 2026-09-25 — The portrait file is delivered: `public/images/portrait.png`, a transparent
   2464×2448 (near-square) black-and-white cutout; `hero.portraitAlt` rewritten for it ("Muhammad
   Waqas, head and shoulders, in black and white, with glasses, a beard and a dark collared shirt,
@@ -96,7 +138,7 @@ the top of the hair now runs behind the nav links or touches the top edge.
   S = min(column height, 66vw) at the column's bottom, its right edge 0.68S − 0.25em from
   the column's right edge — S grows with the section because on tall sections the M sits lower,
   where the chest is wider, keeping only the M's left edge behind the right shoulder from 1024 to
-  4K. The light pool follows the head at CR + 0.25em − 1.21S. `sizes` tracks the rendered width,
+  4K. `sizes` tracks the rendered width,
   including viewport height. Replaces the earlier "square pinned bottom-left, height
   min(column − 5rem, 68vw)" decision, which used a fixed 68vw cap instead of scaling S with
   section height. (2026-09-25 update, user's request: the portrait is about 10% bigger — S was
@@ -131,6 +173,32 @@ the top of the hair now runs behind the nav links or touches the top edge.
   frame; `sizes` scaled ×1.1). User approved the result, accepting that on desktop (1366, 1440,
   1920, 3840) the top of the hair now runs behind the nav links or touches the top edge. Replaces
   the "S = min(column height, 66vw) (a trial +10% bigger was reverted)" line.
+- 2026-09-25 — First GSAP motion pass added (GSAP 3.15 + `@gsap/react`), per ui-spec §2.5 and the
+  amended constitution §5: portrait fade-in, name lines rising from past their clip, side
+  line/bottom row fade-up, blinking dot, scroll parallax and fade (`autoAlpha`) on the hero text,
+  portrait parallax/scale, a pointer effect on fine pointers, and canvas network pulses on
+  `gsap.ticker`; reduced motion keeps short opacity fades only.
+- 2026-09-25 — User's change: the portrait's pointer effect is a 3D tilt facing the pointer, not a
+  sideways drift — 1100px perspective, smoothed over 0.7s, easing flat when the pointer leaves the
+  window or the hero leaves the screen; it never moves, so it combines with the unchanged scroll
+  parallax/scale; fine pointers and full motion only. Replaces the ±9px sideways drift.
+- 2026-09-25 — From `lg`, the light pool (`HeroBackdrop`) now scales with the 1.1× portrait so it
+  stays centred on the head: `top` 100% − 0.77·min(H,66vw), `left` CR + 0.25em − 1.331·min(H,66vw).
+  The lead checked the pool centre equals the head centre at 1440×900, 1920×1080 and 1024×768.
+  Replaces the fixed "CR + 0.25em − 1.21S" pool offset.
+- 2026-09-25 — User's request: the portrait's pointer tilt is subtler, just enough that the person
+  seems to follow the cursor — ±3° `rotationY` and ±2° `rotationX` (was ±10°/±6°). The lead checked
+  2.96°/1.96° at the corners and flat at the centre. Everything else about the tilt is unchanged.
+- 2026-09-25 — User's request: `HeroBackdrop` now paints network → light pool → vignette → grain,
+  so the pool glows over the network's lines. Replaces the earlier pool-then-network order.
+- 2026-09-25 — User's request: the hero network's nodes each drift slowly and independently
+  (seeded sine loops, 6–10px, 6–12s per axis, random phase, easing in over 1.5s), so every line
+  moves on its own, and pulses ride the moving links. Drift is clamped so nodes never enter the
+  text boxes, nor agents the portrait frame. The canvas redraws in full each tick on
+  `gsap.ticker`; the cached static snapshot is dropped. Off screen, tab hidden, or under reduced
+  motion it shows the plain static drawing. The lead checked at 1440×900: nodes moved ~10–15px
+  independently over 3s with the lines following, at 145fps with no errors, and the canvas stayed
+  identical across 6s under reduced motion.
 
 ## Open Questions
 
@@ -138,3 +206,8 @@ the top of the hair now runs behind the nav links or touches the top edge.
   visual call for the user to make.
 - **Review:** between `md` and `lg` a bright agent node can land on the photo below the frame
   (audit NIT) — for the user to judge on screen.
+- **Review:** on a slow load the finished hero can flash before the entrance runs, since content
+  can't be hidden before JS by the rules — for the user to judge.
+- **Review:** network pulses follow links that can pass under the text keep-outs, so 2px accent
+  dots at full strength can move under the side line, tag and buttons, where the still nodes are
+  kept out — should pulses be kept off those areas too?

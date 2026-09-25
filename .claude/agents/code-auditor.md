@@ -1,6 +1,6 @@
 ---
 name: code-auditor
-description: Read-only agent that audits marwix.dev code and copy for bugs, constitution violations and claims not in the facts file. Reports findings only — never fixes anything. Use after copywriter and web-coder finish, and as the final pass before any deploy.
+description: Read-only agent that audits marwix.dev code and copy for bugs, constitution violations and claims not in the facts file. Reports findings only — never fixes anything. Use only when the user asks, or once before a git push (which also covers deploys) — never as a routine step after a build or fix round.
 tools: Read, Glob, Grep
 model: opus
 effort: high

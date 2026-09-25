@@ -94,6 +94,7 @@ Shared rules and parts (§0): [`../ui-spec.md`](../ui-spec.md). Page doc: [`../s
   `BriefBuilder.tsx` (client), `NeedChips.tsx`, `TimelineSegments.tsx`, `RepeatField.tsx`,
   `SendBriefLink.tsx`; `hooks/useBriefState.ts`; `lib/brief.ts` (mailto and summary, pure);
   `lib/track.ts` (the one tracking key, `book-call`). **Images:** none.
-- **Motion (later):** the left column and the builder reveal on scroll (builder delayed 0.15s). The
-  placeholder (`data-anim="brief-placeholder"`) rotates through `placeholders` every 2.4s, and stops
-  on focus or once typed in; the first phrase stays under reduced motion.
+- **Motion (later):** the left column and the builder reveal on scroll (builder delayed 0.15s);
+  under reduced motion they only fade (no rise). The placeholder (`data-anim="brief-placeholder"`)
+  rotates through `placeholders` every 2.4s, and stops on focus or once typed in. Under reduced
+  motion it doesn't rotate (auto-advance is off): the first phrase stays.

@@ -3,9 +3,11 @@
 // z-index, transform or opacity, so the name lines and the portrait share the section's one
 // `isolate` stacking context (§2.1.1). From `lg` the grid is `relative` (position only), so
 // the portrait frame is placed against the full-height site column. `#top` is also what the
-// Nav observes to turn solid once the hero has passed.
+// Nav observes to turn solid once the hero has passed. `HeroMotion` (client) renders nothing; it
+// adds the GSAP motion to this section's `data-anim` hooks.
 import { HeroActions } from "@/components/home/hero/HeroActions";
 import { HeroBackdrop } from "@/components/home/hero/HeroBackdrop";
+import { HeroMotion } from "@/components/home/hero/HeroMotion";
 import { HeroSideLine } from "@/components/home/hero/HeroSideLine";
 import { HeroStage } from "@/components/home/hero/HeroStage";
 import { sectionIds } from "@/lib/routes";
@@ -27,6 +29,7 @@ export function HeroSection() {
           <HeroActions />
         </div>
       </div>
+      <HeroMotion />
     </section>
   );
 }

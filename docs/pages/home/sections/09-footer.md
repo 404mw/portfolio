@@ -28,7 +28,7 @@ MARWIX wordmark (M and W accent via `lib/wordmarkLetters.ts`, A R I X dim).
 - 2026-09-24 — Footer giant MARWIX wordmark (`--text-footer-mark`, Bricolage `wdth` 75, 800): the
   full word is shown, M and W violet, A R I X dim (decorative, `aria-hidden`). Must not cause
   sideways scroll. Motion (later): v3's scroll reveal (M and W appear, then A R I X slide out);
-  reduced motion shows the full word.
+  per §5, under reduced motion the slide becomes a short opacity fade-in of the full word.
 - 2026-09-24 — The nav's social names moved to `footer.social`, and `footer.copyright` became
   `footer.copyrightName`.
 - 2026-09-24 — Footer built: email, filled socials, © + build-time year, then the full-bleed

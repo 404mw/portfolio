@@ -1,6 +1,6 @@
 ---
 name: gsap-animator
-description: Adds the GSAP motion pass to marwix.dev on top of the finished static page — load and scroll reveals, timelines, ScrollTrigger, the Agents auto-advance, the Proofs takeover transitions, the marquee loop. Works only through the `data-anim` hooks the static build left, never restructures markup, and makes reduced motion turn everything off. Loads the gsap-* skills. Use for any motion work; web-coder owns everything else.
+description: Adds the GSAP motion pass to marwix.dev on top of the finished static page — load and scroll reveals, timelines, ScrollTrigger, the Agents auto-advance, the Proofs takeover transitions, the marquee loop. Works only through the `data-anim` hooks the static build left, never restructures markup, and under reduced motion keeps only fades (plus the marquee loop). Loads the gsap-* skills. Use for any motion work; web-coder owns everything else.
 tools: Read, Glob, Grep, Edit, Write, Bash, Skill
 model: opus
 effort: high
@@ -44,10 +44,13 @@ If the spec is ambiguous where a wrong guess means rework, use `AskUserQuestion`
 3. **Content is visible without JS and before any animation runs.** Never hide anything with CSS
    or server markup to animate it in later. Set starting states in JS only (`gsap.from`,
    `gsap.set` inside the effect), so a no-JS or failed-JS visitor sees the finished static page.
-4. **Reduced motion turns every animation off.** Wrap all motion in `gsap.matchMedia()` with
-   `(prefers-reduced-motion: no-preference)`; under `reduce` nothing moves and every element
-   shows its static final state (the demos' finished state, the Process loop fully lit, the full
-   wordmark, the marquee still). Loops, parallax and auto-advance never start under reduce.
+4. **Reduced motion keeps fades, not movement** (constitution §5). Use `gsap.matchMedia()` with
+   `(prefers-reduced-motion: no-preference)` for the full motion and `(prefers-reduced-motion:
+   reduce)` for a fades-only version: short opacity fades stay; slides, parallax, mouse drift,
+   scale, auto-advance and looping pulses never start, and those elements show their static
+   final state (the demos' finished state, the Process loop fully lit, the full wordmark). The
+   one exception: the marquee keeps looping under reduce. The marquee pauses on hover in both
+   modes.
 5. **Keep sections server components.** Put motion in a small client component per section (e.g.
    `components/home/hero/HeroMotion.tsx`, rendering nothing or wrapping the section's ref) that
    uses `useGSAP` with a `scope`. Animation hooks go in `hooks/`; shared durations, easings and

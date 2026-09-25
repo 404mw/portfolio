@@ -1,13 +1,17 @@
 "use client";
 
-// The hero's drawn agent network (ui-spec §2.5): one canvas, drawn once by `useHeroNetwork`.
-// Without JS it stays empty, and the backdrop's CSS layers still finish the section.
+// The hero's drawn agent network (ui-spec §2.5): one canvas. `useHeroNetwork` draws the static
+// network; under full motion `useHeroNetworkMotion` makes the nodes drift and sends pulses along
+// the links, on the same network instance. Without JS it stays empty, and the backdrop's CSS layers still finish the
+// section.
 import { useRef } from "react";
 import { useHeroNetwork } from "@/hooks/useHeroNetwork";
+import { useHeroNetworkMotion } from "@/hooks/useHeroNetworkMotion";
 
 export function HeroNetwork() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  useHeroNetwork(canvasRef);
+  const sceneRef = useHeroNetwork(canvasRef);
+  useHeroNetworkMotion(canvasRef, sceneRef);
 
   return (
     <canvas

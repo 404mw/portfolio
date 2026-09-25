@@ -142,4 +142,6 @@ Every project has the same four images: `{project}Card`, `{project}Shot1`, `{pro
 - **Motion (later):** cards reveal on scroll (stagger 0.12s); hover lifts a card −8px. Open: the
   dialog's `clip-path` expands from the card's rect (`data-proof-card`) to full screen (0.75s), and
   `takeover-content` rises 40px and fades in after 0.35s. Close: clip back to the card (0.6s), then
-  the hash change. Next: content rises 60px and fades in. Reduced motion: instant.
+  the hash change. Next: content rises 60px and fades in. Reduced motion: no `clip-path`, no rise
+  and no lift. Cards only fade in on reveal. On open and on Next the dialog shows at once and
+  `takeover-content` fades in without the rise; close is instant, then the hash change.

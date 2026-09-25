@@ -1,8 +1,9 @@
 # Home
 
-**Last Updated:** 2026-09-25 (roll-up: hero open questions 3→2)
+**Last Updated:** 2026-09-25
 
-> **Status:** Static build complete and counting wired; next: the GSAP motion pass, then deploy
+> **Status:** GSAP motion pass started (Hero done); next: motion for the remaining sections, then
+> deploy
 
 **The one question:** Can they help me?
 
@@ -18,7 +19,7 @@ plus that section's file only.
 | 2 | Hero | Who is this? | `docs/03-facts.md` → Who | Decided | `sections/02-hero.md` |
 | 3 | Marquee | (transition, no claim) | none | Decided | `sections/03-marquee.md` |
 | 4 | Agents | What can their agents handle for my business? | `docs/03-facts.md` → What the user builds | Decided | `sections/04-agents.md` |
-| 5 | Process | How do they work? | `docs/03-facts.md` → How the user works | Decided | `sections/05-process.md` |
+| 5 | Process | How do they work? | `docs/03-facts.md` → How the user works | Redesign pending | `sections/05-process.md` |
 | 6 | Web | Can they build my website end-to-end? | `docs/03-facts.md` → What the user can build | Decided | `sections/06-web.md` |
 | 7 | Proofs | Have they built something real that people use? | `docs/03-facts.md` → Work that is live | Decided | `sections/07-proofs.md` |
 | 8 | Contact | How do I start? | `docs/03-facts.md` → Contact | Decided | `sections/08-contact.md` |
@@ -30,7 +31,8 @@ All nine sections are built statically; section detail lives in `sections/`. Bui
 are green, and the lead re-checked 360/1024/1280/1440/3840 after the latest fixes: every title
 column pins from `lg` except Proofs (Process from `xl`), and nothing scrolls sideways. Type tokens
 are rem-based (zoom-safe). Every batch has been audited; all HIGH and SHOULD items are fixed or
-decided. Counting is wired (Umami Cloud). Next: the GSAP motion pass, then deploy.
+decided. Counting is wired (Umami Cloud). The GSAP motion pass has started: the Hero is done (see
+`sections/02-hero.md`); the other sections are next, then deploy.
 
 Site-wide, in `app/globals.css`: the scrollbar is an accent thumb on a transparent track, and text
 selection plus image dragging are off (inputs, textarea and contenteditable stay selectable). The
@@ -57,6 +59,10 @@ scroll progress bar stays as built (empty), still slated for the GSAP pass (see
   is set, and only counts on `marwix.dev`)
 - `lib/listNumber.ts` — a list row's two-digit number from its zero-based index, shared by
   numbered rows across sections
+- `lib/gsap.ts` — the one place GSAP and its plugins (`ScrollTrigger`, `useGSAP`) are registered;
+  every motion hook imports GSAP from here
+- `lib/motion.ts` — shared motion settings for the GSAP pass: reduced-motion/fine-pointer media
+  queries, durations, eases, staggers, and the `data-anim` hook query
 
 ## Decisions (site-wide)
 
@@ -88,13 +94,18 @@ scroll progress bar stays as built (empty), still slated for the GSAP pass (see
 - 2026-09-25 — Site-wide, in `app/globals.css` (user's request): the scrollbar is an accent thumb
   on a transparent track; text selection and image dragging are off everywhere (inputs, textarea
   and `[contenteditable]` stay selectable).
+- 2026-09-25 — Constitution §5 amended (user's decision): under reduced motion, short opacity
+  fades stay and anything that moves turns off (slides, parallax, mouse drift, auto-advance,
+  looping pulses); the marquee strip is the one exception, kept looping under reduce (marquee
+  exception requested by the user) and pausing on hover in both modes.
 
 ## Open Questions (site-wide)
 
 - **To do (user):** create a free Umami Cloud account, add the website marwix.dev and send the
   lead its website ID; it's set as `NEXT_PUBLIC_UMAMI_WEBSITE_ID` in Vercel and needs a redeploy.
 - **Constitution:** the user to add the takeover/Book a call exception under §3.
-- **Roll-up:** section-specific open questions remain in `sections/02-hero.md` (2),
-  `sections/04-agents.md` (2), `sections/05-process.md` (1), `sections/07-proofs.md` (3) and
+- **To do:** the site has no favicon (`/favicon.ico` 404s).
+- **Roll-up:** section-specific open questions remain in `sections/02-hero.md` (4),
+  `sections/04-agents.md` (2), `sections/05-process.md` (3), `sections/07-proofs.md` (3) and
   `sections/08-contact.md` (1). The pre-deploy check reads this roll-up and every section file;
   the page ships with none open anywhere.

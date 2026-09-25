@@ -28,7 +28,7 @@ confirmation.
 1. `git status`: the working tree must be clean. If it isn't, stop and report.
 2. `npm run build` must pass.
 3. The lead confirms it ran `build`, `lint` and `screens` itself and they passed on this commit, and
-   `code-auditor` reported no HIGH findings. If either is missing, stop and ask the lead.
+   the pre-push `code-auditor` run reported no HIGH findings. If either is missing, stop and ask the lead.
 4. Snapshot the domain's DNS records so you can prove afterwards that nothing else changed:
    ```bash
    nslookup -type=MX marwix.dev

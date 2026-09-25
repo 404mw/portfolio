@@ -36,7 +36,8 @@ is about as tall as the right one.
   rows with a number and a big title; the active row shows its one-line description.
 - 2026-09-24 — Agents interaction: two variants get built, and the user picks after seeing both.
   A: rows are an accessible tab list, first active, click or tap switches the panel (GSAP later
-  adds the 6s auto-advance and progress line, paused on hover or focus, off under reduced motion).
+  adds the 6s auto-advance and progress line, paused on hover or focus, and turned off under
+  reduced motion per §5).
   B: no switching, each row has its own demo panel. Both are separate components; the loser is
   deleted afterwards.
 - 2026-09-24 — Agents demo panels show the finished state statically (full conversation, all

@@ -54,8 +54,10 @@ A new token needs the user's yes and a line in `docs/01-design-system.md`.
   adds it. Static markup is built so the motion pass adds animation without restructuring.
 - **GSAP is the only motion library** (with its plugins and `@gsap/react`). No other animation
   library, no scroll hijacking (no smooth-scroll takeover), no full-page scroll-snap on phones.
-- **Reduced motion turns every animation off**, and all content is visible and usable without
-  JavaScript and before any animation runs.
+- **Reduced motion keeps fades, not movement.** Under `prefers-reduced-motion: reduce`, short
+  opacity fades stay and anything that moves is off: slides, parallax, mouse drift, auto-advance
+  and looping pulses. The one exception is the marquee strip, which keeps looping (it pauses on
+  hover). All content is visible and usable without JavaScript and before any animation runs.
 
 ## 6. Phone first, up to 4K
 
@@ -123,7 +125,7 @@ as a question, never into code. "While I'm here" changes are defects.
 
 1. The page is live on `marwix.dev`.
 2. It looks right on a phone and on screens up to 4K.
-3. The motion pass is live, and reduced motion turns all of it off.
+3. The motion pass is live, and reduced motion follows §5.
 4. Book a call books a real test meeting from start to finish.
 5. A test email sent to the site's contact address arrives.
 6. The sharing preview and a sitemap are in place.

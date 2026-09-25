@@ -20,7 +20,7 @@ capped at 1200px, confirmed 2026-09-24). Paint order, bottom to top:
 
 | z | Part |
 |---|---|
-| `-z-10` | `HeroBackdrop`: light pool, network canvas, vignette, grain (all `aria-hidden`) |
+| `-z-10` | `HeroBackdrop`: network canvas, light pool, vignette, grain (all `aria-hidden`) |
 | `z-0` | MUHAMMAD line wrapper (behind the portrait) |
 | `z-10` | `HeroPortrait` frame |
 | `z-20` | WAQAS line wrapper, row 1 (side line), row 3 (tag and buttons) |
@@ -37,17 +37,19 @@ capped at 1200px, confirmed 2026-09-24). Paint order, bottom to top:
 
 - **Backdrop** (`HeroBackdrop`): `<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 text-hero">`.
   `text-hero` is there only so its `em` matches the name. The pool and vignette are CSS for every
-  reader, with or without JS; the canvas draws only nodes and links. Children, in order:
-  1. **Pool:** `absolute size-[5em] -translate-1/2 rounded-full bg-radial from-accent/15 to-transparent to-70%`,
+  reader, with or without JS; the canvas draws only nodes and links. Children, back to front (the
+  network is the back layer, so the pool glows over the lines):
+  1. **Network:** `HeroNetwork`, `<canvas data-anim="hero-network" class="absolute inset-0 size-full">` (2.5).
+  2. **Pool:** `absolute size-[5em] -translate-1/2 rounded-full bg-radial from-accent/15 to-transparent to-70%`,
      centred behind the head with
-     `left-[calc(var(--spacing-gutter)+1.365em)] top-[calc(39%+2rem+0.87em)] md:top-[calc(39%+5rem+0.87em)] lg:top-[calc(100%-0.7*min(100%,66vw))] lg:left-[calc(100%-max(var(--spacing-gutter),(100%-var(--container-site))/2)+0.25em-1.21*min(clamp(40rem,100svh,75rem),66vw))]`.
+     `left-[calc(var(--spacing-gutter)+1.365em)] top-[calc(39%+2rem+0.87em)] md:top-[calc(39%+5rem+0.87em)] lg:top-[calc(100%-0.77*min(100%,66vw))] lg:left-[calc(100%-max(var(--spacing-gutter),(100%-var(--container-site))/2)+0.25em-1.331*min(clamp(40rem,100svh,75rem),66vw))]`.
      From `lg` it sits on the head, about 47% across and 30% down the portrait frame (2.1.3):
-     x = CR + 0.25em − 1.21S, y = H − 0.7S. `left` writes H out as the section's clamp, because a
+     x = CR + 0.25em − 1.21S, y = H − 0.7S. With S = 1.1·min(H, 66vw), the classes write these
+     as 1.331 and 0.77 times min(…). `left` writes H out as the section's clamp, because a
      horizontal percentage there would measure the width. Below `lg` it's centred on the
      positioner's centre line (1.365em in from the column's left edge) and lands within about
      40px of the head (the head sits 3% of the positioner left of that line, and a line of
      side-line wrap moves it).
-  2. **Network:** `HeroNetwork`, `<canvas data-anim="hero-network" class="absolute inset-0 size-full">` (2.5).
   3. **Vignette:** `absolute inset-0 bg-radial-[ellipse_at_center] from-transparent from-45% to-bg`.
   4. **Grain:** `HeroGrain`, `absolute inset-0 size-full opacity-6` (2.5).
 - **Content:** `relative h-full px-gutter` → `{container} grid h-full grid-rows-[auto_minmax(0,1fr)_auto] gap-4 pt-24 pb-8 md:pt-28 md:pb-10 lg:relative`.
@@ -68,8 +70,8 @@ capped at 1200px, confirmed 2026-09-24). Paint order, bottom to top:
     `z-20 text-right`. Both lines sit flush right at every width, with no offset. The text space
     between the wrappers stays. The 0.12em keeps the Q tail inside the clip.
 - **`HeroPortrait`**, three boxes (the frame places it, the positioner sizes it, the inner box animates):
-  - Frame: `<div data-network-avoid="agents" class="relative z-10 mt-[-0.45em] min-h-0 flex-1 lg:absolute lg:right-[calc(0.68*min(clamp(40rem,100svh,75rem),66vw)-0.25em)] lg:bottom-0 lg:mt-0 lg:aspect-square lg:h-[min(100%,66vw)] lg:w-auto lg:flex-none">`.
-  - Positioner: `<div class="absolute top-[-17%] left-[1.365em] aspect-square h-[200%] -translate-x-1/2 lg:inset-0 lg:aspect-auto lg:h-full lg:w-full lg:translate-x-0">`.
+  - Frame: `<div data-network-avoid="agents" class="relative z-10 mt-[-0.45em] min-h-0 flex-1 lg:absolute lg:right-[calc(0.748*min(clamp(40rem,100svh,75rem),66vw)-0.25em)] lg:bottom-0 lg:mt-0 lg:aspect-square lg:h-[min(110%,72.6vw)] lg:w-auto lg:flex-none">`.
+  - Positioner: `<div class="absolute top-[-19%] left-[1.365em] aspect-square h-[220%] -translate-x-1/2 lg:inset-0 lg:aspect-auto lg:h-full lg:w-full lg:translate-x-0">`.
     Square at every width: below `lg` by `aspect-square`, from `lg` by filling the square frame exactly.
   - Inner: `<div data-anim="hero-portrait" class="relative size-full mask-b-from-75%">`
     → `SiteImage` (`fit="contain"`, `position="bottom"`). The mask replaces the old `from-bg` overlay div.
@@ -84,7 +86,8 @@ capped at 1200px, confirmed 2026-09-24). Paint order, bottom to top:
 - **Why (2026-09-25):** the old geometry sized and placed the frame in `em` of the name (3.2em
   wide, its top 1.8em above the name), which left the photo in the bottom ~55% of the hero. The
   user said it was too short. From `lg` the frame now follows the section's height instead, and
-  the positioner went square for the near-square photo.
+  the positioner went square for the near-square photo. Later the same day the user approved the
+  portrait 10% bigger at every width (S, the phone and tablet positioner and `sizes`, all ×1.1).
 - **Photo:** 2464×2448, near-square, shown `object-contain object-bottom` in a square positioner.
   Measured down the photo: hair top ~8%, eyes ~27%, beard bottom ~49%. The head's centre is about
   47% across and 30% down; the face runs ~34–62% across.
@@ -94,47 +97,50 @@ capped at 1200px, confirmed 2026-09-24). Paint order, bottom to top:
   48px row 3 and the 16px gap.
 - **Below `lg`, name above the photo.** Row 2 is a column: the name, then the frame, which takes the
   rest of the row (F tall) and rises 0.45em, so its top is 1.43em down the stage. The positioner
-  is a square 200% of F and starts 17% of F above the frame. That puts the hair line on the
-  frame's top, the eyes 0.38F below it and the beard's bottom about 0.82F down, well clear of the
-  tag. Its centre sits 1.365em in from the stage's left edge (`left-[1.365em]` with
-  `-translate-x-1/2`), so the head sits on the left of the column and looks right, into the page.
-  The chest runs on under row 3 and fades out. WAQAS's capitals end 1.68em down the stage, above
-  the eyes, so no name line ever crosses them. At 360 WAQAS's left end overlaps the hair top; at
-  768 it sits right of the head.
+  is a square 220% of F and starts 19% of F above the frame. That puts the hair line on the
+  frame's top, the eyes about 0.41F below it and the beard's bottom about 0.90F down, above the
+  frame's bottom and clear of the tag. Its centre sits 1.365em in from the stage's left edge
+  (`left-[1.365em]` with `-translate-x-1/2`), so the head sits on the left of the column and looks
+  right, into the page. The chest runs on under row 3 and fades out. WAQAS's capitals end 1.68em
+  down the stage, above the eyes, so no name line ever crosses them. At 360 WAQAS's left end
+  overlaps the hair top; at 768 it sits right of the head.
 - **From `lg`, portrait left and name right.** The stage is exactly the `<h1>` box and
   `lg:static`; the frame leaves the flow and is placed against the grid (the full-height column).
-  - **Frame:** a square of side S = min(H, 66vw), where H is the column's height (the section's,
-    `clamp(40rem, 100svh, 75rem)`), at `bottom-0`. Its right edge sits 0.68S − 0.25em in from the
-    column's right edge (CR), so it spans CR + 0.25em − 1.68S to CR + 0.25em − 0.68S. `right`
-    writes H out as the clamp, because a percentage there would measure the width. `em` is the
-    name's, inherited from the stage. The positioner fills the frame exactly.
-  - **Height:** the frame's top sits H − S down: 0 where H is the smaller (most desktops), so the
-    photo runs the section's full height; where 66vw is smaller (1024×768) the frame is 676px and
-    starts 92px down. No nav clearance is taken off S: the photo's ~8.6% headroom above the hair
-    puts the hair top about 0.086S below the frame's top. With the frame at the section's top,
-    the hair clears the 67px header from S ≈ 780px; below that (1366×768: ≈66px; 1280×720: ≈62px;
-    the 640px floor: ≈55px) it sits inside the header band, which is transparent while the hero
-    is in view (1.1).
+  - **Frame:** a square of side S = 1.1·min(H, 66vw) (`lg:h-[min(110%,72.6vw)]`), where H is the
+    column's height (the section's, `clamp(40rem, 100svh, 75rem)`), at `bottom-0`. Its right edge
+    sits 0.68S − 0.25em in from the column's right edge (CR), written as
+    `0.748*min(clamp(40rem,100svh,75rem),66vw)-0.25em`, so it spans CR + 0.25em − 1.68S to
+    CR + 0.25em − 0.68S. `right` writes H out as the clamp, because a percentage there would
+    measure the width. `em` is the name's, inherited from the stage. The positioner fills the
+    frame exactly.
+  - **Height:** the frame's top sits H − S down. Where H is the smaller (most desktops), S = 1.1H,
+    so the frame starts 0.1H above the section's top and the section's `overflow-hidden` clips
+    it; where 66vw is smaller (1024×768) the frame is 743px and starts 25px down. No nav
+    clearance is taken off S: the photo's ~8.6% headroom above the hair puts the hair top about
+    0.086S below the frame's top. Where H binds, that's about 0.005H above the section's top
+    (≈5px at 900 tall), so on desktop the top of the hair runs behind the header, just clipped at
+    the section's edge; the user accepted this (2026-09-25). The header band is transparent while
+    the hero is in view (1.1). At 1024×768 the hair top sits ≈89px down, below the 67px header.
   - **Offset:** 0.68S grows with S because on tall sections the M sits lower on the figure, where
     the chest is wider. It's fitted so only the M's lower left tucks behind the right shoulder,
-    from 1024 to 4K. The frame can run past the column's left edge and off the screen (116px at
-    1024×768, 80px at 1440×900); the section's `overflow-hidden` clips it.
+    from 1024 to 4K. The frame can run past the column's left edge and off the screen (229px at
+    1024×768, 231px at 1440×900); the section's `overflow-hidden` clips it.
   - **MUHAMMAD** (right-aligned, starting at CR − 4.37em) overlaps the frame by 4.62em − 0.68S.
-    At 1440×900 that's 275px: its capitals cover the right ~31% of the photo, ~49–64% down, just
+    At 1440×900 that's 214px: its capitals cover the right ~22% of the photo, ~54–67% down, just
     under the beard, over the collar and the right shoulder. Only the M's lower left sits behind
     the shoulder; the rest reads.
   - **WAQAS** (right-aligned, starting at CR − 2.73em) starts 0.68S − 2.98em right of the frame's
-    right edge. Where S > 4.38em it's clear of the photo (1440×900 by 40px, 1024×768 by 25,
-    1920×1080 by 78, 3840×1200 by 160). On shorter screens its left end overlaps the frame's right
-    edge and paints in front of the photo (1366×768 by 26px, 1280×720 by 30, 1440×780 by 42). It
-    never runs past the container.
+    right edge. Where S > 4.38em it's clear of the photo (1440×900 by 101px, 1024×768 by 71,
+    1366×768 by 27, 1280×720 by 19, 1920×1080 by 152, 3840×1200 by 242). On short, wide screens
+    its left end overlaps the frame's right edge and paints in front of the photo (at the 640px
+    height floor: 1280 wide by 40px, 1440 wide by 94). It never runs past the container.
 - **Mask:** only the bottom 25% fades out (`mask-b-from-75%`); the left and right edges aren't
   faded (the user's call). The stop is Tailwind's `black`/`transparent` alpha stop, not a colour,
   so it isn't a brand token (constitution §4).
 - **Nothing on the face or the controls:** the side line is in row 1, top right; the tag and
   buttons are in row 3, over the faded chest (40% alpha at most). WAQAS stays in row 2, 16px
   above row 3, so it never meets the side line, the tag or the buttons. Below `lg` the positioner
-  can be wider than the screen (1119px at 768×1024, starting 368px left of it). The section's
+  can be wider than the screen (1231px at 768×1024, starting 425px left of it). The section's
   `overflow-hidden` clips it, so nothing scrolls sideways.
 
 ### 2.2 Sizes
@@ -146,13 +152,13 @@ capped at 1200px, confirmed 2026-09-24). Paint order, bottom to top:
 | MUHAMMAD / WAQAS width | 315 / ~197 | 512 / ~320 | 839 / ~524 | 962 / ~601 |
 | Line alignment | both right, flush with CR | same | same | same |
 | MUHAMMAD x | 25–340 | 225–737 | 545–1384 | 1726–2688 |
-| WAQAS x / against the photo | 143–340, left end over the hair top | 417–737, right of the head | 860–1384, 40px clear of the photo | 2087–2688, 160px clear |
+| WAQAS x / against the photo | 143–340, left end over the hair top | 417–737, right of the head | 860–1384, 101px clear of the photo | 2087–2688, 242px clear |
 | Side line | 14px, left, max 280 (~3 lines) | 14px, right | same | same |
-| Portrait (positioner, square) | 340 (frame 170 tall); ~540 at 360×740 | 1119, clipped at the left screen edge | S = 900 (photo 900×894) | S = 1200 (photo 1200×1192) |
-| Portrait place | x −52–288 (52 clipped); hair ≈280, eyes ≈345, beard ends ≈419 | x −368–750; hair ≈362, eyes ≈573, beard ends ≈817 | x −80–820 (80 clipped), frame top 0 (hair ≈77), name top 435 | x 727–1927, frame top 0 (hair ≈103), name top 682 |
-| Face width (~34–62% of photo) | ~95 (to ~151 at 740 tall) | ~313 | ~252 | ~336 |
+| Portrait (positioner, square) | 374 (frame 170 tall); ~594 at 360×740 | 1231, clipped at the left screen edge | S = 990 (photo 990×984) | S = 1320 (photo 1320×1311) |
+| Portrait place | x −69–305 (69 clipped); hair ≈280, eyes ≈350, beard ends ≈432 | x −425–806; hair ≈362, eyes ≈594, beard ends ≈863 | x −231–759 (231 clipped), frame top −90 (hair ≈−5, behind the header, clipped), name top 435 | x 525–1845, frame top −120 (hair ≈−6), name top 682 |
+| Face width (~34–62% of photo) | ~105 (to ~166 at 740 tall) | ~345 | ~277 | ~370 |
 | M behind the photo | n/a | n/a | lower left only, behind the right shoulder | same |
-| Light pool (diameter, centre) | 360, ≈(118, 344) | 585, ≈(191, 582) | 960, (343, 270) | 1100, (1291, 360) |
+| Light pool (diameter, centre) | 360, ≈(118, 344) | 585, ≈(191, 582) | 960, (234, 207) | 1100, (1146, 276) |
 | Network nodes / agents | 24 / 3 | 40 / 4 | 64 / 5 | 96 / 6 |
 | Canvas backing store | 720×1280 (DPR 2) | 1536×2048 | 2880×1800 | DPR capped at ~1.34 → ~5150×1610 |
 | Tag | 13px mono | same | same | same |
@@ -160,11 +166,11 @@ capped at 1200px, confirmed 2026-09-24). Paint order, bottom to top:
 
 - **Screen checks:**
   - 360×640: every part fits one screen; WAQAS's capitals end above the eyes, and the beard
-    (≈419) clears the tag (row 3 from ≈466).
-  - 1024×768: name 146px, name top 390; S = 676 (66vw binds), frame x −116–560, frame top 92
-    (hair ≈150); MUHAMMAD x 346–983, 214px over the frame; WAQAS x 585–983, 25px clear of it.
-  - 1440×780: S = 780, frame top 0, hair top ≈67, level with the header's bottom edge; WAQAS
-    x 860–1384 overlaps the frame's right edge by 42px.
+    (≈432) clears the tag (row 3 from ≈466).
+  - 1024×768: name 146px, name top 390; S = 743 (66vw binds), frame x −229–514, frame top 25
+    (hair ≈89); MUHAMMAD x 346–983, 168px over the frame; WAQAS x 585–983, 71px clear of it.
+  - 1440×780: S = 858, frame top −78, hair top ≈−4, behind the header and just clipped at the
+    section's top; WAQAS x 860–1384 clears the frame's right edge by 11px.
   - 1024×1366 (accepted): the upper half holds only the side line and the network.
   - The M still reads; where WAQAS meets the frame, it's plainly in front of the photo; no halo
     shows round the cutout; nothing scrolls sideways from 360 to 3840.
@@ -196,11 +202,12 @@ capped at 1200px, confirmed 2026-09-24). Paint order, bottom to top:
 - **Image:** `portrait` → `/images/portrait.png` (`lib/images.ts` unchanged). The real photo: a
   transparent 2464×2448 cutout, near-square. `SiteImage` with `fit="contain"`, `position="bottom"`
   (`object-contain object-bottom`), `priority`,
-  `sizes="(min-width: 64rem) min(max(640px, min(100vh, 1200px)), 66vw), (min-width: 48rem) min(1470px, max(352px, calc(200vh - 930px))), max(341px, calc(200vh - 941px))"`.
-  Each term is the positioner's width. From `lg` it's S, with `100vh` standing in for the section
-  height, held to its 640–1200px clamp and capped at 66vw. Below `lg` it's 200% of the frame's
-  height: the viewport height less about 465px on tablets (352–1470px across the section's height
-  range) and 470px on phones (at least 341px).
+  `sizes="(min-width: 64rem) min(max(704px, min(110vh, 1320px)), 72.6vw), (min-width: 48rem) min(1617px, max(387px, calc(220vh - 1023px))), max(375px, calc(220vh - 1035px))"`.
+  Each term is the positioner's width, 1.1× the pre-2026-09-25 values. From `lg` it's S: 1.1× the
+  section height, with `100vh` standing in for it, held to 704–1320px (1.1× its 640–1200px clamp)
+  and capped at 72.6vw. Below `lg` it's 220% of the frame's height: 2.2× the viewport height less
+  about 465px on tablets (387–1617px across the section's height range) and 470px on phones (at
+  least 375px).
   The positioner is square at every width and the photo near-square, so `object-contain` never
   crops: it leaves 0.65% of the height spare above the hair, and `object-bottom` keeps the photo
   on the positioner's bottom. The pixels under the alpha still hold a light glow. Screen check: the optimised WebP/AVIF keeps its alpha, and no halo
@@ -216,7 +223,8 @@ capped at 1200px, confirmed 2026-09-24). Paint order, bottom to top:
     alpha 0.10. Nodes: 1.25px radius, `accent` at 0.30. Agents: 2.5px radius, `accent` at 1, with an
     8px halo at 0.15. Links under text still leave `muted` at about 6:1. Nodes stay out of the side
     line, the tag and the buttons (`data-network-avoid="text"`). The name is not a keep-out, so nodes
-    and links can sit behind its letters (open visual call for the user).
+    and links can sit behind its letters (open visual call for the user). It takes optional drifted
+    node positions (each node's resting place if none are given), and it also draws the pulse dots.
   - `hooks/useHeroNetwork.ts`: reads `--color-accent` through `getComputedStyle`, so no colour
     literal lives in code; if it's empty, nothing is drawn. Measuring lives in
     `lib/heroNetworkLayout.ts`: the canvas size and the `[data-network-avoid]` keep-outs. Every box
@@ -225,31 +233,58 @@ capped at 1200px, confirmed 2026-09-24). Paint order, bottom to top:
     `document.fonts.ready` the hook starts a `ResizeObserver` on the canvas, and its first
     notification does the first draw. It redraws on later resizes or a devicePixelRatio change (a
     `resolution` matchMedia, re-armed for the new ratio after each change), coalesced to one frame.
-    A draw is skipped when the CSS size and ratio match the last one drawn. There's no animation loop.
-  - `components/home/hero/HeroNetwork.tsx` (client): the `<canvas aria-hidden="true">` and the hook.
+    A draw is skipped when the CSS size and ratio match the last one drawn. The static drawing has
+    no loop of its own: the hook hands the scene it last drew (network, colour, scale, keep-outs)
+    to `hooks/useHeroNetworkMotion.ts`, which runs on `gsap.ticker` (Motion below) and redraws the
+    whole canvas each tick: the network at its drifted positions, then the pulses. There's no
+    cached snapshot or wipe layer. `lib/heroDrift.ts` (pure) computes the drift and
+    `lib/heroPulses.ts` (pure) the pulses' walks.
+  - `components/home/hero/HeroNetwork.tsx` (client): the `<canvas aria-hidden="true">`,
+    `useHeroNetwork` and `useHeroNetworkMotion`.
   - **Without JS** the canvas stays empty, and the CSS pool, vignette and grain still finish the section.
 - **Grain** (`HeroGrain.tsx`, server): `<svg aria-hidden="true" focusable="false">` with one `<filter id="hero-grain">`.
   The filter is `feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"`,
   then `feColorMatrix type="saturate" values="0"`, over a full-size `<rect>`, at `opacity-6`.
   It has no colour values, needs no JS and is painted once.
 - **Components:**
-  - New: `HeroStage.tsx`, `HeroBackdrop.tsx`, `HeroNetwork.tsx` (client), `HeroGrain.tsx`.
+  - New: `HeroStage.tsx`, `HeroBackdrop.tsx`, `HeroNetwork.tsx` (client), `HeroGrain.tsx`,
+    `HeroMotion.tsx` (client, renders nothing: the entrance, scroll and tilt hooks on `#top`).
   - Changed: `HeroSection.tsx`, `HeroName.tsx`, `HeroPortrait.tsx`, `HeroSideLine.tsx`, `HeroActions.tsx`.
   - Deleted: `HeroGrid.tsx`.
   - All in `components/home/hero/`.
+  - Motion files: `lib/gsap.ts` (registers the plugins; the one import point for GSAP),
+    `lib/motion.ts` (shared media queries, durations, eases, staggers), `lib/heroDrift.ts`,
+    `lib/heroPulses.ts`; `hooks/useElementById.ts`, `hooks/useHeroEntrance.ts`,
+    `hooks/useHeroScroll.ts`, `hooks/usePointerTilt.ts`, `hooks/useHeroNetworkMotion.ts`
+    (replaces `useHeroPulses`).
 - **Doc follow-up (wording only, no token change):** `docs/01-design-system.md` (the
   `--color-line` use and a change-log line) still mentions the hero grid.
-- **Motion (later):**
-  - Network (`hero-network`): pulses travel link to link from the agent nodes, a 2px `accent` dot
-    about every 1.5s per agent, on `gsap.ticker`. They pause when the hero is out of view or the tab
-    is hidden. Under reduced motion there are none, and the static draw stays. The drawer gains a
-    pulse layer; the markup doesn't change.
-  - Name lines (`hero-line`), unchanged: rise from `translateY(105%)` inside their clips, staggered
-    0.12s, on load.
-  - Side line and bottom row (`hero-fade`): fade up from 14px, after the name. Dot (`hero-dot`):
-    opacity 0.25↔1 loop.
-  - Portrait (`hero-portrait`, inner box only): fades in on load. On scroll, y moves at 0.15× scroll
-    and the scale goes to 1.06. Mouse drift of ±9px x on `pointer: fine`. The mask moves with it.
+- **Motion (built):**
+  - Network (`hero-network`), on `gsap.ticker`, redrawn in full each tick:
+    - **Drift:** each node drifts slowly and independently on seeded sine loops, 6–10px and
+      6–12s per axis with a random phase, easing in over 1.5s, so every line moves on its own.
+      The drift is clamped per axis so nodes never enter the text keep-outs' 16px band, and
+      agents never enter the portrait frame.
+    - **Pulses:** they travel link to link from the agent nodes: a 2px `accent` dot about every
+      1.5s per agent, each walking 2–4 hops at 110px/s. They ride the moving links and fade back
+      in when motion resumes.
+    - Off screen, with the tab hidden, or under reduced motion it shows the plain static drawing:
+      no drift and no pulses. The markup doesn't change.
+  - Name lines (`hero-line`): rise on load from below their whole clip wrapper (the wrapper's
+    height plus 0.3 of the line's height, so no glyph top shows at the start), 1.1s, `power4.out`,
+    staggered 0.12s. Under reduced motion: a short opacity fade, no rise.
+  - Side line and bottom row (`hero-fade`): fade up from 14px, starting 0.5s before the name lines
+    finish; under reduced motion, fade only. Dot (`hero-dot`): opacity 0.25↔1 loop; off under
+    reduced motion (the dot stays at full opacity).
+  - Portrait (`hero-portrait`, inner box only): fades in on load (kept under reduced motion). On
+    scroll, y moves at 0.15× scroll and the scale goes to 1.06. On `pointer: fine`, a 3D tilt
+    replaces the ±9px drift (the user's call): it turns to face the pointer, `rotationY` ±3° and
+    `rotationX` ±2° at the window's edges, just enough that the person seems to follow the cursor,
+    1100px perspective, 0.7s smoothing, no translation. It eases back flat when the pointer leaves
+    the window or the hero goes off screen. The mask moves with it. Under reduced motion the
+    scroll move, the scale and the tilt are off: the portrait stays still.
   - Text on scroll (`hero-text`, now on four elements: row 1, each name-line wrapper and row 3):
-    y at 0.35× scroll, fading to 0 by 75% of the viewport height. It's never on the stage or the
-    `<h1>` (2.1.1). As you scroll, the M slides off the shoulder: the parallax is intended.
+    y at 0.35× scroll, fading to 0 by 75% of the viewport height. The fade is plain `opacity`, not
+    `autoAlpha`, so the side line, tag and buttons stay in the tab order. It's never on the stage
+    or the `<h1>` (2.1.1). As you scroll, the M slides off the shoulder: the parallax is intended.
+    Under reduced motion it's off: the text stays put and fully visible.

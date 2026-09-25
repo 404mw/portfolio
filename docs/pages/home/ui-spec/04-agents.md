@@ -137,10 +137,15 @@ The user picked variant A (tab list), 2026-09-24. Variant B's list (`AgentsStack
   `agentRowIds()`); `lib/listNumber.ts` (0 → "01", shared by numbered rows). **Images:** none.
 - **Motion (later):**
   - A: 6s auto-advance; the selected row's `agent-progress` grows `scaleX` 0→1 over 6s; paused on
-    hover or focus-within; off under reduced motion. The line fades up when its row is selected.
-  - Status dot: opacity blink loop.
+    hover or focus-within. Under reduced motion there's no auto-advance and no growth: the selected
+    row's line is full (the static state). The line fades up when its row is selected; under
+    reduced motion it only fades.
+  - Status dot: opacity blink loop; off under reduced motion (a solid dot).
   - Each demo replays from the start when its panel shows (on select):
     parts pop in (`y 8px, scale .96 → none`) in `data-demo-order`. Chat: typing dots show, then hide
     before the reply. Leads: each `demo-before` pill swaps to "followed up", staggered. Report: bars
     grow `scaleY` from the bottom, staggered, then the pill pops. Sync: packets travel left→right
     along their connector on a loop, then events and the pill pop.
+  - Under reduced motion each demo shows its finished state (4.4): its parts fade in by
+    `data-demo-order` with no pop, rise or scale. No typing dots, the Leads pills already read
+    "followed up", the bars stand at full height and the packets rest at their midpoints.

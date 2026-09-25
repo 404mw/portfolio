@@ -41,4 +41,5 @@ Shared rules and parts (§0): [`../ui-spec.md`](../ui-spec.md). Page doc: [`../s
 
 - **Components:** `components/home/web/WebSection.tsx`, `WebStepRow.tsx`. **Images:** none.
 - **Motion (later):** rows reveal on scroll, staggered 0.1s; hover indent (`padding-left` 0 → 12px)
-  on `pointer: fine`; the left column reveals.
+  on `pointer: fine`; the left column reveals. Under reduced motion the reveals only fade (no
+  rise) and the hover indent is off; the line's hover colour stays.
