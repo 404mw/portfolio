@@ -1,6 +1,6 @@
 # Constitution
 
-**Last Updated:** 2026-09-24
+**Last Updated:** 2026-09-25
 
 The non-negotiable rules for `marwix.dev`. Every implementation decision is checked against them.
 They exist to stop scope creep, unsupported claims and rework.
@@ -14,7 +14,8 @@ updating its Last Updated date. Nothing is done as a one-off exception.
 ## 1. Docs stay current
 
 A change to the page's sections, behaviour or text is reflected in its page doc
-(`docs/pages/<page>/page.md`) before the task counts as done. `page-doc-manager` writes the doc;
+(`docs/pages/<page>/page.md`, the index, and the section's `sections/NN-<slug>.md`) before the
+task counts as done. `page-doc-manager` writes the doc;
 the other agents report what changed. A token change also updates `docs/01-design-system.md`.
 
 ## 2. One page
@@ -30,7 +31,8 @@ full-screen takeover on the same page, not on their own routes. English only.
 The reader is a **non-technical small-business owner** who might hire the user, usually sent the
 link directly. **"Book a call" is the main action** and stays visible in the nav.
 
-- Section order, the nav and every section's content live in `docs/pages/home/page.md`, not here.
+- Section order lives in `docs/pages/home/page.md`; the nav and every section's content live in its
+  file under `docs/pages/home/sections/`, not here.
 - **`https://exile.marwix.dev` is linked from the Exile takeover only**, never from the nav.
 - Booking uses **Cal.com**. The link is in `docs/03-facts.md`.
 

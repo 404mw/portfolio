@@ -31,7 +31,7 @@ export function ProofCard({ href, number, tag, title, cardLine, shot, shotAlt }:
         <SiteImage
           name={shot}
           alt={shotAlt}
-          sizes="(min-width:1536px) 500px, (min-width:1024px) 33vw, (min-width:768px) 50vw, 100vw"
+          sizes="(min-width:1536px) 480px, (min-width:1024px) 31vw, (min-width:768px) 46vw, 100vw"
           position="top"
           placeholderTone="cream"
         />

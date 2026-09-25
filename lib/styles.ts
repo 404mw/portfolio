@@ -3,6 +3,20 @@
 /** The site column: full width, capped at `--container-site` (1536px), centred. */
 export const container = "mx-auto w-full max-w-(--container-site)";
 
+/** The two-column split (Agents, Web, Contact): stacked below `lg`, two equal columns
+ * from `lg`. No cross-axis alignment: use `splitGrid`, or set it where used. */
+export const splitColumns = "grid gap-10 md:gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-24";
+
+/** `splitColumns` with both columns top-aligned (Web, Contact). */
+export const splitGrid = `${splitColumns} lg:items-start`;
+
+/** The title column that pins while the other column scrolls, from `lg`. `self-start` keeps it
+ * from being stretched to the row height, which would stop it pinning. */
+export const stickyTitle = "lg:sticky lg:top-30 lg:self-start";
+
+/** `stickyTitle` from `xl` (Process, whose split starts at `xl`). */
+export const stickyTitleXl = "xl:sticky xl:top-30 xl:self-start";
+
 /** Focus ring on dark: 2px `text` outline, 2px offset. */
 export const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text";

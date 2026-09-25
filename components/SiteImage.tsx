@@ -1,5 +1,6 @@
 // Every image on the site: looks the name up in lib/images.ts and fills its positioned parent,
-// cropped with `object-cover`. Renders a placeholder while the file is `null`.
+// cropped with `object-cover` by default (pass `fit="contain"` to letterbox instead). Renders a
+// placeholder while the file is `null`.
 import Image from "next/image";
 import { ImagePlaceholder, type PlaceholderTone } from "@/components/ImagePlaceholder";
 import { imageSrc, type ImageName } from "@/lib/images";
@@ -7,6 +8,12 @@ import { imageSrc, type ImageName } from "@/lib/images";
 const positionClasses = {
   top: "object-top",
   center: "object-center",
+  bottom: "object-bottom",
+} as const;
+
+const fitClasses = {
+  cover: "object-cover",
+  contain: "object-contain",
 } as const;
 
 type SiteImageProps = {
@@ -14,6 +21,7 @@ type SiteImageProps = {
   readonly alt: string;
   readonly sizes: string;
   readonly position?: keyof typeof positionClasses;
+  readonly fit?: keyof typeof fitClasses;
   readonly priority?: boolean;
   readonly placeholderTone?: PlaceholderTone;
 };
@@ -23,6 +31,7 @@ export function SiteImage({
   alt,
   sizes,
   position = "center",
+  fit = "cover",
   priority = false,
   placeholderTone = "dark",
 }: SiteImageProps) {
@@ -36,7 +45,7 @@ export function SiteImage({
       fill
       sizes={sizes}
       priority={priority}
-      className={`object-cover ${positionClasses[position]}`}
+      className={`${fitClasses[fit]} ${positionClasses[position]}`}
     />
   );
 }

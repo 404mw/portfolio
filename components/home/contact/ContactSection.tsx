@@ -1,20 +1,20 @@
 // Section 8, Contact: how do I start? (ui-spec §8). The label, heading, lead and side links on
-// the left; the brief builder on the right (stacked below `lg`).
+// the left (sticky from `lg`); the brief builder on the right (stacked below `lg`).
 import { BriefBuilder } from "@/components/home/contact/BriefBuilder";
 import { ContactLinks } from "@/components/home/contact/ContactLinks";
 import { SectionHeading } from "@/components/SectionHeading";
 import { SectionLabel } from "@/components/SectionLabel";
 import { contact } from "@/content/home";
 import { sectionIds } from "@/lib/routes";
-import { container } from "@/lib/styles";
+import { container, splitGrid, stickyTitle } from "@/lib/styles";
 
 export function ContactSection() {
   return (
     <section id={sectionIds.contact} className="scroll-mt-20 px-gutter">
       <div
-        className={`${container} grid gap-10 border-t border-line py-section md:gap-12 lg:grid-cols-2 lg:items-start lg:gap-16 xl:gap-24`}
+        className={`${container} ${splitGrid} border-t border-line py-section`}
       >
-        <div data-anim="reveal" className="flex flex-col gap-8">
+        <div data-anim="reveal" className={`flex flex-col gap-8 ${stickyTitle}`}>
           <SectionLabel number={contact.number} label={contact.label} />
           <SectionHeading
             lead={contact.heading.lead}

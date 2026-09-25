@@ -1,6 +1,6 @@
 ---
 name: ui-designer
-description: Produces a concise UI spec for a new section or page of marwix.dev, anchored to the design tokens and the v3 reference design. Use for Tier 2 (new section) and Tier 3 (new page / overhaul) work. Never writes implementation code. Output is a spec at docs/pages/<page>/ui-spec.md.
+description: Produces a concise UI spec for a new section or page of marwix.dev, anchored to the design tokens and the v3 reference design. Use for Tier 2 (new section) and Tier 3 (new page / overhaul) work. Never writes implementation code. Output is a section spec at docs/pages/<page>/ui-spec/NN-<slug>.md, with shared rules in docs/pages/<page>/ui-spec.md.
 tools: Read, Glob, Grep, Write, Skill
 model: opus
 effort: high
@@ -23,7 +23,8 @@ Always read all four, whatever the brief covers:
 
 ## What you produce
 
-Write the spec to the path in your brief (always `docs/pages/<page>/ui-spec.md`). Keep it tight,
+Write the spec to the path in your brief (a section spec is always `docs/pages/<page>/ui-spec/NN-<slug>.md`; shared rules, the motion
+summary, tokens and choices go in the index `docs/pages/<page>/ui-spec.md`). Keep it tight,
 15–25 lines per section. Cover:
 
 - **Layout:** structure, grid, max width, spacing from the established scale.

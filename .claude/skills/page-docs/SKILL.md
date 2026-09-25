@@ -35,6 +35,8 @@ If it's still ambiguous, use `AskUserQuestion` with exactly one `(Recommended)` 
 6. Status: `Skeleton`.
 
 **update**
+0. Section-level changes go in `docs/pages/<page>/sections/NN-<slug>.md`; site-wide ones in
+   `page.md`. Keep the index's Open Questions roll-up in sync (see `docs/pages/README.md`).
 1. Read every file in Key Files and re-verify Current State against the code; fix any drift.
 2. Add the brief's `Decision to record:` as one line under Decisions. **Delete every older line
    it contradicts or replaces**, and fix any Current State or Sections text it made wrong.

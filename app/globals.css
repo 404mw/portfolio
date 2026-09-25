@@ -51,6 +51,30 @@
 @layer base {
   html {
     color-scheme: dark;
+    /* Scrollbar: accent thumb on a transparent track (Firefox, Chrome 121+, Safari 26+).
+       Once these are set, Chrome ignores the ::-webkit-scrollbar rules below. */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-accent) transparent;
+  }
+
+  /* Scrollbar fallback for older Safari: ~8px, transparent track, pill thumb, no arrows. */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-button {
+    display: none;
   }
 
   body {
@@ -58,5 +82,21 @@
     line-height: 1.55;
     /* Nothing scrolls sideways at any width (constitution §6). */
     overflow-x: clip;
+    /* No text selection anywhere on the page. */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Form fields stay selectable so typing and editing still work. */
+  input,
+  textarea,
+  [contenteditable] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* Images can't be dragged out (Chromium and Safari; no standard property exists). */
+  img {
+    -webkit-user-drag: none;
   }
 }

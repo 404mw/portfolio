@@ -15,7 +15,7 @@ export const hero = {
   sideLine: "I build AI agents that take repetitive work off your team, and the websites around them.",
   tag: "AI agents · End-to-end web",
   seeProofs: "See proofs",
-  portraitAlt: "Muhammad Waqas, waist-up, against a dark background.",
+  portraitAlt: "Muhammad Waqas, head and shoulders, in black and white, with glasses, a beard and a dark collared shirt, looking to one side.",
 } as const;
 
 export const marquee = {

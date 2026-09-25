@@ -5,8 +5,8 @@ motion pass, ships 2026-09-30. Reference design: `temp/claude-design/Portfolio R
 
 ## Rules (non-negotiable)
 
-1. **No code without a page doc.** Read `docs/pages/<page>/page.md` before touching that page's
-   code. If there's no doc, spawn `page-doc-manager` to create one first. Every change gets a
+1. **No code without a page doc.** Read `docs/pages/<page>/page.md` (the index) and the touched section's
+   `sections/NN-<slug>.md` before touching that page's code. If there's no doc, spawn `page-doc-manager` to create one first. Every change gets a
    one-line decision before it and a Current State update after it.
 
 2. **Ask before assuming.** Use `AskUserQuestion` for ambiguous design choices, non-obvious UX,
@@ -44,8 +44,10 @@ Single Next.js app (App Router, TypeScript, Tailwind v4):
 | `docs/03-facts.md` | The only claims the site may make. Only the user edits it. |
 | `docs/04-voice.md` | How the site's words are written, with length limits |
 | `temp/claude-design/Portfolio Redesign v3.dc.html` | Reference design, layout and behaviour only (local, gitignored) |
-| `docs/pages/<page>/page.md` | One doc per page: sections, decisions, current state |
-| `docs/pages/<page>/ui-spec.md` | The ui-designer's spec for that page |
+| `docs/pages/<page>/page.md` | Page index: sections table, site-wide state, decisions, open-question roll-up |
+| `docs/pages/<page>/sections/NN-<slug>.md` | One per section: its current state, key files, decisions, open questions |
+| `docs/pages/<page>/ui-spec.md` | UI spec index: shared rules (§0), motion summary, tokens, choices |
+| `docs/pages/<page>/ui-spec/NN-<slug>.md` | The ui-designer's spec for one section |
 
 ## Orchestration
 
@@ -57,7 +59,7 @@ pre-digested brief. Never write site code or page text yourself.
 |---|---|
 | Page copy in `content/` | `copywriter`, before `web-coder` |
 | Site code (pages, components, SEO, counting) | `web-coder` |
-| Create / update a page doc | `page-doc-manager`, the only writer of `docs/pages/*/page.md` |
+| Create / update a page doc | `page-doc-manager`, the only writer of `docs/pages/*/page.md` and `sections/*.md` |
 | Review a page doc (read-only) | `page-docs review` skill |
 | UI spec for a new section or page | `ui-designer` → `copywriter` → `web-coder` |
 | Tokens: setup, check, add | `design-tokens` skill (a new token needs the user's yes) |

@@ -1,6 +1,7 @@
 "use client";
 // Agents variant A (ui-spec §4.2): a vertical tab list of the four offers beside one demo
-// panel. The panels are rendered on the server and passed in. Without JavaScript the tab list
+// panel; the label and tab list stay sticky from `lg` while the panel scrolls. The panels are
+// rendered on the server and passed in. Without JavaScript the tab list
 // and panels hide (`noscript:`), and `fallback` (variant B's list) shows in their place.
 import type { ReactNode } from "react";
 import { AgentRowText } from "@/components/home/agents/AgentRowText";
@@ -9,7 +10,7 @@ import { agents } from "@/content/home";
 import { useRovingTabs } from "@/hooks/useRovingTabs";
 import { agentRowIds } from "@/lib/agents";
 import { listNumber } from "@/lib/listNumber";
-import { focusRing } from "@/lib/styles";
+import { focusRing, splitColumns, stickyTitle } from "@/lib/styles";
 
 type AgentsTabsProps = {
   readonly idPrefix: string;
@@ -25,8 +26,8 @@ export function AgentsTabs({ idPrefix, panels, fallback }: AgentsTabsProps) {
   const nameId = (index: number) => `${idPrefix}-name-${index}`;
 
   return (
-    <div className="grid gap-10 noscript:block md:gap-12 lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-24">
-      <div className="flex flex-col gap-10">
+    <div className={`${splitColumns} noscript:block lg:items-center`}>
+      <div className={`flex flex-col gap-10 ${stickyTitle}`}>
         <SectionLabel as="h2" id={labelId} number={agents.number} label={agents.label} />
         <div
           role="tablist"

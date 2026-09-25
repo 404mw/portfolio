@@ -20,8 +20,9 @@ from the brief; don't re-read files it already summarizes unless you find a cont
 ## Before writing anything
 
 1. Read `docs/00-constitution.md` §5 (look and motion) and §6 (phone first).
-2. Read the section's **Motion (later)** lines in `docs/pages/home/ui-spec.md` and the motion
-   decisions in `docs/pages/home/page.md`. That is the spec; don't invent extra motion.
+2. Read the section's **Motion (later)** lines in `docs/pages/home/ui-spec/NN-<slug>.md` (and the §10 summary in
+   `docs/pages/home/ui-spec.md`) and the motion
+   decisions in `docs/pages/home/page.md` and that section's `docs/pages/home/sections/NN-<slug>.md`. That is the spec; don't invent extra motion.
 3. **Load the GSAP skills you need with the Skill tool** before writing code: always
    `gsap-react` and `gsap-core`; add `gsap-scrolltrigger`, `gsap-timeline`, `gsap-plugins`,
    `gsap-utils` and `gsap-performance` as the work needs them. Follow them over memory.

@@ -10,7 +10,8 @@ description: Standard end-to-end workflow for building or changing a marwix.dev 
 Before planning or delegating anything:
 
 1. Read `docs/00-constitution.md`.
-2. Read the page doc (`docs/pages/<page>/page.md`). If there's none, spawn `page-doc-manager` to
+2. Read the page doc index (`docs/pages/<page>/page.md`) and the section files the work
+   touches (`sections/NN-<slug>.md`). If there's none, spawn `page-doc-manager` to
    create it, then invoke `page-docs review` (read-only). Resolve any HIGH findings before going
    on.
 3. Read the relevant source files. Record exact paths and line numbers for everything that must
@@ -55,7 +56,7 @@ run at once only on files that don't overlap, or each in its own worktree (`isol
 "worktree"`).
 12. Run the checks yourself (see **Checks** below): `build`, `lint`, `screens`. Send code
     failures to `web-coder` and overflowing words to `copywriter`, then run them again.
-13. Before a production deploy, check every `docs/pages/*/page.md` for Open Questions. If any
+13. Before a production deploy, check every `docs/pages/*/page.md` and `sections/*.md` for Open Questions. If any
     list isn't empty, show the user what's left and don't deploy to production. Otherwise confirm
     with the user, then spawn `deployer`.
 
@@ -83,14 +84,14 @@ doc via `page-doc-manager`. No agent rewrites the user's lines.
 ```
 Page / section: <page> → <section>
 The one question this section answers: <from the page doc>
-Spec output path: docs/pages/<page>/ui-spec.md
+Spec output path: docs/pages/<page>/ui-spec/NN-<slug>.md (shared rules: ui-spec.md)
 Constraints: <anything from the constitution or page doc that applies>
 ```
 
 **copywriter:**
 ```
-Page doc: docs/pages/<page>/page.md
-UI spec: docs/pages/<page>/ui-spec.md (or "none")
+Page doc: docs/pages/<page>/page.md + sections/NN-<slug>.md
+UI spec: docs/pages/<page>/ui-spec/NN-<slug>.md (or "none")
 Slots: <content keys to write or change, each with its one question and length limit>
 Facts: <the lines in docs/03-facts.md they draw on, and any still [FILL: …]>
 User lines: <lines the user edited, to leave alone>
@@ -98,8 +99,8 @@ User lines: <lines the user edited, to leave alone>
 
 **web-coder:**
 ```
-Page doc: docs/pages/<page>/page.md
-UI spec: docs/pages/<page>/ui-spec.md (or "none, tier 1")
+Page doc: docs/pages/<page>/page.md + sections/NN-<slug>.md
+UI spec: docs/pages/<page>/ui-spec/NN-<slug>.md (or "none, tier 1")
 Content: content/<page>.ts → <keys this section reads>
 
 Files to change:
@@ -116,14 +117,14 @@ Scope: <what to build, which components to reuse or extend, and what NOT to touc
 
 **page-doc-manager (create):**
 ```
-Doc path: docs/pages/<page>/page.md
+Doc path: docs/pages/<page>/page.md (+ sections/NN-<slug>.md for section work)
 Task: create
 Intent: <what this page does; the basis for Current State and the first decision line>
 ```
 
 **page-doc-manager (decision, alongside web-coder):**
 ```
-Doc path: docs/pages/<page>/page.md
+Doc path: docs/pages/<page>/page.md (+ sections/NN-<slug>.md for section work)
 Task: update — decision only
 Decision to record: <one line: what is being built and why>
 Also: <sections, key files, open questions from the brief>
@@ -132,7 +133,7 @@ Don't touch: Current State, Status (web-coder is still building)
 
 **page-doc-manager (current state, after web-coder):**
 ```
-Doc path: docs/pages/<page>/page.md
+Doc path: docs/pages/<page>/page.md (+ sections/NN-<slug>.md for section work)
 Task: update — current state
 From web-coder: <its Decision to record line(s) for the round>
 Verify against: <the files web-coder changed>

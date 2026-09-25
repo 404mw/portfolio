@@ -6,15 +6,15 @@ import { SectionLabel } from "@/components/SectionLabel";
 import { web } from "@/content/home";
 import { listNumber } from "@/lib/listNumber";
 import { sectionIds } from "@/lib/routes";
-import { container } from "@/lib/styles";
+import { container, splitGrid, stickyTitle } from "@/lib/styles";
 
 export function WebSection() {
   return (
     <section id={sectionIds.web} className="scroll-mt-20 px-gutter">
       <div
-        className={`${container} grid gap-10 border-t border-line py-section md:gap-12 lg:grid-cols-2 lg:items-start lg:gap-16 xl:gap-24`}
+        className={`${container} ${splitGrid} border-t border-line py-section`}
       >
-        <div data-anim="reveal" className="flex flex-col gap-7 lg:sticky lg:top-30">
+        <div data-anim="reveal" className={`flex flex-col gap-7 ${stickyTitle}`}>
           <SectionLabel number={web.number} label={web.label} />
           <SectionHeading lead={web.heading.lead} accent={web.heading.accent} size="heading-sm" />
           <p className="max-w-sm text-lead leading-normal text-muted">{web.lead}</p>

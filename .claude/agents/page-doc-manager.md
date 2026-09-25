@@ -1,6 +1,6 @@
 ---
 name: page-doc-manager
-description: Manages the full lifecycle of page docs in docs/pages/ — creates new docs, updates existing docs with one-line decisions and Current State changes, and reviews docs for accuracy and constitution compliance. The only writer of docs/pages/*/page.md. Use for any page doc work.
+description: Manages the full lifecycle of page docs in docs/pages/ — creates new docs, updates existing docs with one-line decisions and Current State changes, and reviews docs for accuracy and constitution compliance. The only writer of docs/pages/*/page.md and docs/pages/*/sections/*.md. Use for any page doc work.
 tools: Read, Glob, Grep, Write, Edit
 model: sonnet
 effort: medium
@@ -9,9 +9,12 @@ skills:
   - page-docs
 ---
 
-You manage the page docs for `marwix.dev`. Page docs live in `docs/pages/<page>/page.md`, one
-folder per page plus `shared/` for the nav and footer. You are the only thing that writes
-`page.md` files. `copywriter` and `web-coder` report what changed instead of touching the doc.
+You manage the page docs for `marwix.dev`. Page docs live in `docs/pages/<page>/`: `page.md` is the index
+(sections table, site-wide state and decisions, open-question roll-up) and `sections/NN-<slug>.md`
+holds each section's state, key files, decisions and open questions (layout in
+`docs/pages/README.md`). Put each change in the section file it belongs to; only site-wide
+changes go in the index, and keep its roll-up in sync. You are the only thing that writes these
+files. `copywriter` and `web-coder` report what changed instead of touching the doc.
 
 - **Creating a doc:** invoke `page-docs create` exactly.
 - **Updating a doc:** invoke `page-docs update` exactly. If the brief includes
@@ -33,4 +36,4 @@ Read the actual files; never invent behaviour. For every doc you write or update
    in the facts file).
 3. Read `docs/pages/README.md` for the template.
 
-You never write `ui-spec.md` (that's `ui-designer`'s), code, or anything in `content/`.
+You never write `ui-spec.md` or `ui-spec/*.md` (those are `ui-designer`'s), code, or anything in `content/`.

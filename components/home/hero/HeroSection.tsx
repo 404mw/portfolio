@@ -1,10 +1,13 @@
-// Section 2, Hero: who is this? (ui-spec §2). Three layers: the grid, the portrait, and the
-// text on top. `#top` is also what the Nav observes to turn solid once the hero has passed.
+// Section 2, Hero: who is this? (ui-spec §2). The backdrop paints behind everything; the
+// content layer holds three rows (side line, stage, actions). The layer and its grid carry no
+// z-index, transform or opacity, so the name lines and the portrait share the section's one
+// `isolate` stacking context (§2.1.1). From `lg` the grid is `relative` (position only), so
+// the portrait frame is placed against the full-height site column. `#top` is also what the
+// Nav observes to turn solid once the hero has passed.
 import { HeroActions } from "@/components/home/hero/HeroActions";
-import { HeroGrid } from "@/components/home/hero/HeroGrid";
-import { HeroName } from "@/components/home/hero/HeroName";
-import { HeroPortrait } from "@/components/home/hero/HeroPortrait";
+import { HeroBackdrop } from "@/components/home/hero/HeroBackdrop";
 import { HeroSideLine } from "@/components/home/hero/HeroSideLine";
+import { HeroStage } from "@/components/home/hero/HeroStage";
 import { sectionIds } from "@/lib/routes";
 import { container } from "@/lib/styles";
 
@@ -14,14 +17,13 @@ export function HeroSection() {
       id={sectionIds.top}
       className="relative isolate h-svh max-h-300 min-h-160 overflow-hidden"
     >
-      <HeroGrid />
-      <HeroPortrait />
-      <div data-anim="hero-text" className="relative z-10 h-full px-gutter">
+      <HeroBackdrop />
+      <div className="relative h-full px-gutter">
         <div
-          className={`${container} grid h-full grid-rows-[auto_1fr_auto] pt-24 pb-8 md:pt-28 md:pb-10`}
+          className={`${container} grid h-full grid-rows-[auto_minmax(0,1fr)_auto] gap-4 pt-24 pb-8 md:pt-28 md:pb-10 lg:relative`}
         >
           <HeroSideLine />
-          <HeroName />
+          <HeroStage />
           <HeroActions />
         </div>
       </div>

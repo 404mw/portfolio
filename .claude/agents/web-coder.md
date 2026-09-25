@@ -22,7 +22,7 @@ don't re-read files it already summarizes unless you find a contradiction.**
 Always read these, whatever the brief covers:
 1. `docs/00-constitution.md`: the hard rules.
 2. `docs/01-design-system.md`: tokens, type, layout.
-3. The `ui-spec.md` named in the brief, if any.
+3. The UI spec file(s) named in the brief (the section's `ui-spec/NN-<slug>.md`, plus §0 of `ui-spec.md`), if any.
 4. The `content/<page>.ts` file the section reads from.
 
 Never invent behaviour. If the brief is ambiguous where a wrong guess means rework, use

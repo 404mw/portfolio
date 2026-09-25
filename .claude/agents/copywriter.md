@@ -19,7 +19,7 @@ Read all of these, every time:
 3. `docs/00-constitution.md`: §2 (each page's one question), §3 (order and the main action),
    §7 (only what's in the facts file) and §8 (copy).
 4. The page doc named in the brief: each section's one question and its content key.
-5. The `ui-spec.md` named in the brief, if any: each slot's meaning and length limit.
+5. The UI spec file(s) named in the brief, if any: each slot's meaning and length limit.
 6. The current `content/<page>.ts`, and its history: `git log -p content/<page>.ts`.
 
 ## How you write

@@ -1,6 +1,6 @@
 # Design system
 
-**Last Updated:** 2026-09-24
+**Last Updated:** 2026-09-25
 
 The look of `marwix.dev`. Layout and behaviour follow the reference design
 (`temp/claude-design/Portfolio Redesign v3.dc.html`); **colours and type come only from this
@@ -16,7 +16,7 @@ step.
 | `--color-band` | `#141413` | Raised surfaces on dark: panels, the marquee strip, inputs |
 | `--color-text` | `#F2F1EC` | Body and headings on dark |
 | `--color-muted` | `#9A9993` | Secondary text on dark, section labels, meta text |
-| `--color-line` | `#2A2A27` | Hairlines, borders and the hero grid on dark |
+| `--color-line` | `#2A2A27` | Hairlines and borders on dark |
 | `--color-cream` | `#EEECE5` | Proof cards and the project takeover |
 | `--color-ink` | `#0E0E0C` | Text on cream |
 | `--color-cream-muted` | `#6B6A63` | Secondary text on cream |
@@ -28,8 +28,9 @@ accent words in headings, active states, the progress bar, primary buttons, focu
 
 **Mapping the reference's greys.** The reference's many near-black and grey steps collapse onto the
 tokens above: its panels, marquee strip and inputs use `band`; every hairline and its dashed
-lines use `line`; its hero grid is `line` at reduced opacity (a Tailwind `/` opacity modifier,
-never a raw value); all its secondary and meta greys use `muted`, keeping 4.5:1 contrast; its
+lines use `line`; the hero backdrop (light pool and agent network, which replaced v3's grid) is
+`accent` at reduced strength (a Tailwind `/` opacity modifier or canvas `globalAlpha`, never a raw
+value); all its secondary and meta greys use `muted`, keeping 4.5:1 contrast; its
 cream cards and takeover use `cream`, `ink` and `cream-muted`. Dimmed, inactive text (the
 reference's dark grey list rows) is `muted` at reduced opacity only where it isn't body text.
 
