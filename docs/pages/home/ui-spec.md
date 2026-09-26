@@ -1,6 +1,6 @@
 # Home: UI spec
 
-**Last Updated:** 2026-09-25
+**Last Updated:** 2026-09-26
 **Sources:** `docs/pages/home/page.md` (decisions 1–44, the source of truth), constitution §2–§9,
 `docs/01-design-system.md`, `app/globals.css`, v3 reference (layout and behaviour only),
 `docs/03-facts.md`, `docs/04-voice.md`.
@@ -101,6 +101,12 @@ typing effects are off, leaving the static final state. Two exceptions: the marq
 (it pauses on hover in both modes), and the nav progress bar still tracks scroll position, set
 directly with no scrub smoothing (1.5). Generic scroll reveal: `data-anim="reveal"`,
 with an optional `data-anim-delay` (ms), from `y: 56, opacity: 0`; under reduce, from `opacity: 0` only.
+Process bots (§5.6–5.7, `data-anim="process-bot"`): stop-motion on one 125ms tick (8fps), no
+tweens or easing. Breathing: an 18-step cycle (breath 0 ×8, 1 ×2, 2 ×6, 1 ×2; 2.25s), phase offsets
+0, 11, 5, 14 steps (rules, team, check, update), set as the `transform` attribute on every
+`[data-breath]` group from the §5.6 breath table. Frame swaps toggle `invisible` on the `data-frame`
+groups (idle ↔ blink, idle ↔ act, an occasional sleep). Both pause off screen and when the tab is
+hidden; under reduce, no breathing and no swaps: the static pose at breath 0.
 
 ## Tokens
 
@@ -118,7 +124,8 @@ until `lg` (each card about 600px tall at 768) or stretching the third card acro
 
 **Accepted by the user, 2026-09-24:**
 
-1. Process ring from `xl` with a 4/8 split; the column below `xl`.
+1. Process ring from `xl` with a 4/8 split; the column below `xl`. **Superseded 2026-09-26** by the
+   stacked canvas with mascots (§5).
 2. Hero height capped at 1200px (confirmed).
 3. Hero name at 360px: screen check; if MUHAMMAD clips, the fix is a 16px phone gutter or `wdth 75` on phone.
 4. Nav solid state from a client observer; server markup starts transparent.

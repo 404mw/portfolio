@@ -20,11 +20,13 @@ export const hero = {
 
 export const marquee = {
   items: [
+    "Specialized agents",
+    "Enforced Ruls",
     "Customer messages",
     "Lead follow-up",
     "Recurring reports",
     "Connected tools",
-    "Websites, end to end",
+    "Webs apps",
   ],
 } as const;
 

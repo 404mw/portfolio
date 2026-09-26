@@ -1,9 +1,9 @@
 # Home
 
-**Last Updated:** 2026-09-25
+**Last Updated:** 2026-09-26
 
-> **Status:** GSAP motion pass started (Hero done); next: motion for the remaining sections, then
-> deploy
+> **Status:** GSAP motion pass started (Hero, Nav, Marquee, Agents and Process done); next: motion
+> for the remaining sections, then deploy
 
 **The one question:** Can they help me?
 
@@ -19,7 +19,7 @@ plus that section's file only.
 | 2 | Hero | Who is this? | `docs/03-facts.md` → Who | Decided | `sections/02-hero.md` |
 | 3 | Marquee | (transition, no claim) | none | Decided | `sections/03-marquee.md` |
 | 4 | Agents | What can their agents handle for my business? | `docs/03-facts.md` → What the user builds | Decided | `sections/04-agents.md` |
-| 5 | Process | How do they work? | `docs/03-facts.md` → How the user works | Redesign pending | `sections/05-process.md` |
+| 5 | Process | How do they work? | `docs/03-facts.md` → How the user works | Built, motion done | `sections/05-process.md` |
 | 6 | Web | Can they build my website end-to-end? | `docs/03-facts.md` → What the user can build | Decided | `sections/06-web.md` |
 | 7 | Proofs | Have they built something real that people use? | `docs/03-facts.md` → Work that is live | Decided | `sections/07-proofs.md` |
 | 8 | Contact | How do I start? | `docs/03-facts.md` → Contact | Decided | `sections/08-contact.md` |
@@ -29,15 +29,16 @@ plus that section's file only.
 
 All nine sections are built statically; section detail lives in `sections/`. Build, lint and tsc
 are green, and the lead re-checked 360/1024/1280/1440/3840 after the latest fixes: every title
-column pins from `lg` except Proofs (Process from `xl`), and nothing scrolls sideways. Type tokens
-are rem-based (zoom-safe). Every batch has been audited; all HIGH and SHOULD items are fixed or
-decided. Counting is wired (Umami Cloud). The GSAP motion pass has started: the Hero is done (see
-`sections/02-hero.md`); the other sections are next, then deploy.
+column pins from `lg` except Proofs and Process (neither pins), and nothing scrolls sideways. Type
+tokens are rem-based (zoom-safe). Every batch has been audited; all HIGH and SHOULD items are fixed
+or decided. Counting is wired (Umami Cloud). The GSAP motion pass has started: the Hero, Nav
+(progress bar fill), Marquee (loop), Agents (scroll entrance, 6s auto-advance, demo replays) and
+Process (bot breathing/frame swaps, header and step reveals) are done (see `sections/02-hero.md`,
+`sections/01-nav.md`, `sections/03-marquee.md`, `sections/04-agents.md`, `sections/05-process.md`);
+the other sections are next, then deploy.
 
 Site-wide, in `app/globals.css`: the scrollbar is an accent thumb on a transparent track, and text
-selection plus image dragging are off (inputs, textarea and contenteditable stay selectable). The
-scroll progress bar stays as built (empty), still slated for the GSAP pass (see
-`sections/01-nav.md`).
+selection plus image dragging are off (inputs, textarea and contenteditable stay selectable).
 
 ## Key Files (site-wide)
 
@@ -52,7 +53,7 @@ scroll progress bar stays as built (empty), still slated for the GSAP pass (see
 - `lib/styles.ts` — shared style helpers: the takeover's cream-side tokens (`pillInk`,
   `focusRingOnCream`, `metaLabelOnCream`) and the split/sticky-title helpers (`splitColumns`,
   `splitGrid` adds `lg:items-start`, `stickyTitle` `lg:sticky lg:top-30 lg:self-start`,
-  `stickyTitleXl` for Process)
+  `stickyTitleXl`, formerly for Process — being removed, see Decisions)
 - `lib/routes.ts` — route/anchor targets
 - `lib/track.ts`, `lib/analytics.ts`, `components/Analytics.tsx` — the one Book a call tracking
   key and the Umami Cloud counting setup (script only loads once `NEXT_PUBLIC_UMAMI_WEBSITE_ID`
@@ -62,7 +63,12 @@ scroll progress bar stays as built (empty), still slated for the GSAP pass (see
 - `lib/gsap.ts` — the one place GSAP and its plugins (`ScrollTrigger`, `useGSAP`) are registered;
   every motion hook imports GSAP from here
 - `lib/motion.ts` — shared motion settings for the GSAP pass: reduced-motion/fine-pointer media
-  queries, durations, eases, staggers, and the `data-anim` hook query
+  queries, durations, eases, staggers, `reveal` (the generic scroll entrance, ui-spec §10), and the
+  `data-anim` hook query
+- `lib/watchLive.ts` — shared: whether an element is on screen and its tab visible, used to pause
+  loops/timers (Agents' auto-advance and demo loops, Process' bots) when nobody can see them
+- `hooks/useScrollReveal.ts` — the reusable scroll-reveal hook for any section's `data-anim="reveal"`
+  elements; used by Hero and Process, still unused (not yet animated) by Contact, Web and Proofs
 
 ## Decisions (site-wide)
 
@@ -90,7 +96,11 @@ scroll progress bar stays as built (empty), still slated for the GSAP pass (see
   sticky at 120px, from `lg` up); Agents pins its left column, Process from `xl`, Contact its left
   column; phone/tablet unpinned; Proofs excluded (reverted layout, see `sections/07-proofs.md`).
   The pattern is written once in `lib/styles.ts` (`splitColumns`, `splitGrid`, `stickyTitle`,
-  `stickyTitleXl`).
+  `stickyTitleXl`). **Process clause superseded 2026-09-26.**
+- 2026-09-26 — Process is excluded from the sticky-title pattern, like Proofs: the canvas's
+  stacked layout puts the heading above the steps at every width, with no pinned title column.
+  `stickyTitleXl` is being removed from `lib/styles.ts` (Process was its only user). See
+  `sections/05-process.md`.
 - 2026-09-25 — Site-wide, in `app/globals.css` (user's request): the scrollbar is an accent thumb
   on a transparent track; text selection and image dragging are off everywhere (inputs, textarea
   and `[contenteditable]` stay selectable).
@@ -106,6 +116,6 @@ scroll progress bar stays as built (empty), still slated for the GSAP pass (see
 - **Constitution:** the user to add the takeover/Book a call exception under §3.
 - **To do:** the site has no favicon (`/favicon.ico` 404s).
 - **Roll-up:** section-specific open questions remain in `sections/02-hero.md` (4),
-  `sections/04-agents.md` (2), `sections/05-process.md` (3), `sections/07-proofs.md` (3) and
+  `sections/04-agents.md` (2), `sections/05-process.md` (2), `sections/07-proofs.md` (3) and
   `sections/08-contact.md` (1). The pre-deploy check reads this roll-up and every section file;
   the page ships with none open anywhere.

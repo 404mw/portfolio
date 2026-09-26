@@ -1,4 +1,4 @@
-// A chevron pointing up: direction on the process return line.
+// A chevron pointing up: the arrowhead on the process return path.
 import { Icon, type IconProps } from "@/components/icons/Icon";
 
 export function ChevronUpIcon(props: IconProps) {

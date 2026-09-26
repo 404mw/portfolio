@@ -3,10 +3,13 @@
 // panel; the label and tab list stay sticky from `lg` while the panel scrolls. The panels are
 // rendered on the server and passed in. Without JavaScript the tab list
 // and panels hide (`noscript:`), and `fallback` (variant B's list) shows in their place.
-import type { ReactNode } from "react";
+// Motion (entrance, auto-advance, demo replays) comes from `useAgentsMotion`, through the
+// `data-anim` hooks below; the markup is the static layout either way.
+import { useRef, type ReactNode } from "react";
 import { AgentRowText } from "@/components/home/agents/AgentRowText";
 import { SectionLabel } from "@/components/SectionLabel";
 import { agents } from "@/content/home";
+import { useAgentsMotion } from "@/hooks/useAgentsMotion";
 import { useRovingTabs } from "@/hooks/useRovingTabs";
 import { agentRowIds } from "@/lib/agents";
 import { listNumber } from "@/lib/listNumber";
@@ -24,15 +27,18 @@ export function AgentsTabs({ idPrefix, panels, fallback }: AgentsTabsProps) {
   const tabId = (index: number) => `${idPrefix}-tab-${index}`;
   const panelId = (index: number) => `${idPrefix}-panel-${index}`;
   const nameId = (index: number) => `${idPrefix}-name-${index}`;
+  const root = useRef<HTMLDivElement>(null);
+  useAgentsMotion(root, { selected, select, labelId });
 
   return (
-    <div className={`${splitColumns} noscript:block lg:items-center`}>
+    <div ref={root} className={`${splitColumns} noscript:block lg:items-center`}>
       <div className={`flex flex-col gap-10 ${stickyTitle}`}>
         <SectionLabel as="h2" id={labelId} number={agents.number} label={agents.label} />
         <div
           role="tablist"
           aria-orientation="vertical"
           aria-labelledby={labelId}
+          data-anim="agents-tablist"
           className="noscript:hidden"
         >
           {agents.items.map((item, index) => {
@@ -50,6 +56,7 @@ export function AgentsTabs({ idPrefix, panels, fallback }: AgentsTabsProps) {
                 tabIndex={isSelected ? 0 : -1}
                 onClick={() => select(index)}
                 onKeyDown={onKeyDown}
+                data-anim="agents-row"
                 className={`group relative block w-full cursor-pointer border-t border-line py-5 text-left ${focusRing}`}
               >
                 <span
@@ -71,7 +78,7 @@ export function AgentsTabs({ idPrefix, panels, fallback }: AgentsTabsProps) {
         </div>
         <noscript>{fallback}</noscript>
       </div>
-      <div className="noscript:hidden">
+      <div data-anim="agents-panels" className="noscript:hidden">
         {panels.map((panel, index) => (
           <div
             key={panelId(index)}
@@ -80,6 +87,7 @@ export function AgentsTabs({ idPrefix, panels, fallback }: AgentsTabsProps) {
             aria-labelledby={agentRowIds(nameId(index)).labelledBy}
             tabIndex={0}
             hidden={index !== selected}
+            data-anim="agent-panel"
             className={`rounded-3xl ${focusRing}`}
           >
             {panel}

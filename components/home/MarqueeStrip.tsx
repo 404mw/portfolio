@@ -1,16 +1,21 @@
 // Section 3, Marquee: a transition strip, no claim (ui-spec §3). The visible strip is
-// decorative (`aria-hidden`) and holds two identical sets so the motion pass can loop it by
-// moving the track to -50%; screen readers get the plain list instead. Static: one still,
-// clipped row that never scrolls the page sideways.
+// decorative (`aria-hidden`) and holds two identical sets, each with the items twice, so the
+// motion pass can loop it by moving the track to -50%; screen readers get the plain list instead.
+// Static: one still, clipped row that never scrolls the page sideways. `MarqueeMotion` (client)
+// renders nothing; it finds the strip by `data-anim="marquee"` and loops the track.
+import { MarqueeMotion } from "@/components/home/MarqueeMotion";
 import { AsteriskIcon } from "@/components/icons/AsteriskIcon";
 import { marquee } from "@/content/home";
 import { condensed } from "@/lib/styles";
 
 const sets = ["a", "b"] as const;
+// Each set repeats the items twice so one set is wider than a 3840px viewport.
+const runs = [1, 2] as const;
 
 export function MarqueeStrip() {
   return (
-    <div className="overflow-hidden border-y border-line bg-band py-5.5">
+    <div data-anim="marquee" className="overflow-hidden border-y border-line bg-band py-5.5">
+      <MarqueeMotion />
       <div aria-hidden="true" data-anim="marquee-track" className="flex w-max">
         {sets.map((set) => (
           <div
@@ -18,15 +23,17 @@ export function MarqueeStrip() {
             data-anim="marquee-set"
             className="flex shrink-0 items-center gap-14 pr-14"
           >
-            {marquee.items.map((item) => (
-              <span
-                key={item}
-                className={`flex items-center gap-14 font-display text-marquee leading-none font-medium tracking-[-0.02em] whitespace-nowrap text-muted/30 ${condensed}`}
-              >
-                {item}
-                <AsteriskIcon className="size-8 shrink-0 text-accent" />
-              </span>
-            ))}
+            {runs.flatMap((run) =>
+              marquee.items.map((item) => (
+                <span
+                  key={`${run}-${item}`}
+                  className={`flex items-center gap-14 font-display text-marquee leading-none font-medium tracking-[-0.02em] whitespace-nowrap text-muted/30 ${condensed}`}
+                >
+                  {item}
+                  <AsteriskIcon className="size-8 shrink-0 text-accent" />
+                </span>
+              )),
+            )}
           </div>
         ))}
       </div>

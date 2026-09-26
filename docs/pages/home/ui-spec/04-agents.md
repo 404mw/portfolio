@@ -135,9 +135,17 @@ The user picked variant A (tab list), 2026-09-24. Variant B's list (`AgentsStack
   `hooks/useRovingTabs.ts`; `lib/agents.ts` (the demo kind per offer, its type tied to
   `agents.items` so an offer can't be added or removed without its demo; the row ids from
   `agentRowIds()`); `lib/listNumber.ts` (0 → "01", shared by numbered rows). **Images:** none.
-- **Motion (later):**
-  - A: 6s auto-advance; the selected row's `agent-progress` grows `scaleX` 0→1 over 6s; paused on
-    hover or focus-within. Under reduced motion there's no auto-advance and no growth: the selected
+- **Motion (built):** `hooks/useAgentsMotion.ts` (entrance, auto-advance, blink, replay) and
+  `lib/agentDemoSequences.ts` (each demo's timeline).
+  - Motion hooks (non-visual `data-anim`): `agents-tablist` on the tab list, `agents-row` on each
+    tab row, `agents-panels` on the panel column, `agent-panel` on each tabpanel.
+  - Entrance (once, when the section enters view): the label and the `agents-row` rows rise from
+    `y 56` with opacity 0, staggered 0.08s; the `agents-panels` column fades up. Under reduced
+    motion it's opacity only.
+  - A: 6s auto-advance; the selected row's `agent-progress` grows `scaleX` 0→1 over 6s. It pauses
+    on pointer hover over the tab list or panel, keyboard focus in the tab list, any focus in the
+    panel, and while the section is off screen or the browser tab is hidden; it resumes where it
+    stopped. Under reduced motion there's no auto-advance and no growth: the selected
     row's line is full (the static state). The line fades up when its row is selected; under
     reduced motion it only fades.
   - Status dot: opacity blink loop; off under reduced motion (a solid dot).
@@ -145,7 +153,8 @@ The user picked variant A (tab list), 2026-09-24. Variant B's list (`AgentsStack
     parts pop in (`y 8px, scale .96 → none`) in `data-demo-order`. Chat: typing dots show, then hide
     before the reply. Leads: each `demo-before` pill swaps to "followed up", staggered. Report: bars
     grow `scaleY` from the bottom, staggered, then the pill pops. Sync: packets travel left→right
-    along their connector on a loop, then events and the pill pop.
+    along their connector on a loop, fading in and out at each end so the loop doesn't jump, then
+    events and the pill pop.
   - Under reduced motion each demo shows its finished state (4.4): its parts fade in by
     `data-demo-order` with no pop, rise or scale. No typing dots, the Leads pills already read
     "followed up", the bars stand at full height and the packets rest at their midpoints.

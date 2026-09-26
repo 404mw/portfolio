@@ -1,6 +1,6 @@
 # Hero
 
-**Last Updated:** 2026-09-25 (network nodes drift; pulses ride the moving links)
+**Last Updated:** 2026-09-26 (portrait pointer tilt halved again — ±1.5°/±1°)
 
 **The one question:** Who is this?
 
@@ -26,7 +26,7 @@ full and dim while the hero is in view; on scroll, `hero-text` wrappers move at 
 (plain `opacity`, so the side line, tag and buttons stay in the tab order and the accessibility
 tree; the lead checked this — opacity 0, visibility visible) by 75% of the viewport, and the portrait
 moves at 0.15× and scales to 1.06; the portrait also tilts subtly in 3D to face the pointer on fine
-pointers (up to ±3° `rotationY` left/right, ±2° `rotationX` up/down, 1100px perspective, smoothed
+pointers (up to ±1.5° `rotationY` left/right, ±1° `rotationX` up/down, 1100px perspective, smoothed
 over 0.7s, easing flat when the pointer leaves the window or the hero leaves the screen; it never
 moves, so it composes with the scroll parallax/scale). The canvas network's nodes each drift
 slowly and independently on `gsap.ticker` (seeded sine loops, 6–10px, 6–12s per axis, random
@@ -36,7 +36,7 @@ at 110px/s) ride the moving links. The whole network redraws each tick; off scre
 hidden, or under reduced motion it shows the plain static drawing. Reduced motion keeps only short
 opacity fades; the blink, scroll parallax, pointer tilt and network motion are off. The lead
 screen-checked full and reduced motion at 1440×900 (`:3000`): both match spec, no sideways scroll,
-entrance clean; the lead also checked the tilt (corners 2.96°/1.96°, centre flat), combining with
+entrance clean; the lead also checked the tilt (corners 1.48°/0.98°, centre flat), combining with
 scroll with no errors; nodes moved about 10–15px independently over 3s with the lines following,
 at 145fps with no errors, and the canvas stayed identical across 6s under reduced motion.
 
@@ -186,9 +186,11 @@ the top of the hair now runs behind the nav links or touches the top edge.
   stays centred on the head: `top` 100% − 0.77·min(H,66vw), `left` CR + 0.25em − 1.331·min(H,66vw).
   The lead checked the pool centre equals the head centre at 1440×900, 1920×1080 and 1024×768.
   Replaces the fixed "CR + 0.25em − 1.21S" pool offset.
-- 2026-09-25 — User's request: the portrait's pointer tilt is subtler, just enough that the person
-  seems to follow the cursor — ±3° `rotationY` and ±2° `rotationX` (was ±10°/±6°). The lead checked
-  2.96°/1.96° at the corners and flat at the centre. Everything else about the tilt is unchanged.
+- 2026-09-26 — User's request: the portrait's pointer tilt halved again — ±1.5° `rotationY` and
+  ±1° `rotationX` (was ±3°/±2°); perspective 1100 unchanged
+  (`components/home/hero/HeroMotion.tsx` `PORTRAIT_TILT { maxX: 1, maxY: 1.5 }`). The lead checked
+  1.48°/0.98° at the corners at 1440, flat at the centre, combining with scroll. Everything else
+  about the tilt is unchanged.
 - 2026-09-25 — User's request: `HeroBackdrop` now paints network → light pool → vignette → grain,
   so the pool glows over the network's lines. Replaces the earlier pool-then-network order.
 - 2026-09-25 — User's request: the hero network's nodes each drift slowly and independently

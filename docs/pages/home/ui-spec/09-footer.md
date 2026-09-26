@@ -9,9 +9,9 @@ Shared rules and parts (§0): [`../ui-spec.md`](../ui-spec.md). Page doc: [`../s
 - `<footer class="overflow-hidden border-t border-line pt-10">` (full-bleed hairline).
 - Row: `px-gutter` → `{container} flex flex-col items-start gap-6 text-small text-muted md:flex-row md:flex-wrap md:items-center md:justify-between`:
   1. Email: `<a href={links.email}>` `inline-flex min-h-11 items-center text-body-lg text-text hover:text-accent {focusRing}`.
-  2. Socials: `<ul class="flex flex-wrap gap-x-6">`, LinkedIn · Instagram · Discord · WhatsApp as
-     text `ExternalLink`s, `inline-flex min-h-11 items-center hover:text-text {focusRing}`. Each shows
-     only when its address passes `lib/isFilled.ts` (`lib/socialItems.ts` overwritten: text only, no icons).
+  2. Socials: `<ul class="flex flex-wrap gap-x-6">`, LinkedIn · GitHub · Instagram · Discord · WhatsApp (in that order) as
+     text `ExternalLink`s, `inline-flex min-h-11 items-center text-body text-text underline decoration-line underline-offset-4 hover:text-accent hover:decoration-accent active:text-accent active:decoration-accent {focusRing}`. Each shows
+     only when its address passes `lib/isFilled.ts` (`lib/socialItems.ts` overwritten: text only, no icons, the user's call).
   3. `<p>`: `©`, `currentYear()` (build time, `lib/currentYear.ts`), then `footer.copyrightName`.
 - Wordmark (`FooterWordmark`, `aria-hidden`, full bleed, outside the container):
   `mt-10 flex w-full justify-center whitespace-nowrap select-none font-display font-extrabold text-footer-mark leading-[0.78] tracking-[-0.05em] {condensedMark}`.
@@ -22,7 +22,7 @@ Shared rules and parts (§0): [`../ui-spec.md`](../ui-spec.md). Page doc: [`../s
 | Element | Default | Hover | Focus-visible | Active |
 |---|---|---|---|---|
 | Email | `text-text` | `text-accent` | `focusRing` | `text-muted` |
-| Social link | `text-muted` | `text-text` | `focusRing` | `text-text` |
+| Social link | `text-text`, `underline decoration-line` | `text-accent decoration-accent` | `focusRing` | `text-accent decoration-accent` |
 | © / wordmark | static | n/a | n/a | n/a |
 
 ### 9.2 Sizes
@@ -30,7 +30,7 @@ Shared rules and parts (§0): [`../ui-spec.md`](../ui-spec.md). Page doc: [`../s
 | Element | Phone 360 | Tablet 768 | Desktop 1440 | 4K 3840 |
 |---|---|---|---|---|
 | Row | stacked, left | one row, wraps if needed | one row | one row in 1536 |
-| Email / links / © | 16 / 14 / 14px, 44 tall | same | same | same |
+| Email / links / © | 16 / 15 / 14px, 44 tall | same | same | same |
 | Wordmark (`25vw`) | 90px (~302 wide) | 192px | 360px | 960px |
 
 ### 9.3 Slots, components, images, motion
@@ -38,6 +38,7 @@ Shared rules and parts (§0): [`../ui-spec.md`](../ui-spec.md). Page doc: [`../s
 | Key (`content/shared.ts → footer`) | Meaning | Limit |
 |---|---|---|
 | `footer.social.linkedin` / `.instagram` / `.discord` / `.whatsapp` | Link text: the platform name | 1 word |
+| `footer.social.github` | "GitHub": link text; its `links.github` address comes from docs/03-facts.md → Contact | 1 word |
 | `footer.copyrightName` | "Muhammad Waqas" (facts → Name); © and year come from code | fixed |
 | `footer.wordmark` `{lead, accent, tail}` | "MARWIX" (facts → Brand) as "MAR" / "W" / "IX"; `lib/wordmarkLetters.ts` splits the letters | fixed |
 | `links.emailAddress`, `links.email`, `links.*` | Addresses (facts) | fixed |

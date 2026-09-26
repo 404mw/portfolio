@@ -278,8 +278,8 @@ capped at 1200px, confirmed 2026-09-24). Paint order, bottom to top:
     reduced motion (the dot stays at full opacity).
   - Portrait (`hero-portrait`, inner box only): fades in on load (kept under reduced motion). On
     scroll, y moves at 0.15× scroll and the scale goes to 1.06. On `pointer: fine`, a 3D tilt
-    replaces the ±9px drift (the user's call): it turns to face the pointer, `rotationY` ±3° and
-    `rotationX` ±2° at the window's edges, just enough that the person seems to follow the cursor,
+    replaces the ±9px drift (the user's call): it turns to face the pointer, `rotationY` ±1.5° and
+    `rotationX` ±1° at the window's edges, just enough that the person seems to follow the cursor,
     1100px perspective, 0.7s smoothing, no translation. It eases back flat when the pointer leaves
     the window or the hero goes off screen. The mask moves with it. Under reduced motion the
     scroll move, the scale and the tilt are off: the portrait stays still.

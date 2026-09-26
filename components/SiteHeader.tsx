@@ -6,11 +6,13 @@ import { NavBar } from "@/components/NavBar";
 import { NavLinks } from "@/components/NavLinks";
 import { NavMenu } from "@/components/NavMenu";
 import { ProgressBar } from "@/components/ProgressBar";
+import { ProgressMotion } from "@/components/ProgressMotion";
 
 export function SiteHeader() {
   return (
     <header className="fixed inset-x-0 top-0 z-40">
       <ProgressBar />
+      <ProgressMotion />
       <NavBar>
         <NavLinks />
         <NavMenu />

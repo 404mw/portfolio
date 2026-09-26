@@ -1,6 +1,6 @@
 # Footer
 
-**Last Updated:** 2026-09-25
+**Last Updated:** 2026-09-26
 
 **The one question:** Where else can I find/reach them?
 
@@ -9,13 +9,21 @@ See `../page.md` for the site-wide index. Spec: `../ui-spec/09-footer.md`.
 ## Current State
 
 Footer built: email, filled socials, © + build-time year, then the full-bleed `aria-hidden`
-MARWIX wordmark (M and W accent via `lib/wordmarkLetters.ts`, A R I X dim).
+MARWIX wordmark (M and W accent via `lib/wordmarkLetters.ts`, A R I X dim). Social links are
+body-size (`text-body`), full text colour and underlined in the line colour
+(`underline-offset-4`), turning accent on hover or press, so they read as clickable (still no
+icons). Order is fixed: LinkedIn, GitHub, Instagram, Discord, WhatsApp, each shown only once its
+address in `content/shared.ts` → `links` is filled; all five are now filled and show.
+Browser-verified 2026-09-26 at 1440 and 360: all five links are underlined and bright, wrap
+on a phone.
 
 ## Key Files
 
 - `components/SiteFooter.tsx`, `components/FooterLinks.tsx`, `components/FooterWordmark.tsx` —
   the footer row (email, filled socials, © + build-time year) and the full-bleed `aria-hidden`
   MARWIX wordmark
+- `lib/socialItems.ts` — the fixed social order (LinkedIn, GitHub, Instagram, Discord, WhatsApp)
+  and the filter that keeps only entries whose address is filled
 - `lib/wordmarkLetters.ts` — splits the wordmark into letters, marking M and W as accent
 
 ## Decisions
@@ -25,6 +33,9 @@ MARWIX wordmark (M and W accent via `lib/wordmarkLetters.ts`, A R I X dim).
 - 2026-09-24 — Footer row (v3): email on the left; LinkedIn · Instagram · Discord · WhatsApp as
   text links in the middle (each shown only once filled in the facts file); © with the build-time
   year plus the name on the right. It stacks on a phone.
+- 2026-09-26 — Social links are body-size, full text colour and underlined in the line colour
+  (turning accent on hover/press, no icons); GitHub sits after LinkedIn (order: LinkedIn, GitHub,
+  Instagram, Discord, WhatsApp).
 - 2026-09-24 — Footer giant MARWIX wordmark (`--text-footer-mark`, Bricolage `wdth` 75, 800): the
   full word is shown, M and W violet, A R I X dim (decorative, `aria-hidden`). Must not cause
   sideways scroll. Motion (later): v3's scroll reveal (M and W appear, then A R I X slide out);

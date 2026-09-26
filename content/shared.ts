@@ -28,6 +28,7 @@ export const footer = {
   copyrightName: "Muhammad Waqas",
   social: {
     linkedin: "LinkedIn",
+    github: "GitHub",
     instagram: "Instagram",
     discord: "Discord",
     whatsapp: "WhatsApp",
@@ -38,6 +39,7 @@ export const footer = {
 export const links = {
   bookCall: "https://cal.com/marwix/30min",
   linkedin: "https://www.linkedin.com/in/marwix/",
+  github: "https://github.com/404mw",
   instagram: "https://www.instagram.com/marwix.dev/",
   discord: "https://discord.com/users/503890038829088788",
   whatsapp: "https://wa.me/923218966303?text=Hi%20Marwix%2C%20I%27d%20like%20to%20talk%20about%20automating%20my%20business",

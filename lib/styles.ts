@@ -14,9 +14,6 @@ export const splitGrid = `${splitColumns} lg:items-start`;
  * from being stretched to the row height, which would stop it pinning. */
 export const stickyTitle = "lg:sticky lg:top-30 lg:self-start";
 
-/** `stickyTitle` from `xl` (Process, whose split starts at `xl`). */
-export const stickyTitleXl = "xl:sticky xl:top-30 xl:self-start";
-
 /** Focus ring on dark: 2px `text` outline, 2px offset. */
 export const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text";

@@ -1,6 +1,6 @@
 # Nav
 
-**Last Updated:** 2026-09-25
+**Last Updated:** 2026-09-26
 
 **The one question:** Where can I go, and how do I book a call?
 
@@ -8,24 +8,33 @@ See `../page.md` for the site-wide index. Spec: `../ui-spec/01-nav.md`.
 
 ## Current State
 
-The shared page frame and fixed Nav are built statically: a 2px scroll progress bar (built empty,
-still slated for the GSAP pass) sits above a 64px nav row. The Nav turns solid via an observer on
-`#top` once the hero passes; it has inline links (Agents · Web · Proofs · Contact) from `md`, a
-phone menu below `md`, and a Book a call pill on the right — no brand mark. The phone menu is a
-native `<details>`/`<summary>` element, so it opens and closes without JS; JS adds closing the menu
-at `md` and up and on a link tap, Escape closing it, and syncing its open state on mount in case it
-was opened before hydration. Escape moves focus back to the menu button only when focus was in the
-menu or on the page body. While scrolling past the hero, the transparent Nav's links overlap the
-big hero name; this stays as-is in the static build and will be fixed by the GSAP pass's hero-text
-fade on scroll.
+The shared page frame and fixed Nav are built statically: a 2px scroll progress bar sits above a
+64px nav row. The Nav turns solid via an observer on `#top` once the hero passes; it has inline
+links (Agents · Web · Proofs · Contact) from `md`, a phone menu below `md`, and a Book a call pill
+on the right — no brand mark. The phone menu is a native `<details>`/`<summary>` element, so it
+opens and closes without JS; JS adds closing the menu at `md` and up and on a link tap, Escape
+closing it, and syncing its open state on mount in case it was opened before hydration. Escape
+moves focus back to the menu button only when focus was in the menu or on the page body. While
+scrolling past the hero, the transparent Nav's links overlap the big hero name; this stays as-is
+and is fixed by the hero-text fade on scroll (the motion pass, see `sections/02-hero.md`).
+
+The progress bar's motion is built: it fills (`scaleX` 0 to 1, ease none) across the whole document
+scroll via a ScrollTrigger scrub (0.3s smoothing in full motion; set straight from the scroll
+position under reduced motion, since it's a position indicator, not decoration), and a
+ResizeObserver on `<body>` refreshes the trigger whenever the page's height changes. Without JS it
+stays empty. Browser-verified at 1440: 0/25/50/100% fill at 0/25/50/100% scroll, in both modes.
 
 ## Key Files
 
-- `components/SiteHeader.tsx` — shared page frame and the fixed Nav
+- `components/SiteHeader.tsx` — shared page frame and the fixed Nav; renders `ProgressBar` and
+  `ProgressMotion`
 - `components/NavBar.tsx` — the Nav row and progress bar
 - `components/NavLinks.tsx` — inline/phone nav links
 - `components/NavMenu.tsx` — phone menu panel
-- `components/ProgressBar.tsx` — scroll progress bar
+- `components/ProgressBar.tsx` — scroll progress bar's static markup (`data-anim="progress"`)
+- `components/ProgressMotion.tsx` — client component that runs `useScrollProgress`, renders nothing
+- `hooks/useScrollProgress.ts` — the progress bar's scroll-linked fill (ScrollTrigger scrub +
+  `ResizeObserver` refresh)
 - `hooks/useScrolledPast.ts` — observer that flips the Nav solid past `#top`
 - `lib/navItems.ts` — nav link data
 
@@ -33,8 +42,7 @@ fade on scroll.
 
 - 2026-09-24 — Nav: no brand mark. Pinned to the top at every width. Transparent over the hero,
   with a band background and a hairline once past it.
-- 2026-09-24 — Scroll progress bar sits at the very top, above the nav. It's scroll-linked, so it
-  is built in the GSAP pass; the static build reserves its place.
+- 2026-09-24 — Scroll progress bar sits at the very top, above the nav; scroll-linked.
 - 2026-09-24 — Nav links: Agents · Web · Proofs · Contact, each jumping to its section (no
   Process, no hero link).
 - 2026-09-24 — Nav's Book a call pill opens the Cal.com link from the facts file in a new tab; it
@@ -60,6 +68,10 @@ fade on scroll.
 - 2026-09-24 — User's choice: while scrolling past the hero, the transparent Nav's links overlap
   the big name; this stays as is in the static build and is fixed by the GSAP pass's hero-text
   fade on scroll (the Nav decision is unchanged).
+- 2026-09-26 — Progress bar motion: `scaleX` 0 to 1, ease none, scrubbed to the whole document
+  scroll (0.3s smoothing in full motion, direct under reduced motion since it's a position
+  indicator); a `ResizeObserver` on `<body>` refreshes the ScrollTrigger when the page's height
+  changes.
 
 ## Open Questions
 

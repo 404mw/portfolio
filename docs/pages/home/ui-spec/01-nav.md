@@ -62,11 +62,14 @@ Shared rules and parts (§0): [`../ui-spec.md`](../ui-spec.md). Page doc: [`../s
 - New: `components/SiteHeader.tsx`, `ProgressBar.tsx`, `NavBar.tsx` (client), `NavLinks.tsx`,
   `NavMenu.tsx` (client), plus `hooks/useScrolledPast.ts`. `lib/navItems.ts` is overwritten with the
   four in-page items.
-- **Motion (later):** progress fill scales `scaleX` 0→1, scrubbed by page scroll
-  (`data-anim="progress"`). Under reduced motion it still fills: it's a direct position indicator,
-  not decoration, so `scaleX` is set straight from the scroll position, with no easing or scrub
-  smoothing. Without JS it stays empty. Nav band fades in on the solid switch (kept under reduced
-  motion). Menu panel (`data-anim="nav-panel"`) fades and drops 8px on open; under reduced motion
-  it only fades. Jump links may get a GSAP scroll-to; none in static (no `scroll-behavior: smooth`),
-  and none under reduced motion (the jump stays instant).
+- **Motion (built), progress bar:** `hooks/useScrollProgress.ts`, mounted by
+  `components/ProgressMotion.tsx` (renders nothing). The fill (`data-anim="progress"`) scales
+  `scaleX` 0→1 linearly over the whole document scroll, scrubbed with 0.3s smoothing in full motion.
+  Under reduced motion it still fills: it's a direct position indicator, not decoration, so `scaleX`
+  is set straight from the scroll position, with no smoothing. A ResizeObserver on `<body>` refreshes
+  the trigger whenever the page's height changes. Without JS it stays empty.
+- **Motion (later):** nav band fades in on the solid switch (kept under reduced motion). Menu panel
+  (`data-anim="nav-panel"`) fades and drops 8px on open; under reduced motion it only fades. Jump
+  links may get a GSAP scroll-to; none in static (no `scroll-behavior: smooth`), and none under
+  reduced motion (the jump stays instant).
 - **Images:** none.

@@ -73,6 +73,7 @@ The home page shows 3–4 of these; the user picks which.
 - **Instagram:** https://www.instagram.com/marwix.dev/
 - **Discord:** https://discord.com/users/503890038829088788
 - **LinkedIn** https://www.linkedin.com/in/marwix/
+- **GitHub** https://github.com/404mw
 
 ## Never, even if it seems helpful
 

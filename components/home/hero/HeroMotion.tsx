@@ -11,7 +11,7 @@ import { usePointerTilt } from "@/hooks/usePointerTilt";
 import { sectionIds } from "@/lib/routes";
 
 /** The portrait's pointer tilt: degrees at the window's edges, and the perspective in px. */
-const PORTRAIT_TILT = { maxX: 2, maxY: 3, perspective: 1100 } as const;
+const PORTRAIT_TILT = { maxX: 1, maxY: 1.5, perspective: 1100 } as const;
 
 export function HeroMotion() {
   // Declared first: its layout effect fills the ref before the motion hooks' effects run.

@@ -23,7 +23,7 @@ export function FooterLinks() {
               <li key={item.key}>
                 <ExternalLink
                   href={item.href}
-                  className={`inline-flex min-h-11 items-center hover:text-text active:text-text ${focusRing}`}
+                  className={`inline-flex min-h-11 items-center text-body text-text underline decoration-line underline-offset-4 hover:text-accent hover:decoration-accent active:text-accent active:decoration-accent ${focusRing}`}
                 >
                   {item.label}
                 </ExternalLink>

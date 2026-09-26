@@ -1,6 +1,6 @@
 # Agents
 
-**Last Updated:** 2026-09-25
+**Last Updated:** 2026-09-26
 
 **The one question:** What can their agents handle for my business?
 
@@ -16,6 +16,22 @@ column carries `self-start`, the Agents grid stays `lg:items-center`, so its dem
 where it's shorter than the tab list (1024). Agents pins but barely moves because its left column
 is about as tall as the right one.
 
+The GSAP motion pass is done (`hooks/useAgentsMotion.ts`, browser-verified 2026-09-26 at 1440 and
+360). A once-only scroll entrance (label and tab rows rise from `y` 56px, staggered; the panel
+fades up) plays when the section scrolls in and starts the selected row's demo. Full motion then
+auto-advances every 6s, the selected row's progress line growing `scaleX` 0→1; it pauses on
+pointer hover over the tab list or panel, on keyboard focus in the tab list, on any focus inside
+the panel, and while the section is off screen or the tab hidden (`lib/watchLive.ts`), resuming
+where it stopped; a click selects without stealing focus and restarts the line for the new row.
+Each panel's demo replays from its start when its panel shows (`lib/agentDemoSequences.ts`): Chat
+shows typing dots then the reply, Leads' pills flip from "new" to "followed up", Report's bars
+grow, Sync's packets loop along their connectors. A status dot in the panel header blinks
+(opacity) while the demo is live. Under reduced motion, only opacity fades remain: no
+auto-advance, the progress line stays full, demos show their finished state fading in by order,
+and the status dot stays solid. Verified: advances 1→2 after 6s, hover pauses it (1440), a click
+resets the timer and advances 6s later, reduced motion never advances with the line full, no
+sideways scroll, no console errors beyond the known favicon 404.
+
 ## Key Files
 
 - `components/home/agents/` — AgentsSection, AgentsTabs, AgentsStack (variant A's no-JS
@@ -23,6 +39,14 @@ is about as tall as the right one.
   DemoStatusPill
 - `hooks/useRovingTabs.ts` — roving-tabindex keyboard behaviour for variant A's tablist; `select`
   never moves focus, only the keyboard path does
+- `hooks/useAgentsMotion.ts` — the section's motion: scroll entrance, 6s auto-advance with
+  pause/resume, demo replay per selection, status-dot blink; reduced motion keeps fades only
+- `lib/agentDemoSequences.ts` — each demo kind's replay sequence, built from its finished static
+  state and `data-demo-order`; reduced motion fades parts in by order instead
+- `lib/watchLive.ts` — shared: whether an element is on screen and the tab visible, used to pause
+  the auto-advance and demo loops
+- `lib/motion.ts` — shared motion settings used here: `motionQuery`, `duration`, `ease`, `stagger`,
+  `blinkDim`, `reveal` (the generic scroll entrance, from ui-spec §10), `animTargets`
 - `lib/agents.ts` — the demo kind per offer (type-tied to `agents.items`), and the row ids a tab
   and its panel share
 
@@ -69,6 +93,11 @@ is about as tall as the right one.
   sticky, no JS), part of the site-wide split/sticky-title pattern (see `../page.md`). Because the
   sticky column carries `self-start`, the Agents grid stays `lg:items-center`, so its demo panel is
   centred again where it's shorter than the tab list (1024).
+- 2026-09-26 — Agents motion pass: a once-only scroll entrance (label and rows rise, staggered;
+  panel fades up, from ui-spec §10's generic reveal — the section's own spec had none), 6s
+  auto-advance with a growing progress line (paused on hover, keyboard focus, off screen or hidden
+  tab), each demo replaying on show with a blinking status dot; reduced motion keeps opacity fades
+  only (no advance, full line, finished demos).
 
 ## Open Questions
 

@@ -41,6 +41,18 @@ export const stagger = {
   row: 0.08,
 } as const;
 
+/** A status dot's dimmest point in its blink loop. */
+export const blinkDim = 0.25;
+
+/**
+ * The generic scroll reveal (ui-spec §10): from `y` px below with opacity 0, once, when the top of
+ * the trigger reaches `start`. Under reduced motion it's the opacity fade only.
+ */
+export const reveal = {
+  y: 56,
+  start: "top 80%",
+} as const;
+
 /** Every `[data-anim="<name>"]` element inside `root`, in document order. */
 export function animTargets<T extends Element = HTMLElement>(root: ParentNode, name: string): T[] {
   return Array.from(root.querySelectorAll<T>(`[data-anim="${name}"]`));
