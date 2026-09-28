@@ -1,6 +1,6 @@
 # Proofs
 
-**Last Updated:** 2026-09-28 (MARWIX-SKILLS hidden temporarily)
+**Last Updated:** 2026-09-28 (side-face extrusion replaces the stacked depth steps)
 
 **The one question:** Have they built something real that people use?
 
@@ -145,13 +145,46 @@ Lead-verified 2026-09-28: `npm run build` and `npm run lint` are green; no sidew
 360/480/600/767/768/1024/1440/3840 (`scrollWidth === clientWidth`, headless Chromium); screens at
 360/768/1440/3840 match the approved sample A. Noted, not blocking: the Design Vault proof line
 wraps to two lines at 1440 while the other two cards' lines take one, so its hairline sits ~16px
-higher than its neighbours'; faint stair lines are visible on the extrusion at large stacked widths
-(around 767) from the 6-step depth table.
+higher than its neighbours'.
 
 Lead-verified 2026-09-28, after hiding MARWIX-SKILLS: build and lint stay green; no sideways scroll
 at 360/480/600/767/768/1024/1440/3840. With only two, wider cards, the bot scales up (~620px
-banner) at 1440/3840: the extrusion's 6-step stair lines are clearly visible, and Exile's right arm
-comes within ~11px (1440) / ~3px (3840) of the Design Vault card (open questions below).
+banner) at 1440/3840, and Exile's right arm comes within ~11px (1440) / ~3px (3840) of the Design
+Vault card (open question below).
+
+Built 2026-09-28: the card bots are animated with GSAP (ui-spec §7.7). Each bot rises with its
+card's reveal — 0.9s from 84 units below the banner floor on `back.out(1.3)`, starting 0.15s after
+its card, in the same `ScrollTrigger.batch` and 0.12s stagger as the cards (`stagger.card`, now
+shared by `lib/motion.ts` and `useProofCards`) — and lands with its inline transform stripped. On a
+fine pointer, hovering a card leans the bot's rig +4° about (50, 92) and plays its prop's act once
+per enter: the phone's screen lights in and out, the fan's four swatches spread −9/−3/+3/+9° then
+close with an overshoot, the puzzle tilts −14° and lifts 2 units then snaps back
+(`back.out(2.6)`) as it flashes — built for MARWIX-SKILLS' puzzle bot even while it's hidden. Idle,
+full motion only: the body breathes (the Process bots' 0.04 `scaleY` stretch, 1.3s half), the arms
+drift ±3° out of phase, the eyes blink, and the eyes follow a fine pointer from −7 to 7 and ease
+back to rest after 2.5s idle — all reusing the Process bots' numbers, registry and
+`lib/processBotPointer.ts` (which gained an optional `point` arg for the proof bots' own eye
+point; Process's calls are unchanged). The bots pause off screen, in a hidden tab, or while a
+takeover is open (new `lib/watchTakeovers.ts`, watching the takeover dialogs' `open` attribute).
+Reduced motion: nothing moves; each bot fades in with its card. Teardown strips `style`,
+`transform` and `data-svg-origin` from every hook. `npm run build` and `npm run lint` are green, no
+console errors; the lead confirmed in headless Chromium at 1440 that the rise plays and lands with
+no inline style, the fan spreads and the phone screen lights on hover, the Exile takeover opens and
+closes with Esc, reduced motion at 360 leaves no hook with inline motion, there's no sideways
+scroll at 360/767/1440/3840 with motion on, and idle runs at about 120fps at 1440 (headless, not a
+real-device profile). Seen: the hover lean pushes Exile's right arm to touch the Design Vault
+card's edge at 1440 (open question below, sharpens the existing arm-clearance one).
+
+Built 2026-09-28: the card bots' depth is now one continuous extrusion — each depth-facing edge
+gets one flat-shaded side quad from `lib/proofBotExtrude.ts`, replacing the 6-step (body) / 5-step
+(prop) stacked copies that showed stair steps and colour bands at two-across sizes.
+`lib/proofBotDepth.ts` holds only the two depth vectors (body, props); `lib/proofBotShape.ts`'s
+`transform?: string` is now a typed `rotation?: { angle, cx, cy }` plus `proofBotRotate()`; the
+fan's swatches turn through `fanTurn(angle)` (`lib/proofBotProps.ts`). Lead-verified 2026-09-28 on
+a production build: the side faces are solid with no stair steps or colour bands at 1440 and in a
+3840 close-up (resolves the stair-line notes above); the motion test passes — the rise lands clean,
+the hover acts work, the takeover opens and closes, no console errors; nothing scrolls sideways at
+360/767/1440/3840; reduced motion leaves 0 hooks with inline motion.
 
 ## Key Files
 
@@ -166,17 +199,19 @@ comes within ~11px (1440) / ~3px (3840) of the Design Vault card (open questions
   (the takeover layer, rendered once after Contact), ProjectTakeover (one project's `<dialog>`),
   TakeoverController (runs `useHashTakeover`), TakeoverTopBar, TakeoverCloseLink,
   TakeoverNextLink, TakeoverInfoRows, TakeoverInfoRow, TakeoverStats (Exile's IN USE numbers),
-  TakeoverShots, ProjectVisitLink, ProofsMotion (client, mounts the reveal and `useProofCards`,
-  renders nothing); `ProofCard`'s h3 carries `data-anim="proof-card-title"`, the card-open morph's
-  source
+  TakeoverShots, ProjectVisitLink, ProofsMotion (client, mounts the reveal, `useProofCards` and
+  `useProofBots`, renders nothing); `ProofCard`'s h3 carries `data-anim="proof-card-title"`, the
+  card-open morph's source
 - `lib/proofBotBody.ts` — the card bot's viewBox, static pose (10° lean, look 7), arms, glints and
   eye positions, reading the MW strips/feet/eyes unchanged from `lib/processBots.ts`
 - `lib/proofBotProps.ts` — the three hardcoded prop drawings (Exile's phone, Design Vault's fan,
   MARWIX-SKILLS' puzzle piece), each a list of pieces in paint order, plus each prop's `grip` point
   for the later motion pass
 - `lib/proofBotShape.ts` — the shared outline/solid/detail types every card-bot file draws from
-- `lib/proofBotDepth.ts` — the literal 6-step (body) / 5-step (prop) extrusion offset-and-shade
-  table
+- `lib/proofBotDepth.ts` — the two depth vectors (body 3.3 × 4.2 units, props 2.75 × 3.5 units) the
+  side-face extrusion sweeps
+- `lib/proofBotExtrude.ts` — builds one flat-shaded side face per visible edge from a depth vector,
+  shaded `sideNear` over `sideFar` by facing (right-facing 100% near, down-facing 20%)
 - `lib/proofBotShades.ts` — every card-bot shade (materials, eye, light, banner ground) as a
   `color-mix()` of existing tokens only, in one table
 - `lib/proofs.ts` — the project order/keys (`proofKeys`, all three), the temporary hide flag
@@ -193,8 +228,23 @@ comes within ~11px (1440) / ~3px (3840) of the Design Vault card (open questions
   `history.back()`; hash parsing never decodes; an optional `transitions` arg (`opened`,
   `replacing`, `closing`) lets motion play around the same path, and `onClose` ignores a dialog
   already reopened by a new hash
-- `hooks/useProofCards.ts` — the cards' staggered reveal (`lib/revealBatch.ts`) and fine-pointer
-  hover lift
+- `hooks/useProofCards.ts` — the cards' staggered reveal (`lib/revealBatch.ts`, `stagger.card`) and
+  fine-pointer hover lift
+- `hooks/useProofBots.ts` — the card bots' motion: wires the rise (with the cards' reveal batch),
+  the idle/pointer branch and the hover listeners; reduced motion runs none of it
+- `lib/proofBotMotion.ts` — the card bots' own motion constants (rise, hover lean, the prop acts),
+  re-exporting the Process bots' idle/pointer numbers (`lib/processBotMotion.ts`) so every proof-bot
+  file reads one place
+- `lib/proofBotRig.ts` — finds a bot's `data-bot` hooks, sets every pivot once with `svgOrigin`, owns
+  the summed channels (breath, drift, look) and their one per-frame writer, and `resetProofBot`
+- `lib/proofBotLife.ts` — the idle loop: breath, out-of-phase arm drift, blink scheduling, all
+  registered on the shared crew so they pause together
+- `lib/proofBotActs.ts` — the hover lean and the three prop acts (phone, fan, puzzle), each playing
+  once per enter
+- `lib/proofBotFollow.ts` — the eyes' pointer follow on a fine pointer, reusing
+  `lib/processBotPointer.ts`'s mapping and easing back to rest after idle
+- `lib/watchTakeovers.ts` — watches the takeover dialogs' `open` attribute so page motion can pause
+  while one is open; used by the proof bots' idle branch
 - `hooks/useTakeoverMotion.ts` — the takeover's open/Next-slide/close clip and content motion,
   handed to `useHashTakeover` as `transitions`; also owns the close morph (`cardMorphBack`,
   `morphOut`), the typography match on both ends and the close's end fade
@@ -341,6 +391,22 @@ comes within ~11px (1440) / ~3px (3840) of the Design Vault card (open questions
   `transform`; eye-wall paths, the depth steps' `color-mix()` strings and eye positions are all
   computed at server render, nothing on the client; the file list has two extra files beyond the
   spec's, `ProofBotShape.tsx` and `lib/proofBotShape.ts`.
+- 2026-09-28 — The card bots' motion pass is built (ui-spec §7.7): they rise with their card's
+  reveal (0.9s, `back.out(1.3)`, 0.15s after the card, the cards' own batch and stagger), lean +4°
+  and play their prop's act once per hover enter, and breathe/drift/blink/follow the pointer while
+  idle, reusing the Process bots' idle and pointer numbers and registry. They pause off screen, in a
+  hidden tab, or while a takeover is open (new `lib/watchTakeovers.ts`). Reduced motion: no
+  movement, the bot fades in with its card.
+- 2026-09-28 — Deviation from ui-spec §7.7's file list (recorded so audits don't flag it): six extra
+  lib files — `lib/proofBotMotion.ts`, `lib/proofBotRig.ts`, `lib/proofBotLife.ts`,
+  `lib/proofBotActs.ts`, `lib/proofBotFollow.ts` and `lib/watchTakeovers.ts` — keeping one purpose
+  per file, matching the Process split.
+- 2026-09-28 — User's choice: the card bots' depth is drawn as one flat-shaded side face per visible
+  edge, swept by the depth vector (body 3.3 × 4.2 units, props 2.75 × 3.5), replacing the 6-step
+  (body) / 5-step (prop) stacked offset copies — the stacked copies read as stair steps and colour
+  bands at the two-across card sizes. Side shade is `sideNear` over `sideFar` by facing: right-facing
+  100% near, down-facing 20%. `lib/proofBotDepth.ts` now holds only the two depth vectors; the side
+  faces are built in the new `lib/proofBotExtrude.ts`. Resolves the stair-line open questions below.
 
 ## Open Questions
 
@@ -353,23 +419,20 @@ comes within ~11px (1440) / ~3px (3840) of the Design Vault card (open questions
 - **To build:** Proofs — Exile, Design Vault and MARWIX-SKILLS takeover screenshots (pending from
   the user; cards no longer carry a screenshot); their shot alt-text `[FILL]` markers clear when
   the images arrive.
-- **To build:** the proof card motion pass (spec §7.7: rise-out reveal, hover lean + prop act, idle
-  breath/blink, pointer eyes) — the static card now passes checks (2026-09-28).
 - **Choice (later):** replace the color-mix shades in `lib/proofBotShades.ts` with named tokens.
 - **Note:** after Back on a direct-load takeover, focus isn't returned to the card (minor).
 - **Note:** at 1440 the Design Vault proof line wraps to two lines while Exile's takes one, so its
   hairline sits ~16px higher than its neighbour's; not a blocker.
-- **Note:** faint stair lines are visible on the card bot's extrusion at large stacked widths
-  (around 767) from the 6-step depth table; not a blocker.
-- **To build:** with two cards shown, the bot scales up (~620px banner) at 1440/3840, making the
-  extrusion's 6-step stair lines clearly visible; fix candidates: more depth steps, or a smooth side
-  fill instead of stepped bands.
 - **To build:** with two cards shown, Exile's right arm comes within ~11px (1440) / ~3px (3840) of
-  the Design Vault card; fix candidates: a wider column gap, or a cap on the bot's scale when only
-  two are shown.
+  the Design Vault card at rest, and the hover lean (+4°) pushes it to touch the card's edge at
+  1440; fix candidates: a wider column gap, or a cap on the bot's scale when only two are shown.
+- **To build:** check the bots' idle cost on a real 4K display and on a phone — each bot has a
+  `feDropShadow` filter and a mask, both re-rasterised while it breathes.
 - **To build:** ui-spec §7.1's grid line still reads "three across from `lg`" / "MARWIX-SKILLS
   starts row two"; needs updating to the two-shown grid (`proofGridColumns`) now that MARWIX-SKILLS
-  is hidden.
+  is hidden. ui-spec §7.2.1/§7.2.2 still describe the stacked-copy depth steps; need updating to the
+  side-face extrusion (`lib/proofBotExtrude.ts`). §7.2.1's "Precomputed, not computed" line is also
+  stale: the side faces are now computed on the server from the outlines, not precomputed.
 - **To build:** check the Next slide-up and both title morphs (Next and card-open) on a real
   Safari/iPhone before launch — only tested in headless Chromium so far; stacked-modal
   (`showModal()` under an open dialog) behaviour on Safari and Firefox is unverified.

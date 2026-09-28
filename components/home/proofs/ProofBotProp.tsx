@@ -16,7 +16,7 @@ type ProofBotPropProps = {
 
 function Detail({ detail }: { readonly detail: ProofBotDetail }) {
   const shape = (
-    <ProofBotShape geometry={detail.geometry} transform={detail.transform} style={{ fill: proofBotFill(detail.fill) }} />
+    <ProofBotShape geometry={detail.geometry} rotation={detail.rotation} style={{ fill: proofBotFill(detail.fill) }} />
   );
   return detail.hook ? (
     <g data-bot={detail.hook} className="opacity-0">

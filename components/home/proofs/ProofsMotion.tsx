@@ -1,9 +1,11 @@
 "use client";
 
 // Proofs' motion (ui-spec §7.7, §10): the heading block reveals, the cards reveal staggered and
-// lift on hover. It renders nothing, so `ProofsSection` and its markup stay server-rendered and
-// unchanged. The takeover's own motion runs in `TakeoverController`.
+// lift on hover, and each card's bot rises with its card, idles, and leans and acts on hover. It
+// renders nothing, so `ProofsSection` and its markup stay server-rendered and unchanged. The
+// takeover's own motion runs in `TakeoverController`.
 import { useElementById } from "@/hooks/useElementById";
+import { useProofBots } from "@/hooks/useProofBots";
 import { useProofCards } from "@/hooks/useProofCards";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { sectionIds } from "@/lib/routes";
@@ -13,5 +15,6 @@ export function ProofsMotion() {
   const section = useElementById<HTMLElement>(sectionIds.proofs);
   useScrollReveal(section);
   useProofCards(section);
+  useProofBots(section);
   return null;
 }

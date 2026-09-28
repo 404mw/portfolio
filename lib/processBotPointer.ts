@@ -24,11 +24,19 @@ export function pointerLean(vx: number): number {
   return clamp(LEAN_MAX, (vx / LEAN_RANGE) * LEAN_MAX);
 }
 
-/** A box's eye centre in page coordinates, from its viewport rect and the scroll offsets. */
-export function eyeCentre(rect: DOMRectReadOnly, scrollX: number, scrollY: number) {
+/**
+ * A box's eye centre in page coordinates, from its viewport rect and the scroll offsets. `point` is
+ * the eye centre as a share of the box: the process bot's by default (the proof bots pass theirs).
+ */
+export function eyeCentre(
+  rect: DOMRectReadOnly,
+  scrollX: number,
+  scrollY: number,
+  point: { readonly x: number; readonly y: number } = EYE_POINT,
+) {
   return {
-    x: rect.left + scrollX + EYE_POINT.x * rect.width,
-    y: rect.top + scrollY + EYE_POINT.y * rect.height,
+    x: rect.left + scrollX + point.x * rect.width,
+    y: rect.top + scrollY + point.y * rect.height,
   };
 }
 

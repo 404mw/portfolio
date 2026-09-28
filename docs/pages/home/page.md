@@ -1,6 +1,6 @@
 # Home
 
-**Last Updated:** 2026-09-28 (MARWIX-SKILLS hidden temporarily)
+**Last Updated:** 2026-09-28 (proof bot depth: continuous extrusion replaces stacked steps)
 
 > **Status:** GSAP motion pass complete for all sections; next: deploy prep (pre-push audit, then
 > deploy)
@@ -84,8 +84,23 @@ Built and verified 2026-09-28: MARWIX-SKILLS is temporarily hidden, card and tak
 flag (`hiddenProofs` in `lib/proofs.ts`); its content and code stay. With two projects shown
 (Exile, Design Vault), the cards sit two across from `md` up at full width, no empty third slot.
 Build and lint are green; the lead confirmed no sideways scroll at eight widths from 360 to 3840.
-See `sections/07-proofs.md` for two open build questions from this change (extrusion stair lines and
-arm/card clearance at 1440/3840, with the larger two-card bot).
+See `sections/07-proofs.md` for an open build question from this change (arm/card clearance at
+1440/3840, with the larger two-card bot).
+
+Built and verified 2026-09-28: the proof card bots are animated with GSAP (ui-spec §7.7) — they rise
+with their card's reveal, lean +4° and play their prop's act on hover, and breathe/drift/blink/follow
+the pointer while idle, reusing the Process bots' numbers and registry; they pause off screen, in a
+hidden tab or while a takeover is open. Reduced motion: no movement, each bot fades in with its
+card. Build and lint are green, no console errors; the lead confirmed the rise, hover acts, a
+takeover open/close, reduced motion and no sideways scroll at 360/767/1440/3840 (headless
+Chromium), and noted the hover lean sharpens the existing Exile/Design Vault arm-clearance question
+at 1440. See `sections/07-proofs.md`.
+
+Built and verified 2026-09-28: the proof card bots' depth is now one continuous extrusion —
+one flat-shaded side quad per depth-facing edge (`lib/proofBotExtrude.ts`) — replacing the stacked
+depth-copy steps that showed stair steps and colour bands at two-across sizes. Lead-verified on a
+production build: solid side faces with no stair steps at 1440 and in a 3840 close-up, the motion
+test passes, and no sideways scroll at 360/767/1440/3840. See `sections/07-proofs.md`.
 
 ## Key Files (site-wide)
 
@@ -180,7 +195,7 @@ arm/card clearance at 1440/3840, with the larger two-card bot).
   lead its website ID; it's set as `NEXT_PUBLIC_UMAMI_WEBSITE_ID` in Vercel and needs a redeploy.
 - **Constitution:** the user to add the takeover/Book a call exception under §3.
 - **Roll-up:** section-specific open questions remain in `sections/02-hero.md` (4),
-  `sections/04-agents.md` (2), `sections/05-process.md` (7), `sections/07-proofs.md` (12),
+  `sections/04-agents.md` (2), `sections/05-process.md` (7), `sections/07-proofs.md` (10),
   `sections/08-contact.md` (1) and `sections/09-footer.md` (2). The
   pre-deploy check reads this roll-up and every section file; the page ships with none open
   anywhere.

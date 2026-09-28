@@ -2,19 +2,21 @@
 // circle. Colour comes in through `style` (token expressions from lib/proofBotShades.ts) or as a
 // `url(#…)` paint reference; never a raw value. Used by the solids, the flat details and the clip.
 import type { CSSProperties } from "react";
-import type { ProofBotGeometry } from "@/lib/proofBotShape";
+import { proofBotRotate, type ProofBotGeometry, type ProofBotRotation } from "@/lib/proofBotShape";
 
 type ProofBotShapeProps = {
   readonly geometry: ProofBotGeometry;
-  readonly transform?: string;
+  readonly rotation?: ProofBotRotation;
   readonly style?: CSSProperties;
   /** A paint reference, `url(#…)`, for gradient fronts. */
   readonly fill?: string;
   readonly stroke?: string;
   readonly strokeWidth?: number;
+  readonly strokeLinejoin?: "round";
 };
 
-export function ProofBotShape({ geometry, ...paint }: ProofBotShapeProps) {
+export function ProofBotShape({ geometry, rotation, ...rest }: ProofBotShapeProps) {
+  const paint = { ...rest, transform: rotation ? proofBotRotate(rotation) : undefined };
   switch (geometry.kind) {
     case "polygon":
       return <polygon points={geometry.points} {...paint} />;

@@ -39,6 +39,8 @@ export const ease = {
 export const stagger = {
   line: 0.12,
   row: 0.08,
+  /** The proof cards' reveal, which their bots' rise follows (ui-spec §7.7). */
+  card: 0.12,
 } as const;
 
 /** A status dot's dimmest point in its blink loop. */

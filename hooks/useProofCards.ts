@@ -11,11 +11,9 @@
 // applying clears what it set. The takeover's clip reads the card where it sits, lifted or not.
 import type { RefObject } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
-import { duration, ease, finePointerQuery, motionQuery } from "@/lib/motion";
+import { duration, ease, finePointerQuery, motionQuery, stagger } from "@/lib/motion";
 import { revealBatch } from "@/lib/revealBatch";
 
-/** Seconds between cards that reveal together. */
-const CARD_STAGGER = 0.12;
 /** The hover lift, in px (ui-spec §7.7). */
 const LIFT = -8;
 
@@ -31,7 +29,7 @@ export function useProofCards(section: RefObject<HTMLElement | null>) {
 
       mm.add({ full: motionQuery.full, reduced: motionQuery.reduced }, (context) => {
         revealBatch(cards, {
-          each: CARD_STAGGER,
+          each: stagger.card,
           reduced: Boolean(context.conditions?.reduced),
           context,
           clearProps: "opacity",

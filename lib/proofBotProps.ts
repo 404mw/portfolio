@@ -27,6 +27,8 @@ const phoneDot = (cx: number) => ({ kind: "circle", cx, cy: 49.5, r: 0.9 }) as c
 
 const swatchOutline = path("M-12 26h8v34h-8Z");
 const swatchChip = path("M-11 28h6v5h-6Z");
+/** A swatch's turn about the fan's rivet (-8 56). */
+const fanTurn = (angle: number) => ({ angle, cx: -8, cy: 56 }) as const;
 
 const puzzleStripe = path("M-15 46H-11L-19 60H-23Z");
 
@@ -56,23 +58,23 @@ export const proofBotProps = {
     pieces: [
       {
         hook: "swatch",
-        solids: [{ geometry: swatchOutline, material: "ink", transform: "rotate(-50 -8 56)" }],
-        details: [{ geometry: swatchChip, fill: { material: "violet", stop: "mid" }, transform: "rotate(-50 -8 56)" }],
+        solids: [{ geometry: swatchOutline, material: "ink", rotation: fanTurn(-50) }],
+        details: [{ geometry: swatchChip, fill: { material: "violet", stop: "mid" }, rotation: fanTurn(-50) }],
       },
       {
         hook: "swatch",
-        solids: [{ geometry: swatchOutline, material: "muted", transform: "rotate(-32 -8 56)" }],
-        details: [{ geometry: swatchChip, fill: { detail: "screen" }, transform: "rotate(-32 -8 56)" }],
+        solids: [{ geometry: swatchOutline, material: "muted", rotation: fanTurn(-32) }],
+        details: [{ geometry: swatchChip, fill: { detail: "screen" }, rotation: fanTurn(-32) }],
       },
       {
         hook: "swatch",
-        solids: [{ geometry: swatchOutline, material: "cream", transform: "rotate(-14 -8 56)" }],
-        details: [{ geometry: swatchChip, fill: { material: "violet", stop: "mid" }, transform: "rotate(-14 -8 56)" }],
+        solids: [{ geometry: swatchOutline, material: "cream", rotation: fanTurn(-14) }],
+        details: [{ geometry: swatchChip, fill: { material: "violet", stop: "mid" }, rotation: fanTurn(-14) }],
       },
       {
         hook: "swatch",
-        solids: [{ geometry: swatchOutline, material: "violet", transform: "rotate(4 -8 56)" }],
-        details: [{ geometry: swatchChip, fill: { detail: "screen" }, transform: "rotate(4 -8 56)" }],
+        solids: [{ geometry: swatchOutline, material: "violet", rotation: fanTurn(4) }],
+        details: [{ geometry: swatchChip, fill: { detail: "screen" }, rotation: fanTurn(4) }],
       },
       {
         solids: [{ geometry: { kind: "circle", cx: -8, cy: 56, r: 2.4 }, material: "ink" }],
