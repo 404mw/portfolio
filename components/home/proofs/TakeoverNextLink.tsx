@@ -25,6 +25,7 @@ export function TakeoverNextLink({ href, title }: TakeoverNextLinkProps) {
         <ArrowRightIcon className="size-3.5" />
       </span>
       <span
+        data-anim="takeover-next-title"
         className={`font-display text-heading leading-[0.95] font-semibold tracking-[-0.04em] group-hover:text-cream-muted ${condensed}`}
       >
         {title}

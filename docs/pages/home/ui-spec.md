@@ -1,6 +1,6 @@
 # Home: UI spec
 
-**Last Updated:** 2026-09-26
+**Last Updated:** 2026-09-28
 **Sources:** `docs/pages/home/page.md` (decisions 1–44, the source of truth), constitution §2–§9,
 `docs/01-design-system.md`, `app/globals.css`, v3 reference (layout and behaviour only),
 `docs/03-facts.md`, `docs/04-voice.md`.
@@ -101,12 +101,18 @@ typing effects are off, leaving the static final state. Two exceptions: the marq
 (it pauses on hover in both modes), and the nav progress bar still tracks scroll position, set
 directly with no scrub smoothing (1.5). Generic scroll reveal: `data-anim="reveal"`,
 with an optional `data-anim-delay` (ms), from `y: 56, opacity: 0`; under reduce, from `opacity: 0` only.
-Process bots (§5.6–5.7, `data-anim="process-bot"`): stop-motion on one 125ms tick (8fps), no
-tweens or easing. Breathing: an 18-step cycle (breath 0 ×8, 1 ×2, 2 ×6, 1 ×2; 2.25s), phase offsets
-0, 11, 5, 14 steps (rules, team, check, update), set as the `transform` attribute on every
-`[data-breath]` group from the §5.6 breath table. Frame swaps toggle `invisible` on the `data-frame`
-groups (idle ↔ blink, idle ↔ act, an occasional sleep). Both pause off screen and when the tab is
-hidden; under reduce, no breathing and no swaps: the static pose at breath 0.
+Process bots (§5.6–5.7, `data-anim="process-bot"`, hooks `data-bot="…"`; revised 2026-09-27 and
+2026-09-28): one rig per bot with separate feet, in fully smooth GSAP motion (tweens, easing, squash
+and stretch, rotation; transforms, `opacity` and `attr` only), numbers in `lib/processBotMotion.ts`.
+Life layer (breathing from the feet tops, sway, arm drift), blinks, look-arounds, foot taps, role
+acts every 5–10s, naps (rules and update), eyes and lean following a fine pointer, a hover/tap jump
+(the only jump), a once-per-load drop-in entrance on `process-list` (skipped if already passed), and
+a crew relay every 9s (`process-relay` dot from `lg` along the ground line and return path, pulsing
+`process-chevron` icons; a catch cascade below `lg`), where each caught bot plays its full role act
+with its feet planted. All pause off screen and when the tab is hidden (`watchLive`);
+teardown restores the server markup exactly. Under reduce: no movement at all; the entrance is an
+opacity fade only and each bot shows its static pose. **Supersedes** the 2026-09-26 stop-motion rule
+(one 125ms tick, 8fps, stepped, no tweens, easing or rotation).
 
 ## Tokens
 
@@ -121,6 +127,12 @@ hidden; under reduce, no breathing and no swaps: the static pose at breath 0.
 the same width, left-aligned, so all three stay identical. The alternatives were one column
 until `lg` (each card about 600px tall at 768) or stretching the third card across both columns
 (which would make it different from the other two).
+
+**Accepted by the user, 2026-09-27:**
+
+- Process bots move in fully smooth GSAP motion, with eyes following the pointer, a scroll-in
+  entrance, a crew relay and a hover/tap reaction, and each bot gets separate feet (§5.6–5.8).
+  The 2026-09-26 stop-motion rule is **superseded 2026-09-27**.
 
 **Accepted by the user, 2026-09-24:**
 

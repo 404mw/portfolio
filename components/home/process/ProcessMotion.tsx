@@ -1,8 +1,8 @@
 "use client";
 
 // Process's motion (ui-spec §5.7, §10): the header and step text reveal on scroll, and the bots
-// breathe and swap frames in stop-motion. It renders nothing, so `ProcessSection` and its markup
-// stay server-rendered and unchanged.
+// come alive (drop-in, life, acts, pointer follow, reactions and the crew relay). It renders
+// nothing, so `ProcessSection` and its markup stay server-rendered and unchanged.
 import { useElementById } from "@/hooks/useElementById";
 import { useProcessBots } from "@/hooks/useProcessBots";
 import { useScrollReveal } from "@/hooks/useScrollReveal";

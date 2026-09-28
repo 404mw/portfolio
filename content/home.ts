@@ -4,7 +4,7 @@
 // takeover only. Agents demo content is sample illustration (constitution §7 item 5).
 
 export const meta = {
-  title: "Muhammad Waqas: AI Automation Engineer | MARWIX",
+  title: "MARWIX: AI Automation Engineer",
   description:
     "I build AI agents that take repetitive work off your team, and the websites around them. Book a call.",
 } as const;
@@ -14,14 +14,14 @@ export const hero = {
   lastName: "Waqas",
   sideLine: "I build AI agents that take repetitive work off your team, and the websites around them.",
   tag: "AI agents · End-to-end web",
-  seeProofs: "See proofs",
+  seeProofs: "See projects",
   portraitAlt: "Muhammad Waqas, head and shoulders, in black and white, with glasses, a beard and a dark collared shirt, looking to one side.",
 } as const;
 
 export const marquee = {
   items: [
     "Specialized agents",
-    "Enforced Ruls",
+    "Enforced Rules",
     "Customer messages",
     "Lead follow-up",
     "Recurring reports",
@@ -126,7 +126,7 @@ export const web = {
 // Facts → Work that is live. The three real projects only; no stacks, no clients.
 export const proofs = {
   number: "04",
-  label: "Proofs",
+  label: "Projects",
   heading: { lead: "Work that", accent: "runs." },
   hint: "Open a card to see more",
   open: "Open",
@@ -194,7 +194,7 @@ export const proofs = {
     },
   },
   takeover: {
-    proof: "Proof",
+    proof: "Project",
     close: "Close",
     escHint: "Esc",
     next: "Next project",

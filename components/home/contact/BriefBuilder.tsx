@@ -28,6 +28,7 @@ export function BriefBuilder() {
     <form
       ref={formRef}
       data-anim="reveal"
+      data-anim-delay="150"
       aria-labelledby={headingId}
       onSubmit={preventSubmit}
       className="flex flex-col gap-8 rounded-3xl border border-line bg-band p-6 md:p-8 lg:p-10"

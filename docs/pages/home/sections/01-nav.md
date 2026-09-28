@@ -10,7 +10,7 @@ See `../page.md` for the site-wide index. Spec: `../ui-spec/01-nav.md`.
 
 The shared page frame and fixed Nav are built statically: a 2px scroll progress bar sits above a
 64px nav row. The Nav turns solid via an observer on `#top` once the hero passes; it has inline
-links (Agents · Web · Proofs · Contact) from `md`, a phone menu below `md`, and a Book a call pill
+links (Agents · Web · Projects · Contact) from `md`, a phone menu below `md`, and a Book a call pill
 on the right — no brand mark. The phone menu is a native `<details>`/`<summary>` element, so it
 opens and closes without JS; JS adds closing the menu at `md` and up and on a link tap, Escape
 closing it, and syncing its open state on mount in case it was opened before hydration. Escape
@@ -24,18 +24,31 @@ position under reduced motion, since it's a position indicator, not decoration),
 ResizeObserver on `<body>` refreshes the trigger whenever the page's height changes. Without JS it
 stays empty. Browser-verified at 1440: 0/25/50/100% fill at 0/25/50/100% scroll, in both modes.
 
+The band and menu motion are built. `useNavBandFade` (mounted from `NavBar`, on its `<nav>` ref)
+fades the solid band in over 0.4s whenever `solid` turns on (kept under reduced motion, since it's
+a fade): its background and bottom-line colours are the `band`/`line` tokens mixed with transparent
+by a `--nav-fade` CSS variable, tweened 0 to 1; it skips the fade when the phone menu is already
+open (the band is already solid then), and turning back to transparent is instant either way.
+`useNavPanelMotion` (mounted from `NavMenu`, watching the `<details>`' `open` attribute) fades the
+phone panel in and drops it 8px on every open, fade only under reduced motion; closing stays
+instant since the native `<details>` hides it. No GSAP scroll-to for the jump links.
+
 ## Key Files
 
 - `components/SiteHeader.tsx` — shared page frame and the fixed Nav; renders `ProgressBar` and
   `ProgressMotion`
-- `components/NavBar.tsx` — the Nav row and progress bar
+- `components/NavBar.tsx` — the Nav row and progress bar; holds the `<nav>` ref and runs
+  `useNavBandFade`
 - `components/NavLinks.tsx` — inline/phone nav links
-- `components/NavMenu.tsx` — phone menu panel
+- `components/NavMenu.tsx` — phone menu panel; runs `useNavPanelMotion` on its `<details>`
 - `components/ProgressBar.tsx` — scroll progress bar's static markup (`data-anim="progress"`)
 - `components/ProgressMotion.tsx` — client component that runs `useScrollProgress`, renders nothing
 - `hooks/useScrollProgress.ts` — the progress bar's scroll-linked fill (ScrollTrigger scrub +
   `ResizeObserver` refresh)
 - `hooks/useScrolledPast.ts` — observer that flips the Nav solid past `#top`
+- `hooks/useNavBandFade.ts` — fades the solid band's background/line colours in via `--nav-fade`
+  when `solid` turns on
+- `hooks/useNavPanelMotion.ts` — fades and drops the phone menu panel in on every open
 - `lib/navItems.ts` — nav link data
 
 ## Decisions
@@ -72,6 +85,13 @@ stays empty. Browser-verified at 1440: 0/25/50/100% fill at 0/25/50/100% scroll,
   scroll (0.3s smoothing in full motion, direct under reduced motion since it's a position
   indicator); a `ResizeObserver` on `<body>` refreshes the ScrollTrigger when the page's height
   changes.
+- 2026-09-26 — The GSAP motion pass is built (ui-spec §1.5): the solid band fades in over 0.4s via
+  a `--nav-fade` variable mixing the `band`/`line` tokens with transparent (kept under reduce,
+  skipped while the phone menu is open, instant back to transparent); the menu panel fades and
+  drops 8px on open (fade only under reduce); GSAP scroll-to for jump links is skipped (out of
+  scope).
+- 2026-09-26 — User's choice: the nav link reads Projects, not Proofs (text + anchor `#proofs` →
+  `#projects` only; code/content key names stay `proofs`). See `sections/07-proofs.md`.
 
 ## Open Questions
 

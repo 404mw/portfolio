@@ -7,7 +7,7 @@ export const sectionIds = {
   agents: "agents",
   process: "process",
   web: "web",
-  proofs: "proofs",
+  proofs: "projects",
   contact: "contact",
   exile: "exile",
   designVault: "design-vault",

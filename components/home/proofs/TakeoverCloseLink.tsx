@@ -1,6 +1,6 @@
 "use client";
 
-// The takeover's Close link (ui-spec §7.3 part 1). Without JS it's a plain link to #proofs,
+// The takeover's Close link (ui-spec §7.3 part 1). Without JS it's a plain link to #projects,
 // which un-targets the dialog. With JS it closes the way Esc does (lib/takeoverLinks.ts).
 import { CloseIcon } from "@/components/icons/CloseIcon";
 import { proofs } from "@/content/home";

@@ -1,11 +1,13 @@
 "use client";
 // The phone menu (below `md`): a native <details>, so it opens and closes without JS. The
 // 44px <summary> is the button; the panel under the nav row holds the four jump links.
-// With JS: Escape closes it and returns focus, and a link click or reaching `md` closes it.
+// With JS: Escape closes it and returns focus, and a link click or reaching `md` closes it; the
+// panel fades and drops in on open (useNavPanelMotion).
 import { CloseIcon } from "@/components/icons/CloseIcon";
 import { MenuIcon } from "@/components/icons/MenuIcon";
 import { nav } from "@/content/shared";
 import { useDisclosure } from "@/hooks/useDisclosure";
+import { useNavPanelMotion } from "@/hooks/useNavPanelMotion";
 import { useOnMediaMatch } from "@/hooks/useOnMediaMatch";
 import { navItems } from "@/lib/navItems";
 import { focusRing } from "@/lib/styles";
@@ -16,6 +18,7 @@ const mdQuery = "(min-width: 48rem)";
 export function NavMenu() {
   const { open, onToggle, close, detailsRef, summaryRef } = useDisclosure();
   useOnMediaMatch(mdQuery, close);
+  useNavPanelMotion(detailsRef);
 
   return (
     <details ref={detailsRef} onToggle={onToggle} className="group md:hidden">

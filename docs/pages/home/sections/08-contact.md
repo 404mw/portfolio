@@ -1,6 +1,6 @@
 # Contact
 
-**Last Updated:** 2026-09-25
+**Last Updated:** 2026-09-26
 
 **The one question:** How do I start?
 
@@ -18,13 +18,25 @@ can't carry are hidden and Send keeps the default brief mailto. Timeline hover/a
 unchecked segments. An empty "what do you repeat" answer reads "Left blank" (`mail.repeatEmpty`).
 Textarea capped at 500 characters.
 
+The GSAP motion pass is built. `ContactMotion` mounts the generic reveal on both columns (the left
+column, and the brief `<form>` via its `data-anim-delay="150"`, 0.15s later) and
+`useBriefPlaceholder` on the "what do you repeat" textarea, passed `contact.brief.repeat.placeholders`.
+The placeholder rotates to the next sample phrase every 2.4s, wrapping, pausing while the field is
+off screen or the tab is hidden; it stops for good, keeping its current phrase, once the field is
+focused or holds any text (including text typed before hydration). Only the `placeholder`
+attribute changes, so the field stays uncontrolled and `useBriefState`'s read-back is untouched.
+Reduced motion: no rotation, fades only, the first phrase stays.
+
 ## Key Files
 
 - `components/home/contact/` — ContactSection, ContactLinks, ContactRow (shared by all side rows
-  including Book a call), BriefBuilder (client), NeedChips, TimelineSegments, RepeatField,
-  SendBriefLink
+  including Book a call), BriefBuilder (client, its `<form>` carries `data-anim-delay="150"`),
+  NeedChips, TimelineSegments, RepeatField, SendBriefLink, ContactMotion (client, mounts the reveal
+  and `useBriefPlaceholder`, renders nothing)
 - `hooks/useBriefState.ts` — the brief's uncontrolled radios/textarea read back on mount, so a
   choice made before hydration survives it
+- `hooks/useBriefPlaceholder.ts` — the "what do you repeat" placeholder's rotation, pause and
+  stop-for-good behaviour
 - `lib/brief.ts` — the brief's default choices, the summary line and the mailto builder (surrogate-safe
   encoding); `mail.repeatEmpty` covers an empty "what do you repeat" answer
 
@@ -54,6 +66,9 @@ Textarea capped at 500 characters.
   blank" (`mail.repeatEmpty`). Textarea capped at 500 characters.
 - 2026-09-25 — Contact pins its left column at 120px from the top from `lg` (CSS sticky, no JS),
   part of the site-wide split/sticky-title pattern (see `../page.md`).
+- 2026-09-26 — The GSAP motion pass is built (ui-spec §8.5): the left column and the builder
+  reveal (builder +0.15s); the placeholder rotates every 2.4s and stops on focus or input, pausing
+  off screen or hidden tab; under reduced motion, no rotation, first phrase stays.
 
 ## Open Questions
 

@@ -2,7 +2,8 @@
 // `section`: once, when the element's top reaches `reveal.start`, it rises from `reveal.y` px below
 // with opacity 0; an optional `data-anim-delay` (ms) holds it back. Reduced motion: the short
 // opacity fade only. The starting state is set here, in JS, so without JS (or before this runs)
-// the element shows as built. Any section can mount it through its own motion component.
+// the element shows as built. Once revealed, its inline transform and opacity are cleared, so a
+// revealed element (e.g. a sticky title column) carries no leftover transform. Any section can mount it through its own motion component.
 import type { RefObject } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { animTargets, duration, ease, motionQuery, reveal } from "@/lib/motion";
@@ -32,6 +33,7 @@ export function useScrollReveal(section: RefObject<HTMLElement | null>) {
             duration: reduced ? duration.fade : duration.enter,
             ease: ease.out,
             delay: delayOf(item),
+            clearProps: "transform,opacity",
             scrollTrigger: { trigger: item, start: reveal.start, once: true },
           });
         });

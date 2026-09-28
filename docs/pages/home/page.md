@@ -1,9 +1,9 @@
 # Home
 
-**Last Updated:** 2026-09-26
+**Last Updated:** 2026-09-28 (motion pass complete)
 
-> **Status:** GSAP motion pass started (Hero, Nav, Marquee, Agents and Process done); next: motion
-> for the remaining sections, then deploy
+> **Status:** GSAP motion pass complete for all sections; next: deploy prep (pre-push audit, then
+> deploy)
 
 **The one question:** Can they help me?
 
@@ -15,15 +15,15 @@ plus that section's file only.
 
 | # | Section | The one question it answers | Facts source | Status | Doc |
 |---|---|---|---|---|---|
-| 1 | Nav | Where can I go, and how do I book a call? | `docs/03-facts.md` → Contact | Decided | `sections/01-nav.md` |
-| 2 | Hero | Who is this? | `docs/03-facts.md` → Who | Decided | `sections/02-hero.md` |
-| 3 | Marquee | (transition, no claim) | none | Decided | `sections/03-marquee.md` |
-| 4 | Agents | What can their agents handle for my business? | `docs/03-facts.md` → What the user builds | Decided | `sections/04-agents.md` |
+| 1 | Nav | Where can I go, and how do I book a call? | `docs/03-facts.md` → Contact | Built, motion done | `sections/01-nav.md` |
+| 2 | Hero | Who is this? | `docs/03-facts.md` → Who | Built, motion done | `sections/02-hero.md` |
+| 3 | Marquee | (transition, no claim) | none | Built, motion done | `sections/03-marquee.md` |
+| 4 | Agents | What can their agents handle for my business? | `docs/03-facts.md` → What the user builds | Built, motion done | `sections/04-agents.md` |
 | 5 | Process | How do they work? | `docs/03-facts.md` → How the user works | Built, motion done | `sections/05-process.md` |
-| 6 | Web | Can they build my website end-to-end? | `docs/03-facts.md` → What the user can build | Decided | `sections/06-web.md` |
-| 7 | Proofs | Have they built something real that people use? | `docs/03-facts.md` → Work that is live | Decided | `sections/07-proofs.md` |
-| 8 | Contact | How do I start? | `docs/03-facts.md` → Contact | Decided | `sections/08-contact.md` |
-| 9 | Footer | Where else can I find/reach them? | `docs/03-facts.md` → Contact | Decided | `sections/09-footer.md` |
+| 6 | Web | Can they build my website end-to-end? | `docs/03-facts.md` → What the user can build | Built, motion done | `sections/06-web.md` |
+| 7 | Projects (formerly Proofs) | Have they built something real that people use? | `docs/03-facts.md` → Work that is live | Built, motion done | `sections/07-proofs.md` |
+| 8 | Contact | How do I start? | `docs/03-facts.md` → Contact | Built, motion done | `sections/08-contact.md` |
+| 9 | Footer | Where else can I find/reach them? | `docs/03-facts.md` → Contact | Built, motion done | `sections/09-footer.md` |
 
 ## Current State (site-wide)
 
@@ -31,14 +31,46 @@ All nine sections are built statically; section detail lives in `sections/`. Bui
 are green, and the lead re-checked 360/1024/1280/1440/3840 after the latest fixes: every title
 column pins from `lg` except Proofs and Process (neither pins), and nothing scrolls sideways. Type
 tokens are rem-based (zoom-safe). Every batch has been audited; all HIGH and SHOULD items are fixed
-or decided. Counting is wired (Umami Cloud). The GSAP motion pass has started: the Hero, Nav
-(progress bar fill), Marquee (loop), Agents (scroll entrance, 6s auto-advance, demo replays) and
-Process (bot breathing/frame swaps, header and step reveals) are done (see `sections/02-hero.md`,
-`sections/01-nav.md`, `sections/03-marquee.md`, `sections/04-agents.md`, `sections/05-process.md`);
-the other sections are next, then deploy.
+or decided. Counting is wired (Umami Cloud).
+
+The GSAP motion pass is complete for every section (see each section's file for detail): the Hero
+(section 2), Nav's progress bar fill and band/menu fades (1), the Marquee's loop (3), Agents'
+scroll entrance, 6s auto-advance and demo replays (4), Process' bot breathing/frame swaps (being
+redone as smooth motion, see `sections/05-process.md`) and header/step reveals (5), Web's row
+reveal and hover indent (6), Proofs' card reveal/lift and the
+takeover's clip-path open/close/Next-slide motion (7), Contact's column reveal and rotating brief
+placeholder (8), and the Footer's wordmark reveal (9). The lead browser-checked 360/1024/1440/3840
+in full and reduced motion: nothing scrolls sideways at any point (including mid footer animation),
+no console errors, and no reveal is left stuck hidden; the Proofs takeover's open/Esc/Back
+mid-open/Next/double-Esc/direct-load+Back all end in the right state at 360 and 1440. Next: deploy
+prep (a pre-push audit), then deploy.
 
 Site-wide, in `app/globals.css`: the scrollbar is an accent thumb on a transparent track, and text
-selection plus image dragging are off (inputs, textarea and contenteditable stay selectable).
+selection plus image dragging are off (inputs, textarea and contenteditable stay selectable). The
+favicon is served from `app/icon.svg` and `app/apple-icon.png` (the mascot mark).
+
+Built and verified 2026-09-26: the Proofs section is renamed Proofs → Projects in every visible
+word (nav link, section label, the hero's "See projects" button, the takeover top bar) and its
+anchor is `#projects` (`lib/routes.ts` `sectionIds.proofs = "projects"`); code, file and content key
+names stay `proofs`. The takeover's Next now slides the old project up and out while the new dialog
+stays in place and its content slides up in its place, with the Next link's title morphing into the
+new heading and the new top bar fading in once the title clears it (`hooks/useTakeoverMotion.ts`,
+`lib/takeoverTitleMorph.ts`); every takeover opens at its top, even right after one was scrolled to
+the bottom (`hooks/useHashTakeover.ts`). Build and lint are green; flow tests pass and the lead
+checked the slide frame strips and the no-crash repro. See `sections/07-proofs.md`.
+
+Built and verified 2026-09-27: opening a project from its card now morphs the card's title into the
+takeover heading too (`lib/takeoverTitleMorph.ts`, `lib/takeoverClip.ts`, `ProofCard.tsx`), on the
+same clip timing; the lead confirmed it in headless Chromium for all three cards, full and reduced
+motion, at 360/1440. See `sections/07-proofs.md`. The footer wordmark's dim letters (A R I X) now
+wipe on a slower, easing-out stagger (`hooks/useWordmarkReveal.ts`, function stagger, not a stagger
+object, to dodge a GSAP 3.15 ease quirk); verified in Chromium. See `sections/09-footer.md`.
+
+Built and verified 2026-09-28: closing a project now morphs the takeover heading back into its
+card title too (`hooks/useTakeoverMotion.ts`, `lib/takeoverTitleMorph.ts`), matching the card
+title's optical size and letter spacing at both hand-offs so the text boxes line up within 1px, and
+ending with a 0.15s fade of the whole dialog so the card dissolves in underneath. See
+`sections/07-proofs.md`.
 
 ## Key Files (site-wide)
 
@@ -66,9 +98,14 @@ selection plus image dragging are off (inputs, textarea and contenteditable stay
   queries, durations, eases, staggers, `reveal` (the generic scroll entrance, ui-spec §10), and the
   `data-anim` hook query
 - `lib/watchLive.ts` — shared: whether an element is on screen and its tab visible, used to pause
-  loops/timers (Agents' auto-advance and demo loops, Process' bots) when nobody can see them
+  loops/timers (Agents' auto-advance and demo loops, Process' bots, Contact's brief placeholder)
+  when nobody can see them
 - `hooks/useScrollReveal.ts` — the reusable scroll-reveal hook for any section's `data-anim="reveal"`
-  elements; used by Hero and Process, still unused (not yet animated) by Contact, Web and Proofs
+  elements; used by Process, Web, Proofs and Contact (each via its own motion component); clears
+  the element's inline transform/opacity once it has revealed, so a sticky column carries no
+  leftover transform
+- `lib/revealBatch.ts` — the shared staggered list reveal (`ScrollTrigger.batch`, same from-state
+  as the generic reveal), used by Web's rows and Proofs' cards
 
 ## Decisions (site-wide)
 
@@ -108,14 +145,20 @@ selection plus image dragging are off (inputs, textarea and contenteditable stay
   fades stay and anything that moves turns off (slides, parallax, mouse drift, auto-advance,
   looping pulses); the marquee strip is the one exception, kept looping under reduce (marquee
   exception requested by the user) and pausing on hover in both modes.
+- 2026-09-26 — The site favicon is the mascot mark: the violet MW "gap eyes" body with the eyes cut
+  as holes, no hat or tools. Ships as `app/icon.svg` plus `app/apple-icon.png` (180px, on the bg
+  colour); sources are the SVGs in `temp/A-GAP_EYES/` (gitignored). The OG image is unchanged.
+- 2026-09-26 — User's choice: the section is renamed Proofs → Projects in every visible word (nav
+  link, section label, the hero's "See projects" button, the takeover top bar "PROJECT 0n / 03")
+  and the page anchor (`#proofs` → `#projects`; not live yet, so no shared links break). Code, file
+  and content key names stay `proofs`. See `sections/07-proofs.md`.
 
 ## Open Questions (site-wide)
 
 - **To do (user):** create a free Umami Cloud account, add the website marwix.dev and send the
   lead its website ID; it's set as `NEXT_PUBLIC_UMAMI_WEBSITE_ID` in Vercel and needs a redeploy.
 - **Constitution:** the user to add the takeover/Book a call exception under §3.
-- **To do:** the site has no favicon (`/favicon.ico` 404s).
 - **Roll-up:** section-specific open questions remain in `sections/02-hero.md` (4),
-  `sections/04-agents.md` (2), `sections/05-process.md` (2), `sections/07-proofs.md` (3) and
-  `sections/08-contact.md` (1). The pre-deploy check reads this roll-up and every section file;
-  the page ships with none open anywhere.
+  `sections/04-agents.md` (2), `sections/05-process.md` (2), `sections/07-proofs.md` (4),
+  `sections/08-contact.md` (1) and `sections/09-footer.md` (2). The pre-deploy check reads this
+  roll-up and every section file; the page ships with none open anywhere.

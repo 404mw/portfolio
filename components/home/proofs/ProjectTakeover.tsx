@@ -34,7 +34,7 @@ export function ProjectTakeover({ projectKey }: ProjectTakeoverProps) {
     <dialog
       id={id}
       aria-labelledby={titleId}
-      className="fixed inset-0 z-50 m-0 hidden h-dvh max-h-none w-full max-w-none overflow-y-auto overscroll-contain border-0 bg-cream p-0 text-ink open:block [:root:not([data-takeover-js])_&:target]:block"
+      className="fixed inset-0 z-50 m-0 hidden h-dvh max-h-none w-full max-w-none overflow-y-auto overscroll-contain border-0 bg-cream p-0 text-ink open:block data-sliding:backdrop:bg-transparent [:root:not([data-takeover-js])_&:target]:block"
     >
       <div data-anim="takeover-content">
         <TakeoverTopBar number={proofNumber(projectKey)} tag={project.tag} />
@@ -42,6 +42,7 @@ export function ProjectTakeover({ projectKey }: ProjectTakeoverProps) {
           <div className={`${container} flex flex-col gap-10 pt-10 md:gap-14 md:pt-16 lg:gap-18 lg:pt-22`}>
             <h2
               id={titleId}
+              data-anim="takeover-title"
               className={`font-display text-takeover leading-[0.88] font-semibold tracking-[-0.045em] text-ink ${condensed}`}
             >
               {project.title}

@@ -8,6 +8,12 @@ Source: Claude Design canvas "Process mascots" (`Main.dc.html` desktop 1440, `Ph
 `Bot.dc.html` vector bot, `Sprites.dc.html` sheet), 2026-09-26. Replaces the ring and column-rail spec.
 **Revised 2026-09-26:** the pixel sprite is replaced by a vector bot built from the logo's geometry,
 and the bots breathe (motion pass).
+**Revised 2026-09-27 (user's decision):** each bot is one rig with separate feet, and the bots move in
+fully smooth GSAP motion with four extras (eyes follow the pointer, scroll-in entrance, crew relay,
+hover/tap reaction). Replaces the stop-motion rule (§5.6–5.8).
+**Revised 2026-09-28 (user's change):** the bots jump only on user interaction (hover or tap). A relay
+catch plays the full role act, check's "found it" is an eye pop and waking is a feet-planted startle;
+none of them hop. `HOP_UP` / `HOP_FEET` are removed.
 
 ### 5.1 Layout (canvas stacked at every width; no pinned title)
 
@@ -92,108 +98,263 @@ phone box is 88 × 56.94 in exact ratio; `h-14.25` (57px) leaves a 0.06px letter
 
 The body is the logo itself: the MW outline on a 100 grid, cut into three "/" strips with gap 8
 (bands x + y = 36–76, 84–116, 124–164). Vector: **no `crispEdges`, no cells, no run-merging.**
+**2026-09-27:** one rig per bot; the W's two bottom points are cut off as separate feet. The
+four `data-frame` groups and the `data-breath` groups are **superseded 2026-09-27**.
 
-- **Markup (one SVG, four frame groups, three breath groups each).**
-  `<svg viewBox="-30 -18 170 110" aria-hidden="true" focusable="false" data-anim="process-bot" data-role={role} data-pose={pose} class="h-14.25 w-22 shrink-0 lg:mt-5 lg:h-22 lg:w-34">`
-  → four `<g data-frame="idle|blink|act|sleep">`, each a complete pose; the static pose's group shows,
-  the other three carry `class="invisible"`. Inside every frame, in paint order:
-  `<g data-breath="body">` (strips, then eyes), `<g data-breath="hand">` (arms, then tools),
-  `<g data-breath="hat">` (hat parts). All three are always rendered (the hat group is empty for
-  `check` and `update`), so every bot has the same 12 hooks. Static = breath 0: no `transform` attributes.
-- **No background rect.** The canvas paints a `bg` rect behind each bot; ours is transparent.
-- **Poses (static):** `stepBots` = step 1 `rules`/`idle`, step 2 `team`/`idle`, step 3 `check`/`act`, step 4 `update`/`idle`.
+- **Markup (one SVG, one rig).** The SVG element is unchanged:
+  `<svg viewBox="-30 -18 170 110" aria-hidden="true" focusable="false" data-anim="process-bot" data-role={role} data-pose={pose} class="h-14.25 w-22 shrink-0 overflow-visible lg:mt-5 lg:h-22 lg:w-34">`.
+  Inside, one tree in paint order (feet under the strips, then strips → eyes → arms/tools → hat → effects):
+
+  ```
+  g rig
+  ├ polygon foot-left, polygon foot-right
+  └ g upper
+    ├ g body → strip A, strip B, strip C, g eyes[data-look] → rect eye, rect eye
+    ├ g arm-left → arm rect, left tools (rules: clipboard, clip, 3 × mark; update: rulebook, spine, page edge, mark, page)
+    ├ g arm-right → arm rect, g tool (right tool parts; check adds lens-lit after its lens)
+    ├ g hat → hat parts
+    └ extras: team g sparks → 3 × spark; rules and update g zzz → 3 × z
+  ```
+  Every hook is `data-bot="<part>"`. The 12 base hook elements (rig, foot-left, foot-right, upper,
+  body, eyes, eye ×2, arm-left, arm-right, tool, hat) render on every bot; `tool` and `hat` are empty
+  where the role has none. **Static = the pose, complete and visible:** no `transform` attributes, no
+  inline styles. Only decorative extras start hidden, with the `opacity-0` class: `sparks`, each `z`,
+  `page`, and `lens-lit` when the pose isn't `act` (check's pose is `act`, so its `lens-lit` shows).
+- **No background rect.** **Eye holes are filled, not cut:** `fill-bg` rects over the body (no mask,
+  no clip-path), valid only while the section sits on `bg`.
+- **Poses (static):** `stepBots` = step 1 `rules`/`idle`, step 2 `team`/`idle`, step 3 `check`/`act`,
+  step 4 `update`/`idle`. `BotPose` = `idle | act` replaces `BotFrame`; `botFrames` goes.
 - **Colour keys → classes** (map in `ProcessBot`): B `fill-accent`, C `fill-cream`, M `fill-muted`,
-  D `fill-cream-muted`, I `fill-ink`, L `fill-line`, H `fill-bg` (eye holes).
-- **Eye holes are filled, not cut:** each eye is a `fill-bg` rect painted over the body (no mask, no
-  clip-path). This holds only because the section sits on `bg`; if the section background changes,
-  the eye fill changes with it.
-- **Paths:** every `<path>` gets `fill-rule="evenodd"` (only the `check` ring needs it). Hardcode the
-  strings below; nothing is computed at render.
+  D `fill-cream-muted`, I `fill-ink`, L `fill-line`, H `fill-bg`. Flat fills; no gradients, blur or strokes.
+- **Paths:** every `<path>` gets `fill-rule="evenodd"`. Hardcode the strings below; nothing is computed at render.
 
-**Body group** (every frame): polygons, all B. The source emits V10 (and its mirror) twice in A and
-C, a zero-length edge; hardcode as given (dropping the repeat renders the same).
+**Hooks and pivots.** All pivots are viewBox units in the element's own rest space (no static
+transforms anywhere, so ancestors don't shift them); the animator sets each once with `svgOrigin`.
+`botPivots` in `lib/processBots.ts` holds them, so motion code never measures the SVG.
+
+| Hook | Element | Pivot | Moves (the only writers) |
+|---|---|---|---|
+| `rig` | g | 50 92 (ground centre) | `rotation` = sway + lean + act tilt (summed); entrance `y`, `opacity` |
+| `foot-left` | polygon | 26 90 (its tip) | `y` (jump lag, tap), `x` (shuffle) |
+| `foot-right` | polygon | 72 92 (its tip) | same |
+| `upper` | g | 50 84 (feet tops) | `y` (jump), `scaleX`/`scaleY` (squash, stretch) |
+| `body` | g | 50 84 | `scaleY` (breathing) |
+| `eyes` | g | none (translate only) | `x` = d − rest, `y` = −(d − rest); d = look along the gap diagonal, −7…7, + = up-right; rest = `data-look` |
+| `eye` ×2 | rect | its drawn centre (idle 30 50 / 70 50; check 37 43 / 77 43) | `attr` `y`/`height` (blink, sleep); `scale` (pop) |
+| `arm-left` | g | 6 53 (shoulder) | `y` (breath ride); `rotation` = drift × mix + act |
+| `arm-right` | g | 94 53 (shoulder) | same |
+| `tool` | g | team 112.5 53 · check 101 55 · update 104 53 (grips) | `rotation`; check also `x`/`y` (scan) |
+| `hat` | g | 50 10 (brim base) | `y` (breath ride); `rotation` (landing wobble) |
+| `mark` | path | its left end, centre y (rules −21 45.5 / −21 51.5 / −21 57.5; update −17 47.5) | `scaleX` (writing) |
+| `page` | path | −21 52 (spine edge) | `scaleX`, `opacity` |
+| `lens-lit` | path | none | `opacity` |
+| `sparks` / `spark` | g / path | 140 33 (strike point) | group `opacity`, `scale`; each spark `x`/`y` outward |
+| `z` ×3 | path | its centre (92 2 / 105 −7 / 120 −12) | `x`, `y`, `scale`, `opacity` |
+
+**Body and feet** (all B polygons). Strip A is unchanged; B and C are trimmed by a horizontal cut 7
+units above each tip. Each foot is a 14 × 7 right-angled "V" extended 0.5 unit up under its strip
+(feet paint first), so the trimmed strip + foot cover exactly the old strip, with no seam. The source's
+repeated vertex in A and C is kept (zero-length edge).
 
 | Part | `points` |
 |---|---|
 | Strip A | `6.00,30.00 28.00,8.00 48.00,28.00 6.00,70.00 6.00,70.00` |
-| Strip B | `74.00,10.00 90.00,26.00 26.00,90.00 10.00,74.00` |
-| Strip C | `94.00,70.00 72.00,92.00 52.00,72.00 94.00,30.00 94.00,30.00` |
+| Strip B (trimmed at y 83) | `74.00,10.00 90.00,26.00 33.00,83.00 19.00,83.00 10.00,74.00` |
+| Strip C (trimmed at y 85) | `94.00,70.00 79.00,85.00 65.00,85.00 52.00,72.00 94.00,30.00 94.00,30.00` |
+| `foot-left` | `18.50,82.50 33.50,82.50 26.00,90.00` (edges on x − y = −64 and x + y = 116) |
+| `foot-right` | `64.50,84.50 79.50,84.50 72.00,92.00` (edges on x − y = −20 and x + y = 164) |
 
-**Eyes** (H, after the strips). Centres (30,50) and (70,50) sit where the gaps cross the middle; on
-`act` they shift ±7 along the gap diagonal.
+The lowest point (y 92, §5.2's box bottom) is now `foot-right`'s tip; the left tip sits at y 90 as
+before. Static render is visually unchanged.
 
-| Frame | Rects `x,y` (both) | Size |
-|---|---|---|
-| `idle` | 23,43 and 63,43 | 14×14 |
-| `act`, `team` / `check` (up-right) | 30,36 and 70,36 | 14×14 |
-| `act`, `rules` / `update` (down-left) | 16,50 and 56,50 | 14×14 |
-| `blink` | none | |
-| `sleep` (slits) | 23,52 and 63,52 | 14×3 |
+**Eyes** (H, 14 × 14, drawn at the pose): idle 23,43 and 63,43 (`data-look="0"`); check `act` 30,36
+and 70,36 (`data-look="7"`). Motion values: blink closed = `y` drawn y + 7, `height` 0; sleep slit =
+`y` 52, `height` 3 (only rest-0 bots nap, after the look returns to 0); pop = scale 1.25. Blinks and
+slits use `attr` rather than `scaleY` because the slit isn't centred on the eye (52–55 vs centre 50).
 
-**Hand group:** left arm `<rect x="-4" y="50" width="10" height="6">` B; right arm
-`<rect x="94" y="50" width={armR} height="6">` B, `armR` 18 for `team`, 10 for the rest. Then the tools.
-**Hat group:** the hat parts. Both in the order listed. `blink` and `sleep` use the idle parts.
+**Arms and tools** (in each arm group, in the order listed). Left arm `<rect x="-4" y="50" width="10" height="6">` B;
+right arm `<rect x="94" y="50" width={armR} height="6">` B, `armR` 18 for `team`, 10 for the rest.
+The old act paths (raised hammer, 15° wrench, cream lens) are **superseded 2026-09-27**.
 
 | Role | Group | Part: `d` (fill) |
 |---|---|---|
 | `rules` | hat | cap `M26 8L30 -8H70L74 8Z` (M); badge `M46 -4h8v6h-8Z` (C); brim `M18 4h64v6h-64Z` (D) |
-| | hand | clipboard `M-26 34h22v32h-22Z` (C); clip `M-20 30h10v7h-10Z` (M); marks `M-21 44h12v3h-12Z`, `M-21 50h16v3h-16Z`, `M-21 56h9v3h-9Z` (I). No act variant: on `act` only the eyes move |
+| | arm-left | clipboard `M-26 34h22v32h-22Z` (C); clip `M-20 30h10v7h-10Z` (M); `mark` ×3 `M-21 44h12v3h-12Z`, `M-21 50h16v3h-16Z`, `M-21 56h9v3h-9Z` (I) |
 | `team` | hat | shell `M26 6L34 -8H66L74 6Z` (C); ridge `M46 -10h8v16h-8Z` (D); brim `M16 4h68v6h-68Z` (C) |
-| | hand | hammer head `M100 16h26v12h-26Z`, act `M100 6h26v12h-26Z` (M); handle `M110 28h5v28h-5Z`, act `M110 18h5v38h-5Z` (D) |
-| `check` | hand | ring `M122 18L138 34L122 50L106 34Z M122 25L113 34L122 43L131 34Z` (C); lens `M122 25L131 34L122 43L113 34Z` (L, act C); handle `M110.5 41.5L114.5 45.5L103 57L99 53Z` (M) |
-| `update` | hand | wrench handle, 45°: `M101.88 50.88L123.09 29.67L127.33 33.91L106.12 55.12Z`; act 15°: `M101.10 52.22L108.87 23.25L114.66 24.80L106.90 53.78Z` (M) |
-| | | wrench jaws, 45°: `M117.44 26.84L130.16 14.11L134.05 18.00L128.40 23.66L133.34 28.60L139.00 22.95L142.89 26.84L130.16 39.56Z`; act 15°: `M102.55 23.62L107.21 6.24L112.52 7.66L110.45 15.39L117.22 17.20L119.29 9.47L124.60 10.90L119.94 28.28Z` (M) |
-| | | rulebook `M-26 38h22v28h-22Z` (C); spine `M-26 38h5v28h-5Z` (D); page edge `M-8 40h3v24h-3Z` (M); mark `M-17 46h8v3h-8Z` (I) |
+| | tool | hammer head `M100 16h26v12h-26Z` (M); handle `M110 28h5v28h-5Z` (D) |
+| `check` | tool | ring `M122 18L138 34L122 50L106 34Z M122 25L113 34L122 43L131 34Z` (C); lens `M122 25L131 34L122 43L113 34Z` (L); `lens-lit` same `d` (C); handle `M110.5 41.5L114.5 45.5L103 57L99 53Z` (M) |
+| `update` | tool | wrench handle `M101.88 50.88L123.09 29.67L127.33 33.91L106.12 55.12Z` (M); jaws `M117.44 26.84L130.16 14.11L134.05 18.00L128.40 23.66L133.34 28.60L139.00 22.95L142.89 26.84L130.16 39.56Z` (M) |
+| | arm-left | rulebook `M-26 38h22v28h-22Z` (C); spine `M-26 38h5v28h-5Z` (D); page edge `M-8 40h3v24h-3Z` (M); `mark` `M-17 46h8v3h-8Z` (I); `page` `M-21 40h13v24h-13Z` (D, `opacity-0`) |
 
-The wrench is rotated about (104,53); the strings above are the resolved results. At 45° the right
-jaw tip reaches x 142.89, 2.89 units past the viewBox edge (140); the SVG's default
-`overflow: hidden` clips it (~2.3px at 136 wide), as the canvas does (see Choices).
+**Effects** (last in `upper`; decorative, hidden statically).
 
-**Breath values** (motion pass only; `sy = 1 + 0.03 · breath`; hand −39·(sy−1), hat −84·(sy−1)).
-The body stretches up from its feet (y 92), so the feet never leave the ground line.
+| Role | Hook | `d` (fill) |
+|---|---|---|
+| `team` | `sparks` (`opacity-0`) → `spark` ×3 | right `M143 32h7v2h-7Z`; down-right `M142 36L143.5 34.5L148.5 39.5L147 41Z`; down `M139 36h2v7h-2Z` (C) |
+| `rules`, `update` | `zzz` → `z` ×3 (`opacity-0` each) | `M88 -2H96V0L92 4H96V6H88V4L92 0H88Z`; `M100 -12H110V-10L104 -4H110V-2H100V-4L106 -10H100Z`; `M114 -18H126V-16L118 -8H126V-6H114V-8L122 -16H114Z` (M) |
 
-| breath | `data-breath="body"` | `"hand"` | `"hat"` |
-|---|---|---|---|
-| 0 (static) | none | none | none |
-| 1 | `translate(0 92) scale(1 1.03) translate(0 -92)` | `translate(0 -1.17)` | `translate(0 -2.52)` |
-| 2 | `translate(0 92) scale(1 1.06) translate(0 -92)` | `translate(0 -2.34)` | `translate(0 -5.04)` |
+Z glyphs are paths, not text: sizes 8, 10, 12 with a 2-unit bar and a 45° diagonal, rising up-right
+from the head, clear of the rules hat (brim ends x 82) and the update wrench (jaws from y 14).
 
-At breath 2 the highest point (the `team` ridge, −10 − 5.04 = −15.04) stays inside the viewBox (−18).
+**Rotations, confirmed from the geometry** (SVG rotation is clockwise-positive, y down): the wrench
+drawn at 45° rotated **−30°** about (104,53) lands exactly on the old 15° act pose (jaw top
+111.8,24.0). The hammer strikes forward at **+30°** about its grip; its face (126,22) then sits at
+(139.7,32.9), which is the sparks' point. Anticipation at −45° draws the head over strip C (in front
+of the body). A positive `rig` rotation leans right; a positive `arm-left` rotation raises the clipboard.
+
+**Breath (motion only; the 2026-09-26 breath table is superseded 2026-09-27).** `body` `scaleY` =
+1 + stretch × b about (50,84), b 0 → 1. Riders move by the body's stretch at their height: arms
+`y` = −31 × stretch × b (y 53), hat `y` = −76 × stretch × b (y 8). Stretch 0.04 gives arms −1.24 and
+hat −3.04; nap stretch 0.06 gives −1.86 and −4.56. The feet never move with breathing.
+
+**Overflow (paint only; SVG overflow and transforms cause no layout shift).** The jaw at x 142.89
+(2.3px into the gap at 136 wide, as before); sparks to x 154 with fly-out (11px desktop, 7px phone,
+inside the ≥75px spare column width at `lg` and the 18px phone gap); a jump lifts the team ridge to
+about y −35 (14px above the box desktop, 9px phone, inside the 20px top margin and the phone row's
+24px padding); zzz rise to y −28; the entrance starts 60 units up (48px, faded, transient). Squash
+and lean reach x ≈ −36 on the left (5px desktop, 3px phone, into the gutter). No sideways scroll at 360.
 
 ### 5.7 Components, images, motion
 
-- **Components (`components/home/process/`):** `ProcessSection.tsx` (frame, header, body),
-  `ProcessList.tsx` (ground line and `<ol>`), `ProcessStep.tsx` (bot, chevron, text),
-  `ProcessBot.tsx` (rewritten: the vector SVG; props `role`, `pose`), `ProcessReturn.tsx` (return path or
-  row, and the label). Icons: `ChevronRightIcon.tsx` and `CornerUpLeftIcon.tsx` (one glyph each);
-  `ChevronUpIcon` reused. Logic: `lib/processBots.ts` (rewritten: the hardcoded polygons, eye rects
-  and part paths above, `botParts(role, frame)` returning the three groups' parts, `stepBots`; the
-  pixel maps and `botRects` go). **Deleted:** `ProcessLoop.tsx`, `ProcessRing.tsx`, `ProcessRail.tsx`,
-  and `stickyTitleXl` in `lib/styles.ts`. **Images:** none.
+- **Components (`components/home/process/`):** `ProcessSection.tsx` (frame, header, body; the body
+  wrapper gains `relative` and holds `ProcessRelay` last), `ProcessList.tsx` (ground line and `<ol>`),
+  `ProcessStep.tsx` (bot, chevron, text), `ProcessBot.tsx` (rewritten: the rig in 5.6; props `role`,
+  `pose`), `ProcessReturn.tsx`, **new** `ProcessRelay.tsx` (the relay dot, below). Icons unchanged.
+  **Motion hooks added to markup (no layout change):** `data-anim="process-list"` on `ProcessList`'s
+  root, `process-ground` on the ground line, `process-chevron` on each chevron span (motion scales the
+  icon inside, not the masking span), `process-return` on the path box (its first child is the arrowhead).
+  **Images:** none.
+- **Relay dot (`ProcessRelay`):** `<span aria-hidden="true" data-anim="process-relay" class="pointer-events-none absolute left-0 top-0 -ml-1.25 -mt-1.25 hidden size-2.5 rounded-full bg-accent opacity-0 shadow-[0_0_12px_3px_color-mix(in_oklab,var(--color-accent)_55%,transparent)] lg:block">`.
+  10px, centred on its `x`/`y` by the negative margins (so motion owns `transform` alone); the glow is
+  built from the token only. Decoration: `opacity-0` without JS is correct.
+- **Logic files (one job each):** `lib/processBots.ts` (geometry, `botPivots`, `stepBots`),
+  `lib/processBotMotion.ts` (the constants table below, nothing else), `lib/processBotRig.ts` (finds a
+  bot's hooks, sets pivots, owns the summed channels, `resetBot`), `lib/processBotLife.ts` (breath,
+  sway, drift, blinks, looks, taps), `lib/processBotActs.ts` (role acts, jumps, reactions, naps),
+  `lib/processBotPointer.ts` (pure mapping: pointer vector → look and lean), `lib/processRelay.ts`
+  (waypoints and the relay / column cascade). Hook: `hooks/useProcessBots.ts` (rewritten; split out
+  `useProcessRelay` if it grows a second job). `ProcessMotion` is unchanged.
 - **Motion (later), reveals:** `data-anim="reveal"` on the header wrapper and each step's text
   column, never on the `li`, so bots, ground line and chevrons stay put while text rises in.
-- **Motion (later), bots:** two stepped layers on one 125ms tick per bot (8fps). No tweens, easing,
-  rotation or blur.
-  1. **Breathing:** an 18-step cycle, breath 0 for 8 steps, 1 for 2, 2 for 6, 1 for 2 (2.25s). Phase
-     offsets 0, 11, 5 and 14 steps for `rules`, `team`, `check`, `update` (at tick t a bot shows the
-     cycle's step t + offset), so the crew never breathes in unison. Each change sets the SVG
-     `transform` attribute from the breath table on every `[data-breath]` group in that bot, in all
-     four frames, so a frame swap keeps the current breath; breath 0 removes it. Breathing runs in
-     every frame, `sleep` included.
-  2. **Frame swaps:** toggle `invisible` on the `data-frame` groups; holds are multiples of 125ms and
-     vary per bot; idle ↔ blink, idle ↔ act (eyes jump along the gaps, tools switch to their act
-     paths), an occasional sleep.
-  - Pause both when the section is off screen (ScrollTrigger or an observer) and on
-    `visibilitychange`. **Reduced motion:** no breathing, no swaps; each bot keeps its static pose at breath 0.
-- The ground line, chevrons and return path don't move.
+- **Motion (later), bots.** The 2026-09-26 stop-motion (one 125ms tick, 8fps, stepped, no tweens,
+  easing or rotation) is **superseded 2026-09-27** by fully smooth GSAP motion, below. Full motion
+  only unless marked. Transforms, `opacity` and `attr` only; no filters.
+
+**Constants (`lib/processBotMotion.ts`; seconds, viewBox units, degrees unless marked).** Ranges are
+picked at random each time; per-role values are listed rules / team / check / update.
+
+| Constant | Value | Use |
+|---|---|---|
+| `BREATH_STRETCH` / `NAP_STRETCH` | 0.04 / 0.06 | body stretch peak (awake / napping) |
+| `BREATH_HALF` | 1.25 / 1.1 / 1.35 / 1.4 | half-cycle, `sine.inOut` yoyo (2.2–2.8s full) |
+| `ARM_LIFT` / `HAT_LIFT` | 31 / 76 | breath ride per unit of stretch |
+| `SWAY_DEG` / `SWAY_HALF` | 1.2 / 1.5 / 1.0 / 1.3 · 2.6 / 3.0 / 2.8 / 3.4 | rig sway ±, `sine.inOut` yoyo |
+| `DRIFT_DEG` / `DRIFT_HALF` | 3 · 1.8–2.4 per arm | arm drift ±, arms out of phase |
+| `BLINK_GAP` / `CLOSE` / `OPEN` | 2–6 · 0.07 `power2.in` · 0.12 `power2.out` | blinks |
+| `DOUBLE_BLINK` / `DOUBLE_GAP` | 0.2 · 0.1 | chance and gap of a second blink |
+| `LOOK_MAX` / `LOOK_HOLD` / `LOOK_MOVE` | 7 · 0.8–2 · 0.35–0.6 `power3.out` | autonomous looks (30% return to rest) |
+| `TAP_GAP` / `TAP_LIFT` | 7–14 · 3 | foot taps: up 0.09 `power2.out`, down 0.07 `power2.in`, twice |
+| `ACT_GAP` | 5–10 | between role acts |
+| `NAP_GAP` / `NAP_LENGTH` / `NAP_TIMESCALE` | 25–40 · 4–5 · 0.55 | rules and update only |
+| `Z_RISE` / `Z_STAGGER` | 1.6 · 0.5 | each z: `y` −10, `x` +4, scale 0.6 → 1, opacity 0 → 1 (first 25%) → 0, looping |
+| `POINTER_RANGE` / `LEAN_RANGE` / `LEAN_MAX` | 240px · 480px · 2.5 | pointer mapping |
+| `EYE_FOLLOW` / `LEAN_FOLLOW` / `POINTER_IDLE` | 0.35 · 0.6 (`power3.out` quickTo) · 2.5 | pointer smoothing and hand-back |
+| `ANTICIPATE` / `STRETCH` / `SQUASH` | 1.06 × 0.92 · 0.94 × 1.08 · 1.1 × 0.9 | `upper` scaleX × scaleY |
+| `SETTLE` | 0.6 `elastic.out(1, 0.4)` | back to scale 1 after any landing |
+| `JUMP_UP` / `JUMP_FEET` | 14 / 10 | upper / feet lift (the hover/tap jump, the only jump) |
+| `POP_SCALE` / `REACT_COOLDOWN` | 1.25 · 1.2 | eye pop; reaction cooldown from its start |
+| `DROP_FROM` / `DROP_FALL` / `DROP_STAGGER` / `DROP_START` | −60 · 0.45 `power2.in` · 0.15 · `"top 75%"` | entrance |
+| `RELAY_EVERY` / `RELAY_HOP` / `RELAY_DWELL` / `RELAY_FADE` | 9 · 0.7 `power2.inOut` · 0.15 · 0.2 | relay (start to start) |
+| `RETURN_SPEED` / `CHEVRON_PULSE` / `CASCADE_GAP` | 700px/s `none` · 1.35 · 0.6 | return path, chevron and arrowhead pulse, below-`lg` cascade |
+
+**Channels.** Each property has one writer (hook table, 5.6). Summed properties (`rig` rotation,
+arm rotations) are plain proxy objects combined in one apply function; arm rotation is drift × mix +
+act, and an act eases `mix` to 0 while it needs the arm. Eye position is one `look.d` proxy: the
+pointer drives it with `quickTo`; looks and acts tween it after killing the previous look tween. A bot
+is in one state at a time: entering, idle, acting, reacting or napping. Blinks, looks and taps run
+only in idle; acts and naps never overlap; while not idle, the pointer drives lean but not eyes.
+
+**The layers** (numbers from the table):
+
+1. **Life (always, per bot, out of phase; starts when the bot lands).** Breathing on a `b` proxy
+   (random start progress), sway on `rig`, drift on each arm. Feet stay planted.
+2. **Blinks:** close then open via `attr`; sometimes a double blink.
+3. **Looks:** when the pointer isn't driving, `look.d` glides to a random target and holds.
+4. **Taps:** one foot at a time lifts `TAP_LIFT` (it rises under the strip, so the foot shortens; no gap) and taps twice.
+5. **Role acts** (one at a time, never while napping). A relay catch plays the full act; the short
+   version runs only after a reaction. After a catch or a reaction, the bot's `ACT_GAP` scheduler
+   restarts, so its next random act comes 5–10s later.
+
+| Role | Full act | Short |
+|---|---|---|
+| `rules` | look −7; arm-left act +10° (0.4 `power2.out`, clipboard tilts up); marks to scaleX 0 (0.12, stagger 0.05) then re-written left to right (0.25 each `power2.out`, stagger 0.2); two nods (`upper` 0.95 scaleY / 1.03 scaleX, 0.1 down, 0.2 up); look and arm back (0.5 `power2.inOut`) | marks re-write together (0.3, stagger 0.06), arm +6° and back, one nod |
+| `team` | 2–3 strikes: anticipation tool −45°, `upper` squash 1.03 × 0.96, look +5, foot-right `x` +1.5 (0.28 `power2.out`); strike tool +30° (0.09 `power4.in`); impact `upper` 1.05 × 0.94 (0.05) then `SETTLE`, foot-left `x` −1 and back (0.05 / 0.2), sparks: group opacity 1, scale 0.5 → 1.2 about (140,33), sparks fly 4 units along their rays (right; down-right 2.8, 2.8; down), 0.25 `power2.out`, then fade 0.15; after the last, tool to 0 (0.35 `back.out(1.6)`), feet `x` 0, look 0. Arm-right mix 0 throughout | one strike |
+| `check` | rig act tilt +3° (0.4 `power2.out`, leans to the lens); figure-8 scan: tool `x` 0 → 4 → 0 → −4 → 0 (0.35 legs) with `y` 0 → 2.5 → 0 → −2.5 → 0 twice (0.175 legs), tool rotation ±4° with `x`, `sine.inOut`; lens-lit flicker (opacity 1/0 held 0.08, 0.05, 0.12, 0.06, ending 1); 35% chance "found it": an eye pop (scale to `POP_SCALE` over 0.1, back over 0.3), feet down, no hop; tilt back (0.5 `power2.inOut`) | tilt + one flicker |
+| `update` | look +5; 3 ratchets: tool −30° (0.22 `power2.out`) and back (0.16 `power2.in`), rig act tilt −1.5° with each; then look −7, page flip: `page` opacity 1 (0.06), scaleX 1 → 0 about the spine (0.4 `power2.in`), opacity 0 and scaleX 1 (set); `mark` set to scaleX 0 while covered, re-written (0.3 `power2.out`); look 0 | one ratchet |
+
+6. **Naps (rules and update):** look to 0 (0.4), eyes to slits (0.3 `power2.inOut`), breathing
+   stretch → `NAP_STRETCH` and timeScale → `NAP_TIMESCALE` (0.6), sway timeScale 0.6, zzz loop.
+   **Wake** (after `NAP_LENGTH`, or early on pointer hover or a relay pass): zzz fade (0.15), eyes open
+   (0.08) and pop (0.1, back 0.3), a feet-planted startle (an `upper` squash at 0.1, then `SETTLE`;
+   no hop), a double blink 0.3s later, breathing back (0.6).
+   A napping bot ignores pointer look.
+7. **Eyes follow the pointer** (full motion and `(pointer: fine)`, section live): on `pointermove`
+   (rAF-throttled) each bot takes v = pointer − its eye centre, in page px. Look d = clamp(±7,
+   ((vx − vy)/√2) / 240 × 7) (the projection onto the up-right diagonal), via `quickTo`
+   `EYE_FOLLOW`; lean = clamp(±2.5, vx / 480 × 2.5) on the rig's lean channel via `quickTo`
+   `LEAN_FOLLOW`. Eye centre = svg rect left + 0.4706 × width, top + 0.6182 × height (viewBox 50,50),
+   cached in page coordinates and refreshed on resize (ResizeObserver on the list) and ScrollTrigger
+   refresh; `pageX`/`pageY` need no scroll refresh. After `POINTER_IDLE` without movement, or on
+   pointer leaving the window, lean eases to 0 and autonomous looks resume.
+8. **Hover / tap reaction:** `pointerenter` (fine pointer) or `pointerdown` (any pointer, no
+   `preventDefault`) on a bot's SVG; `REACT_COOLDOWN` from its start; interrupts naps and idle acts.
+   Timeline (s): 0 anticipate `upper` (0.1 `power2.out`); 0.1 `upper` `y` −14 with stretch (0.22
+   `power2.out`), eyes pop (0.12, back 0.3); 0.16 feet `y` −10 (0.2 `power2.out`: the body lifts first,
+   feet leave last); 0.36 feet down (0.16 `power2.in`, land first at 0.52); 0.34 `upper` down (0.22
+   `power2.in`, lands 0.56); 0.56 squash (0.06) then `SETTLE`, hat wobble ±4° (`elastic.out`); then the
+   short act. This is the only jump: relay catches, the cascade, "found it" and waking keep the feet
+   down. Nothing becomes focusable; no cursor change.
+9. **Scroll-in entrance (once per page load):** ScrollTrigger on `process-list`, `DROP_START`. If the
+   start is already passed at setup (page loaded lower down, or a matchMedia re-run), the bots are
+   simply shown and life starts. Otherwise set per bot: `rig` `y` −60, opacity 0; `upper` stretch
+   0.9 × 1.15; eyes closed. On enter, staggered 0.15: fall (opacity to 1 over the first 0.15), feet
+   land, `upper` squash 1.12 × 0.86 (0.07) then `SETTLE`, eyes open (0.12), glance d ±5 toward the
+   next bot (bot 4 at bot 1; sign from the pointer projection), hold 0.5, back to rest (0.4). Life
+   starts on each bot's landing. Revert at any point leaves every bot visible.
+10. **Crew relay (loop, while live, after all four have landed; first run 1.5s after):**
+    - **From `lg` (the dot):** waypoints measured from the DOM relative to the body wrapper, refreshed
+      with the eye centres: F1–F4 = each bot's feet (svg left + 0.4706 × width, ground line top + 1);
+      K1–K3 = chevron centres; the return box R with xr = R.right − 1, xl = R.left + 1, yb = R.bottom − 1:
+      R0 (xr, R.top), R1 (xr, yb − 16), R2 (xr − 4.69, yb − 4.69), R3 (xr − 16, yb), R4 (xl + 16, yb),
+      R5 (xl + 4.69, yb − 4.69), R6 (xl, yb − 16), R7 (xl, R.top) (the arrowhead).
+      Run: dot to F1, fade in; bot 1 launches (a squash); hop to F2, F3, F4 (`RELAY_HOP`, dwell
+      `RELAY_DWELL`); each chevron's icon pulses scale `CHEVRON_PULSE` (0.15 up, 0.3 down) as the dot
+      crosses its x; the bot ahead taps a foot as the dot heads its way. Each bot catches on arrival,
+      with no jump: an idle bot plays its **full** role act (a busy bot glances at the dot instead; a
+      napping bot wakes). After bot
+      4, the dot fades out (0.15), fades in at R0, traces R0 → R7 at `RETURN_SPEED` (segment times by
+      length, `none`), the arrowhead pulses, the dot fades at R7 and bot 1 catches it.
+    - **Below `lg`:** no dot. Every `RELAY_EVERY`, bots 1 → 4 each catch in turn, `CASCADE_GAP` apart,
+      as above (full act if idle, glance if busy, wake if napping; no jump).
+11. **Pausing and teardown:** every tween, timeline and `delayedCall` the bots make goes in one
+    registry; `watchLive` (section off screen or tab hidden) pauses all and resumes them. Pointer
+    events are ignored while not live. `gsap.matchMedia()` blocks: full (bots, entrance, reactions);
+    full + `lg` (dot); full and below `lg` (cascade); full + fine pointer (follow); reduced (fade).
+    On unmount or a mode switch, revert, then `resetBot` removes every `transform` attribute and inline
+    style on `[data-bot]` and the relay, and restores the eyes' `y`/`height` from values stored at
+    setup: the DOM equals the server markup.
+12. **Reduced motion:** no breathing, blinks, looks, taps, acts, naps, relay, pointer, reactions or
+    drops. The entrance is `rig` opacity 0 → 1 (`duration.fade`, stagger `stagger.row`) on the same
+    trigger, skipped if already passed. The bots show their static pose.
+
+- The ground line and return path don't move; only the chevron icons and the arrowhead pulse (full motion).
 
 ### 5.8 Choices for the lead
 
 1. **Tablet is rows, four across from `lg`** (not a 2×2 grid, not four columns at `md`). Reason in 5.1.
 2. **Bot stays 136px at 4K,** not larger: the section is capped at 1536 and the type stops growing.
-3. **Breath groups inside each frame** (as briefed: 12 hooks per bot, the motion pass sets all of
-   them each breath change) over three outer breath groups each holding four frame parts (3 hooks,
-   but a frame swap then toggles three groups). Chose the brief's: each frame stays one complete pose.
+3. ~~**Breath groups inside each frame** (12 hooks per bot) over three outer breath groups.~~
+   **Superseded 2026-09-27:** one rig per bot, no frames (5.6).
 4. **Return path is a CSS dashed border box** (browser dash rhythm, about 6/6) rather than an SVG
    with exact 8/8 dashes. An SVG can't stretch to the fluid column width without distorting its
    16px corners unless split into three pieces; say if exact 8/8 matters.
@@ -201,5 +362,24 @@ At breath 2 the highest point (the `team` ridge, −10 − 5.04 = −15.04) stay
 6. **Left out:** `Main.dc.html` still has a lone 16×16 cream square on the ground line right of bot 3
    (x 824, y 92–108), not in the brief. It reads as "the work being checked"; add it only on your yes.
 7. Step title limit set to 3 words (the voice file has none; the old spec said 4).
-8. **Wrench jaw clipped at the viewBox edge** (as the canvas renders it) rather than
-   `overflow-visible` on the SVG (shows the full jaw, 2.3px into the column gap, no layout effect).
+8. **Wrench jaw shown in full with `overflow-visible`** on the SVG (2.3px into the column gap, no
+   layout effect) rather than clipped at the viewBox edge (as the canvas renders it).
+9. **An `upper` group between `rig` and the body** (2026-09-27): the feet must stay planted while
+   the body squashes and jumps, so squash and jump live on `upper` (pivot 50,84) and `rig` keeps
+   rotation and the entrance. Sway and lean rotate the whole rig about (50,92), feet included, so no
+   seam opens; the tips move at most ~2.7 units at the 6.5° peak (check's lean included). The
+   alternative (feet fixed, body tilting on them) opens a 1–2 unit gap at the left foot beyond ~1°.
+10. **Eyes inside `body`**, so breathing carries them, rather than a sibling with its own ride. Eye
+    rects are **drawn at the pose** with `data-look` rather than drawn idle with a static transform,
+    keeping "no transforms in markup". Blinks and slits use `attr`, not `scaleY` (slit off-centre).
+11. **Feet cut 7 units above each tip** (equal 14 × 7 feet; the left cut is y 83, the right y 85),
+    not one shared cut height, which would make unequal feet. Squash `scaleX` shows a brief ~1-unit
+    step at the foot joins; it's transient, so left as is.
+12. **Relay return:** the dot fades at bot 4 and reappears at the path's right end, rather than
+    flying straight down across step 4's text to reach it.
+13. **Hammer strike +30° with sparks at (140,33)**; the −45° wind-up draws the head over the body.
+14. **Update's `mark` is its own hook** (re-written after the page flip): a small addition to the brief.
+15. **No cursor change on bots** (a pointer cursor would suggest a link or an action). Tap uses
+    `pointerdown` as briefed, so a scroll that starts on a bot also makes it jump; `pointerup`
+    without movement is the alternative.
+16. **Chevron pulse is scale only:** no brighter violet token exists; a flash to `text` is the alternative.

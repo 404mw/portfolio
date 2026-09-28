@@ -52,6 +52,11 @@ export function proofCardIds(targetId: string) {
   return { title, open, labelledBy: `${title} ${open}` };
 }
 
+/** The selector for the card that opens the takeover with `targetId` (focus return, motion). */
+export function proofCardSelector(targetId: string): string {
+  return `[data-proof-card][href="#${targetId}"]`;
+}
+
 /** The id of a takeover's title, which names its dialog. */
 export function takeoverTitleId(targetId: string): string {
   return `${targetId}-title`;

@@ -2,12 +2,12 @@
 // last step), then the step label, title and line. A row below `lg`, a column from `lg`.
 import { ProcessBot } from "@/components/home/process/ProcessBot";
 import { ChevronRightIcon } from "@/components/icons/ChevronRightIcon";
-import type { BotFrame, BotRole } from "@/lib/processBots";
+import type { BotPose, BotRole } from "@/lib/processBots";
 import { condensed, metaLabel } from "@/lib/styles";
 
 type ProcessStepProps = {
   readonly role: BotRole;
-  readonly pose: BotFrame;
+  readonly pose: BotPose;
   readonly hasNext: boolean;
   readonly label: string;
   readonly title: string;
@@ -21,6 +21,7 @@ export function ProcessStep({ role, pose, hasNext, label, title, line }: Process
       {hasNext && (
         <span
           aria-hidden="true"
+          data-anim="process-chevron"
           className="absolute top-27 -right-6 hidden h-0.5 w-4 items-center justify-center bg-bg lg:flex"
         >
           <ChevronRightIcon className="size-6 shrink-0 text-accent" />

@@ -10,10 +10,13 @@ export function ProcessReturn() {
   return (
     <div className="flex items-center gap-3 border-t border-line pt-6 lg:grid lg:grid-cols-4 lg:gap-x-8 lg:border-t-0 lg:pt-0">
       <CornerUpLeftIcon className="size-5 shrink-0 text-accent lg:hidden" />
-      <div className="contents lg:relative lg:col-span-3 lg:ml-15.5 lg:-mr-24 lg:block lg:h-14 lg:rounded-b-2xl lg:border-2 lg:border-t-0 lg:border-dashed lg:border-accent">
+      <div
+        data-anim="process-return"
+        className="contents lg:relative lg:col-span-3 lg:ml-15.5 lg:-mr-24 lg:block lg:h-14 lg:rounded-b-2xl lg:border-2 lg:border-t-0 lg:border-dashed lg:border-accent"
+      >
         <ChevronUpIcon className="absolute -left-3.25 -top-2.5 hidden size-6 text-accent lg:block" />
         <p
-          className={`${monoLabel} lg:absolute lg:inset-x-0 lg:bottom-0 lg:translate-y-[calc(50%+1px)] lg:text-center`}
+          className={`${monoLabel} lg:absolute lg:inset-x-0 lg:z-10 lg:bottom-0 lg:translate-y-[calc(50%+1px)] lg:text-center`}
         >
           <span className="lg:bg-bg lg:px-4">{process.loopLabel}</span>
         </p>

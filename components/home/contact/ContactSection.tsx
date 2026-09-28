@@ -1,7 +1,9 @@
 // Section 8, Contact: how do I start? (ui-spec §8). The label, heading, lead and side links on
 // the left (sticky from `lg`); the brief builder on the right (stacked below `lg`).
+// `ContactMotion` (client) renders nothing; it adds the reveals and the placeholder rotation.
 import { BriefBuilder } from "@/components/home/contact/BriefBuilder";
 import { ContactLinks } from "@/components/home/contact/ContactLinks";
+import { ContactMotion } from "@/components/home/contact/ContactMotion";
 import { SectionHeading } from "@/components/SectionHeading";
 import { SectionLabel } from "@/components/SectionLabel";
 import { contact } from "@/content/home";
@@ -26,6 +28,7 @@ export function ContactSection() {
         </div>
         <BriefBuilder />
       </div>
+      <ContactMotion placeholders={contact.brief.repeat.placeholders} />
     </section>
   );
 }

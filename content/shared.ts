@@ -8,7 +8,7 @@ export const nav = {
   links: {
     agents: "Agents",
     web: "Web",
-    proofs: "Proofs",
+    proofs: "Projects",
     contact: "Contact",
   },
   menu: {

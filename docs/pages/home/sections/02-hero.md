@@ -1,6 +1,6 @@
 # Hero
 
-**Last Updated:** 2026-09-26 (portrait pointer tilt halved again — ±1.5°/±1°)
+**Last Updated:** 2026-09-28 (removed the deleted `usePointerDrift.ts`/`useHeroPulses.ts` Key Files entries)
 
 **The one question:** Who is this?
 
@@ -77,12 +77,8 @@ the top of the hair now runs behind the nav links or touches the top edge.
   only
 - `hooks/usePointerTilt.ts` — shared 3D pointer-tilt (facing the pointer, never moves) for a
   section's `data-anim` element; fine pointers, full motion only
-- `hooks/usePointerDrift.ts` — unused, awaiting the user's delete (replaced by
-  `usePointerTilt.ts`)
 - `hooks/useHeroNetworkMotion.ts` — runs the network's node drift and travelling pulses on
-  `gsap.ticker`, paused off screen or when the tab is hidden; full motion only; replaces
-  `useHeroPulses.ts`
-- `hooks/useHeroPulses.ts` — unused (emptied to a placeholder), awaiting the user's delete
+  `gsap.ticker`, paused off screen or when the tab is hidden; full motion only
 - `hooks/useElementById.ts` — shared: a ref to a DOM element by id, filled before other motion
   hooks run
 - `lib/heroDrift.ts` — the network's per-node drift offsets: seeded sine loops clamped clear of the
@@ -101,7 +97,7 @@ the top of the hair now runs behind the nav links or touches the top edge.
 - `components/home/hero/HeroPortrait.tsx` — the portrait, edge-masked, sibling of the h1
 - `components/home/hero/HeroSideLine.tsx` — the "what I do" line with its violet dot
 - `components/home/hero/HeroName.tsx` — the MUHAMMAD/WAQAS h1
-- `components/home/hero/HeroActions.tsx` — the mono tag plus See proofs / Book a call row
+- `components/home/hero/HeroActions.tsx` — the mono tag plus See projects / Book a call row
 
 ## Decisions
 
@@ -201,6 +197,9 @@ the top of the hair now runs behind the nav links or touches the top edge.
   motion it shows the plain static drawing. The lead checked at 1440×900: nodes moved ~10–15px
   independently over 3s with the lines following, at 145fps with no errors, and the canvas stayed
   identical across 6s under reduced motion.
+- 2026-09-26 — User's choice: the "See proofs" button reads "See projects" (text + anchor
+  `#proofs` → `#projects` only; code/content key names stay `proofs`). See
+  `sections/07-proofs.md`.
 
 ## Open Questions
 

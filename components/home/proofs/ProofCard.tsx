@@ -48,6 +48,7 @@ export function ProofCard({ href, number, tag, title, cardLine, shot, shotAlt }:
         </p>
         <h3
           id={ids.title}
+          data-anim="proof-card-title"
           className={`font-display text-card leading-none font-semibold tracking-[-0.03em] decoration-1 underline-offset-4 group-hover:underline ${condensed}`}
         >
           {title}

@@ -7,8 +7,12 @@ import { stepBots } from "@/lib/processBots";
 
 export function ProcessList() {
   return (
-    <div className="relative">
-      <div aria-hidden="true" className="absolute inset-x-0 top-27 hidden h-0.5 bg-line lg:block" />
+    <div data-anim="process-list" className="relative">
+      <div
+        aria-hidden="true"
+        data-anim="process-ground"
+        className="absolute inset-x-0 top-27 hidden h-0.5 bg-line lg:block"
+      />
       <ol className="grid lg:grid-cols-4 lg:gap-x-8">
         {process.steps.map((step, index) => (
           <ProcessStep

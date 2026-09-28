@@ -1,7 +1,9 @@
 // Section 7, Proofs: have they built something real that people use? (ui-spec §7.1). A header
 // row (label and heading left, hint right), then the three identical project cards, each opening
-// its takeover.
+// its takeover. `ProofsMotion` (client) renders nothing; it adds the reveals and the cards' hover
+// lift.
 import { ProofCard } from "@/components/home/proofs/ProofCard";
+import { ProofsMotion } from "@/components/home/proofs/ProofsMotion";
 import { SectionHeading } from "@/components/SectionHeading";
 import { SectionLabel } from "@/components/SectionLabel";
 import { proofs } from "@/content/home";
@@ -42,6 +44,7 @@ export function ProofsSection() {
           })}
         </ul>
       </div>
+      <ProofsMotion />
     </section>
   );
 }

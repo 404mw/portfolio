@@ -1,4 +1,4 @@
-// The hero's bottom row: the mono tag, then See proofs and Book a call (ui-spec §2.1.2, row 3).
+// The hero's bottom row: the mono tag, then See projects and Book a call (ui-spec §2.1.2, row 3).
 // DOM order is the visual order. The outer `hero-text` box sits above the portrait (`z-20`), so
 // the photo never covers a button or its focus ring; the network keeps its nodes off the text.
 import { BookCallLink } from "@/components/BookCallLink";

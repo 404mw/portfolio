@@ -1,13 +1,13 @@
-// A process mascot (ui-spec §5.6): one vector SVG holding all four frames as groups. The static
-// pose shows; the others are invisible, ready for the motion pass to swap. Each frame holds the
-// three breath groups (body, hand, hat), always rendered, at breath 0 (no transforms).
-// `overflow-visible` lets the update wrench's jaw (x 142.89) show past the viewBox edge (140).
-// Decorative: hidden from assistive tech.
+// A process mascot (ui-spec §5.6): one vector SVG holding one rig, in paint order: the feet, then
+// `upper` (body strips and eyes, arms and tools, hat, extras). Every movable part carries a
+// `data-bot` hook for the motion pass. Static = the pose, complete and visible: no transforms, no
+// inline styles; only decorative extras start hidden (`opacity-0`). `overflow-visible` lets the
+// update wrench's jaw (x 142.89) show past the viewBox edge (140). Decorative: hidden from
+// assistive tech.
 import {
-  botFrames,
-  botParts,
+  botRig,
   type BotColour,
-  type BotFrame,
+  type BotPose,
   type BotRole,
   type BotShape,
 } from "@/lib/processBots";
@@ -23,12 +23,13 @@ const fills: Record<BotColour, string> = {
   H: "fill-bg",
 };
 
-/** Draws one part in its token fill. */
-function renderShape(shape: BotShape, index: number) {
-  const className = fills[shape.colour];
+/** Draws one part in its token fill, with its hook, hidden if its rest pose says so. */
+function renderShape(shape: BotShape, index: number, pose: BotPose) {
+  const shown = shape.shownIn === undefined || shape.shownIn.includes(pose);
+  const className = shown ? fills[shape.colour] : `${fills[shape.colour]} opacity-0`;
   switch (shape.kind) {
     case "polygon":
-      return <polygon key={index} points={shape.points} className={className} />;
+      return <polygon key={index} points={shape.points} data-bot={shape.hook} className={className} />;
     case "rect":
       return (
         <rect
@@ -37,20 +38,23 @@ function renderShape(shape: BotShape, index: number) {
           y={shape.y}
           width={shape.width}
           height={shape.height}
+          data-bot={shape.hook}
           className={className}
         />
       );
     case "path":
-      return <path key={index} d={shape.d} fillRule="evenodd" className={className} />;
+      return <path key={index} d={shape.d} fillRule="evenodd" data-bot={shape.hook} className={className} />;
   }
 }
 
 type ProcessBotProps = {
   readonly role: BotRole;
-  readonly pose: BotFrame;
+  readonly pose: BotPose;
 };
 
 export function ProcessBot({ role, pose }: ProcessBotProps) {
+  const rig = botRig(role, pose);
+  const draw = (shapes: readonly BotShape[]) => shapes.map((shape, index) => renderShape(shape, index, pose));
   return (
     <svg
       viewBox="-30 -18 170 110"
@@ -61,16 +65,29 @@ export function ProcessBot({ role, pose }: ProcessBotProps) {
       data-pose={pose}
       className="h-14.25 w-22 shrink-0 overflow-visible lg:mt-5 lg:h-22 lg:w-34"
     >
-      {botFrames.map((frame) => {
-        const parts = botParts(role, frame);
-        return (
-          <g key={frame} data-frame={frame} className={frame === pose ? undefined : "invisible"}>
-            <g data-breath="body">{parts.body.map(renderShape)}</g>
-            <g data-breath="hand">{parts.hand.map(renderShape)}</g>
-            <g data-breath="hat">{parts.hat.map(renderShape)}</g>
+      <g data-bot="rig">
+        {draw(rig.feet)}
+        <g data-bot="upper">
+          <g data-bot="body">
+            {draw(rig.strips)}
+            <g data-bot="eyes" data-look={rig.look}>
+              {draw(rig.eyes)}
+            </g>
           </g>
-        );
-      })}
+          <g data-bot="arm-left">{draw(rig.armLeft)}</g>
+          <g data-bot="arm-right">
+            {draw(rig.armRight)}
+            <g data-bot="tool">{draw(rig.tool)}</g>
+          </g>
+          <g data-bot="hat">{draw(rig.hat)}</g>
+          {rig.sparks && (
+            <g data-bot="sparks" className="opacity-0">
+              {draw(rig.sparks)}
+            </g>
+          )}
+          {rig.zzz && <g data-bot="zzz">{draw(rig.zzz)}</g>}
+        </g>
+      </g>
     </svg>
   );
 }

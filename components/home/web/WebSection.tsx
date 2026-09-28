@@ -1,5 +1,7 @@
 // Section 6, Web: can they build my website end to end? (ui-spec §6). The label, heading and
-// lead on the left (sticky from `lg`), the four steps as rows on the right.
+// lead on the left (sticky from `lg`), the four steps as rows on the right. `WebMotion` (client)
+// renders nothing; it adds the reveals and the rows' hover indent.
+import { WebMotion } from "@/components/home/web/WebMotion";
 import { WebStepRow } from "@/components/home/web/WebStepRow";
 import { SectionHeading } from "@/components/SectionHeading";
 import { SectionLabel } from "@/components/SectionLabel";
@@ -30,6 +32,7 @@ export function WebSection() {
           ))}
         </ol>
       </div>
+      <WebMotion />
     </section>
   );
 }
