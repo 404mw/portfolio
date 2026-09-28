@@ -1,6 +1,6 @@
 # Home
 
-**Last Updated:** 2026-09-28 (motion pass complete)
+**Last Updated:** 2026-09-28 (MARWIX-SKILLS hidden temporarily)
 
 > **Status:** GSAP motion pass complete for all sections; next: deploy prep (pre-push audit, then
 > deploy)
@@ -71,6 +71,21 @@ card title too (`hooks/useTakeoverMotion.ts`, `lib/takeoverTitleMorph.ts`), matc
 title's optical size and letter spacing at both hand-offs so the text boxes line up within 1px, and
 ending with a 0.15s fade of the whole dialog so the card dissolves in underneath. See
 `sections/07-proofs.md`.
+
+Built and verified 2026-09-28: proof cards now show a CSS "ink stage" banner and a static,
+server-rendered 3D SVG bot (the Process bot's MW geometry, extruded and shaded from existing
+tokens only) in place of the card screenshot (`components/home/proofs/ProofBanner.tsx`,
+`ProofBot.tsx` and its parts, `lib/proofBotBody.ts`, `lib/proofBotDepth.ts`,
+`lib/proofBotShades.ts`, `lib/proofBotProps.ts`). Build and lint are green; the lead confirmed no
+sideways scroll at eight widths from 360 to 3840 and that 360/768/1440/3840 match the approved
+sample. See `sections/07-proofs.md`.
+
+Built and verified 2026-09-28: MARWIX-SKILLS is temporarily hidden, card and takeover, behind one
+flag (`hiddenProofs` in `lib/proofs.ts`); its content and code stay. With two projects shown
+(Exile, Design Vault), the cards sit two across from `md` up at full width, no empty third slot.
+Build and lint are green; the lead confirmed no sideways scroll at eight widths from 360 to 3840.
+See `sections/07-proofs.md` for two open build questions from this change (extrusion stair lines and
+arm/card clearance at 1440/3840, with the larger two-card bot).
 
 ## Key Files (site-wide)
 
@@ -152,6 +167,12 @@ ending with a 0.15s fade of the whole dialog so the card dissolves in underneath
   link, section label, the hero's "See projects" button, the takeover top bar "PROJECT 0n / 03")
   and the page anchor (`#proofs` → `#projects`; not live yet, so no shared links break). Code, file
   and content key names stay `proofs`. See `sections/07-proofs.md`.
+- 2026-09-28 — User's choice: proof cards are redesigned on one template — an "Ink stage" banner
+  with a 3D ProcessBot (holding a per-project prop) replaces the card screenshot, with one proof
+  line added below the card line. See `sections/07-proofs.md`.
+- 2026-09-28 — User's choice: MARWIX-SKILLS is hidden temporarily (card and takeover) behind one
+  flag; content and code stay. Two shown projects sit two across from `md` up, full width, no empty
+  third slot. See `sections/07-proofs.md`.
 
 ## Open Questions (site-wide)
 
@@ -159,6 +180,7 @@ ending with a 0.15s fade of the whole dialog so the card dissolves in underneath
   lead its website ID; it's set as `NEXT_PUBLIC_UMAMI_WEBSITE_ID` in Vercel and needs a redeploy.
 - **Constitution:** the user to add the takeover/Book a call exception under §3.
 - **Roll-up:** section-specific open questions remain in `sections/02-hero.md` (4),
-  `sections/04-agents.md` (2), `sections/05-process.md` (2), `sections/07-proofs.md` (4),
-  `sections/08-contact.md` (1) and `sections/09-footer.md` (2). The pre-deploy check reads this
-  roll-up and every section file; the page ships with none open anywhere.
+  `sections/04-agents.md` (2), `sections/05-process.md` (7), `sections/07-proofs.md` (12),
+  `sections/08-contact.md` (1) and `sections/09-footer.md` (2). The
+  pre-deploy check reads this roll-up and every section file; the page ships with none open
+  anywhere.

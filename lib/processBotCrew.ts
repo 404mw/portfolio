@@ -14,6 +14,8 @@ export type Crew = {
   /** Plays or pauses the whole registry. */
   readonly setLive: (live: boolean) => void;
   readonly isLive: () => boolean;
+  /** Live time in seconds: it stands still while the registry is paused. */
+  readonly now: () => number;
   /** Stops and drops everything in the registry. */
   readonly kill: () => void;
 };
@@ -36,6 +38,7 @@ export function createCrew(): Crew {
       timeline.paused(!next);
     },
     isLive: () => live,
+    now: () => timeline.time(),
     kill: () => {
       live = false;
       timeline.getChildren(true, true, true).forEach((child) => child.kill());

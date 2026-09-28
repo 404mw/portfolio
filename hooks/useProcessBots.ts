@@ -6,7 +6,10 @@
 // - lib/processBotActs.ts: role acts, jumps, the hover/tap reaction, naps.
 // - lib/processBotEntrance.ts: the once-per-load drop onto the ground line.
 // - lib/processBotPointer.ts: pointer → look and lean.
-// - lib/processRelay.ts: the relay dot (from `lg`) and the cascade (below `lg`).
+// - lib/processRelay.ts: the relay job run along the ground line (from `lg`; its job changes and
+//   exit in lib/processRelayJob.ts, the lesson that rides the return in lib/processRelayLesson.ts,
+//   its trail and lit lines in lib/processRelayTrail.ts).
+// - lib/processRelayColumn.ts: the same run down the bot column (below `lg`, ui-spec §5.9).
 // - lib/processBotCrew.ts: the one registry every bot animation and scheduler runs in.
 //
 // Full motion: all of it. The registry and the per-frame channel writer run only while the section
@@ -14,15 +17,18 @@
 // follow needs a fine pointer too. Reduced motion: no movement at all; the entrance is an opacity
 // fade only, and every bot shows its static pose. The entrance's from-state is set here in JS only,
 // and skipped if the list is already scrolled past (once per page load, across matchMedia re-runs).
-// On unmount or any mode change everything is killed and every bot, the dot and the chevrons go
-// back to the server markup exactly.
+// On unmount or any mode change everything is killed and every bot, the job and its parts, the
+// lesson and its parts, the ghosts, lit overlays, chevron icons and arrowhead go back to the server
+// markup exactly (bot 4's lesson hold is a bot act, so `resetBot` puts his eyes back too). Crossing `lg` is a mode change: the run in the
+// old geometry is reverted and the new one starts on the usual first-run delay.
+// Catch priority: the relay publishes each bot's next catch, so timed acts and naps keep clear of it.
 //
 // Tweens made later by handlers and schedulers are deliberately outside the matchMedia context (it
 // would otherwise collect every tween the bots ever make); the registry and `resetBot` clean them up.
 import { useRef, type RefObject } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { animTargets, duration, ease, finePointerQuery, motionQuery, stagger } from "@/lib/motion";
-import { catchRelay, launch, react, startActs } from "@/lib/processBotActs";
+import { catchRelay, holdLesson, react, receive, startActs } from "@/lib/processBotActs";
 import { createCrew, type Crew } from "@/lib/processBotCrew";
 import { dropIn, hideForDrop } from "@/lib/processBotEntrance";
 import { startLife, tap } from "@/lib/processBotLife";
@@ -40,13 +46,16 @@ import {
 import { eyeCentre, pointerLean, pointerLook } from "@/lib/processBotPointer";
 import { findBot, pointerShare, resetBot, rigBot, setState, stripMotion, type Bot } from "@/lib/processBotRig";
 import {
-  cascadeRun,
   measureRelay,
+  relayArrivals,
+  relayElements,
   relayParts,
   relayQuery,
   relayRun,
+  type RelayStop,
   type RelayWaypoints,
 } from "@/lib/processRelay";
+import { columnElements, columnParts, columnRun, measureColumn, type ColumnWaypoints } from "@/lib/processRelayColumn";
 import { watchLive } from "@/lib/watchLive";
 
 type Flag = { current: boolean };
@@ -116,7 +125,7 @@ type FullOptions = {
   readonly list: HTMLElement;
   readonly bots: readonly Bot[];
   readonly entered: Flag;
-  /** From `lg`: the relay dot runs; below it, the cascade. */
+  /** The relay's geometry: along the ground line from `lg`, down the bot column below it. */
   readonly wide: boolean;
   /** A fine pointer: eyes and lean follow it, and hovering reacts. */
   readonly fine: boolean;
@@ -239,18 +248,22 @@ function listenForReactions(bots: readonly Bot[], crew: Crew, fine: boolean): ()
   return () => detach.forEach((off) => off());
 }
 
-/** Full motion: rigs, life, acts, entrance, reactions, pointer follow and the relay or cascade. */
+/** Full motion: rigs, life, acts, entrance, reactions, pointer follow and the relay. */
 function fullMotion({ root, list, bots, entered, wide, fine }: FullOptions): () => void {
   const crew = createCrew();
   bots.forEach(rigBot);
 
-  // Pointer follow (fine pointer only) and the relay's parts (from `lg` only).
+  // Pointer follow (fine pointer only) and the relay's parts, in the geometry the width picks.
   const pointer = fine ? followPointer(bots, crew) : null;
-  const relay = wide ? relayParts(root, bots.map((bot) => bot.parts.svg)) : null;
+  const stops: RelayStop[] = bots.map((bot) => ({ svg: bot.parts.svg, role: bot.role }));
+  const relay = wide ? relayParts(root, stops) : null;
+  const column = wide ? null : columnParts(root, stops);
   let waypoints: RelayWaypoints | null = null;
+  let columnWaypoints: ColumnWaypoints | null = null;
   const measure = () => {
     pointer?.measure();
     if (relay) waypoints = measureRelay(relay);
+    if (column) columnWaypoints = measureColumn(column);
   };
   measure();
   const resize = new ResizeObserver(measure);
@@ -274,26 +287,49 @@ function fullMotion({ root, list, bots, entered, wide, fine }: FullOptions): () 
     tick(live);
   });
 
-  // The relay (or cascade), every `RELAY_EVERY` once all the bots have landed.
+  // Catch priority: each bot's next catch is a run start plus its arrival (A1–A4, one clock at
+  // every width).
+  const arrivals = relay || column ? relayArrivals(bots.map((bot) => bot.role)) : [];
+  let runAt = -Infinity;
+  let nextRunAt = Infinity;
+  const untilCatch = (bot: Bot) => {
+    const arrival = arrivals[bots.indexOf(bot)];
+    if (arrival === undefined) return Infinity;
+    const now = crew.now();
+    const next = [runAt + arrival, nextRunAt + arrival].find((at) => at >= now);
+    return next === undefined ? Infinity : next - now;
+  };
+
+  // The relay, every `RELAY_EVERY` once all the bots have landed: along the ground line from `lg`,
+  // down the bot column below it. A run always ends before the next starts, which kills it anyway.
   let relayTimer: gsap.core.Tween | null = null;
   let relayPlaying: gsap.core.Timeline | null = null;
   const cues = {
-    launch: (i: number) => bots[i] && launch(bots[i], crew),
     head: (i: number) => bots[i] && tap(bots[i], crew),
-    arrive: (i: number) => bots[i] && catchRelay(bots[i], crew, -1),
+    arrive: (i: number) => bots[i] && catchRelay(bots[i], crew, 1),
+    receive: (i: number) => bots[i] && receive(bots[i], crew),
+    holdLesson: (i: number, seconds: number) => bots[i] && holdLesson(bots[i], crew, seconds),
+  };
+  /** One run in this width's geometry, or null if its parts are missing. */
+  const oneRun = (): gsap.core.Timeline | null => {
+    const latest = waypoints;
+    if (relay && latest) return relayRun(relay, () => waypoints ?? latest, cues);
+    const latestColumn = columnWaypoints;
+    if (column && latestColumn) return columnRun(column, () => columnWaypoints ?? latestColumn, cues);
+    return null;
   };
   const runRelay = () => {
     relayPlaying?.kill();
-    const latest = waypoints;
-    relayPlaying = crew.run(
-      relay && latest
-        ? relayRun(relay, () => waypoints ?? latest, cues)
-        : cascadeRun(bots.length, (i) => bots[i] && catchRelay(bots[i], crew, 1)),
-    );
+    runAt = crew.now();
+    const run = oneRun();
+    relayPlaying = run ? crew.run(run) : null;
+    nextRunAt = runAt + RELAY_EVERY;
     relayTimer = crew.after(RELAY_EVERY, runRelay);
   };
   const startRelay = () => {
+    if (!relay && !column) return;
     relayTimer?.kill();
+    nextRunAt = crew.now() + RELAY_FIRST;
     relayTimer = crew.after(RELAY_FIRST, runRelay);
   };
 
@@ -301,7 +337,7 @@ function fullMotion({ root, list, bots, entered, wide, fine }: FullOptions): () 
   const land = (bot: Bot) => startLife(bot, crew);
   const settle = (bot: Bot) => {
     crew.run(setState(bot, "idle"));
-    startActs(bot, crew);
+    startActs(bot, crew, untilCatch);
   };
   let drop: gsap.core.Timeline | null = null;
   const stopEntrance = onceInView(list, entered, {
@@ -331,7 +367,8 @@ function fullMotion({ root, list, bots, entered, wide, fine }: FullOptions): () 
     drop?.kill();
     crew.kill();
     bots.forEach(resetBot);
-    if (relay) stripMotion([relay.dot, ...relay.icons, ...(relay.arrowhead ? [relay.arrowhead] : [])]);
+    if (relay) stripMotion(relayElements(relay));
+    if (column) stripMotion(columnElements(column));
   };
 }
 

@@ -4,12 +4,12 @@
 import { LEAN_MAX, LEAN_RANGE, LOOK_MAX, POINTER_RANGE } from "@/lib/processBotMotion";
 
 /** The bot SVG's viewBox (`-30 -18 170 110`). */
-const VIEWBOX = { x: -30, y: -18, width: 170, height: 110 } as const;
+export const BOT_VIEWBOX = { x: -30, y: -18, width: 170, height: 110 } as const;
 
 /** viewBox (50, 50), the eyes' centre and the body's centre line, as a share of the SVG box. */
 export const EYE_POINT = {
-  x: (50 - VIEWBOX.x) / VIEWBOX.width,
-  y: (50 - VIEWBOX.y) / VIEWBOX.height,
+  x: (50 - BOT_VIEWBOX.x) / BOT_VIEWBOX.width,
+  y: (50 - BOT_VIEWBOX.y) / BOT_VIEWBOX.height,
 } as const;
 
 const clamp = (limit: number, value: number) => Math.max(-limit, Math.min(limit, value));

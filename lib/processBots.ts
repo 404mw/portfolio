@@ -77,20 +77,20 @@ const rect = (x: number, y: number, width: number, height: number, colour: BotCo
 });
 
 /** The feet: each a 14 × 7 "V", 0.5 unit up under its strip. Painted first. */
-const feet: readonly BotShape[] = [
+export const feet: readonly BotShape[] = [
   { kind: "polygon", points: "18.50,82.50 33.50,82.50 26.00,90.00", colour: "B", hook: "foot-left" },
   { kind: "polygon", points: "64.50,84.50 79.50,84.50 72.00,92.00", colour: "B", hook: "foot-right" },
 ];
 
 /** The body's three strips; B and C trimmed 7 units above their tips (the source repeats the last vertex of A and C; kept). */
-const strips: readonly BotShape[] = [
+export const strips: readonly BotShape[] = [
   { kind: "polygon", points: "6.00,30.00 28.00,8.00 48.00,28.00 6.00,70.00 6.00,70.00", colour: "B" },
   { kind: "polygon", points: "74.00,10.00 90.00,26.00 33.00,83.00 19.00,83.00 10.00,74.00", colour: "B" },
   { kind: "polygon", points: "94.00,70.00 79.00,85.00 65.00,85.00 52.00,72.00 94.00,30.00 94.00,30.00", colour: "B" },
 ];
 
 /** The eyes at each rest look: 0 centred, 7 up-right toward right-hand tools, −7 down-left toward left-hand ones. */
-const eyesAt = {
+export const eyesAt = {
   0: [rect(23, 43, 14, 14, "H", "eye"), rect(63, 43, 14, 14, "H", "eye")],
   7: [rect(30, 36, 14, 14, "H", "eye"), rect(70, 36, 14, 14, "H", "eye")],
   [-7]: [rect(16, 50, 14, 14, "H", "eye"), rect(56, 50, 14, 14, "H", "eye")],

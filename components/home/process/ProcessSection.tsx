@@ -1,7 +1,8 @@
 // Section 5, Process: how do they work? (ui-spec §5). The label and heading stacked above the
 // steps at every width (no pinning), then the four steps and the loop's return. `ProcessMotion`
-// (client) renders nothing; it adds the reveals. `ProcessRelay` is the relay dot, placed last in
-// the body wrapper.
+// (client) renders nothing; it adds the reveals. `ProcessRelay` is the relay job layer (ghosts and job),
+// placed last in the body wrapper, which is `isolate` so the layer's `z-1` (above the bots, below
+// the `lg:z-10` loop label) stays inside it.
 import { ProcessList } from "@/components/home/process/ProcessList";
 import { ProcessMotion } from "@/components/home/process/ProcessMotion";
 import { ProcessRelay } from "@/components/home/process/ProcessRelay";
@@ -22,7 +23,7 @@ export function ProcessSection() {
           <SectionLabel number={process.number} label={process.label} as="p" />
           <SectionHeading lead={process.heading.lead} accent={process.heading.accent} size="heading" />
         </div>
-        <div className="relative flex max-w-2xl flex-col lg:max-w-none lg:gap-10">
+        <div className="relative isolate flex max-w-2xl flex-col lg:max-w-none lg:gap-10">
           <ProcessList />
           <ProcessReturn />
           <ProcessRelay />

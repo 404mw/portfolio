@@ -135,7 +135,7 @@ export const proofs = {
       tag: "Bot platform",
       title: "Exile",
       cardLine: "Stops spam and raids in gaming communities, around the clock.",
-      cardShotAlt: "[FILL: Exile card screenshot alt text]",
+      proofLine: "Live since March 2026, run by me alone",
       rows: {
         whatItIs: "A Discord bot, its website and an owner dashboard.",
         built: "By me alone, since March 2026. I still run it.",
@@ -158,7 +158,7 @@ export const proofs = {
       tag: "Design library",
       title: "Design Vault",
       cardLine: "Keeps a designer's screens, colour palettes and fonts in one place.",
-      cardShotAlt: "[FILL: Design Vault card screenshot alt text]",
+      proofLine: "Public since September 2026, built by me alone",
       rows: {
         whatItIs: "A free, open-source library for a designer's work.",
         built: "By me alone. MIT licence.",
@@ -176,8 +176,8 @@ export const proofs = {
     marwixSkills: {
       tag: "AI tools",
       title: "MARWIX-SKILLS",
-      cardLine: "Free, open-source tools for people building with AI.",
-      cardShotAlt: "[FILL: MARWIX-SKILLS card screenshot alt text]",
+      cardLine: "Tools that help people build with AI.",
+      proofLine: "Free and open source, anyone can use it",
       rows: {
         whatItIs: "A free, open-source set of tools for building with AI.",
         built: "[FILL: MARWIX-SKILLS built]",

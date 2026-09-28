@@ -1,6 +1,6 @@
 # Process
 
-**Last Updated:** 2026-09-28 (recorded the relay job-block decision, superseding the dropped-job-block line)
+**Last Updated:** 2026-09-28 (bot 4's phone lesson handover is built and screen-checked at 390px)
 
 **The one question:** How do they work?
 
@@ -21,17 +21,17 @@ clipped.
 The bots are one static rig each (`lib/processBots.ts` `botRig(role, pose)` and `botPivots`;
 `data-bot` hooks: `rig`, feet, `upper`, `body`, `eyes`/`eye`, arms, `tool`, `hat`, plus per-role
 extras: marks, sparks, page, lens-lit, zzz). Separate feet are cut from the W tips, so at rest each
-looks exactly as before. A hidden `ProcessRelay` dot and `process-list/ground/chevron/return` hooks
-sit alongside.
+looks exactly as before. A hidden `ProcessRelay` layer (the three ghosts, the job, then the lesson
+card) and `process-list/ground/chevron/return` hooks sit alongside.
 
 `ProcessMotion` runs `useScrollReveal` and `useProcessBots`, which covers:
 - smooth GSAP life: breathing, sway, arm drift, blinks, looks and foot taps
 - role acts
 - naps with z's (rules and update)
 - eyes and lean following the pointer (fine pointers)
-- a hover/tap reaction, the only time a bot jumps
+- a hover/tap reaction, the only time a bot jumps — hover/tap skipped while acting or reacting
 - a once-per-load drop-in
-- the crew relay dot from `lg`, and a cascade below `lg`, where each bot plays its full role act as
+- the crew relay job from `lg`, and a cascade below `lg`, where each bot plays its full role act as
   it's reached
 
 Everything runs in one registry, paused off screen or with the tab hidden. Reduced motion is an
@@ -42,9 +42,81 @@ Build, lint and tsc were green after the motion build. The lead screen-checked h
 sideways scroll at any size across 14s of motion; bots are visible after the drop-in and also when
 the page loads already scrolled past the section; without interaction the body only rises ~1.4
 units (breathing, no jumps), while a hover (fine pointer) or tap (touch) jumps ~21 units; the relay
-dot runs at 1440 and 4K and stays off at 360; under reduced motion the bots only fade in (the rigs
-keep just `opacity: 1`, no transforms); the relay dot passes behind the loop label. Relay job block being built 2026-09-28 (see Decisions); the dot
-is still the plain violet one.
+job runs at 1440 and 4K and stays off at 360; under reduced motion the bots only fade in (the rigs
+keep just `opacity: 1`, no transforms).
+
+From `lg`, with full motion, the relay runs every 16.4s (final numbers, screen-checked 2026-09-28). A
+blank 24px cream job pops in at bot 1, on the right of every bot (rules, team and check hold it at
+viewBox x 122, update further right at 126 so the built step clears the wrench), and each bot
+changes it on a beat of its own act, stopping 2s at each stop:
+- bot 1 writes two rules and stamps it
+- bot 2 adds a violet band and a step on its two hammer strikes
+- bot 3 flickers a tick in and flashes an outline glow, in sync with its lens flicker
+- bot 4 folds the corner on its page-flip beat
+
+The acts themselves are retimed to fit inside the 2s dwell (rules ends 1.75s after its start, team
+1.69s, check 1.95s — "found it" pops at 1.55s — update 1.9s). The watching bot's eyes stay on the job
+to its right for what's left of the dwell (`RELAY_WATCH`), but 2s no longer leaves enough over for
+the job's hold bob or a watch blink, so neither plays now. A 3-ghost trail and a lit ground segment
+follow each hop, with the chevrons flashing cream; the job passes behind each bot (relay layer `z-1`,
+above the bots, below the `lg:z-10` loop label, which fully hides it while it crosses behind the
+label). Arrivals at 1440 land about 0.2/2.9/5.6/8.3s into the run.
+
+At about 10.3s (bot 4's fold settled), the job is complete: it slides right along the ground line to
+14px inside the line's end (0.35s at `lg` and 1440, 0.46s at 4K, trailed by the ghosts and the lit
+ground segment), pops once as done (settling at 11.07s) and fades out there (gone by 11.37s) — no
+sideways scroll. At the same moment a 14px cream lesson card (`ProcessLesson`, a cut corner and one
+violet line) splits off the job's centre at bot 4, pops in and peels 10px up off the sheet, fades out
+leaving bot 4 at 10.8–11.0s (hidden the whole time, so it never crosses step 4's text), drops in at
+the return path's top-right start (R0) at 11.3s, and rides the path itself at 450px/s — no ghosts —
+lighting the path violet as it goes. It reaches the arrowhead (R7) at about 13.72s, where the
+arrowhead flashes and it pops out as it fades (about 13.97s); bot 1 takes the loop back at that
+moment. A run (return included) lasts about 13.7s at `lg`, 14.4s at 1440 and 14.7s at 4K — about 2s
+clear before the next run starts. Below `lg` the cascade stays at 9s.
+
+Lead's check in headless Chromium (2026-09-28, final numbers): screen-checked at 1024, 1440 and 3840
+— no console errors, no sideways scroll, the lesson never shows through the loop label, and the
+below-`lg` and reduced-motion revert are clean (no leftover style, transform, clip or colour on any
+relay element).
+
+The relay now also runs below `lg` (built per `ui-spec/05-process.md` §5.9, choice 27), on the same
+16.4s clock as desktop (arrivals at 0.2/2.9/5.6/8.3s, 2s stops). The 16px job waits at each bot's
+right foot and drops one row per hop down the bot column, trailed by the 16px ghosts; there's no
+ground-lit, return-lit, arrowhead or chevrons below `lg`. At 10.3s, as the job exits, a 10px lesson
+pops in and fades in (0.6 → 1, settling at 10.65s) on bot 4's live rulebook position
+(`COLUMN_LESSON_FROM`, mapped through the `arm-left` group so it follows his breath, drift and sway).
+Bot 4 looks down-left at it (0.3s) and holds it (`acting`, so taps are ignored) until 11.25s
+(`COLUMN_LESSON_HOLD`, 0.6s after the pop settles); the job itself drops to 14px above the return
+row, pops once and fades by about 11.4s. At 11.25s the lesson lifts 4px with no fade (`LESSON_LEAVE`),
+bot 4's eyes ease back to rest, and bot 1's foot tap (`head(0)`) starts at that same moment. It then
+rides straight up the column's left lane at 450px/s (`RETURN_SPEED`, x easing into the lane over 0.3s
+if the live rulebook sits off it — `COLUMN_LESSON_GLIDE`); at bot 1's clipboard it pops out
+(`LESSON_OUT`) and bot 1 squashes (`receive`) as it takes the loop back. Removed on phones: the split
+and peel at the job, the fade-out leaving bot 4, the rise-in at the return icon and the icon's flash
+(it no longer flashes). A phone run is about 12.6–12.9s (360: 12.92s, 390: 12.80s, 768: 12.64s),
+leaving about 3.5s clear before the next run. This replaces the old below-`lg` 9s cascade
+(`cascadeRun`, `CASCADE_EVERY`/`CASCADE_GAP` are removed, and `catchRelay` no longer takes a `relay`
+flag).
+
+Screen-checked at 390px: the lesson appears on bot 4's rulebook, holds, lifts off and rides the left
+lane to bot 1; no overlap with step text or the loop label, no sideways scroll, no console errors;
+reduced motion shows no relay; resizing across `lg` mid-run reverts cleanly both ways. A recheck at
+360 and 768 couldn't run — the dev server returned 500 from separate, in-progress Proofs work
+(`content/home.ts` removed `cardShotAlt`, which `ProofsSection.tsx` still reads); pending.
+
+`ProcessRelay.tsx` shows the relay layer at every width now (`pointer-events-none absolute inset-0
+z-1`), with the ghosts `size-4` below `lg`; `ProcessJob.tsx` is `h-4.75 w-4` below `lg`;
+`ProcessLesson.tsx` is `size-2.5` below `lg`; `ProcessReturn.tsx`'s return row carries
+`data-anim="process-return-row"` so the relay can find the icon it flashes. `lessonEnter` now takes
+a side argument (above on desktop, below on phones). In `hooks/useProcessBots.ts`, the width picks
+the geometry: `wide` (from `lg`) builds `relayParts`/`relayRun` as before, otherwise `columnParts`/
+`columnRun` from the new `lib/processRelayColumn.ts` runs the vertical relay, sharing the job,
+lesson and trail helpers with desktop.
+
+Lead's check in headless Chromium (2026-09-28): screen-checked at 360, 390, 768, 1023, 1024, 1440 and
+3840 — no console errors and no sideways scroll; below `lg` the job, ghosts and lesson never overlap
+step text or the loop label; reduced motion shows no relay; resizing across `lg` mid-run reverts
+cleanly and restarts in the right geometry; desktop behaviour is unchanged.
 
 ## Key Files
 
@@ -59,9 +131,24 @@ is still the plain violet one.
 - `lib/processBotActs.ts` (role acts, the reaction jump, relay catches, naps)
 - `lib/processBotEntrance.ts` (drop-in)
 - `lib/processBotPointer.ts` (pointer to look/lean mapping)
-- `lib/processRelay.ts` (relay waypoints, dot run, cascade)
+- `lib/processRelay.ts` (relay waypoints and the ground-line job run — including its
+  slide-to-line-end exit and the lesson's split-off and ride back along the return path)
+- `lib/processRelayColumn.ts` (the same run turned vertical below `lg`: column waypoints,
+  `columnRun`, the job's row-by-row drop, the exit drop to the return row, and the lesson's
+  appearance on bot 4's live rulebook and its ride up the column's left edge to bot 1's clipboard)
 - `lib/processBotCrew.ts` (the one registry that pauses everything)
-- `components/home/process/ProcessRelay.tsx` (the dot)
+- `components/home/process/ProcessRelay.tsx` (the relay layer — ghosts, then the job, then the
+  lesson card)
+- `components/home/process/ProcessJob.tsx` (the job SVG)
+- `lib/processJob.ts` (job paths and pivots)
+- `components/home/process/ProcessLesson.tsx` (the lesson card SVG)
+- `lib/processLesson.ts` (lesson card path and line)
+- `lib/processRelayJob.ts` (the job's blank start, per-bot changes, its wait-bob and its
+  slide/pop/fade exit)
+- `lib/processRelayLesson.ts` (the lesson's split-off/leave/enter for the desktop return, its
+  pop-in/lift for bot 4's rulebook below `lg`, and its pop-out at the arrowhead or bot 1's clipboard)
+- `lib/processRelayTrail.ts` (ghosts and lit ground segment for hops and the job's exit slide,
+  chevron/arrowhead flashes, the return-lit overlay — no ghosts on the return)
 - `hooks/useScrollReveal.ts` — the reusable scroll-reveal hook this section uses (also usable by
   other sections; see `../page.md`)
 - `lib/watchLive.ts` — on-screen/tab-visible watcher, reused from elsewhere
@@ -190,7 +277,9 @@ is still the plain violet one.
   and naps. On top of that come four extras the user chose: the eyes follow the pointer along
   their gaps (fine pointers); a scroll-in entrance where the bots drop onto the ground line; a crew
   relay where an accent dot travels the ground line and return path and each bot reacts as it
-  passes (from `lg`; below `lg` the bots react in turn); and a hover/tap reaction (jump and act).
+  passes (from `lg`; below `lg` the bots react in turn). **"Below `lg` the bots react in turn"
+  superseded 2026-09-28** (the crew relay now runs below `lg` too, as a vertical relay — see
+  below); and a hover/tap reaction (jump and act).
   **Jump narrowed 2026-09-28** (see below). Reduced motion stays per constitution §5: fades only,
   static poses. Spec:
   `ui-spec/05-process.md` §5.6–5.7 (rewritten 2026-09-27).
@@ -210,13 +299,61 @@ is still the plain violet one.
 - 2026-09-28 — From `lg`, the loop label gets `lg:z-10` (`ProcessReturn.tsx`), so the relay dot
   passes behind it along the return path, as the dashed line does. Animating transform or opacity
   on the `process-return` box or its parent would create a stacking context and break this.
-- 2026-09-28 — User's choice: the relay dot becomes the job. A small cream job block is passed
-  along the ground line, and each bot changes it on its step: bot 1 stamps it, bot 2 builds it,
-  bot 3 checks it, bot 4 files it into the rulebook. A fresh job starts at bot 1 each run. It gets
-  a short trail, and the ground line, chevrons and dashed return path light violet briefly as it
-  passes. The return route stays as it is. From `lg` and full motion only. Spec:
-  `ui-spec/05-process.md` §5.7 (revised 2026-09-28). Supersedes the 2026-09-26 "lone cream job
+- 2026-09-28 — The relay job is built per ui-spec §5.7 (revised 2026-09-28), with the lead accepting
+  its choices 16–24: the job paints behind the bots **(superseded 2026-09-28, see below)**, a cream
+  spark traces the return **(superseded 2026-09-28, see below)**, the return lights violet, chevrons
+  flash cream, team strikes twice on a relay catch, the relay runs every 15s (the run is about 12s;
+  the cascade stays at 9s **(superseded 2026-09-28, see below — the crew relay now runs below `lg`
+  too, as a vertical relay)**), and timed acts and naps keep clear of a bot's catch (`RELAY_CLEAR`).
+  Supersedes the 2026-09-28 "relay dot becomes the job" plan line and the 2026-09-26 "lone cream job
   block ... left out" line.
+- 2026-09-28 — User revises the relay job: the job paints above the bots and below the loop label
+  (relay layer `z-1`, label `lg:z-10` with a taller `bg-bg` backing: `lg:px-5 lg:py-3`), so it never
+  peeks from behind a bot and is fully hidden while it passes behind the label. It grows to 24px
+  with a clear mark from each bot: rules writes two lines and a violet stamp, team adds the band and
+  step, check adds the tick with an outline glow, update folds the corner. It stays about 3s at each
+  bot **(superseded 2026-09-28, see below)**. After bot 4 the job itself rides the dashed return path
+  (replacing the cream spark, which is removed) back to bot 1 **(superseded 2026-09-28, see below —
+  the job now stops at the ground line's end and a separate lesson card rides the return; the trail
+  ghosts stay with the job, not this return ride)**. Runs are about 20s apart from `lg`
+  **(superseded 2026-09-28, see below)**. Supersedes the "job paints behind the bots" and "a cream
+  spark traces the return" parts of the earlier 2026-09-28 relay-job entry.
+- 2026-09-28 — User revises the relay job's timing and side: it stops 2s at each bot (was 3s), and
+  sits on the right of every bot, bots 1 and 4 included (it was on their left — the clipboard and
+  the rulebook); each bot watches it on that side. It repeats about every 16s, so the gap between
+  runs stays about 2s. Supersedes the "about 3s at each bot" and "Runs are about 20s apart from `lg`"
+  lines from the entry above.
+- 2026-09-28 — While a bot is active (any act: its relay step, the cascade step, its timed acts, the
+  loop-back squash) or already reacting, hover and tap are ignored; there's no queued jump. A napping
+  bot still wakes and jumps on hover or tap. Eye and lean follow are unchanged. **Narrows the
+  2026-09-27 "hover/tap reaction (jump and act)" extra and its "interrupts naps and idle acts" detail
+  in `ui-spec/05-process.md` §5.7 (superseded there, not deleted).**
+- 2026-09-28 — User's decision: after bot 4 the job is complete, not carried back. It slides right
+  along the ground line to the line's end, pops once as done, and fades out there, with no sideways
+  scroll. At the same moment a small lesson card (14px cream card with a cut corner and one violet
+  line, like a rulebook page) splits off at bot 4 and rides the dashed return path back to bot 1,
+  lighting it, hidden behind the loop label as it passes; bot 1 takes it with the squash at the
+  arrowhead. The three trail ghosts stay with the job (its hops and exit slide), not the lesson card
+  — the return path carries the lesson card alone, no ghosts. Supersedes the "After bot 4 the job
+  itself rides the dashed return path ... back to bot 1" clause in the 2026-09-28 relay-job-revision
+  entry above (superseded, not deleted).
+- 2026-09-28 — User's decision: the crew relay runs below `lg` too (phones and tablets), as a
+  vertical relay per `ui-spec/05-process.md` §5.9 (choice 27). The job is 16px, waiting at each
+  bot's right foot and dropping down the bot column past only the next bot's hand and tool.
+  There's no track: the ghosts only show the path, and the static page is unchanged. After bot 4,
+  the job drops to the return row, pops and fades. **A 10px lesson rises in at the return icon
+  (which flashes) and rides the column's left edge up to bot 1's clipboard — superseded
+  2026-09-28** (bot 4 hands the lesson over instead; see below). The clock is the
+  desktop one. It replaces the 9s cascade below `lg`. Supersedes the 2026-09-27 "below `lg` the
+  bots react in turn" clause and the 2026-09-28 "the cascade stays at 9s" clause above (both
+  superseded, not deleted).
+- 2026-09-28 — User's decision: on phones (below `lg`), bot 4 hands the lesson over. As the job
+  leaves, the lesson appears in bot 4's rulebook hand (screen left), and he looks at it briefly
+  (about 0.6s); then it lifts off and rides straight up the column's left edge to bot 1's
+  clipboard, where bot 1 receives it. This replaces, below `lg`, the lesson splitting and peeling
+  off the job beside the wrench, fading there, and rising in at the flashing return icon — the
+  icon no longer flashes. The desktop relay is unchanged. Spec: `ui-spec/05-process.md` §5.9,
+  choice 27(c) (marked superseded there, not deleted).
 
 ## Open Questions
 
@@ -228,4 +365,13 @@ is still the plain violet one.
   is a separate change that needs the user's yes.
 - **Review:** the user should judge the feel on a real screen: how often the eyes look around
   (every 0.8–2s), the hammer's pacing, the foot seam during a squash, and full acts on every relay
-  step (every 9s).
+  step (every 16.4s at every width); whether 2s stays and 16.4s runs feel right.
+- **To build:** whether to bring back the hold bob and watch blink (shorter `JOB_BOB` / lower
+  `RELAY_WATCH_BLINK`) now that 2s stops leave no time for them.
+- **Review:** the cream lesson sits on the cream rulebook during the phone handover, so it reads
+  subtly, as the rulebook gaining a violet line; the user should judge whether that's enough contrast.
+- **Review:** below `lg`, bots 2 and 3's left arms come within about 0.7px of the lesson's lane (as
+  close as 0.2px with sway) but never touch a face or body; the user should judge whether that's too
+  tight.
+- **To build:** recheck the phone lesson handover at 360 and 768 once the dev server's 500 (from the
+  in-progress Proofs `cardShotAlt` removal) is fixed — only 390 has been screen-checked so far.

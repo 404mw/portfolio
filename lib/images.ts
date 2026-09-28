@@ -5,16 +5,13 @@ type ImageEntry = { readonly dark: string | null };
 
 export const images = {
   portrait: { dark: "/images/portrait.png" },
-  // Proofs (ui-spec §7.6): each project's card shot, then its takeover's big shot and two details.
-  exileCard: { dark: null },
+  // Proofs (ui-spec §7.6): each project's takeover big shot and two details.
   exileShot1: { dark: null },
   exileShot2: { dark: null },
   exileShot3: { dark: null },
-  designVaultCard: { dark: null },
   designVaultShot1: { dark: null },
   designVaultShot2: { dark: null },
   designVaultShot3: { dark: null },
-  marwixSkillsCard: { dark: null },
   marwixSkillsShot1: { dark: null },
   marwixSkillsShot2: { dark: null },
   marwixSkillsShot3: { dark: null },

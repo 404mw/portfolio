@@ -1,6 +1,6 @@
 # Proofs
 
-**Last Updated:** 2026-09-28
+**Last Updated:** 2026-09-28 (MARWIX-SKILLS hidden temporarily)
 
 **The one question:** Have they built something real that people use?
 
@@ -14,16 +14,25 @@ The section is renamed Proofs → Projects in every visible word: the nav link, 
 file and content key names stay `proofs`.
 
 Proofs is reverted to its original layout: label, heading and hint sit above the cards (no split,
-nothing pinned), and the cards run in one grid, three across from `lg`, stacked on phone; it's the
-one section after the hero without a pinned title. `ProofCard`'s image `sizes` hint is back to the
-original `(min-width:1536px) 500px, (min-width:1024px) 33vw, (min-width:768px) 50vw, 100vw`.
+nothing pinned), and the cards run in one grid, stacked on phone; it's the one section after the
+hero without a pinned title. `ProofCard`'s image `sizes` hint is back to the original
+`(min-width:1536px) 500px, (min-width:1024px) 33vw, (min-width:768px) 50vw, 100vw`.
 
-Proofs built: three identical `ProofCard`s and one native `<dialog>` takeover per project, driven
-by the hash (`:target` without JS, `showModal` with JS). Every open takeover has a page entry
-beneath it (a direct load rewrites its entry to `#projects` and pushes the project), so Back, Esc
-and Close all use `history.back()`; hash parsing never decodes, so a malformed URL can't crash the
-page. The takeover top bar is solid `bg-cream` with an `ink/15` hairline (the blurred 85% bar
-failed contrast).
+**MARWIX-SKILLS is temporarily hidden** (2026-09-28), card and takeover, behind one flag —
+`hiddenProofs` in `lib/proofs.ts`. Every consumer (cards, takeovers, numbers, the "0n" total, the
+Next wrap, takeover ids) reads the shown list (`shownProofKeys`), not `proofKeys`; `proofKeys`
+still lists all three, and MARWIX-SKILLS' content and code stay in place, unused. `#marwix-skills`
+opens nothing while hidden; its route, section id and image entries stay, unused. Un-hide by
+setting `hiddenProofs` back to `[]`. With two projects shown (Exile, Design Vault), the grid is two
+across from `md` up at full width, no empty third slot (`proofGridColumns`); it only goes to three
+across at `lg` when three or more are shown.
+
+Proofs built: identical `ProofCard`s and one native `<dialog>` takeover per shown project (two of
+the three built today; MARWIX-SKILLS hidden, see above), driven by the hash (`:target` without JS,
+`showModal` with JS). Every open takeover has a page entry beneath it (a direct load rewrites its
+entry to `#projects` and pushes the project), so Back, Esc and Close all use `history.back()`; hash
+parsing never decodes, so a malformed URL can't crash the page. The takeover top bar is solid
+`bg-cream` with an `ink/15` hairline (the blurred 85% bar failed contrast).
 
 The GSAP motion pass is built. `ProofsMotion` mounts the generic reveal on the heading row and
 `useProofCards` on the cards: they reveal 0.12s apart via the shared `lib/revealBatch.ts`, and a
@@ -109,16 +118,74 @@ the heading is visible from frame one, opens end with no leftover inline styles 
 focus inside, Esc mid-open and Next mid-open clean up, the Next-slide suite still passes, and there
 are no console errors.
 
+Built 2026-09-28: each card's screenshot is replaced by a CSS "ink stage" banner
+(`ProofBanner.tsx`, an ink ground with a violet floor glow and a faint "/" hatch, built only from
+existing colour tokens) holding a static, server-rendered 3D SVG bot (`ProofBot.tsx`) — the Process
+bot's MW geometry (`lib/processBots.ts`, re-exported by `lib/proofBotBody.ts`), extruded with a
+literal 6-step depth table (`lib/proofBotDepth.ts`, 5 steps for props) and a shade table
+(`lib/proofBotShades.ts`) that mixes only existing tokens. The bot breaks out past the card's top
+and right, clipped at the banner floor by the bot layer's own clip-path; the card itself carries no
+`overflow-hidden`. Row headroom (`pt-[11.2%]` on each card's `li`), a 48px column gap (`gap-x-12`
+in `ProofsSection.tsx`), a `min()`-capped left offset on the bot's own position, and the section's
+`overflow-x-clip` keep every card's break-out clear of the viewport at every width from 360 to 3840.
+Each bot holds one prop in its left hand (`ProofBotProp.tsx`, `lib/proofBotProps.ts`): Exile a
+generic game phone, Design Vault a colour swatch fan, MARWIX-SKILLS a puzzle piece; every outline is
+hardcoded from the spec, nothing computed at render. Eye-wall paths (`ProofBotEye.tsx`), the depth
+steps' `color-mix()` strings (`lib/proofBotShades.ts` `proofBotSide`) and the eyes' positions
+(`lib/proofBotBody.ts`, reading `lib/processBots.ts`'s `eyesAt`) are all computed at server render;
+nothing runs on the client for the still pose. Colours on non-hook elements go through `style`
+(`stopColor`, `floodColor`, `fill`); gradient fronts use `fill="url(#proof-bot-…)"`; no `data-bot`
+element carries a `style` or `transform` (the lean is a plain wrapper, `proofBotLean`). The body's
+two glints sit in `data-bot="body"` after `data-bot="eyes"` and are clipped by a `<g clipPath>`
+wrapper to the unrotated strips (`lib/proofBotBody.ts` `strips`), so they don't follow the eyes; the
+glint gradient peaks at stop-opacity 0.55. The header row keeps `gap-x-10 gap-y-6` (ui-spec §7.1
+calls for `gap-6`; kept wider on purpose, not a drift).
+
+Lead-verified 2026-09-28: `npm run build` and `npm run lint` are green; no sideways scroll at
+360/480/600/767/768/1024/1440/3840 (`scrollWidth === clientWidth`, headless Chromium); screens at
+360/768/1440/3840 match the approved sample A. Noted, not blocking: the Design Vault proof line
+wraps to two lines at 1440 while the other two cards' lines take one, so its hairline sits ~16px
+higher than its neighbours'; faint stair lines are visible on the extrusion at large stacked widths
+(around 767) from the 6-step depth table.
+
+Lead-verified 2026-09-28, after hiding MARWIX-SKILLS: build and lint stay green; no sideways scroll
+at 360/480/600/767/768/1024/1440/3840. With only two, wider cards, the bot scales up (~620px
+banner) at 1440/3840: the extrusion's 6-step stair lines are clearly visible, and Exile's right arm
+comes within ~11px (1440) / ~3px (3840) of the Design Vault card (open questions below).
+
 ## Key Files
 
 - `components/home/proofs/` — ProofsSection (label/heading/hint above the cards, no split, not
-  pinned; cards three across from `lg`), ProofCard (all three identical), ProjectTakeovers
+  pinned; cards two across from `md`, three from `lg` only when three or more are shown), ProofCard
+  (identical across shown projects, no `overflow-hidden` so the bot can break out), ProofBanner (the ink-stage banner and the bot's break-out clip layer),
+  ProofBot (the card bot's SVG: viewBox, lean, rig, eyes, glints), ProofBotDefs (the gradients, rim,
+  glint and clip-path defs, and the drop-shadow filter, one set per card), ProofBotSolid (one
+  extruded shape: depth steps then its lit front), ProofBotEye (one recessed eye's walls and hole),
+  ProofBotProp (a card's left-hand prop, built from its pieces), ProofBotShape (one outline as its
+  SVG element — polygon, rect, path or circle), ProofLine (the card's proof-line row), ProjectTakeovers
   (the takeover layer, rendered once after Contact), ProjectTakeover (one project's `<dialog>`),
   TakeoverController (runs `useHashTakeover`), TakeoverTopBar, TakeoverCloseLink,
   TakeoverNextLink, TakeoverInfoRows, TakeoverInfoRow, TakeoverStats (Exile's IN USE numbers),
   TakeoverShots, ProjectVisitLink, ProofsMotion (client, mounts the reveal and `useProofCards`,
   renders nothing); `ProofCard`'s h3 carries `data-anim="proof-card-title"`, the card-open morph's
   source
+- `lib/proofBotBody.ts` — the card bot's viewBox, static pose (10° lean, look 7), arms, glints and
+  eye positions, reading the MW strips/feet/eyes unchanged from `lib/processBots.ts`
+- `lib/proofBotProps.ts` — the three hardcoded prop drawings (Exile's phone, Design Vault's fan,
+  MARWIX-SKILLS' puzzle piece), each a list of pieces in paint order, plus each prop's `grip` point
+  for the later motion pass
+- `lib/proofBotShape.ts` — the shared outline/solid/detail types every card-bot file draws from
+- `lib/proofBotDepth.ts` — the literal 6-step (body) / 5-step (prop) extrusion offset-and-shade
+  table
+- `lib/proofBotShades.ts` — every card-bot shade (materials, eye, light, banner ground) as a
+  `color-mix()` of existing tokens only, in one table
+- `lib/proofs.ts` — the project order/keys (`proofKeys`, all three), the temporary hide flag
+  (`hiddenProofs`) and the shown list it derives (`shownProofKeys`), each shown project's dialog id,
+  image names, two-digit number and total, next-project wraparound, the grid's column count
+  (`proofGridColumns`: two from `md`, three from `lg` only when three or more are shown), card bot
+  prop (`proofProp`), the card bot's per-card SVG ids (`proofBotIds`) and `proofCardSelector()` (the
+  card that opens a given takeover, used for focus return and the clip's source rect) — every one of
+  these reads the shown list, not `proofKeys`
 - `hooks/useHashTakeover.ts` — opens/closes the takeover `<dialog>`s from the address hash with
   `showModal()`, resetting each dialog's `scrollTop` right after opening and again just before
   every close so every takeover opens at its top; a direct load on a takeover hash rewrites the
@@ -144,24 +211,47 @@ are no console errors.
   on-screen rect), so GSAP tweens numbers rather than parsing clip-path strings
 - `components/home/proofs/TakeoverController.tsx` — wires `useTakeoverMotion` into
   `useHashTakeover`
-- `lib/proofs.ts` — the project order/keys, each project's dialog id, image names, two-digit
-  number, next-project wraparound and `proofCardSelector()` (the card that opens a given takeover,
-  used for focus return and the clip's source rect)
 - `lib/takeoverLinks.ts` — Close (raises `cancel`, same path as Esc) and Next (replaces the hash,
   so Back still closes rather than stepping through projects) click handlers
 
 ## Decisions
 
+- 2026-09-28 — User's choice: MARWIX-SKILLS is hidden temporarily, card and takeover, behind one
+  flag (`hiddenProofs` in `lib/proofs.ts`); its content and code stay. With two projects shown, the
+  cards sit two across from `md` up at full width, no empty third slot (three across from `lg` only
+  once three or more are shown again). Un-hide: set `hiddenProofs` back to `[]`.
 - 2026-09-24 — Proofs: the three real projects only, Exile, Design Vault and MARWIX-SKILLS, as
   cream cards each opening a takeover. Exile's takeover shows its two numbers and is the only
   place linking exile.marwix.dev. No tech stacks, no clients.
-- 2026-09-24 — Proof cards are fully identical: one card design and one set of inputs (shot, tag,
-  title, card line) for all three projects, in one grid (three across from `lg`, stacked on
-  phone). Cream cards (cream/ink/cream-muted), numbered label 04, heading "Work that runs"-style
-  (copywriter). Exile's two numbers appear only in its takeover's IN USE row, not on the card.
-- 2026-09-24 — Proofs images: the user supplies a card shot plus takeover shots for all three
-  projects — Exile, Design Vault and MARWIX-SKILLS. Placeholders are used while building and none
-  may ship. All images go through the image helper.
+- 2026-09-24 — Proof cards are fully identical: one card design and one set of inputs (banner, tag,
+  title, card line, proof line) for all three projects, in one grid, stacked on phone (grid column
+  count superseded 2026-09-28, see above). Cream cards (cream/ink/cream-muted), numbered label 04,
+  heading "Work that runs"-style (copywriter).
+- 2026-09-24 — Proofs images: the user supplies takeover shots for all three projects — Exile,
+  Design Vault and MARWIX-SKILLS. Placeholders are used while building and none may ship. All
+  images go through the image helper. (Card shots are superseded 2026-09-28: cards no longer show
+  a screenshot.)
+- 2026-09-28 — Proof cards are redesigned on one template: a short banner (style A "Ink stage" —
+  ink ground, faint "/" hatch, violet floor glow) replaces the 16:10 card shot, with the meta row,
+  title, card line and one proof line below it. Screenshots live only in the takeover; `{project}Card`
+  images and `cardShotAlt` are removed. Supersedes the card-shot part of the 2026-09-24 image
+  decision and the "shot" input above.
+- 2026-09-28 — Each banner holds this repo's ProcessBot (the MW mark), one per card, same body: big,
+  leaning right, rising out of the banner with its feet sunk below the floor, breaking past the
+  card's top and right edges; 3D on cards only (extruded depth, light, shadow) — Process' bots stay
+  flat — and must still read as the MW mark. Left hand holds one prop per project: Exile a generic
+  game phone (no Discord or Idle Heroes marks, those are trademarks), Design Vault a colour swatch
+  fan, MARWIX-SKILLS a puzzle piece. Eyes look up-right, outward. The still pose works alone; motion
+  comes later (spec §7.7).
+- 2026-09-28 — Numbers stay off cards: the 2026-09-24 rule that Exile's two numbers appear only in
+  its takeover's IN USE row stays. The card's proof line is an outcome in words; a month-and-year
+  date from the facts is allowed on cards, stats are not.
+- 2026-09-28 — Proof lines (from current facts): Exile "Live since March 2026, run by me alone";
+  Design Vault "Public since September 2026, built by me alone"; MARWIX-SKILLS "Free and open
+  source, anyone can use it". MARWIX-SKILLS' card line is rewritten to "Tools that help people build
+  with AI." so it doesn't repeat the proof line.
+- 2026-09-28 — The cards' bot shades use no new tokens: every shade is a `color-mix()` of existing
+  tokens, kept in one table (`lib/proofBotShades.ts`) so real tokens can replace it later if wanted.
 - 2026-09-24 — Proofs takeover template, the same for every project: (1) top bar "PROJECT 0n / 03 ·
   tag" plus a Close button; (2) big title; (3) three info rows WHAT IT IS / BUILT / IN USE, facts
   only; (4) one summary paragraph on what it does for its users; (5) shots, one big and two
@@ -191,8 +281,8 @@ are no console errors.
   `(min-width:1536px) 500px, (min-width:1024px) 33vw, (min-width:768px) 50vw, 100vw` (no longer
   affected by the split/sticky-title pattern, since Proofs doesn't use it).
 - 2026-09-25 — User's choice: Proofs is reverted to its original layout. Label, heading and hint
-  sit above the cards, the cards are three across from `lg`, and nothing is pinned. Proofs is the
-  one section after the hero without a pinned title.
+  sit above the cards and nothing is pinned (grid column count superseded 2026-09-28, see above).
+  Proofs is the one section after the hero without a pinned title.
 - 2026-09-26 — The GSAP motion pass is built (ui-spec §7.7): cards reveal (stagger 0.12s) and lift
   −8px on hover; the takeover clip-path expands from the card (0.75s) with content rising 40px
   after 0.35s, clips back on close (0.6s); under reduced motion the dialog shows at once, content
@@ -244,15 +334,42 @@ are no console errors.
 - 2026-09-28 — The card-to-takeover title morph matches the card title's optical size and letter
   spacing at the card end and lines up the text boxes, so both hand-offs are the same glyphs within
   1px; the close ends with a 0.15s fade of the whole dialog so the card dissolves in underneath.
+- 2026-09-28 — Deviations from ui-spec §7.1/§7.2 (recorded so audits don't flag them): the header
+  row keeps `gap-x-10 gap-y-6`, not the spec's `gap-6`; the glints are clipped by a `<g clipPath>`
+  wrapper to the unrotated strips and sit in `body` after `eyes` (so they don't follow the eyes),
+  and their gradient peaks at stop-opacity 0.55; no `data-bot` element carries a `style` or
+  `transform`; eye-wall paths, the depth steps' `color-mix()` strings and eye positions are all
+  computed at server render, nothing on the client; the file list has two extra files beyond the
+  spec's, `ProofBotShape.tsx` and `lib/proofBotShape.ts`.
 
 ## Open Questions
 
 - **Fact:** the user is adding MARWIX-SKILLS details (BUILT / IN USE) to `docs/03-facts.md`; its
-  rows show `[FILL]` until then and can't ship.
-- **To build:** Proofs — Exile, Design Vault and MARWIX-SKILLS screenshots (pending from the
-  user); 12 shot alt-text `[FILL]` markers (three projects × card + 3 shots) clear when the
-  images arrive.
+  rows show `[FILL]` until then and can't ship. MARWIX-SKILLS is hidden for now (see Decisions), so
+  this doesn't block launch.
+- **Fact:** the user is adding Exile facts (Idle Heroes, the mobile game it serves, and its
+  in-game resource calculations) to `docs/03-facts.md`; once they land, copywriter updates Exile's
+  card line, summary and rows.
+- **To build:** Proofs — Exile, Design Vault and MARWIX-SKILLS takeover screenshots (pending from
+  the user; cards no longer carry a screenshot); their shot alt-text `[FILL]` markers clear when
+  the images arrive.
+- **To build:** the proof card motion pass (spec §7.7: rise-out reveal, hover lean + prop act, idle
+  breath/blink, pointer eyes) — the static card now passes checks (2026-09-28).
+- **Choice (later):** replace the color-mix shades in `lib/proofBotShades.ts` with named tokens.
 - **Note:** after Back on a direct-load takeover, focus isn't returned to the card (minor).
+- **Note:** at 1440 the Design Vault proof line wraps to two lines while Exile's takes one, so its
+  hairline sits ~16px higher than its neighbour's; not a blocker.
+- **Note:** faint stair lines are visible on the card bot's extrusion at large stacked widths
+  (around 767) from the 6-step depth table; not a blocker.
+- **To build:** with two cards shown, the bot scales up (~620px banner) at 1440/3840, making the
+  extrusion's 6-step stair lines clearly visible; fix candidates: more depth steps, or a smooth side
+  fill instead of stepped bands.
+- **To build:** with two cards shown, Exile's right arm comes within ~11px (1440) / ~3px (3840) of
+  the Design Vault card; fix candidates: a wider column gap, or a cap on the bot's scale when only
+  two are shown.
+- **To build:** ui-spec §7.1's grid line still reads "three across from `lg`" / "MARWIX-SKILLS
+  starts row two"; needs updating to the two-shown grid (`proofGridColumns`) now that MARWIX-SKILLS
+  is hidden.
 - **To build:** check the Next slide-up and both title morphs (Next and card-open) on a real
   Safari/iPhone before launch — only tested in headless Chromium so far; stacked-modal
   (`showModal()` under an open dialog) behaviour on Safari and Firefox is unverified.

@@ -1,7 +1,9 @@
 // A process bot's acts (ui-spec §5.7 layers 5, 6, 8 and the relay catch): each role's full and
-// short act, the hover/tap reaction (the only jump), naps and waking. A bot does one of these at
-// a time (`bot.busy`); starting one stops the idle moves in progress, and interrupting one eases
-// every part it may have moved back to rest first, so no channel is left stranded. Tweens that
+// short act, the hover/tap reaction (the only jump), naps and waking. The beats the relay job
+// shares (marks, strikes, lens flicker, page flip) come from `JOB_BEATS`, so they line up with it. A bot does one of these at
+// a time (`bot.busy`); starting one stops the idle moves in progress. The hover/tap reaction never
+// cuts an act or another reaction short (a busy bot just ignores it); it only wakes a nap, easing
+// every part the nap moved back to rest first, so no channel is left stranded. Tweens that
 // share a property use `overwrite: "auto"`: whichever starts last owns it. Everything runs in the
 // crew registry, so it pauses with the section.
 import { gsap } from "@/lib/gsap";
@@ -12,15 +14,25 @@ import {
   ACT_GAP,
   ANTICIPATE,
   BUSY_RETRY,
+  COLUMN_LESSON_HOLD,
+  JOB_BEATS,
   JUMP_FEET,
   JUMP_UP,
+  LENS_FLICKER,
   LOOK_EASE,
   LOOK_MAX,
+  MARK_WRITE,
   NAP_GAP,
   NAP_LENGTH,
+  PAGE_FLIP,
   POP_SCALE,
   REACT_COOLDOWN,
+  RELAY_CLEAR,
+  RELAY_DWELL,
   RELAY_GLANCE,
+  RELAY_STRIKES,
+  RELAY_WATCH,
+  RELAY_WATCH_BLINK,
   SETTLE,
   SQUASH,
   STRETCH,
@@ -33,11 +45,24 @@ import {
 } from "@/lib/processBotMotion";
 import { eyeAttr, setState, setTimer, type Bot, type BotState } from "@/lib/processBotRig";
 
-type Length = "full" | "short";
+/**
+ * `catch`: the full act as played on a relay catch (team strikes exactly `RELAY_STRIKES`), ending
+ * with the eyes on the job (`RELAY_WATCH`) rather than back at rest.
+ */
+type Length = "full" | "catch" | "short";
+
+/** Seconds of live time until the bot's next relay catch (`Infinity` if none is due). */
+export type CatchClock = (bot: Bot) => number;
+const clocks = new WeakMap<Bot, CatchClock>();
+/** Relay catches' watch timelines: the one busy timeline the lesson hold may cut short. */
+const watches = new WeakSet<gsap.core.Timeline>();
+const untilCatch = (bot: Bot) => clocks.get(bot)?.(bot) ?? Infinity;
 
 const pick = ([min, max]: Range) => gsap.utils.random(min, max);
 const timeline = () => gsap.timeline({ defaults: { overwrite: "auto" } });
 const feet = (bot: Bot) => [bot.parts.footLeft, bot.parts.footRight];
+/** Where a full act leaves the eyes: on the job after a relay catch, otherwise at rest. */
+const endLook = (bot: Bot, length: Length) => (length === "catch" ? RELAY_WATCH[bot.role] : bot.restLook);
 
 // Shared moves.
 
@@ -95,17 +120,14 @@ function sparksBurst(bot: Bot): gsap.core.Timeline {
   return tl;
 }
 
-/** Check's lens flickers off and on, ending lit. */
+/** Check's lens flickers off and on (`LENS_FLICKER`, shifted to start at `at`), ending lit. */
 function flicker(bot: Bot, tl: gsap.core.Timeline, at: number) {
   const { lensLit } = bot.parts;
   if (!lensLit) return;
-  const holds = [0.08, 0.05, 0.12, 0.06];
-  let t = at;
-  holds.forEach((hold, i) => {
-    tl.set(lensLit, { opacity: i % 2 === 0 ? 0 : 1 }, t);
-    t += hold;
+  const [first] = LENS_FLICKER;
+  LENS_FLICKER.forEach((time, i) => {
+    tl.set(lensLit, { opacity: i % 2 === 0 ? 0 : 1 }, at + time - first);
   });
-  tl.set(lensLit, { opacity: 1 }, t);
 }
 
 // Role acts.
@@ -121,24 +143,30 @@ function rulesAct(bot: Bot, length: Length): gsap.core.Timeline {
       .add(nod(bot), 0.3)
       .to(ch, { actL: 0, mixL: 1, duration: 0.4, ease: "power2.inOut" }, 0.6);
   }
+  // Fits a relay stop (`RELAY_DWELL`): done at 1.75.
+  const { marks, stamp } = JOB_BEATS.rules;
   return tl
-    .to(ch, { look: -LOOK_MAX, duration: 0.4, ease: "power2.out" }, 0)
-    .to(ch, { actL: 10, mixL: 0, duration: 0.4, ease: "power2.out" }, 0)
-    .to(parts.marks, { scaleX: 0, duration: 0.12, ease: "power2.in", stagger: 0.05 }, 0.4)
-    .to(parts.marks, { scaleX: 1, duration: 0.25, ease: "power2.out", stagger: 0.2 }, 0.7)
-    .add(nod(bot), 1.4)
-    .add(nod(bot), 1.7)
-    .to(ch, { look: bot.restLook, actL: 0, mixL: 1, duration: 0.5, ease: "power2.inOut" }, 2.0);
+    .to(ch, { look: -LOOK_MAX, duration: 0.35, ease: "power2.out" }, 0)
+    .to(ch, { actL: 10, mixL: 0, duration: 0.35, ease: "power2.out" }, 0)
+    .to(parts.marks, { scaleX: 0, duration: 0.12, ease: "power2.in", stagger: 0.05 }, 0.3)
+    .to(parts.marks, { scaleX: 1, ...MARK_WRITE, stagger: marks[1] - marks[0] }, marks[0])
+    .add(nod(bot), stamp)
+    .add(nod(bot), stamp + 0.3)
+    .to(ch, { look: endLook(bot, length), actL: 0, mixL: 1, duration: 0.45, ease: "power2.inOut" }, stamp + 0.25);
 }
 
 function teamAct(bot: Bot, length: Length): gsap.core.Timeline {
   const { ch, parts } = bot;
-  const strikes = length === "full" ? gsap.utils.random(2, 3, 1) : 1;
+  const strikes = length === "catch" ? RELAY_STRIKES : length === "full" ? gsap.utils.random(2, 3, 1) : 1;
+  // Impacts on `JOB_BEATS.team`, evenly spaced after the second; each strike winds up 0.28 and
+  // swings 0.09 before its impact.
+  const [firstHit, secondHit] = JOB_BEATS.team;
   const tl = timeline();
   tl.to(ch, { mixR: 0, duration: 0.2, ease: "power2.out" }, 0);
-  let t = 0;
   let hit = 0;
   for (let i = 0; i < strikes; i += 1) {
+    hit = firstHit + i * (secondHit - firstHit);
+    const t = hit - 0.37;
     // Wind-up: the head swings back over the body.
     tl.to(parts.tool, { rotation: -45, duration: 0.28, ease: "power2.out" }, t)
       .to(parts.upper, { scaleX: 1.03, scaleY: 0.96, duration: 0.28, ease: "power2.out" }, t)
@@ -146,19 +174,17 @@ function teamAct(bot: Bot, length: Length): gsap.core.Timeline {
       .to(parts.footRight, { x: 1.5, duration: 0.28, ease: "power2.out" }, t)
       // Strike.
       .to(parts.tool, { rotation: 30, duration: 0.09, ease: "power4.in" }, t + 0.28);
-    hit = t + 0.37;
     // Impact.
     tl.to(parts.upper, { scaleX: 1.05, scaleY: 0.94, duration: 0.05, ease: "power2.out" }, hit)
       .to(parts.upper, { scaleX: 1, scaleY: 1, ...SETTLE }, hit + 0.05)
       .to(parts.footLeft, { x: -1, duration: 0.05, ease: "power2.out" }, hit)
       .to(parts.footLeft, { x: 0, duration: 0.2, ease: "power2.out" }, hit + 0.05)
       .add(sparksBurst(bot), hit);
-    t = hit + 0.3;
   }
   return tl
     .to(parts.tool, { rotation: 0, duration: 0.35, ease: "back.out(1.6)" }, hit + 0.15)
     .to(parts.footRight, { x: 0, duration: 0.3, ease: "power2.inOut" }, hit + 0.15)
-    .to(ch, { look: bot.restLook, mixR: 1, duration: 0.4, ease: "power2.inOut" }, hit + 0.15);
+    .to(ch, { look: endLook(bot, length), mixR: 1, duration: 0.4, ease: "power2.inOut" }, hit + 0.15);
 }
 
 function checkAct(bot: Bot, length: Length): gsap.core.Timeline {
@@ -169,26 +195,30 @@ function checkAct(bot: Bot, length: Length): gsap.core.Timeline {
     flicker(bot, tl, 0.3);
     return tl.to(ch, { tilt: 0, duration: 0.4, ease: "power2.inOut" }, 0.7);
   }
+  // Fits a relay stop (`RELAY_DWELL`): the scan ends at 1.6, the act at 1.95, "found it" or not.
   tl.to(ch, { tilt: 3, duration: 0.4, ease: "power2.out" }, 0);
   // Figure-8: x (and a matching ±4° turn) makes one loop while y makes two.
   [4, 0, -4, 0].forEach((x, i) => {
-    tl.to(parts.tool, { x, rotation: x, duration: 0.35, ease: "sine.inOut" }, 0.3 + i * 0.35);
+    tl.to(parts.tool, { x, rotation: x, duration: 0.35, ease: "sine.inOut" }, 0.2 + i * 0.35);
   });
   [2.5, 0, -2.5, 0, 2.5, 0, -2.5, 0].forEach((y, i) => {
-    tl.to(parts.tool, { y, duration: 0.175, ease: "sine.inOut" }, 0.3 + i * 0.175);
+    tl.to(parts.tool, { y, duration: 0.175, ease: "sine.inOut" }, 0.2 + i * 0.175);
   });
-  flicker(bot, tl, 1.0);
-  const found = Math.random() < 0.35;
-  if (found) tl.add(eyePop(bot), 1.75);
-  return tl.to(ch, { tilt: 0, duration: 0.5, ease: "power2.inOut" }, found ? 2.4 : 1.8);
+  flicker(bot, tl, LENS_FLICKER[0]);
+  if (Math.random() < 0.35) tl.add(eyePop(bot), 1.55);
+  // A timed act leaves the eyes where they are; a relay catch turns them onto the job.
+  const back = length === "catch" ? { tilt: 0, look: endLook(bot, length) } : { tilt: 0 };
+  return tl.to(ch, { ...back, duration: 0.4, ease: "power2.inOut" }, 1.55);
 }
 
-/** One ratchet of the wrench, with a small counter-lean of the whole bot. */
+/** One ratchet of the wrench (`RATCHET.turn` then `back`), with a small counter-lean of the whole bot. */
+const RATCHET = { turn: 0.14, back: 0.1 } as const;
 function ratchet(bot: Bot, tl: gsap.core.Timeline, at: number) {
-  tl.to(bot.parts.tool, { rotation: -30, duration: 0.22, ease: "power2.out" }, at)
-    .to(bot.ch, { tilt: -1.5, duration: 0.22, ease: "power2.out" }, at)
-    .to(bot.parts.tool, { rotation: 0, duration: 0.16, ease: "power2.in" }, at + 0.22)
-    .to(bot.ch, { tilt: 0, duration: 0.16, ease: "power2.in" }, at + 0.22);
+  const { turn, back } = RATCHET;
+  tl.to(bot.parts.tool, { rotation: -30, duration: turn, ease: "power2.out" }, at)
+    .to(bot.ch, { tilt: -1.5, duration: turn, ease: "power2.out" }, at)
+    .to(bot.parts.tool, { rotation: 0, duration: back, ease: "power2.in" }, at + turn)
+    .to(bot.ch, { tilt: 0, duration: back, ease: "power2.in" }, at + turn);
 }
 
 function updateAct(bot: Bot, length: Length): gsap.core.Timeline {
@@ -199,23 +229,41 @@ function updateAct(bot: Bot, length: Length): gsap.core.Timeline {
     ratchet(bot, tl, 0.1);
     return tl.to(ch, { mixR: 1, duration: 0.3, ease: "power2.inOut" }, 0.5);
   }
-  tl.to(ch, { look: 5, duration: 0.3, ease: "power2.out" }, 0).to(ch, { mixR: 0, duration: 0.2, ease: "power2.out" }, 0);
-  [0.2, 0.66, 1.12].forEach((at) => ratchet(bot, tl, at));
-  tl.to(ch, { look: -LOOK_MAX, duration: 0.35, ease: "power2.inOut" }, 1.58).to(
+  // Fits a relay stop (`RELAY_DWELL`): three quick ratchets, the look to the rulebook, the flip on
+  // `JOB_BEATS.update.flip` (so the job's fold settles by 1.95), done at 1.9.
+  const { page, marks } = parts;
+  const { flip, rewrite } = JOB_BEATS.update;
+  tl.to(ch, { look: 5, duration: 0.25, ease: "power2.out" }, 0).to(ch, { mixR: 0, duration: 0.2, ease: "power2.out" }, 0);
+  [0.1, 0.36, 0.62].forEach((at) => ratchet(bot, tl, at));
+  tl.to(ch, { look: -LOOK_MAX, duration: 0.3, ease: "power2.inOut" }, flip - 0.3).to(
     ch,
     { mixR: 1, duration: 0.3, ease: "power2.inOut" },
-    1.58,
+    0.86,
   );
-  const { page, marks } = parts;
   if (page) {
     // The page flips over toward the spine; the mark is re-written while it's covered.
-    tl.to(page, { opacity: 1, duration: 0.06, ease: "none" }, 1.9)
-      .set(marks, { scaleX: 0 }, 1.96)
-      .to(page, { scaleX: 0, duration: 0.4, ease: "power2.in" }, 1.96)
-      .set(page, { opacity: 0, scaleX: 1 }, 2.36)
-      .to(marks, { scaleX: 1, duration: 0.3, ease: "power2.out" }, 2.4);
+    tl.to(page, { opacity: 1, duration: 0.06, ease: "none" }, flip - 0.06)
+      .set(marks, { scaleX: 0 }, flip)
+      .to(page, { scaleX: 0, ...PAGE_FLIP }, flip)
+      .set(page, { opacity: 0, scaleX: 1 }, flip + PAGE_FLIP.duration)
+      .to(marks, { scaleX: 1, duration: 0.3, ease: "power2.out" }, rewrite);
   }
-  return tl.to(ch, { look: bot.restLook, duration: 0.4, ease: "power2.inOut" }, 2.75);
+  return tl.to(ch, { look: endLook(bot, length), duration: 0.4, ease: "power2.inOut" }, rewrite + 0.15);
+}
+
+/**
+ * A relay catch: the act, then the bot keeps its eyes on the job (where the act left them), blinks
+ * once if the wait allows, and looks back to rest as the job leaves, `RELAY_DWELL` after the catch
+ * (or when the act ends, if that's later).
+ */
+function watchJob(bot: Bot, act: gsap.core.Timeline): gsap.core.Timeline {
+  const done = act.duration();
+  const leave = Math.max(done, RELAY_DWELL[bot.role]);
+  const tl = timeline().add(act, 0);
+  if (leave - done >= RELAY_WATCH_BLINK) tl.add(blink(bot, false), (done + leave) / 2);
+  tl.to(bot.ch, { look: bot.restLook, duration: 0.4, ease: "power2.inOut" }, leave);
+  watches.add(tl);
+  return tl;
 }
 
 const acts: Record<BotRole, (bot: Bot, length: Length) => gsap.core.Timeline> = {
@@ -248,7 +296,8 @@ function startZzz(bot: Bot, crew: Crew) {
 }
 
 /**
- * Every part an act, nap or jump may have moved, eased back to rest, for when one is cut short:
+ * Every part an act, nap or jump may have moved, eased back to rest, for when one is cut short
+ * (today only a nap, by the reaction; kept whole so no channel can be left stranded):
  * tools, marks, page, sparks, lens, feet, upper, hat, eyes (open, unpopped), the act channels,
  * and breathing back from a nap. The z loop stops and its z's fade.
  */
@@ -328,12 +377,15 @@ function wake(bot: Bot, crew: Crew) {
 // Entry points.
 
 /**
- * The hover/tap reaction: a jump with popped eyes, then the short act. Interrupts idle acts and
- * naps; ignored while the bot drops in, and within `REACT_COOLDOWN` of the last one's start. The
- * next timed act comes the usual gap after it ends.
+ * The hover/tap reaction: a jump with popped eyes, then the short act. Only an idle or napping bot
+ * reacts (a nap is interrupted, not "active"); it's ignored while the bot drops in, while it's
+ * `acting` (a timed act, a relay catch and its watch of the job, the `receive`
+ * squash, bot 4's lesson hold below `lg`) or `reacting`, and within `REACT_COOLDOWN` of the last one's start. An ignored hover or
+ * tap is dropped, not queued, and doesn't count toward the cooldown. The next timed act comes the
+ * usual gap after it ends.
  */
 export function react(bot: Bot, crew: Crew) {
-  if (bot.state === "entering") return;
+  if (bot.state !== "idle" && bot.state !== "napping") return;
   const now = performance.now() / 1000;
   if (now - bot.lastReact < REACT_COOLDOWN) return;
   bot.lastReact = now;
@@ -345,8 +397,8 @@ export function react(bot: Bot, crew: Crew) {
   nextActAfter(bot, crew, tl);
 }
 
-/** Relay start: the first bot pushes the dot off with a squash (idle only). */
-export function launch(bot: Bot, crew: Crew) {
+/** The job reaches the arrowhead: the first bot takes the loop back with a squash (idle only). */
+export function receive(bot: Bot, crew: Crew) {
   if (bot.state !== "idle") return;
   const tl = timeline()
     .to(bot.parts.upper, { ...SQUASH, duration: 0.08, ease: "power2.out" })
@@ -355,9 +407,10 @@ export function launch(bot: Bot, crew: Crew) {
 }
 
 /**
- * The relay (or cascade) reaches the bot, its step: an idle bot plays its full role act (no jump)
- * and its next timed act comes the usual gap after that, a napping one wakes, a busy one (still acting, reacting or launching) glances `toward` (+1
- * up-right, −1 down-left) and back.
+ * The relay reaches the bot, its step: an idle bot plays its full role act (no jump; team strikes
+ * exactly `RELAY_STRIKES`) and watches the job until it leaves, and its next timed act comes
+ * the usual gap after that, a napping one wakes, a busy one (still acting or reacting) glances
+ * `toward` (+1 up-right, where the job always sits; −1 down-left) and back. The relay's job changes on its own clock either way.
  */
 export function catchRelay(bot: Bot, crew: Crew, toward: 1 | -1) {
   switch (bot.state) {
@@ -367,7 +420,7 @@ export function catchRelay(bot: Bot, crew: Crew, toward: 1 | -1) {
       wake(bot, crew);
       return;
     case "idle": {
-      const act = acts[bot.role](bot, "full");
+      const act = watchJob(bot, acts[bot.role](bot, "catch"));
       play(bot, crew, act, "acting");
       nextActAfter(bot, crew, act);
       return;
@@ -383,12 +436,39 @@ export function catchRelay(bot: Bot, crew: Crew, toward: 1 | -1) {
   }
 }
 
+/**
+ * Below `lg`, as the job leaves bot 4: the lesson pops in on its rulebook for `seconds`. An idle
+ * bot, or one still watching the job it just let go (its look back to rest is all that's left), looks
+ * down-left at the rulebook and holds it, `acting` so a tap is ignored, then looks back to rest.
+ * A napping one wakes; one busy with anything else (a reaction, a timed act) glances down-left and
+ * back, as on a busy catch, so nothing it's doing is cut short.
+ */
+export function holdLesson(bot: Bot, crew: Crew, seconds: number) {
+  if (bot.state === "entering") return;
+  if (bot.state === "napping") {
+    wake(bot, crew);
+    return;
+  }
+  const watching = bot.state === "acting" && bot.busy !== null && watches.has(bot.busy);
+  if (bot.state !== "idle" && !watching) {
+    catchRelay(bot, crew, -1);
+    return;
+  }
+  const { look, back } = COLUMN_LESSON_HOLD;
+  const tl = timeline()
+    // Eyes open, in case the watch was cut mid-blink.
+    .to(bot.parts.eye, { attr: eyeAttr(bot, "open"), duration: 0.08, ease: "power2.out" }, 0)
+    .to(bot.ch, { look: -LOOK_MAX, ...look }, 0)
+    .to(bot.ch, { look: bot.restLook, ...back }, Math.max(seconds, look.duration));
+  play(bot, crew, tl, "acting");
+}
+
 function scheduleAct(bot: Bot, crew: Crew, delay: number) {
   setTimer(
     bot,
     "act",
     crew.after(delay, () => {
-      if (bot.state !== "idle") {
+      if (bot.state !== "idle" || untilCatch(bot) < RELAY_CLEAR) {
         scheduleAct(bot, crew, pick(BUSY_RETRY));
         return;
       }
@@ -409,7 +489,7 @@ function scheduleNap(bot: Bot, crew: Crew, delay: number) {
     bot,
     "nap",
     crew.after(delay, () => {
-      if (bot.state !== "idle") {
+      if (bot.state !== "idle" || untilCatch(bot) < NAP_LENGTH[1] + RELAY_CLEAR) {
         scheduleNap(bot, crew, pick(BUSY_RETRY));
         return;
       }
@@ -419,8 +499,13 @@ function scheduleNap(bot: Bot, crew: Crew, delay: number) {
   );
 }
 
-/** Starts the bot's act scheduler, and its nap scheduler if its role naps (rules and update). */
-export function startActs(bot: Bot, crew: Crew) {
+/**
+ * Starts the bot's act scheduler, and its nap scheduler if its role naps (rules and update). Catch
+ * priority: `clock` gives the time to the bot's next relay catch; a timed act doesn't start within
+ * `RELAY_CLEAR` of it, nor a nap within `NAP_LENGTH` max + `RELAY_CLEAR`; both retry after `BUSY_RETRY`.
+ */
+export function startActs(bot: Bot, crew: Crew, clock: CatchClock) {
+  clocks.set(bot, clock);
   scheduleAct(bot, crew, pick(ACT_GAP));
   if (bot.role === "rules" || bot.role === "update") scheduleNap(bot, crew, pick(NAP_GAP));
 }
