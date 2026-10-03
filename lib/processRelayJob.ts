@@ -170,6 +170,9 @@ export function jobBeat(tl: gsap.core.Timeline, parts: JobParts, role: BotRole, 
       }
       return pop(tl, job, JOB_SQUASH, arrival + flip + JOB_FOLD.duration);
     }
+    case "host":
+      // About's host never joins the relay: no change to the job.
+      return arrival;
   }
 }
 

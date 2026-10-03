@@ -4,29 +4,19 @@
 // inline styles; only decorative extras start hidden (`opacity-0`). `overflow-visible` lets the
 // update wrench's jaw (x 142.89) show past the viewBox edge (140). Decorative: hidden from
 // assistive tech.
+import type { ReactNode } from "react";
+import { botFills } from "@/lib/botFills";
 import {
   botRig,
-  type BotColour,
   type BotPose,
   type BotRole,
   type BotShape,
 } from "@/lib/processBots";
 
-/** Colour keys → token fill classes. Eye holes use the page background. */
-const fills: Record<BotColour, string> = {
-  B: "fill-accent",
-  C: "fill-cream",
-  M: "fill-muted",
-  D: "fill-cream-muted",
-  I: "fill-ink",
-  L: "fill-line",
-  H: "fill-bg",
-};
-
 /** Draws one part in its token fill, with its hook, hidden if its rest pose says so. */
 function renderShape(shape: BotShape, index: number, pose: BotPose) {
   const shown = shape.shownIn === undefined || shape.shownIn.includes(pose);
-  const className = shown ? fills[shape.colour] : `${fills[shape.colour]} opacity-0`;
+  const className = shown ? botFills[shape.colour] : `${botFills[shape.colour]} opacity-0`;
   switch (shape.kind) {
     case "polygon":
       return <polygon key={index} points={shape.points} data-bot={shape.hook} className={className} />;
@@ -47,12 +37,19 @@ function renderShape(shape: BotShape, index: number, pose: BotPose) {
   }
 }
 
+/** Process' size: 88 × 57 below `lg`, 136 × 88 from `lg`. */
+const processSize = "h-14.25 w-22 lg:mt-5 lg:h-22 lg:w-34";
+
 type ProcessBotProps = {
   readonly role: BotRole;
   readonly pose: BotPose;
+  /** Size and placement classes; Process' size when absent. */
+  readonly className?: string;
+  /** Extra SVG parts drawn last inside `upper` (Rix's props on About); Process passes none. */
+  readonly children?: ReactNode;
 };
 
-export function ProcessBot({ role, pose }: ProcessBotProps) {
+export function ProcessBot({ role, pose, className = processSize, children }: ProcessBotProps) {
   const rig = botRig(role, pose);
   const draw = (shapes: readonly BotShape[]) => shapes.map((shape, index) => renderShape(shape, index, pose));
   return (
@@ -63,7 +60,7 @@ export function ProcessBot({ role, pose }: ProcessBotProps) {
       data-anim="process-bot"
       data-role={role}
       data-pose={pose}
-      className="h-14.25 w-22 shrink-0 overflow-visible lg:mt-5 lg:h-22 lg:w-34"
+      className={`shrink-0 overflow-visible ${className}`}
     >
       <g data-bot="rig">
         {draw(rig.feet)}
@@ -86,6 +83,7 @@ export function ProcessBot({ role, pose }: ProcessBotProps) {
             </g>
           )}
           {rig.zzz && <g data-bot="zzz">{draw(rig.zzz)}</g>}
+          {children}
         </g>
       </g>
     </svg>

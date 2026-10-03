@@ -8,6 +8,8 @@ type PerRole = Readonly<Record<BotRole, number>>;
 export type Range = readonly [min: number, max: number];
 /** A tween's duration and ease. */
 export type Timing = { readonly duration: number; readonly ease: string };
+/** Only a timing's `duration` and `ease`, so a config's other keys (`at`, `width`…) never reach a tween. */
+export const timed = ({ duration, ease }: Timing): Timing => ({ duration, ease });
 /** An `upper` scaleX × scaleY pair. */
 export type Scale2 = { readonly scaleX: number; readonly scaleY: number };
 
@@ -16,13 +18,13 @@ export type Scale2 = { readonly scaleX: number; readonly scaleY: number };
 export const BREATH_STRETCH = 0.04;
 export const NAP_STRETCH = 0.06;
 /** Half a breath (`sine.inOut` yoyo), per role. */
-export const BREATH_HALF: PerRole = { rules: 1.25, team: 1.1, check: 1.35, update: 1.4 };
+export const BREATH_HALF: PerRole = { rules: 1.25, team: 1.1, check: 1.35, update: 1.4, host: 1.3 };
 /** How far the arms / hat ride up per unit of body stretch (their height above the feet tops). */
 export const ARM_LIFT = 31;
 export const HAT_LIFT = 76;
 /** Rig sway ± and its half-cycle (`sine.inOut` yoyo), per role. */
-export const SWAY_DEG: PerRole = { rules: 1.2, team: 1.5, check: 1.0, update: 1.3 };
-export const SWAY_HALF: PerRole = { rules: 2.6, team: 3.0, check: 2.8, update: 3.4 };
+export const SWAY_DEG: PerRole = { rules: 1.2, team: 1.5, check: 1.0, update: 1.3, host: 1.2 };
+export const SWAY_HALF: PerRole = { rules: 2.6, team: 3.0, check: 2.8, update: 3.4, host: 3.0 };
 /** Arm drift ± and its half-cycle, picked per arm so the arms run out of phase. */
 export const DRIFT_DEG = 3;
 export const DRIFT_HALF: Range = [1.8, 2.4];
@@ -156,7 +158,8 @@ export const RELAY_EVERY = 16.4;
 export const RELAY_FIRST = 1.5;
 export const RELAY_HOP: Timing = { duration: 0.7, ease: "power2.inOut" };
 /** Arrival to departure at each stop (update: to the job leaving right and the lesson splitting off). */
-export const RELAY_DWELL: PerRole = { rules: 2.0, team: 2.0, check: 2.0, update: 2.0 };
+/** The host (About) never joins the relay; its entry only completes the record. */
+export const RELAY_DWELL: PerRole = { rules: 2.0, team: 2.0, check: 2.0, update: 2.0, host: 2.0 };
 /** A fresh job fades in at stop 1. */
 export const RELAY_FADE = 0.2;
 /** Team's strikes on a relay catch (timed acts keep 2–3). */
@@ -168,7 +171,7 @@ export const RELAY_GLANCE = 5;
  * role: every bot holds the job on its right, so every look is toward the right), with one blink
  * if the wait is at least `RELAY_WATCH_BLINK`.
  */
-export const RELAY_WATCH: PerRole = { rules: 7, team: 5, check: 7, update: 7 };
+export const RELAY_WATCH: PerRole = { rules: 7, team: 5, check: 7, update: 7, host: 7 };
 export const RELAY_WATCH_BLINK = 0.4;
 /** No timed act starts within this of a bot's next catch; no nap within `NAP_LENGTH` max + this. */
 export const RELAY_CLEAR = 3.5;
@@ -188,7 +191,7 @@ export const CHEVRON_PULSE = {
  * (rules), the hammer (team) and the lens (check); update's sits 4 units further right, so the
  * built step (5px above the sheet) keeps ~5 units clear of the wrench handle's low end at (106, 55).
  */
-export const JOB_AT: PerRole = { rules: 122, team: 122, check: 122, update: 126 };
+export const JOB_AT: PerRole = { rules: 122, team: 122, check: 122, update: 126, host: 122 };
 /** A fresh job appears at stop 1. */
 export const JOB_POP = { from: 0.6, duration: 0.3, ease: "back.out(1.7)" } as const;
 /** The small pop that marks a change (team, check, update): the job squashes, then `SETTLE`. */

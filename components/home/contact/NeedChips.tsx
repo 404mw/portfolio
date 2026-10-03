@@ -3,9 +3,9 @@
 // JavaScript, where the buttons can't toggle.
 import { CheckIcon } from "@/components/icons/CheckIcon";
 import type { Need } from "@/lib/brief";
-import { focusRing, metaLabel } from "@/lib/styles";
+import { chip, focusRing, metaLabel } from "@/lib/styles";
 
-const chipBase = `inline-flex min-h-11 items-center gap-2 rounded-full border px-4.5 text-body ${focusRing}`;
+const chipBase = `${chip} ${focusRing}`;
 const chipPressed = "border-accent bg-accent text-on-accent";
 const chipUnpressed = "border-line text-muted hover:border-muted hover:text-text active:bg-line";
 

@@ -30,9 +30,11 @@ Reduced motion: no rotation, fades only, the first phrase stays.
 ## Key Files
 
 - `components/home/contact/` — ContactSection, ContactLinks, ContactRow (shared by all side rows
-  including Book a call), BriefBuilder (client, its `<form>` carries `data-anim-delay="150"`),
-  NeedChips, TimelineSegments, RepeatField, SendBriefLink, ContactMotion (client, mounts the reveal
-  and `useBriefPlaceholder`, renders nothing)
+  including Book a call; its WhatsApp row now goes through the shared `components/WhatsAppLink.tsx`,
+  whose `href` follows an About pick), BriefBuilder (client, its `<form>` carries
+  `data-anim-delay="150"`), NeedChips (its chip shape is the shared `chip` style in `lib/styles.ts`,
+  now also used by About's reply chips), TimelineSegments, RepeatField, SendBriefLink, ContactMotion
+  (client, mounts the reveal and `useBriefPlaceholder`, renders nothing)
 - `hooks/useBriefState.ts` — the brief's uncontrolled radios/textarea read back on mount, so a
   choice made before hydration survives it
 - `hooks/useBriefPlaceholder.ts` — the "what do you repeat" placeholder's rotation, pause and

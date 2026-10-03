@@ -33,6 +33,8 @@ export const footer = {
     discord: "Discord",
     whatsapp: "WhatsApp",
   },
+  // The footer link to /rix, the Rix playground (docs/pages/rix/ui-spec.md §0.1).
+  rixLink: "Play with Rix",
 } as const;
 
 // Addresses, not copy. Copied verbatim from docs/03-facts.md → Contact.

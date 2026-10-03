@@ -22,7 +22,8 @@ motion pass, ships 2026-09-30. Reference design: `temp/claude-design/Portfolio R
    request's scope until it fits, or amend the constitution (the user's own edit, updating its
    Last Updated date). Never make a one-off exception.
 
-5. **Only facts from `docs/03-facts.md` reach the site.** Page text lives in `content/`, is
+5. **Only facts from `docs/03-facts.md` reach the site.** It's the source of truth; any agent may update it,
+   but only with the user's explicit permission for that change. Page text lives in `content/`, is
    written by `copywriter` following `docs/04-voice.md` before `web-coder` builds, and the user's
    edits to it are final.
 
@@ -41,7 +42,7 @@ Single Next.js app (App Router, TypeScript, Tailwind v4):
 |---|---|
 | `docs/00-constitution.md` | Hard rules. Read first. |
 | `docs/01-design-system.md` | Tokens, type, layout |
-| `docs/03-facts.md` | The only claims the site may make. Only the user edits it. |
+| `docs/03-facts.md` | The only claims the site may make. Any agent may edit it, only with the user's explicit permission. |
 | `docs/04-voice.md` | How the site's words are written, with length limits |
 | `temp/claude-design/Portfolio Redesign v3.dc.html` | Reference design, layout and behaviour only (local, gitignored) |
 | `docs/pages/<page>/page.md` | Page index: sections table, site-wide state, decisions, open-question roll-up |

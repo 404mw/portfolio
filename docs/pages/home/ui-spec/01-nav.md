@@ -62,6 +62,11 @@ Shared rules and parts (§0): [`../ui-spec.md`](../ui-spec.md). Page doc: [`../s
 - New: `components/SiteHeader.tsx`, `ProgressBar.tsx`, `NavBar.tsx` (client), `NavLinks.tsx`,
   `NavMenu.tsx` (client), plus `hooks/useScrolledPast.ts`. `lib/navItems.ts` is overwritten with the
   four in-page items.
+  - **Link hrefs (2026-10-02, approved with the `/rix` build):** the four hrefs are `/#agents`,
+    `/#web`, `/#projects` and `/#contact` (built as `/${routes.x}`), not bare `#…`. The nav also
+    shows on `/rix`, where a bare hash points at nothing. On `/` they still jump in place.
+  - `/rix` gives its intro `id="top"`, so the solid switch works there too. See
+    `docs/pages/rix/ui-spec.md` §0.1.
 - **Motion (built), progress bar:** `hooks/useScrollProgress.ts`, mounted by
   `components/ProgressMotion.tsx` (renders nothing). The fill (`data-anim="progress"`) scales
   `scaleX` 0→1 linearly over the whole document scroll, scrubbed with 0.3s smoothing in full motion.

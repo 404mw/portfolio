@@ -6,7 +6,8 @@ edits it whenever they want. **The user's edits are final:** before changing any
 
 ## The reader
 
-A small-business owner who isn't technical. Someone sent them the link. They skim each section
+Someone who isn't technical and might hire the user: a small-business owner, a community owner,
+a founder, an agency or a creator (constitution §3). Someone sent them the link. They skim each section
 for 3–5 seconds and decide whether to keep going. Every section answers **one question**, the
 question in its page doc.
 

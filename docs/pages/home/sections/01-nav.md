@@ -1,6 +1,6 @@
 # Nav
 
-**Last Updated:** 2026-09-26
+**Last Updated:** 2026-10-03
 
 **The one question:** Where can I go, and how do I book a call?
 
@@ -17,6 +17,9 @@ closing it, and syncing its open state on mount in case it was opened before hyd
 moves focus back to the menu button only when focus was in the menu or on the page body. While
 scrolling past the hero, the transparent Nav's links overlap the big hero name; this stays as-is
 and is fixed by the hero-text fade on scroll (the motion pass, see `sections/02-hero.md`).
+
+The link hrefs are rooted (`/#agents`, `/#web`, `/#projects`, `/#contact`, built in `lib/navItems.ts`
+from `lib/routes.ts`), so they reach home's sections from `/rix` and still jump in place on `/`.
 
 The progress bar's motion is built: it fills (`scaleX` 0 to 1, ease none) across the whole document
 scroll via a ScrollTrigger scrub (0.3s smoothing in full motion; set straight from the scroll
@@ -92,6 +95,8 @@ instant since the native `<details>` hides it. No GSAP scroll-to for the jump li
   scope).
 - 2026-09-26 — User's choice: the nav link reads Projects, not Proofs (text + anchor `#proofs` →
   `#projects` only; code/content key names stay `proofs`). See `sections/07-proofs.md`.
+
+- 2026-10-02 — The nav links become `/#agents` etc. (not bare `#agents`) so they work from `/rix`.
 
 ## Open Questions
 

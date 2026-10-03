@@ -7,7 +7,7 @@ these facts (see `docs/04-voice.md`); this file isn't copy.
 A `[FILL: …]` value is waiting for the user. Never guess one. Until the user fills it, the page
 shows the same `[FILL: …]` marker, and no page ships with one (constitution §8).
 
-Only the user edits this file.
+Any agent may edit this file, but only with the user's explicit permission for that change.
 
 ## Who
 

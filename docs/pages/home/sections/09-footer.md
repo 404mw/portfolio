@@ -1,6 +1,6 @@
 # Footer
 
-**Last Updated:** 2026-09-27
+**Last Updated:** 2026-10-03
 
 **The one question:** Where else can I find/reach them?
 
@@ -16,6 +16,10 @@ icons). Order is fixed: LinkedIn, GitHub, Instagram, Discord, WhatsApp, each sho
 address in `content/shared.ts` → `links` is filled; all five are now filled and show.
 Browser-verified 2026-09-26 at 1440 and 360: all five links are underlined and bright, wrap
 on a phone.
+
+The footer row also has the "Play with Rix" link (`footer.rixLink`, a `Link` to `/rix`, same style as
+the socials), placed between the socials and ©; it is the only entry to `/rix`. The WhatsApp link
+goes through `WhatsAppLink`.
 
 The wordmark container is `pointer-events-none`, so all six footer links are clickable at 1440 and
 390 (previously blocked on desktop); tracking is `-0.01em`; A R I X sit at their natural width, with
@@ -82,10 +86,14 @@ long settle, no leftover inline styles; reduced motion unchanged.
   the word, so the reveal slows as it finishes. This refines "Wipe in place"; the accents' rise,
   the clip wipe itself and reduced motion (fade only) are unchanged.
 
+- 2026-10-02 — The footer gets a "Play with Rix" link (`footer.rixLink`) to `/rix`; it is the only entry to the route.
+
 ## Open Questions
 
 - **Choice:** `docs/01-design-system.md` gives display tracking as −0.015 to −0.045em; the
   wordmark's −0.01em sits just outside. The user to decide: add a wordmark exception to the design
   system, or accept −0.015em with sub-pixel overlap.
+- **Choice:** the "Play with Rix" link's place in the row (between the socials and ©) needs the
+  user's confirmation.
 - **To build:** ui-spec `09-footer.md` §9.1/§9.3 still describe −0.05em, the max-width clip and the
   opening; superseded by this doc's decisions above.

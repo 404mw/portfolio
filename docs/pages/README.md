@@ -1,7 +1,8 @@
 # Page docs
 
-The site is one page. There is a single page doc set: `home/`, covering the nav, every section and
-the footer. It's split so agents load only what they need:
+The site is one page, plus one extra route. There are two page doc sets: `home/`, covering `/`, the
+nav, every section and the footer, and `rix/`, covering the `/rix` Rix playground (constitution §2).
+Each is split the same way so agents load only what they need (paths below shown for `home/`):
 
 - `page.md`: the index — title, status, the one question, the Sections table (linking each row to
   its section file), and everything **site-wide**: overall Current State, site-wide Key Files,
@@ -107,7 +108,7 @@ site-wide open questions plus a one-line roll-up naming which section files stil
 questions.
 
 1. Each open question is one line with one of three tags:
-   - **Fact:** a value the user fills in `docs/03-facts.md`. List only the field names; never
+   - **Fact:** a value still missing from `docs/03-facts.md`. List only the field names; never
      copy the value or the `[FILL]` text, so the line can't go stale.
    - **Choice:** a decision for the user. The lead asks it with `AskUserQuestion` in
      page-workflow Phase 1, before any agent is briefed.

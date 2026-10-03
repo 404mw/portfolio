@@ -7,8 +7,8 @@
 // ProcessBot maps them to token fill classes. `botPivots` gives the motion every pivot, so it
 // never measures the SVG.
 
-/** A bot's job, one per step. */
-export type BotRole = "rules" | "team" | "check" | "update";
+/** A bot's job: one per Process step, plus About's `host` (no hat, no tools, idle arms). */
+export type BotRole = "rules" | "team" | "check" | "update" | "host";
 
 /** A bot's static pose. */
 export type BotPose = "idle" | "act";
@@ -53,7 +53,7 @@ export type BotRig = {
   readonly hat: readonly BotShape[];
   /** Team only: the sparks group (hidden at rest) and its sparks. */
   readonly sparks: readonly BotShape[] | null;
-  /** Rules and update only: the zzz group and its three z's (each hidden at rest). */
+  /** Rules, update and About's host only: the zzz group and its three z's (each hidden at rest). */
   readonly zzz: readonly BotShape[] | null;
 };
 
@@ -104,6 +104,7 @@ const looks: Record<BotRole, Record<BotPose, Look>> = {
   team: { idle: 0, act: 7 },
   check: { idle: 0, act: 7 },
   update: { idle: 0, act: -7 },
+  host: { idle: 0, act: 7 },
 };
 
 /** Each role's hat parts. */
@@ -120,6 +121,7 @@ const hats: Record<BotRole, readonly BotShape[]> = {
   ],
   check: [],
   update: [],
+  host: [],
 };
 
 /** Each role's left-hand tools, after the left arm. */
@@ -140,6 +142,7 @@ const leftTools: Record<BotRole, readonly BotShape[]> = {
     path("M-17 46h8v3h-8Z", "I", { hook: "mark" }),
     path("M-21 40h13v24h-13Z", "D", { hook: "page", shownIn: hidden }),
   ],
+  host: [],
 };
 
 /** Each role's right-hand tool, at its idle geometry (the `tool` group). */
@@ -162,6 +165,7 @@ const tools: Record<BotRole, readonly BotShape[]> = {
       "M",
     ), // wrench jaws
   ],
+  host: [],
 };
 
 /** Team's sparks at the hammer's strike point (the group is hidden at rest). */
@@ -191,7 +195,7 @@ export function botRig(role: BotRole, pose: BotPose): BotRig {
     tool: tools[role],
     hat: hats[role],
     sparks: role === "team" ? sparks : null,
-    zzz: role === "rules" || role === "update" ? zzz : null,
+    zzz: role === "rules" || role === "update" || role === "host" ? zzz : null,
   };
 }
 

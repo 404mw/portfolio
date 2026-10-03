@@ -1,9 +1,9 @@
 # Home
 
-**Last Updated:** 2026-09-28 (proof bot depth: continuous extrusion replaces stacked steps)
+**Last Updated:** 2026-10-03 (`/rix` built; nav links are `/#…`; footer links to `/rix`)
 
-> **Status:** GSAP motion pass complete for all sections; next: deploy prep (pre-push audit, then
-> deploy)
+> **Status:** GSAP motion pass complete for all nine built sections; About: option B live on /; the
+> Rix playground is built at /rix (doc: `docs/pages/rix/page.md`)
 
 **The one question:** Can they help me?
 
@@ -17,6 +17,7 @@ plus that section's file only.
 |---|---|---|---|---|---|
 | 1 | Nav | Where can I go, and how do I book a call? | `docs/03-facts.md` → Contact | Built, motion done | `sections/01-nav.md` |
 | 2 | Hero | Who is this? | `docs/03-facts.md` → Who | Built, motion done | `sections/02-hero.md` |
+| 2a | About | Can he help someone like me? | `docs/03-facts.md` → Who (more needed) | Option B live on /; the Rix playground is built at /rix | `sections/02a-about.md` |
 | 3 | Marquee | (transition, no claim) | none | Built, motion done | `sections/03-marquee.md` |
 | 4 | Agents | What can their agents handle for my business? | `docs/03-facts.md` → What the user builds | Built, motion done | `sections/04-agents.md` |
 | 5 | Process | How do they work? | `docs/03-facts.md` → How the user works | Built, motion done | `sections/05-process.md` |
@@ -136,6 +137,10 @@ test passes, and no sideways scroll at 360/767/1440/3840. See `sections/07-proof
   leftover transform
 - `lib/revealBatch.ts` — the shared staggered list reveal (`ScrollTrigger.batch`, same from-state
   as the generic reveal), used by Web's rows and Proofs' cards
+- `components/WhatsAppLink.tsx` — the shared WhatsApp link, its `href` following an About pick;
+  used by Contact's side row (`ContactRow`/`ContactLinks`) and the footer (`FooterLinks`)
+- `components/TypingBubble.tsx` — the shared typing-dots bubble, used by Agents' `ChatDemo`
+- `lib/styles.ts` `chip` — the shared chip shape (44px tall), used by Contact's need chips
 
 ## Decisions (site-wide)
 
@@ -188,14 +193,28 @@ test passes, and no sideways scroll at 360/767/1440/3840. See `sections/07-proof
 - 2026-09-28 — User's choice: MARWIX-SKILLS is hidden temporarily (card and takeover) behind one
   flag; content and code stay. Two shown projects sit two across from `md` up, full width, no empty
   third slot. See `sections/07-proofs.md`.
+- 2026-10-02 — The user amended constitution §2 to allow one extra route, `/rix`: a public Rix
+  playground with its own page doc at `docs/pages/rix/`.
+- 2026-10-01 — Launch is on hold until the new About section (see `sections/02a-about.md`) is
+  spec'd, built and approved.
 
 ## Open Questions (site-wide)
 
 - **To do (user):** create a free Umami Cloud account, add the website marwix.dev and send the
   lead its website ID; it's set as `NEXT_PUBLIC_UMAMI_WEBSITE_ID` in Vercel and needs a redeploy.
 - **Constitution:** the user to add the takeover/Book a call exception under §3.
+- **Choice:** Agents and Process will change per the visitor's About reply. The user has said that
+  in Process both the steps and the bots change per visitor (not only the words), and that the
+  default view (no reply / "Just looking") is one the user will define. Projects stay the same for
+  everyone. Both sections are yet to be decided in detail.
 - **Roll-up:** section-specific open questions remain in `sections/02-hero.md` (4),
-  `sections/04-agents.md` (2), `sections/05-process.md` (7), `sections/07-proofs.md` (10),
-  `sections/08-contact.md` (1) and `sections/09-footer.md` (2). The
+  `sections/02a-about.md` (1), `sections/04-agents.md` (2), `sections/05-process.md` (7),
+  `sections/07-proofs.md` (10), `sections/08-contact.md` (1) and `sections/09-footer.md` (3). The
   pre-deploy check reads this roll-up and every section file; the page ships with none open
   anywhere.
+- **To build:** screen re-check of `/` and `/rix` after the motion pass (pending). `/rix` is built
+  (doc: `docs/pages/rix/page.md`). Lint is green and tsc has no errors outside `.next/`;
+  `npm run build` fails only on a stale `.next/dev/types/validator.ts` that still references the
+  deleted `app/dev`, which clears once the dev server regenerates it or `.next/dev` is removed.
+- **Fact:** the About Fact copy (`content/home.ts` → `about`) is still SAMPLE (see
+  `sections/02a-about.md`).

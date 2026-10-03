@@ -4,6 +4,7 @@
 export const sectionIds = {
   main: "main",
   top: "top",
+  about: "about",
   agents: "agents",
   process: "process",
   web: "web",

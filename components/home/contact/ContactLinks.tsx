@@ -1,5 +1,5 @@
 // The Contact side links (ui-spec §8.1): Book a call (Cal.com, counted), the email address
-// (mailto) and WhatsApp click-to-chat.
+// (mailto) and WhatsApp click-to-chat (its message follows an About pick).
 import { ContactRow } from "@/components/home/contact/ContactRow";
 import { contact } from "@/content/home";
 import { links, nav } from "@/content/shared";
@@ -21,12 +21,7 @@ export function ContactLinks() {
         <ContactRow href={links.email} label={links.emailAddress} kind={contact.links.email.kind} />
       </li>
       <li>
-        <ContactRow
-          href={links.whatsapp}
-          label={contact.links.whatsapp.label}
-          kind={contact.links.whatsapp.kind}
-          newTab
-        />
+        <ContactRow whatsapp label={contact.links.whatsapp.label} kind={contact.links.whatsapp.kind} />
       </li>
     </ul>
   );

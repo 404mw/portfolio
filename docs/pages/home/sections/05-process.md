@@ -123,7 +123,7 @@ cleanly and restarts in the right geometry; desktop behaviour is unchanged.
 - `components/home/process/` — ProcessSection, ProcessList, ProcessStep, ProcessBot, ProcessReturn,
   ProcessMotion
 - `lib/processBots.ts` — the bots' vector geometry (body strips, eyes, hats, tools) and each step's
-  role/static pose
+  role/static pose; now also holds the bare `host` role (no hat/tools) used by About's mascot
 - `hooks/useProcessBots.ts` (wiring)
 - `lib/processBotMotion.ts` (constants)
 - `lib/processBotRig.ts` (hooks, pivots, summed channels, reset)

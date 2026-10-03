@@ -18,6 +18,79 @@ export const hero = {
   portraitAlt: "Muhammad Waqas, head and shoulders, in black and white, with glasses, a beard and a dark collared shirt, looking to one side.",
 } as const;
 
+// SAMPLE: preview only. Replace with facts from docs/03-facts.md before shipping (sections/02a-about.md → Open Questions).
+// Unnumbered (user's answer). Rix speaks for the user: acks say "MARWIX" (the brand, third person), never "I".
+// Acks use facts → What the user builds (communities: Exile); no result is promised.
+// whatsappText is the visitor's own default message; the address stays in content/shared.ts.
+export const about = {
+  label: "About me",
+  heading: { lead: "Software that", accent: "runs on its own." },
+  lines: [
+    "I'm an AI Automation Engineer. I automate the work a business repeats.",
+    "I take customer messages, follow-ups and reports off your plate.",
+  ],
+  prompt: "What do you do? Pick the closest one.",
+  // Rix, the mascot (About on home and the playground on /rix). Playful, no claims.
+  rix: {
+    buttonLabel: "Poke Rix",
+    pokeLines: [
+      "Hey! That tickles.",
+      "Again? Bold move.",
+      "I'm not a button.",
+      "You poke, I bounce.",
+      "Fun. Now pick one?",
+    ],
+    nudgeLines: ["Go on, pick one.", "Which one are you?", "Just looking counts too."],
+    // Poke ladder (ui-spec/00-rix.md R6A, R12.1). Shown and announced: annoyed, angry.
+    // Shown, never announced: sulk, forgive. throwAway is screen-reader only.
+    annoyedLines: ["Okay, that's plenty.", "Easy. I'm counting pokes.", "One more and I'm off."],
+    angryLines: ["That's it. I'm done!", "Hmph! No more pokes!"],
+    sulkLine: "I'm not talking.",
+    forgiveLine: "Fine. We're friends.",
+    throwAway: "Rix threw your pick away in a huff. You can pick again.",
+    // The pet (ui-spec/00-rix.md R6B, R12.1). Shown in turn, never announced.
+    petLines: ["Aw, that's nice.", "Okay, don't stop."],
+  },
+  replies: [
+    {
+      key: "small-business",
+      label: "Small business",
+      ack: "Answering customers and booking appointments by hand? MARWIX can take both off you.",
+      whatsappText: "Hi Marwix, I run a small business and I'd like to talk about automating it.",
+    },
+    {
+      key: "communities",
+      label: "Online community",
+      ack: "Spam, raids and routine moderation? MARWIX can set up a bot that handles them.",
+      whatsappText: "Hi Marwix, I run an online community and I'd like to talk about automating it.",
+    },
+    {
+      key: "startups",
+      label: "Startup team",
+      ack: "Leads waiting on a reply? MARWIX can follow up and send your recurring reports.",
+      whatsappText: "Hi Marwix, we're a startup and I'd like to talk about automating our work.",
+    },
+    {
+      key: "agencies",
+      label: "Agency or freelancer",
+      ack: "Recurring client reports? MARWIX can send them on schedule and connect your tools.",
+      whatsappText: "Hi Marwix, I work with clients and I'd like to talk about automating my work.",
+    },
+    {
+      key: "creators",
+      label: "Creator",
+      ack: "The same messages, every day? MARWIX can answer those and follow up on enquiries.",
+      whatsappText: "Hi Marwix, I'm a creator and I'd like to talk about automating my work.",
+    },
+    {
+      key: "just-looking",
+      label: "Just looking",
+      ack: "Fair enough. Scroll on to see what MARWIX builds.",
+      whatsappText: "Hi Marwix, I'd like to talk about automating my business",
+    },
+  ],
+} as const;
+
 export const marquee = {
   items: [
     "Specialized agents",

@@ -44,6 +44,9 @@ export const metaLabel = "font-mono text-meta text-muted";
 /** `metaLabel` on cream (proof cards, the takeover): mono, 12px, `cream-muted`. */
 export const metaLabelOnCream = "font-mono text-meta text-cream-muted";
 
+/** The chip shape, no state classes (Contact's need chips, About's reply chips): 44px tall. */
+export const chip = "inline-flex min-h-11 items-center gap-2 rounded-full border px-4.5 text-body";
+
 /** The primary pill: accent background, 48px tall. */
 export const pillPrimary = `inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 text-body font-semibold text-on-accent hover:bg-text active:bg-muted ${focusRing}`;
 

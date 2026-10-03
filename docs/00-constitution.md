@@ -1,6 +1,6 @@
 # Constitution
 
-**Last Updated:** 2026-09-25
+**Last Updated:** 2026-10-02
 
 The non-negotiable rules for `marwix.dev`. Every implementation decision is checked against them.
 They exist to stop scope creep, unsupported claims and rework.
@@ -24,12 +24,18 @@ v1 is a **single page at `/`** that answers one question: **can they help me?** 
 it answers exactly one smaller question and reads in a 3–5 second skim. Projects open in a
 full-screen takeover on the same page, not on their own routes. English only.
 
-**Not in v1:** other routes, a blog, a services or pricing page.
+**The one exception is `/rix`:** the Rix playground, where a visitor presses buttons to make the
+mascot act out its emotions, moves and plays. It makes no claims and has its own page doc
+(`docs/pages/rix/`).
+
+**Not in v1:** any other route, a blog, a services or pricing page.
 
 ## 3. The reader and the main action
 
-The reader is a **non-technical small-business owner** who might hire the user, usually sent the
-link directly. **"Book a call" is the main action** and stays visible in the nav.
+The reader is **someone who isn't technical and might hire the user**: a small-business owner, a
+community owner, a founder, an agency or a creator, usually sent the link directly. Every section
+is written so any of them can follow it. **"Book a call" is the main action** and stays visible in
+the nav.
 
 - Section order lives in `docs/pages/home/page.md`; the nav and every section's content live in its
   file under `docs/pages/home/sections/`, not here.

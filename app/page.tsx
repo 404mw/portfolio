@@ -1,3 +1,4 @@
+import { AboutPosterSection } from "@/components/home/about/poster/AboutPosterSection";
 import { AgentsSection } from "@/components/home/agents/AgentsSection";
 import { ContactSection } from "@/components/home/contact/ContactSection";
 import { HeroSection } from "@/components/home/hero/HeroSection";
@@ -15,6 +16,7 @@ export default function Home() {
   return (
     <>
       <HeroSection />
+      <AboutPosterSection />
       <MarqueeStrip />
       <AgentsSection />
       <ProcessSection />

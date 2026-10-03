@@ -35,7 +35,8 @@ sideways scroll, no console errors beyond the known favicon 404.
 ## Key Files
 
 - `components/home/agents/` — AgentsSection, AgentsTabs, AgentsStack (variant A's no-JS
-  fallback), AgentRowText, AgentDemoFrame, AgentDemo, ChatDemo, LeadsDemo, ReportDemo, SyncDemo,
+  fallback), AgentRowText, AgentDemoFrame, AgentDemo, ChatDemo (its typing dots are the shared
+  `components/TypingBubble.tsx`, now also used by About's thread), LeadsDemo, ReportDemo, SyncDemo,
   DemoStatusPill
 - `hooks/useRovingTabs.ts` — roving-tabindex keyboard behaviour for variant A's tablist; `select`
   never moves focus, only the keyboard path does

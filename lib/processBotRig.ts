@@ -1,9 +1,9 @@
 // One process bot's rig for the motion pass (ui-spec §5.6 hook table, §5.7 channels): finds the
 // bot's `data-bot` hooks, sets every pivot once with `svgOrigin` (from `botPivots`, never measured),
 // and owns the summed channels. The summed and ridden properties (rig rotation = sway + lean + act
-// tilt; arm rotation = drift × mix + act; the breath and its riders; the eyes' look) are plain
-// numbers on `bot.ch`, tweened by the life, act and pointer code and written to the DOM by one
-// `apply` per frame, so each DOM property has exactly one writer. The rest (upper, feet, tools,
+// tilt; arm rotation = drift × mix + act; the breath and its riders; the eyes' look, plus the
+// host's perpendicular look) are plain numbers on `bot.ch`, tweened by the life, act and pointer
+// code and written to the DOM by one `apply` per frame, so each DOM property has exactly one writer. The rest (upper, feet, tools,
 // effects, eye attributes) are tweened directly, one state at a time.
 //
 // `resetBot` puts the SVG back exactly as server-rendered: no `transform`, `style` or
@@ -62,6 +62,11 @@ export type BotChannels = {
   look: number;
   pointerLook: number;
   pointerMix: number;
+  /**
+   * The host-only perpendicular look (+ = down-right), added to both eye axes so targets below the
+   * bot read (02a-about-options §2a.O4). Process never sets it, so it stays 0 there.
+   */
+  perp: number;
 };
 
 export type Bot = {
@@ -104,10 +109,11 @@ const restChannels = (restLook: number): BotChannels => ({
   look: restLook,
   pointerLook: restLook,
   pointerMix: 0,
+  perp: 0,
 });
 
 const isRole = (value: string | undefined): value is BotRole =>
-  value === "rules" || value === "team" || value === "check" || value === "update";
+  value === "rules" || value === "team" || value === "check" || value === "update" || value === "host";
 
 /** The bot in `svg` (a `[data-anim="process-bot"]`), or null if its rig is incomplete. */
 export function findBot(svg: SVGSVGElement, index: number): Bot | null {
@@ -195,7 +201,7 @@ export function rigBot(bot: Bot) {
   eyePivots(bot.restLook).forEach((point, i) => pivot(parts.eye[i] ?? null, point));
   pivot(parts.armLeft, botPivots.armLeft);
   pivot(parts.armRight, botPivots.armRight);
-  if (role !== "rules") pivot(parts.tool, botPivots.tool[role]);
+  if (role !== "rules" && role !== "host") pivot(parts.tool, botPivots.tool[role]);
   pivot(parts.hat, botPivots.hat);
   if (role === "rules" || role === "update") {
     botPivots.marks[role].forEach((point, i) => pivot(parts.marks[i] ?? null, point));
@@ -235,8 +241,8 @@ function channelWriter(bot: Bot): () => void {
     next[4] = next[2];
     next[5] = ch.driftR * ch.mixR * ch.life + ch.actR;
     next[6] = -HAT_LIFT * breath;
-    next[7] = look;
-    next[8] = -look;
+    next[7] = look + ch.perp;
+    next[8] = -look + ch.perp;
     for (let i = 0; i < setters.length; i += 1) {
       if (Math.abs(next[i] - last[i]) > 1e-4) {
         last[i] = next[i];

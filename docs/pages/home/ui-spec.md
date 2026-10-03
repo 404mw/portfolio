@@ -1,6 +1,6 @@
 # Home: UI spec
 
-**Last Updated:** 2026-09-28
+**Last Updated:** 2026-10-01
 **Sources:** `docs/pages/home/page.md` (decisions 1–44, the source of truth), constitution §2–§9,
 `docs/01-design-system.md`, `app/globals.css`, v3 reference (layout and behaviour only),
 `docs/03-facts.md`, `docs/04-voice.md`.
@@ -14,8 +14,11 @@ file plus the one section you work on. The § numbers stay as they were (for exa
 
 | § | Section | UI spec | Page doc |
 |---|---|---|---|
+| — | Rix character sheet: the mascot, defined once (new 2026-10-02; used first by §2a option B, later by Process) | [`ui-spec/00-rix.md`](ui-spec/00-rix.md) | [`sections/02a-about.md`](sections/02a-about.md) |
 | 1 | Nav | [`ui-spec/01-nav.md`](ui-spec/01-nav.md) | [`sections/01-nav.md`](sections/01-nav.md) |
 | 2 | Hero | [`ui-spec/02-hero.md`](ui-spec/02-hero.md) | [`sections/02-hero.md`](sections/02-hero.md) |
+| 2a | About (new 2026-10-01; spec only, not built) | [`ui-spec/02a-about.md`](ui-spec/02a-about.md) | [`sections/02a-about.md`](sections/02a-about.md) |
+| 2a | About redesign: options A, B, C on `/dev` (temporary, 2026-10-01; the winner folds into `02a-about.md`) | [`ui-spec/02a-about-options.md`](ui-spec/02a-about-options.md) | [`sections/02a-about.md`](sections/02a-about.md) |
 | 3 | Marquee | [`ui-spec/03-marquee.md`](ui-spec/03-marquee.md) | [`sections/03-marquee.md`](sections/03-marquee.md) |
 | 4 | Agents | [`ui-spec/04-agents.md`](ui-spec/04-agents.md) | [`sections/04-agents.md`](sections/04-agents.md) |
 | 5 | Process | [`ui-spec/05-process.md`](ui-spec/05-process.md) | [`sections/05-process.md`](sections/05-process.md) |
@@ -33,10 +36,13 @@ file plus the one section you work on. The § numbers stay as they were (for exa
 - `app/layout.tsx`: `<SkipLink />`, `<SiteHeader />`, `<main id="main" tabIndex={-1}>`,
   `<SiteFooter />`. `app/page.tsx` renders, in order: Hero, Marquee, Agents, Process, Web, Proofs,
   Contact, then the three `<ProjectTakeover />` dialogs and `<TakeoverController />`.
+  **About (§2a, decided 2026-10-01):** `<AboutSection />` goes right after Hero, before Marquee.
+  Agents' frame is unchanged (still no `border-t`, under the marquee).
 - In-page ids live in `lib/routes.ts` (overwritten; one job: link targets): `top`, `agents`,
   `process`, `web`, `proofs`, `contact`, and the takeover hashes `exile`, `design-vault`,
   `marwix-skills`. Every section takes `scroll-mt-20` (80px) to clear the fixed header.
-- **Section frame** (Process, Web, Proofs, Contact, and Agents without the top line):
+  **2026-10-01:** `about` is added (§2a); no nav link for it (decided).
+- **Section frame** (Process, Web, Proofs, Contact, About, and Agents without the top line):
   `<section id class="px-gutter scroll-mt-20">` → `<div class="{container} py-section border-t border-line">`.
   The hairline spans the content width. Agents drops `border-t` (the marquee's bottom line is above it).
 - **Spacing tokens (approved 2026-09-24):** `--spacing-gutter` (`clamp(20px, 4vw, 56px)`) gives
@@ -72,19 +78,22 @@ file plus the one section you work on. The § numbers stay as they were (for exa
 | `pillPrimary` | `inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 text-body font-semibold text-on-accent hover:bg-text active:bg-muted` + `focusRing` | primary pill |
 | `pillOutline` | `inline-flex min-h-12 items-center justify-center rounded-full border border-line bg-bg/50 px-6 text-body text-text hover:border-accent hover:text-accent active:bg-band` + `focusRing` | secondary pill |
 | `pillInk` | `inline-flex items-center rounded-full bg-ink text-cream hover:bg-accent hover:text-on-accent active:bg-accent/80` + `focusRingOnCream` | ink pill on cream (takeover Close and Visit); height, padding, gap and type set where used |
+| `chip` (**new 2026-10-01**) | `inline-flex min-h-11 items-center gap-2 rounded-full border px-4.5 text-body` | the chip shape, no state classes: Contact's need chips (moved out of `NeedChips`) and About's reply chips (§2a), each adding its own state classes |
 
 ### 0.4 Shared components (all server unless marked)
 
 | File | Job |
 |---|---|
 | `components/SkipLink.tsx` | "Skip to content" to `#main`: `sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-60` + `pillPrimary` when focused |
-| `components/SectionLabel.tsx` | Number, a 24px hairline (`h-px w-6 bg-muted`, `aria-hidden`), label text, in `monoLabel`. Prop `as` (`h2` for Agents, `p` elsewhere). The hairline replaces v3's em dash (voice rule 10) |
+| `components/SectionLabel.tsx` | Number, a 24px hairline (`h-px w-6 bg-muted`, `aria-hidden`), label text, in `monoLabel`. Prop `as` (`h2` for Agents, `p` elsewhere). The hairline replaces v3's em dash (voice rule 10). **2026-10-01:** `number` is optional; without it (About, unnumbered) it renders the hairline, then the label |
 | `components/SectionHeading.tsx` | `<h2>` = `lead` + `<span class="text-accent">accent</span>`. Size prop `heading-sm` / `heading` / `heading-xl`. Base: `font-display font-semibold text-balance text-text` + `condensed`; `heading-sm`/`heading`: `leading-[0.95] tracking-[-0.025em]`; `heading-xl`: `leading-[0.9] tracking-[-0.03em]` (loosened from −0.04/−0.045em by the user's choice, 2026-09-24: letters touched at desktop sizes) |
 | `components/ExternalLink.tsx` | `<a target="_blank" rel="noopener noreferrer">` plus a `sr-only` suffix from `a11y.newTab` |
 | `components/BookCallLink.tsx` | The one Book a call link (Cal.com, `links.bookCall`), built on `ExternalLink`, carrying `data-track="book-call"`: the single place clicks are counted (§11). Prop `variant`: `nav` (1.2) or `hero` (2.1). The Contact row (8.1) is built by the shared contact-row component, not a variant here |
 | `components/SiteImage.tsx` | Every image: reads `lib/images.ts`, renders `next/image` with `fill`, `sizes`, `alt`, and an object-position prop. Renders `ImagePlaceholder` when the entry's file is `null` |
 | `components/ImagePlaceholder.tsx` | Build-time stand-in: `grid size-full place-items-center border border-dashed` with a mono name label. On cream: `bg-ink/5 border-ink/20 text-cream-muted`; on dark: `bg-band border-line text-muted` |
 | `components/icons/{Menu,Close,ArrowRight,ArrowUpRight,Check,ChevronUp,Asterisk}Icon.tsx` | One glyph each: inline SVG, `currentColor`, `aria-hidden="true"`, `focusable="false"` |
+| `components/TypingBubble.tsx` (**new 2026-10-01**, §2a) | The three-dot typing bubble, moved out of `ChatDemo` so Agents and About share it: `hidden items-center gap-1.5 rounded-xl bg-line/40 px-4.5 py-4`, three `size-1.5 rounded-full bg-muted`, `aria-hidden`. Prop `side` (`start` adds `self-start rounded-tl-sm`, `end` adds `self-end rounded-br-sm`) and its `data-anim` value |
+| `components/WhatsAppLink.tsx` (**new 2026-10-01**, client, §2a.2) | The WhatsApp link, built on `ExternalLink`: server markup uses `links.whatsapp`; after an About pick its `href` carries that group's `whatsappText` (`hooks/useAboutPick.ts`, `lib/whatsapp.ts`). Used by the Contact WhatsApp row and the footer socials; look unchanged |
 
 - `lib/images.ts`: each name → `{ dark: string | null }`. A `null` file fails the ship check, like
   a `[FILL]` marker. Names are listed in each section's file.
@@ -143,15 +152,53 @@ rotation), the 2026-09-27 relay dot, the 2026-09-28 filed-into-the-rulebook/crea
 the relay job, the 2026-09-28 20s/3s-dwell/left-of-the-bots numbers, and the 2026-09-28 16s/job-rides-
 the-return version (each superseded the same day, the last by the lead's screen check), and the
 below-`lg` 9s catch cascade (2026-09-28, the phone relay, §5.9).
+**About (§2a.7, new 2026-10-01, not built):** the intro and the chat panel use `reveal` (panel
++150ms). The mascot is a `ProcessBot` with `data-role="host"` (the same `process-bot` and
+`data-bot` hooks), run by `hooks/useAboutBot.ts` on the About root with the Process rig, life,
+acts and pointer modules: a once-per-load drop onto the panel's top edge, then life, blinks, looks,
+pointer follow and the hover/tap jump; no naps; its act is a wave (`arm-right`), played as the
+prompt appears and on each pick. `about-typing` (the shared `TypingBubble`) shows before the
+prompt (`about-prompt`) and before each ack; `about-chip`s fade up staggered; on a pick the
+`about-pair`'s `about-echo` then `about-ack` pop in. `about-status-dot` loops its opacity. All
+pause off screen and in a hidden tab. Under reduce: no mascot movement (static pose, fades in with
+the panel), no typing step, no pulse; bubbles and chips only fade.
 
 ## Tokens
 
 - **Approved 2026-09-24:** `--spacing-gutter: clamp(20px, 4vw, 56px)` and
   `--spacing-section: clamp(80px, 12vw, 160px)`. Both are in `app/globals.css` `@theme` and the
   `docs/01-design-system.md` change log.
-- **To request:** none.
+- **To request:** none. (About, §2a, uses existing tokens only.)
 
 ## Choices
+
+**About, §2a: answered by the user 2026-10-01 (decided unless marked open):**
+
+1. **Placement — decided:** right after the Hero, before the Marquee (as recommended).
+2. **Section number — decided:** About stays **unnumbered** (the user's choice; the recommendation
+   was "01"). No `about.number` slot; Agents–Contact keep 01–05; the label shows without a number
+   (`SectionLabel`'s `number` is optional, §0.4).
+3. **What a pick does — decided, B:** the acknowledgement, plus every existing WhatsApp link (the
+   Contact row, the footer) carrying that group's default message (`whatsappText`); no new button.
+4. **No-JS path — decided:** native radios with CSS `:has` showing the reply.
+5. **Intro shape — decided:** a display heading plus 1–2 lead lines.
+6. **One question — decided:** the skim question is "Can he help someone like me?"; the "who I
+   am" lines are its set-up.
+7. **Reader (constitution §3) — open:** widening the reader beyond small-business owners needs the
+   user's own amendment before the preview is built.
+8. **Nav link — decided:** none for About.
+9. **`?for=` — decided:** applied in the browser after load; the page stays static, a pick doesn't
+   rewrite the URL and isn't remembered across reloads.
+10. **Redesign — decided 2026-10-01:** About is no longer a chat. Three options (A Stage, B Poster
+    board, C Fill in the blank) are built on `/dev`, and the user picks one there after the build.
+    - **Reduced motion:** one nudge, a single fade-in line.
+    - **Nudges stop** after 4, or on any pick.
+    - **The group props** are samples until the real groups come in.
+    - **`/dev`** runs under `next dev` only and 404s in every build.
+    - **The lead's defaults** stand.
+    - **`about.chat.title`** stays until the old build is removed.
+
+    See [`ui-spec/02a-about-options.md`](ui-spec/02a-about-options.md) §2a.O7.
 
 **Open for the lead:** Proof cards at `md` go two across, with MARWIX-SKILLS alone on row two at
 the same width, left-aligned, so all three stay identical. The alternatives were one column

@@ -271,12 +271,14 @@ const acts: Record<BotRole, (bot: Bot, length: Length) => gsap.core.Timeline> = 
   team: teamAct,
   check: checkAct,
   update: updateAct,
+  // About's host: a neutral nod for now; its wave comes with the About motion pass (§2a.7).
+  host: (bot) => nod(bot),
 };
 
 // Naps.
 
-/** The z's rise and fade, one after another, looping, until the bot wakes. */
-function startZzz(bot: Bot, crew: Crew) {
+/** The z's rise and fade, one after another, looping, until the bot wakes (Rix's nap reuses it). */
+export function startZzz(bot: Bot, crew: Crew) {
   bot.zzz?.kill();
   const loop = gsap.timeline();
   bot.parts.z.forEach((z, i) => {
