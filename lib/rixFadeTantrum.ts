@@ -4,7 +4,8 @@
 // release runs (the deselect and `throwAway`), so the pick's state matches full motion. No stomp,
 // shake, flee, slant, turn or hmph. The sulk window runs `TANTRUM.fleeAt` + `SULK.hold` from the
 // start: presses in it do nothing (the caller's verdict), `sulkLine` fades in after the angry line
-// has gone, and `forgiveLine` at the end, when `done` resets the ladder. Timers run in the crew.
+// has gone, and `forgiveLine` at the end, when `done` resets the ladder. On home's About the picks
+// lock for the whole window (R6A.9): `lock` at the start, `unlock` at its end. Timers run in the crew.
 import { about } from "@/content/home";
 import { gsap } from "@/lib/gsap";
 import { duration, ease } from "@/lib/motion";
@@ -19,12 +20,19 @@ export type FadeTantrumOptions = {
   readonly thrown: { readonly prop: Element; readonly ack: Element | null } | null;
   /** The deselect and `throwAway` (R6A.4 steps 1–5). */
   readonly release: () => void;
+  /** Home's About: the picks lock at the start and unlock at the window's end (R6A.9). */
+  readonly lock?: () => void;
+  readonly unlock?: () => void;
   readonly done: () => void;
 };
 
 /** Plays the faded tantrum with `line`; returns its cancel. */
-export function fadeTantrum(line: string, { crew, say, announce, thrown, release, done }: FadeTantrumOptions): () => void {
+export function fadeTantrum(
+  line: string,
+  { crew, say, announce, thrown, release, lock, unlock, done }: FadeTantrumOptions,
+): () => void {
   const tl = gsap.timeline();
+  lock?.();
   say(line);
   if (thrown) {
     const parts = thrown.ack ? [thrown.prop, thrown.ack] : [thrown.prop];
@@ -43,6 +51,7 @@ export function fadeTantrum(line: string, { crew, say, announce, thrown, release
     () => {
       say(about.rix.forgiveLine);
       done();
+      unlock?.();
     },
     [],
     REDUCED_SULK.end,

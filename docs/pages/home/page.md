@@ -1,9 +1,16 @@
 # Home
 
-**Last Updated:** 2026-10-03 (`/rix` built; nav links are `/#…`; footer links to `/rix`)
+**Last Updated:** 2026-10-06
 
-> **Status:** GSAP motion pass complete for all nine built sections; About: option B live on /; the
-> Rix playground is built at /rix (doc: `docs/pages/rix/page.md`)
+> **Status:** In build. All nine sections are built; the per-card redesign of About, Agents and
+> Process is built (2026-10-03): the About pick sets Agents' offers and Process' flow. The motion
+> pass for Agents and Process (relay, demo sequences, swap fade) is built and lead-checked
+> (2026-10-04); Process' phone ledges and Agents' new Discord demos are built and lead-checked
+> (2026-10-05). The Rix playground is built at /rix (doc: `docs/pages/rix/page.md`). The project
+> takeover is rebuilt static as up to seven parts and lead-checked (2026-10-05). Open: the user's calls on
+> copy and the ledges, the takeover's motion pass (parts 5 and 6 and the `useTakeoverMotion`
+> re-test), the code-auditor pass on the Exile Bot three-shot round (before the push), and the
+> screen re-check below.
 
 **The one question:** Can they help me?
 
@@ -17,10 +24,10 @@ plus that section's file only.
 |---|---|---|---|---|---|
 | 1 | Nav | Where can I go, and how do I book a call? | `docs/03-facts.md` → Contact | Built, motion done | `sections/01-nav.md` |
 | 2 | Hero | Who is this? | `docs/03-facts.md` → Who | Built, motion done | `sections/02-hero.md` |
-| 2a | About | Can he help someone like me? | `docs/03-facts.md` → Who (more needed) | Option B live on /; the Rix playground is built at /rix | `sections/02a-about.md` |
+| 2a | About | Can he help someone like me? | `docs/03-facts.md` → Who (more needed) | Built, per-card pick (six cards); the Rix playground is built at /rix | `sections/02a-about.md` |
 | 3 | Marquee | (transition, no claim) | none | Built, motion done | `sections/03-marquee.md` |
-| 4 | Agents | What can their agents handle for my business? | `docs/03-facts.md` → What the user builds | Built, motion done | `sections/04-agents.md` |
-| 5 | Process | How do they work? | `docs/03-facts.md` → How the user works | Built, motion done | `sections/05-process.md` |
+| 4 | Agents | What can their agents handle for my business? | `docs/03-facts.md` → What the user builds | Built per card; swimlane orchestra, phone stepper, entrance, auto-advance, demo replays and swap fade run | `sections/04-agents.md` |
+| 5 | Process | How do they work? | `docs/03-facts.md` → How the user works | Built per card; bot life, crew relay and swap fade run | `sections/05-process.md` |
 | 6 | Web | Can they build my website end-to-end? | `docs/03-facts.md` → What the user can build | Built, motion done | `sections/06-web.md` |
 | 7 | Projects (formerly Proofs) | Have they built something real that people use? | `docs/03-facts.md` → Work that is live | Built, motion done | `sections/07-proofs.md` |
 | 8 | Contact | How do I start? | `docs/03-facts.md` → Contact | Built, motion done | `sections/08-contact.md` |
@@ -29,25 +36,44 @@ plus that section's file only.
 ## Current State (site-wide)
 
 All nine sections are built statically; section detail lives in `sections/`. Build, lint and tsc
-are green, and the lead re-checked 360/1024/1280/1440/3840 after the latest fixes: every title
-column pins from `lg` except Proofs and Process (neither pins), and nothing scrolls sideways. Type
-tokens are rem-based (zoom-safe). Every batch has been audited; all HIGH and SHOULD items are fixed
-or decided. Counting is wired (Umami Cloud).
+are green (lead's production-build check, 2026-10-03: 360, 768, 1024, 1440 and 3840 have no
+sideways scroll, no tap target under 44px and no console errors). Every title column pins from
+`lg` except Proofs and Process (neither pins). Type tokens are rem-based (zoom-safe). Counting is
+wired (Umami Cloud).
 
-The GSAP motion pass is complete for every section (see each section's file for detail): the Hero
+The About pick (the checked radio in About's group) is the one source for three sections: About's
+ack and Rix's emblem, Agents' offers and panels, and Process' five- or six-step flow. Agents and
+Process swap with a fade (0.15s out, 0.25s in, opacity only, the same under reduced motion) from one
+shared store (`lib/shownSet.ts`), so they and the bots change in one commit
+(`lib/aboutPick.ts` `pickSet` gives `default` or a card's set). A "Shown for" tag
+(`components/home/pick/ShownForTag.tsx`) sits in Agents and Process and changes the pick in place.
+The pick is remembered for the visit in session storage (`lib/aboutMemory.ts`), and a `?for=` link
+wins the first time that value is seen (`hooks/useAboutFor.ts`). Without JavaScript both sections
+render the `default` set and the tags are hidden. Lead-checked: `?for=` sets both sections, the tag
+sets the pick everywhere by pointer and by keyboard, and the pick survives a reload.
+
+The GSAP motion pass is complete for the nine sections: the Hero
 (section 2), Nav's progress bar fill and band/menu fades (1), the Marquee's loop (3), Agents'
-scroll entrance, 6s auto-advance and demo replays (4), Process' bot breathing/frame swaps (being
-redone as smooth motion, see `sections/05-process.md`) and header/step reveals (5), Web's row
+scroll entrance, 6s auto-advance, stepper bars, demo sequences, Report bar hover and swap fade (4), Process' smooth
+bot life, header/step reveals, crew relay and swap fade (5; `RELAY_ON = true`), Web's row
 reveal and hover indent (6), Proofs' card reveal/lift and the
 takeover's clip-path open/close/Next-slide motion (7), Contact's column reveal and rotating brief
 placeholder (8), and the Footer's wordmark reveal (9). The lead browser-checked 360/1024/1440/3840
 in full and reduced motion: nothing scrolls sideways at any point (including mid footer animation),
 no console errors, and no reveal is left stuck hidden; the Proofs takeover's open/Esc/Back
-mid-open/Next/double-Esc/direct-load+Back all end in the right state at 360 and 1440. Next: deploy
-prep (a pre-push audit), then deploy.
+mid-open/Next/double-Esc/direct-load+Back all end in the right state at 360 and 1440. The Agents
+and Process motion pass was lead-checked 2026-10-04 (lint, tsc and build green; 360, 768, 1024,
+1440 and 3840 in full and reduced motion: no sideways scroll, no console errors, nothing left dimmed
+after a swap). Next: deploy prep (a pre-push audit).
 
 Site-wide, in `app/globals.css`: the scrollbar is an accent thumb on a transparent track, and text
-selection plus image dragging are off (inputs, textarea and contenteditable stay selectable). The
+selection plus image dragging are off (inputs, textarea and contenteditable stay selectable), and
+any text that does get selected (form fields, browsers that ignore `user-select`) shows the accent
+background with the opposite of its own colour: light text (`text`, `cream`, `muted`) selects as ink
+(about 9:1), dark text (`ink`, `on-accent`, `bg`, `cream-muted`) as off-white (about 2:1, only on
+cream and accent surfaces). Text-colour classes set an inherited `--selection-text` in `@layer base`
+that `::selection` reads, so the nearest class wins at any depth; checked and pressed states have
+their own selectors, and hover-only or opacity-suffixed colours inherit the parent's. The
 favicon is served from `app/icon.svg` and `app/apple-icon.png` (the mascot mark).
 
 Built and verified 2026-09-26: the Proofs section is renamed Proofs → Projects in every visible
@@ -103,20 +129,70 @@ depth-copy steps that showed stair steps and colour bands at two-across sizes. L
 production build: solid side faces with no stair steps at 1440 and in a 3840 close-up, the motion
 test passes, and no sideways scroll at 360/767/1440/3840. See `sections/07-proofs.md`.
 
+The workflow offer's `orchestra` demo (three swimlanes, eight rows) and Process' step 4-to-3 fix
+loop are built, with motion (the orchestra's token run; the fix hop on every second relay run).
+Below `lg`, Agents swaps its tab list for one shared stepper above the panel (‹ / ›, counter and
+title, bars filling on the 6s clock, the offer's line). Lead-checked 2026-10-04 at 360 to 3840: no
+sideways scroll, no console errors, no clipped text in the chart. See `sections/04-agents.md` and
+`sections/05-process.md`.
+
+Process' Discord flow is the one flow with no loops: five steps (Mentioned, Your tone, Remembers,
+Connected, Always on), no return and no fix loop (`hasLoops` / `flowLoops` in `lib/processFlows.ts`,
+`data-loops="off"`); the other five flows keep both loops. Agents' Discord "Member questions" demos
+use an @mention and a reply that recalls a past chat, and "Custom commands" shows Server, Sheets and
+Twitch; "Welcome and roles" is a ticking checklist and "Moderation" a three-person list with a done
+pill per row. Lead-checked 2026-10-04 on a production build at 360 to 3840: lint and build pass, no
+sideways scroll, no console errors, set switching re-rigs the bots cleanly.
+
+Below `lg`, Process stands each bot on its own short ledge (`ProcessLedge`) and draws the fix loop as
+a dotted bracket from bot 4 up to bot 3; under full motion the relay's job hops ledge to ledge, each
+ledge lighting as it lands; on the fix run the job goes back along the dotted fix line, which lights
+behind it (reduced motion: static only).
+Lead-checked 2026-10-05 in headless Chromium on a production build, static at 360 to 3840 and full
+motion at 360 and 768: no sideways scroll, no console errors, the job within about 4px of every
+ledge; Safari, Firefox and real devices unchecked. See `sections/05-process.md`.
+
+The project takeover is rebuilt static as up to seven parts (intro and rows, problem, built, took,
+learned, showcase, and an ink "means for you" panel with its own Book a call; took, learned and
+showcase only for Exile Bot). Lead-checked 2026-10-05: lint, tsc and build pass, no sideways scroll,
+no console errors, and open, Next and Esc end in the right state. See `sections/07-proofs.md`.
+
+Exile Bot's takeover (2026-10-06): three screenshots in the one shared layout, the spam diagram's
+steps showing Eva, Exile Bot's mascot, on an ink stage (one band from `md`, one band per step on
+phones; shared `InkStageGround`, spec `ui-spec/07-proofs-spam.md`), and in-use numbers 18+ and 3.9K+.
+Lead-checked on the production build (lint and build pass; 360, 768, 1440 and 3840 have no sideways
+scroll; every image loads; the proof card banner is unchanged). No code-auditor pass yet; it runs
+before the push. See `sections/07-proofs.md`.
+
+Built and lead-checked 2026-10-06: under full motion a plain click or Enter on a proof card first
+ducks its bot below the banner floor, then opens the takeover; bots stay down while any takeover is
+open and rise back after. Lint and build pass; checked in Edge at 1440. See `sections/07-proofs.md`.
+
 ## Key Files (site-wide)
 
 - `app/page.tsx` — renders the nine sections in order, then the takeover layer
 - `app/layout.tsx` — skip link, `SiteHeader` and `SiteFooter` around `children`
 - `app/globals.css` — tokens, spacing, site-wide scrollbar/selection/drag styling
 - `content/home.ts`, `content/shared.ts` — page/nav/footer copy, written to the spec's slots
-- `docs/pages/home/ui-spec.md` (the spec's index: shared rules §0, the motion summary §10, tokens
-  and choices) plus `docs/pages/home/ui-spec/NN-<slug>.md` (each section's spec), `docs/00-constitution.md`,
+- `docs/pages/home/ui-spec.md` (the spec's index: shared rules §0, including the pick §0.5 and the
+  "Shown for" tag §0.6, the motion summary §10, tokens and choices) plus
+  `docs/pages/home/ui-spec/NN-<slug>.md` (each section's spec; Process also has
+  `05-process-motion.md`, the bots' built motion, and `05-process-relay-legacy.md`, the earlier
+  four-step relay spec), `docs/00-constitution.md`,
   `docs/01-design-system.md`, `docs/03-facts.md` — the static-then-GSAP rules, tokens/type scale, the allow list
-- `temp/claude-design/Portfolio Redesign v3.dc.html` — reference layout/behaviour (local, gitignored)
+- `temp/claude-design/Portfolio Redesign v3.dc.html` — reference layout/behaviour (local, gitignored;
+  missing on disk 2026-10-03, see Open Questions)
 - `lib/styles.ts` — shared style helpers: the takeover's cream-side tokens (`pillInk`,
   `focusRingOnCream`, `metaLabelOnCream`) and the split/sticky-title helpers (`splitColumns`,
-  `splitGrid` adds `lg:items-start`, `stickyTitle` `lg:sticky lg:top-30 lg:self-start`,
-  `stickyTitleXl`, formerly for Process — being removed, see Decisions)
+  `splitGrid` adds `lg:items-start`, `stickyTitle` `lg:sticky lg:top-30 lg:self-start`)
+- `lib/aboutPick.ts`, `lib/aboutMemory.ts`, `lib/holdInView.ts`, `lib/shownSet.ts`,
+  `hooks/useShownSet.ts`, `hooks/useSwapFade.ts`, `hooks/useShownForMotion.ts`,
+  `hooks/useAboutRemember.ts`, `hooks/useCloseOnLeave.ts`, `components/home/pick/` (including
+  `ShownForTag.tsx`) — the shared pick: the set it maps to, setting it from outside About, the
+  session memory, the shared set store and its swap fade (`shownSet.ts`; `useSwapFade` names a
+  section's fading wrappers), keeping the tag in view (`holdInView` holds twice: at the pick and at
+  the swap's commit), the set Agents and Process read, the "Shown for" list's open fade and chevron
+  turn (`useShownForMotion`), and the tag (see `sections/02a-about.md`)
 - `lib/routes.ts` — route/anchor targets
 - `lib/track.ts`, `lib/analytics.ts`, `components/Analytics.tsx` — the one Book a call tracking
   key and the Umami Cloud counting setup (script only loads once `NEXT_PUBLIC_UMAMI_WEBSITE_ID`
@@ -167,15 +243,18 @@ test passes, and no sideways scroll at 360/767/1440/3840. See `sections/07-proof
 - 2026-09-25 — User's choice: every section after the hero pins its title column like Web (CSS
   sticky at 120px, from `lg` up); Agents pins its left column, Process from `xl`, Contact its left
   column; phone/tablet unpinned; Proofs excluded (reverted layout, see `sections/07-proofs.md`).
-  The pattern is written once in `lib/styles.ts` (`splitColumns`, `splitGrid`, `stickyTitle`,
-  `stickyTitleXl`). **Process clause superseded 2026-09-26.**
+  The pattern is written once in `lib/styles.ts` (`splitColumns`, `splitGrid`, `stickyTitle`).
+  **Process clause superseded 2026-09-26.**
 - 2026-09-26 — Process is excluded from the sticky-title pattern, like Proofs: the canvas's
   stacked layout puts the heading above the steps at every width, with no pinned title column.
-  `stickyTitleXl` is being removed from `lib/styles.ts` (Process was its only user). See
-  `sections/05-process.md`.
+  `stickyTitleXl` is gone from `lib/styles.ts`. See `sections/05-process.md`.
 - 2026-09-25 — Site-wide, in `app/globals.css` (user's request): the scrollbar is an accent thumb
   on a transparent track; text selection and image dragging are off everywhere (inputs, textarea
   and `[contenteditable]` stay selectable).
+- 2026-10-05 — User's choice: selected text sits on the accent background and takes the opposite of
+  its own colour (light text turns ink, dark text turns off-white), via an inherited
+  `--selection-text` (a local variable, not a theme token) set by text-colour classes in
+  `app/globals.css`; it only shows in form fields and browsers that ignore `user-select`.
 - 2026-09-25 — Constitution §5 amended (user's decision): under reduced motion, short opacity
   fades stay and anything that moves turns off (slides, parallax, mouse drift, auto-advance,
   looping pulses); the marquee strip is the one exception, kept looping under reduce (marquee
@@ -197,24 +276,79 @@ test passes, and no sideways scroll at 360/767/1440/3840. See `sections/07-proof
   playground with its own page doc at `docs/pages/rix/`.
 - 2026-10-01 — Launch is on hold until the new About section (see `sections/02a-about.md`) is
   spec'd, built and approved.
+- 2026-10-03 — Blocker resolved: at the user's instruction the constitution was amended (§3 five
+  audiences and per-card tone; §7.3 results stated in the facts' words with no figure; §7.4 demo
+  samples may name an everyday product and the builder card may use builders' words; §7.5 Process
+  flows are illustrations) and `docs/03-facts.md` was rewritten per card; `docs/04-voice.md` gained
+  a "Tone per card" table.
+- 2026-10-03 — The per-card redesign of About, Agents and Process is built, static (specs:
+  `ui-spec.md` §0.5–0.6 and its Choices, all decided). The About pick also drives Agents
+  (offers and demos per card) and Process (a flow per card); Marquee, Web, Projects and Contact stay
+  the same for everyone. Each card's own content has its own tone (`docs/04-voice.md`); the rest of
+  the page keeps one voice. Details in `sections/02a-about.md`, `sections/04-agents.md` and
+  `sections/05-process.md`.
+- 2026-10-03 — Site-wide pick: remembered for the visit (session); a `?for=` link wins the first
+  time that value is seen in a visit; a "Shown for: …" tag on Agents and Process opens an in-flow
+  list of the six cards and switches in place; the tag is hidden without JavaScript, where both
+  sections show the default set; Rix's tantrum still deselects.
+- 2026-10-05 — User's call: Rix on About is livelier and talks more (`ui-spec/00-rix.md` rev 4),
+  and card picks are locked from a tantrum's start until the forgive ends; home no longer allows
+  "a pick is never blocked". See `sections/02a-about.md`.
+- 2026-10-04 — Set swaps fade (0.15s out, swap, 0.25s in; opacity only, the same under reduced
+  motion) from one shared store (`lib/shownSet.ts`), so Agents, Process and the bots change in one
+  commit, with `holdInView` holding the tag again when the swap lands; the "Shown for" list fades in
+  over 0.2s on open with the chevron turning (no turn under reduced motion).
+- 2026-10-04 — The Process crew relay is back on (`RELAY_ON = true`), rebuilt for five or six steps,
+  paced by `RELAY_REST` (2s after each run), not a fixed rhythm; see `sections/05-process.md`.
+- 2026-10-03 — The workflow offer gets an `orchestra` demo (lead, team, checks, drawn as swimlanes
+  since 2026-10-04) and every Process flow but Discord a second return line (step 4 back to step 3);
+  two lines were added to `docs/03-facts.md` under "How the user works", with the user's permission.
+  See `sections/04-agents.md` and `sections/05-process.md`.
+- 2026-10-04 — Four lines were added to `docs/03-facts.md` under "For a Discord server", with the
+  user's permission (around the clock and answers mentions; a tone the owner sets; an optional record
+  of past chats; connects to business tools and other apps). Process' Discord flow (no check, no
+  loops) and Agents' Discord demos follow them; see `sections/05-process.md` and
+  `sections/04-agents.md`.
+- 2026-10-05 — User's calls on Process' phone ledges (a ledge under each bot below `lg`, the job hopping between them) and on
+  Agents' Discord demos (a welcome checklist; moderation with a done pill per row, a 20-character
+  pill limit): see `sections/05-process.md` and `sections/04-agents.md`.
+- 2026-10-05 — Agents' demo steps get randomized durations (Agents only, not the Process relay),
+  built and lead-checked: see `sections/04-agents.md`.
+- 2026-10-05 — Exile's card line, In use row and summary state its real use (Idle Heroes players'
+  Discord communities); spam protection only in the takeover (showcase and, from 2026-10-06, a
+  screenshot), stated as live in the communities that use it (the user's facts correction,
+  2026-10-05); the Marquee typo "Webs apps"
+  is fixed. See `sections/07-proofs.md` and `sections/03-marquee.md`.
+- 2026-10-06 — The user's Exile Bot takeover calls: three screenshots, in-use numbers 18+ and 3.9K+,
+  a status pill with no count, and Eva (Exile Bot's mascot) in the spam diagram's step tiles as the
+  one exception to "no generated art on the site", Exile Bot view only. See `sections/07-proofs.md`.
+- 2026-10-05 — The project is named "Exile Bot" (title, summary, visit button; tag now "Discord
+  platform"); no key, hash or file renamed. See `sections/07-proofs.md`.
+- 2026-10-05 — With the user's permission, docs/03-facts.md gained: the corrected Exile use, a
+  "What the user can do for a business: shown by Exile" block (four capabilities, not on the page
+  yet), the booking page showing free hours in the visitor's own time zone, and "the user's location
+  or time zone" on the Never list.
+- 2026-10-05 — User's call: each project takeover is rebuilt into up to seven parts (same structure,
+  optional parts, Exile Bot has all seven and Design Vault four; only its closing line follows the
+  About pick; each takeover ends with its own Book a call, covered by constitution §3). See
+  `sections/07-proofs.md`.
+- 2026-10-05 — User's call: the site's copy has no fixed length limits. `docs/04-voice.md` 'Length
+  limits' table is replaced by a 'Length' section saying so; a 'Limit' column in any UI spec is a
+  sizing note, not a rule; whether words fit is judged on the lead's screen check.
 
 ## Open Questions (site-wide)
 
 - **To do (user):** create a free Umami Cloud account, add the website marwix.dev and send the
   lead its website ID; it's set as `NEXT_PUBLIC_UMAMI_WEBSITE_ID` in Vercel and needs a redeploy.
-- **Constitution:** the user to add the takeover/Book a call exception under §3.
-- **Choice:** Agents and Process will change per the visitor's About reply. The user has said that
-  in Process both the steps and the bots change per visitor (not only the words), and that the
-  default view (no reply / "Just looking") is one the user will define. Projects stay the same for
-  everyone. Both sections are yet to be decided in detail.
+- **Choice:** constitution §13's ship date (2026-09-30) has passed; the user decides the new one.
+- **Choice:** the reference design file `temp/claude-design/Portfolio Redesign v3.dc.html` is
+  missing on disk (constitution §5 names it); the user restores it or says to drop it.
 - **Roll-up:** section-specific open questions remain in `sections/02-hero.md` (4),
-  `sections/02a-about.md` (1), `sections/04-agents.md` (2), `sections/05-process.md` (7),
-  `sections/07-proofs.md` (10), `sections/08-contact.md` (1) and `sections/09-footer.md` (3). The
+  `sections/02a-about.md` (7), `sections/04-agents.md` (16), `sections/05-process.md` (23),
+  `sections/07-proofs.md` (21), `sections/08-contact.md` (1) and `sections/09-footer.md` (3). The
   pre-deploy check reads this roll-up and every section file; the page ships with none open
   anywhere.
 - **To build:** screen re-check of `/` and `/rix` after the motion pass (pending). `/rix` is built
-  (doc: `docs/pages/rix/page.md`). Lint is green and tsc has no errors outside `.next/`;
-  `npm run build` fails only on a stale `.next/dev/types/validator.ts` that still references the
-  deleted `app/dev`, which clears once the dev server regenerates it or `.next/dev` is removed.
-- **Fact:** the About Fact copy (`content/home.ts` → `about`) is still SAMPLE (see
+  (doc: `docs/pages/rix/page.md`).
+- **Fact:** the About copy (`content/home.ts` → `about`) is still SAMPLE (see
   `sections/02a-about.md`).

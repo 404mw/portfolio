@@ -37,16 +37,16 @@ export const replyShow = {
 export type AboutReply = (typeof about.replies)[number];
 
 /**
- * The prop Rix holds for each reply key (sample groups; real groups need their own). `null` is
- * "just looking": no prop, a shrug.
+ * The emblem for each card (02a-about-options §2a.R1): on the card, in Rix's hand, in the "Shown
+ * for" tag and in Process' step 1. `null` is "Not sure yet": no emblem, the gap eyes, a shrug.
  */
 export const aboutReplyProp: Readonly<Record<AboutReply["key"], RixPropName | null>> = {
-  "small-business": "calendar",
-  communities: "shield",
-  startups: "send",
-  agencies: "report",
-  creators: "envelope",
-  "just-looking": null,
+  "service-business": "calendar",
+  "online-store": "parcel",
+  discord: "bubble",
+  "software-builder": "code",
+  website: "window",
+  "not-sure": null,
 };
 
 /** The reply's index for a `?for=` key, compared raw; -1 if none matches. */

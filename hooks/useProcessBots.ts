@@ -6,10 +6,15 @@
 // - lib/processBotActs.ts: role acts, jumps, the hover/tap reaction, naps.
 // - lib/processBotEntrance.ts: the once-per-load drop onto the ground line.
 // - lib/processBotPointer.ts: pointer → look and lean.
-// - lib/processRelay.ts: the relay job run along the ground line (from `lg`; its job changes and
-//   exit in lib/processRelayJob.ts, the lesson that rides the return in lib/processRelayLesson.ts,
-//   its trail and lit lines in lib/processRelayTrail.ts).
-// - lib/processRelayColumn.ts: the same run down the bot column (below `lg`, ui-spec §5.9).
+// - lib/processRelayPlan.ts: the relay's clock, which stop the job visits when (five or six stops,
+//   and the fix hop on every `FIX_EVERY`-th run of a flow that draws the fix loop).
+// - lib/processRelay.ts: the relay job run along the ground line (from `lg`; the shared story in
+//   lib/processRelayRun.ts, the hand-off out of step 1's hand in lib/processRelayHand.ts, the job's
+//   changes and exit in lib/processRelayJob.ts, the fix hop in lib/processRelayFix.ts, the lesson
+//   that rides the return in lib/processRelayLesson.ts, its trail and lit lines in
+//   lib/processRelayTrail.ts).
+// - lib/processRelayColumn.ts: the same run down the bot column (below `lg`, ui-spec §5.9), hopping
+//   ledge to ledge with each ledge and the dotted fix line lighting (lib/processRelayLedge.ts).
 // - lib/processBotCrew.ts: the one registry every bot animation and scheduler runs in.
 //
 // Full motion: all of it. The registry and the per-frame channel writer run only while the section
@@ -17,11 +22,15 @@
 // follow needs a fine pointer too. Reduced motion: no movement at all; the entrance is an opacity
 // fade only, and every bot shows its static pose. The entrance's from-state is set here in JS only,
 // and skipped if the list is already scrolled past (once per page load, across matchMedia re-runs).
-// On unmount or any mode change everything is killed and every bot, the job and its parts, the
-// lesson and its parts, the ghosts, lit overlays, chevron icons and arrowhead go back to the server
-// markup exactly (bot 4's lesson hold is a bot act, so `resetBot` puts his eyes back too). Crossing `lg` is a mode change: the run in the
-// old geometry is reverted and the new one starts on the usual first-run delay.
-// Catch priority: the relay publishes each bot's next catch, so timed acts and naps keep clear of it.
+// On unmount, a new flow (`set`) or any mode change everything is killed and every bot, the job and
+// its parts, the lesson and its parts, the ghosts, the lit overlays (ground, return and fix; below
+// `lg` each ledge's and the fix line's), chevron
+// icons and arrowhead go back to the server markup exactly: hidden again, with the emblem held in
+// step 1's hand (it is a `data-bot` part, so `resetBot` shows it; the last bot's lesson hold is a
+// bot act, so `resetBot` puts its eyes back too). Crossing `lg` is a mode change: the run in the
+// old geometry is reverted and the new one starts on the usual first-run delay. A flow with no
+// loops has no return and no fix parts: the relay still runs, as a one-way pass.
+// Catch priority: the relay publishes each bot's next catches, so timed acts and naps keep clear of them.
 //
 // Tweens made later by handlers and schedulers are deliberately outside the matchMedia context (it
 // would otherwise collect every tween the bots ever make); the registry and `resetBot` clean them up.
@@ -35,11 +44,13 @@ import { startLife, tap } from "@/lib/processBotLife";
 import {
   DROP_START,
   EYE_FOLLOW,
+  FIX_EVERY,
   FOLLOW_EASE,
   LEAN_FOLLOW,
   POINTER_IDLE,
-  RELAY_EVERY,
   RELAY_FIRST,
+  RELAY_ON,
+  RELAY_REST,
   TAP_SLOP,
   TAP_TIME,
 } from "@/lib/processBotMotion";
@@ -47,7 +58,6 @@ import { eyeCentre, pointerLean, pointerLook } from "@/lib/processBotPointer";
 import { findBot, pointerShare, resetBot, rigBot, setState, stripMotion, type Bot } from "@/lib/processBotRig";
 import {
   measureRelay,
-  relayArrivals,
   relayElements,
   relayParts,
   relayQuery,
@@ -55,7 +65,16 @@ import {
   type RelayStop,
   type RelayWaypoints,
 } from "@/lib/processRelay";
-import { columnElements, columnParts, columnRun, measureColumn, type ColumnWaypoints } from "@/lib/processRelayColumn";
+import {
+  columnBack,
+  columnElements,
+  columnParts,
+  columnRun,
+  measureColumn,
+  type ColumnWaypoints,
+} from "@/lib/processRelayColumn";
+import { catchTimes, fixStop, relayPlan, type Visit } from "@/lib/processRelayPlan";
+import type { RelayCues, RunOptions } from "@/lib/processRelayRun";
 import { watchLive } from "@/lib/watchLive";
 
 type Flag = { current: boolean };
@@ -256,8 +275,9 @@ function fullMotion({ root, list, bots, entered, wide, fine }: FullOptions): () 
   // Pointer follow (fine pointer only) and the relay's parts, in the geometry the width picks.
   const pointer = fine ? followPointer(bots, crew) : null;
   const stops: RelayStop[] = bots.map((bot) => ({ svg: bot.parts.svg, role: bot.role }));
-  const relay = wide ? relayParts(root, stops) : null;
-  const column = wide ? null : columnParts(root, stops);
+  // With the relay off (`RELAY_ON`) neither is built: no run starts and the catch clock is empty.
+  const relay = RELAY_ON && wide ? relayParts(root, stops) : null;
+  const column = RELAY_ON && !wide ? columnParts(root, stops) : null;
   let waypoints: RelayWaypoints | null = null;
   let columnWaypoints: ColumnWaypoints | null = null;
   const measure = () => {
@@ -287,47 +307,69 @@ function fullMotion({ root, list, bots, entered, wide, fine }: FullOptions): () 
     tick(live);
   });
 
-  // Catch priority: each bot's next catch is a run start plus its arrival (A1–A4, one clock at
-  // every width).
-  const arrivals = relay || column ? relayArrivals(bots.map((bot) => bot.role)) : [];
+  // The relay's clock: the flow's stops in step order, and on every `FIX_EVERY`-th run (2, 4, 6…)
+  // the fix hop, in a flow that draws the fix loop (never one with `data-loops="off"`).
+  const roles = bots.map((bot) => bot.role);
+  const fixAt = relay?.fix || column?.fixes ? fixStop(roles) : null;
+  // The hop back's length is the geometry's: below `lg` the longer way along the dotted fix line.
+  const back = column ? columnBack(column).duration : undefined;
+  const planFor = (run: number): readonly Visit[] =>
+    relayPlan(roles, fixAt !== null && run % FIX_EVERY === FIX_EVERY - 1 ? fixAt : null, back);
+
+  // Catch priority: each bot's next catch is a run start plus one of its arrivals in that run's
+  // plan (the work step and the check are caught twice on a fix run), on one clock at every width.
+  const running = relay !== null || column !== null;
+  let runs = 0;
   let runAt = -Infinity;
   let nextRunAt = Infinity;
+  let catches: readonly (readonly number[])[] = [];
+  let nextCatches = running ? catchTimes(planFor(0), bots.length) : [];
   const untilCatch = (bot: Bot) => {
-    const arrival = arrivals[bots.indexOf(bot)];
-    if (arrival === undefined) return Infinity;
+    const i = bots.indexOf(bot);
     const now = crew.now();
-    const next = [runAt + arrival, nextRunAt + arrival].find((at) => at >= now);
-    return next === undefined ? Infinity : next - now;
+    const due = [
+      ...(catches[i] ?? []).map((arrival) => runAt + arrival),
+      ...(nextCatches[i] ?? []).map((arrival) => nextRunAt + arrival),
+    ].find((at) => at >= now);
+    return due === undefined ? Infinity : due - now;
   };
 
-  // The relay, every `RELAY_EVERY` once all the bots have landed: along the ground line from `lg`,
-  // down the bot column below it. A run always ends before the next starts, which kills it anyway.
+  // The relay, once all the bots have landed: along the ground line from `lg`, down the bot column
+  // below it. Runs differ in length, so the next one starts `RELAY_REST` after this one ends.
   let relayTimer: gsap.core.Tween | null = null;
   let relayPlaying: gsap.core.Timeline | null = null;
-  const cues = {
-    head: (i: number) => bots[i] && tap(bots[i], crew),
-    arrive: (i: number) => bots[i] && catchRelay(bots[i], crew, 1),
-    receive: (i: number) => bots[i] && receive(bots[i], crew),
-    holdLesson: (i: number, seconds: number) => bots[i] && holdLesson(bots[i], crew, seconds),
+  const cues: RelayCues = {
+    head: (i) => bots[i] && tap(bots[i], crew),
+    arrive: (i, kind, dwell) => bots[i] && catchRelay(bots[i], crew, 1, kind, dwell),
+    receive: (i) => bots[i] && receive(bots[i], crew),
+    holdLesson: (i, seconds) => bots[i] && holdLesson(bots[i], crew, seconds),
   };
-  /** One run in this width's geometry, or null if its parts are missing. */
-  const oneRun = (): gsap.core.Timeline | null => {
+  /** One run in this width's geometry, or null if its waypoints aren't measured yet. */
+  const oneRun = (options: RunOptions): gsap.core.Timeline | null => {
     const latest = waypoints;
-    if (relay && latest) return relayRun(relay, () => waypoints ?? latest, cues);
+    if (relay && latest) return relayRun(relay, () => waypoints ?? latest, cues, options);
     const latestColumn = columnWaypoints;
-    if (column && latestColumn) return columnRun(column, () => columnWaypoints ?? latestColumn, cues);
+    if (column && latestColumn) return columnRun(column, () => columnWaypoints ?? latestColumn, cues, options);
     return null;
   };
   const runRelay = () => {
     relayPlaying?.kill();
-    runAt = crew.now();
-    const run = oneRun();
+    const visits = planFor(runs);
+    const run = oneRun({ visits, first: runs === 0 });
+    if (run) {
+      // The plan counts only for a run that plays: the fix hop falls on every second real run.
+      runAt = crew.now();
+      catches = catchTimes(visits, bots.length);
+      runs += 1;
+      nextCatches = catchTimes(planFor(runs), bots.length);
+    }
     relayPlaying = run ? crew.run(run) : null;
-    nextRunAt = runAt + RELAY_EVERY;
-    relayTimer = crew.after(RELAY_EVERY, runRelay);
+    const wait = (run?.duration() ?? 0) + RELAY_REST;
+    nextRunAt = crew.now() + wait;
+    relayTimer = crew.after(wait, runRelay);
   };
   const startRelay = () => {
-    if (!relay && !column) return;
+    if (!running) return;
     relayTimer?.kill();
     nextRunAt = crew.now() + RELAY_FIRST;
     relayTimer = crew.after(RELAY_FIRST, runRelay);
@@ -372,7 +414,12 @@ function fullMotion({ root, list, bots, entered, wide, fine }: FullOptions): () 
   };
 }
 
-export function useProcessBots(section: RefObject<HTMLElement | null>) {
+/**
+ * `set` is the flow the section shows (ui-spec §5.7 wiring 6): a change remounts the bots, so the
+ * hook lets go of the old ones and rigs the new ones. `entered` is already true by then, so they
+ * are shown at rest and life starts: no second drop-in.
+ */
+export function useProcessBots(section: RefObject<HTMLElement | null>, set: string) {
   // Once per page load: survives matchMedia re-runs (resizing across `lg`, switching motion).
   const entered = useRef(false);
 
@@ -400,6 +447,6 @@ export function useProcessBots(section: RefObject<HTMLElement | null>) {
 
       return () => mm.revert();
     },
-    { scope: section },
+    { scope: section, dependencies: [set], revertOnUpdate: true },
   );
 }

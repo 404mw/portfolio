@@ -1,11 +1,14 @@
-// Lead follow-up demo, finished state (ui-spec §4.4): three new leads, each followed up. The
-// "new" pills are in the markup but hidden; the motion pass swaps them for "followed up".
+// List demo, finished state (ui-spec §4.4): three people, each row turned to done. The done pill
+// reads the row's own label where it has one, else the shared one. The "new" pills are in the
+// markup but hidden; the motion pass swaps them for the done pill.
 import { DemoStatusPill } from "@/components/home/agents/DemoStatusPill";
-import { agents } from "@/content/home";
+import type { LeadsDemoContent } from "@/lib/agents";
 import { metaLabel } from "@/lib/styles";
 
-export function LeadsDemo() {
-  const { rows, statusNew, statusDone } = agents.demos.leads;
+type LeadsDemoProps = { readonly demo: LeadsDemoContent };
+
+export function LeadsDemo({ demo }: LeadsDemoProps) {
+  const { rows, statusNew, statusDone } = demo;
   return (
     <ul className="flex flex-col gap-2.5">
       {rows.map((row, index) => (
@@ -21,7 +24,7 @@ export function LeadsDemo() {
             >
               {row.initials}
             </span>
-            <span className="flex min-w-0 flex-col">
+            <span className="flex min-w-0 flex-col wrap-break-word">
               <span className="text-body font-medium text-text">{row.name}</span>
               <span className={metaLabel}>{row.source}</span>
             </span>
@@ -32,7 +35,7 @@ export function LeadsDemo() {
           >
             {statusNew}
           </span>
-          <DemoStatusPill label={statusDone} order={rows.length + index + 1} />
+          <DemoStatusPill label={row.done ?? statusDone} order={rows.length + index + 1} />
         </li>
       ))}
     </ul>

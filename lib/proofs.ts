@@ -1,5 +1,5 @@
 // Proofs wiring (ui-spec §7): the project order, each project's takeover id, image names and card
-// bot prop, and the ids that tie a card, its bot and its takeover together.
+// bot prop, and the ids that tie a card, its bot and its takeover (and its parts) together.
 // Words stay in content/home.ts.
 import type { proofs } from "@/content/home";
 import type { ImageName } from "@/lib/images";
@@ -49,14 +49,59 @@ export function proofTarget(key: ProofKey) {
 /** One IN USE number in a takeover: the value over its label. */
 export type ProofStat = { readonly value: string; readonly label: string };
 
-/** A takeover's three shots, or their alt texts, in order: the big shot, then two details. */
-export type ShotTriple<T> = readonly [T, T, T];
+/**
+ * A takeover's shots, or their alt texts, in order (ui-spec §7.6): always three, the big shot,
+ * then two details.
+ */
+export type ProofShots<T> = readonly [T, T, T];
 
-/** A project's three images (ui-spec §7.6), all in its takeover: the big shot, then two details. */
-export function proofImages(key: ProofKey) {
+/** The edge of a shot its frame keeps when it crops (ui-spec §7.6). */
+export type ProofShotPosition = "top" | "center" | "left";
+
+/** One shot: its image name and the edge its frame keeps. */
+export type ProofShot = { readonly name: ImageName; readonly position: ProofShotPosition };
+
+/**
+ * Each project's shots. A project's count must equal its `shotAlts` count in content/home.ts, so
+ * shots and alts can't drift apart.
+ */
+const proofShotNames = {
+  exile: ["exileShot1", "exileShot2", "exileShot3"],
+  designVault: ["designVaultShot1", "designVaultShot2", "designVaultShot3"],
+  marwixSkills: ["marwixSkillsShot1", "marwixSkillsShot2", "marwixSkillsShot3"],
+} as const satisfies {
+  readonly [K in ProofKey]: ProofShots<ImageName> & {
+    readonly length: (typeof proofs.projects)[K]["shotAlts"]["length"];
+  };
+};
+
+/** Each slot's default position: the big shot keeps its top, the details their centre. */
+const slotPositions: ProofShots<ProofShotPosition> = ["top", "center", "center"];
+
+/** The projects whose shots set their own positions; the others keep the slot defaults. */
+const proofShotPositions: { readonly [K in ProofKey]?: ProofShots<ProofShotPosition> } = {
+  exile: ["center", "top", "left"],
+};
+
+/** A project's images (ui-spec §7.6), all in its takeover's part 3. */
+export function proofImages(key: ProofKey): { readonly shots: ProofShots<ProofShot> } {
+  const names = proofShotNames[key];
+  const positions = proofShotPositions[key] ?? slotPositions;
   return {
-    shots: [`${key}Shot1`, `${key}Shot2`, `${key}Shot3`],
-  } as const satisfies { shots: ShotTriple<ImageName> };
+    shots: [
+      { name: names[0], position: positions[0] },
+      { name: names[1], position: positions[1] },
+      { name: names[2], position: positions[2] },
+    ],
+  };
+}
+
+/** A takeover's parts, in order (ui-spec §7.3): the `data-part` values. */
+export type TakeoverPartKey = "intro" | "problem" | "built" | "took" | "learned" | "showcase" | "means";
+
+/** The id of a part's headline, which names its section: `{targetId}-{part}-headline`. */
+export function takeoverPartId(targetId: string, part: TakeoverPartKey): string {
+  return `${targetId}-${part}-headline`;
 }
 
 /** The prop a project's card bot holds (ui-spec §7.2.3). */

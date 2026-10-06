@@ -47,6 +47,14 @@ export const metaLabelOnCream = "font-mono text-meta text-cream-muted";
 /** The chip shape, no state classes (Contact's need chips, About's reply chips): 44px tall. */
 export const chip = "inline-flex min-h-11 items-center gap-2 rounded-full border px-4.5 text-body";
 
+/** A takeover part's paragraph, on cream: 17px on a 576px measure (ui-spec §7.3.1). */
+export const takeoverText = "max-w-xl text-lead leading-normal text-pretty text-ink";
+
+/** A small mono pill's shape, not interactive, no colour classes: the takeover showcase's status
+ * line and the diagram's return pill, each adding its own colours (ui-spec §7.3.1, §7.3.2). */
+export const monoPill =
+  "inline-flex items-center gap-2 rounded-full px-3 py-2 font-mono text-meta leading-none font-medium tracking-[0.06em] uppercase";
+
 /** The primary pill: accent background, 48px tall. */
 export const pillPrimary = `inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 text-body font-semibold text-on-accent hover:bg-text active:bg-muted ${focusRing}`;
 

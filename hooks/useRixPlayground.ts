@@ -1,6 +1,7 @@
 // The /rix playground (docs/pages/rix/ui-spec.md §0.4, §10): runs the playground's own Rix on
-// `section#rix-playground` (option B's character sheet with every scheduler off: no nudges, plays,
-// nap timer, tag, walks to targets or arrival on load; life on; poking or petting him runs the real
+// `section#rix-playground` (option B's character sheet with every scheduler off: no idle clock,
+// chatter, hover mode, nap timer, tag, walks to targets, pick lock or arrival on load; life on;
+// poking or petting him runs the real
 // ladder and pet) and dispatches its buttons. `play(command)` cuts the current move and plays the
 // command's own (lib/rixPlaygroundMoves.ts), its R8.1 version when the OS asks for reduced motion;
 // `playing` is the move under way (the readout and the button's `data-playing`), back to null when
@@ -15,6 +16,7 @@ import { gsap, useGSAP } from "@/lib/gsap";
 import { finePointerQuery, motionQuery } from "@/lib/motion";
 import { rixFade } from "@/lib/rixFade";
 import { rixFull, type RixMemo } from "@/lib/rixFull";
+import { newLineMemo } from "@/lib/rixLines";
 import { rixIds, sameRixPlaygroundCommand, type RixPlaygroundCommand } from "@/lib/rixPlayground";
 import { playgroundMoves, type PlaygroundMoves } from "@/lib/rixPlaygroundMoves";
 import { findRixParts } from "@/lib/rixRig";
@@ -34,7 +36,7 @@ export function useRixPlayground(): RixPlayground {
   const moves = useRef<PlaygroundMoves | null>(null);
   // The toggle's latest value, for a motion run that starts after it was set.
   const patrolOn = useRef(false);
-  const memo = useRef<RixMemo>({ entered: { current: true }, nudges: { count: 0, done: true }, juggles: 0 });
+  const memo = useRef<RixMemo>({ entered: { current: true }, lines: newLineMemo(), live: 0, juggles: 0 });
 
   useGSAP(
     () => {
@@ -45,8 +47,8 @@ export function useRixPlayground(): RixPlayground {
       const mm = gsap.matchMedia();
       mm.add({ full: motionQuery.full, reduced: motionQuery.reduced, fine: finePointerQuery }, (context) => {
         const { full = false, fine = false } = context.conditions ?? {};
-        const options = { parts, scope: aboutScope("b"), host: "playground" as const, memo: memo.current };
-        const run = full ? rixFull({ ...options, fine }) : null;
+        const options = { parts, scope: aboutScope("b"), host: "playground" as const, memo: memo.current, fine };
+        const run = full ? rixFull(options) : null;
         const fade = full ? null : rixFade(options);
         const dispatch = playgroundMoves(root, run?.kit ?? null, fade?.kit ?? null);
         moves.current = dispatch;

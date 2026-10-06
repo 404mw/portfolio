@@ -1,28 +1,56 @@
-// One process step (ui-spec §5.2): its bot, the chevron to the next step (from `lg`, not on the
-// last step), then the step label, title and line. A row below `lg`, a column from `lg`.
+// One process step (ui-spec §5.2): its bot (holding the job on step 1), the ledge it stands on
+// (below `lg`, ProcessLedge, §5.9), the chevron to the next step (from `lg`, not on the last
+// step), then the step label, title and line. A row below `lg`, a column from `lg`. The `<li>` is
+// `relative` at every width (no z-index) so the ledge, the chevron and step 3's fix loop are
+// placed against it. Nothing here is interactive.
+import type { ReactNode } from "react";
 import { ProcessBot } from "@/components/home/process/ProcessBot";
+import { ProcessLedge } from "@/components/home/process/ProcessLedge";
 import { ChevronRightIcon } from "@/components/icons/ChevronRightIcon";
 import type { BotPose, BotRole } from "@/lib/processBots";
 import { condensed, metaLabel } from "@/lib/styles";
 
 type ProcessStepProps = {
+  /** Its index, for `data-step`. */
+  readonly index: number;
   readonly role: BotRole;
   readonly pose: BotPose;
-  readonly hasNext: boolean;
+  /** The chevron's placement classes (lib/processLayout.ts); absent on the last step. */
+  readonly chevron?: string;
   readonly label: string;
   readonly title: string;
   readonly line: string;
+  /** What the bot holds (step 1: the flow's emblem). */
+  readonly children?: ReactNode;
+  /** The `<li>`'s last child, after the text (step 3: the fix loop). */
+  readonly after?: ReactNode;
 };
 
-export function ProcessStep({ role, pose, hasNext, label, title, line }: ProcessStepProps) {
+export function ProcessStep({
+  index,
+  role,
+  pose,
+  chevron,
+  label,
+  title,
+  line,
+  children,
+  after,
+}: ProcessStepProps) {
   return (
-    <li className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-start gap-x-4.5 border-t border-line py-6 lg:relative lg:flex lg:flex-col lg:border-t-0 lg:py-0">
-      <ProcessBot role={role} pose={pose} />
-      {hasNext && (
+    <li
+      data-step={index}
+      className="relative grid grid-cols-[5.5rem_minmax(0,1fr)] items-start gap-x-4.5 border-t border-line py-6 lg:flex lg:min-w-0 lg:flex-col lg:border-t-0 lg:py-0"
+    >
+      <ProcessBot role={role} pose={pose}>
+        {children}
+      </ProcessBot>
+      <ProcessLedge />
+      {chevron !== undefined && (
         <span
           aria-hidden="true"
           data-anim="process-chevron"
-          className="absolute top-27 -right-6 hidden h-0.5 w-4 items-center justify-center bg-bg lg:flex"
+          className={`absolute top-27 hidden h-0.5 w-4 items-center justify-center bg-bg lg:flex ${chevron}`}
         >
           <ChevronRightIcon className="size-6 shrink-0 text-accent" />
         </span>
@@ -30,12 +58,13 @@ export function ProcessStep({ role, pose, hasNext, label, title, line }: Process
       <div data-anim="reveal" className="flex flex-col gap-2 lg:gap-2.5 lg:pt-7.5">
         <p className={`${metaLabel} uppercase tracking-[0.06em]`}>{label}</p>
         <h3
-          className={`font-display font-semibold text-step leading-[1.05] tracking-[-0.02em] text-balance text-text ${condensed}`}
+          className={`font-display font-semibold text-step leading-[1.05] tracking-[-0.02em] text-balance wrap-break-word text-text ${condensed}`}
         >
           {title}
         </h3>
         <p className="text-body-lg leading-normal text-muted lg:max-w-65">{line}</p>
       </div>
+      {after}
     </li>
   );
 }

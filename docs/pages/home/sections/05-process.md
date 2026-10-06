@@ -1,377 +1,332 @@
 # Process
 
-**Last Updated:** 2026-09-28 (bot 4's phone lesson handover is built and screen-checked at 390px)
+**Last Updated:** 2026-10-05
+
+> **Status:** In build. Process shows a five- or six-step flow per About card; the bots' life, the
+> crew relay (rebuilt for five or six steps), the swap fade and the phone ledges (static and their
+> motion, the job hopping ledge to ledge) are built and lead-checked in headless Chromium
+> (2026-10-04, 2026-10-05; Safari, Firefox and real devices unchecked). Open: the user's calls on
+> copy, the new emblems and the ledges, and the known limits below.
 
 **The one question:** How do they work?
 
-See `../page.md` for the site-wide index. Spec: `../ui-spec/05-process.md`.
+See `../page.md` for the site-wide index. Spec: `../ui-spec/05-process.md` (§5.10 flows and
+roles, §5.7 motion); the bots' built motion is `../ui-spec/05-process-motion.md`; the earlier
+four-step relay spec is `../ui-spec/05-process-relay-legacy.md`; the pick and the tag are in
+`../ui-spec.md` §0.5–0.6.
 
 ## Current State
 
-The redesign is built and live in code, replacing the old ring/loop: `ProcessSection` stacks the
-label and heading above the steps at every width (no pinning), then `ProcessList` (a ground line
-from `lg`, four steps across from `lg`, one column of rows below `lg`) and `ProcessReturn` (the
-dashed loop path from `lg`, a row with an icon and label below `lg`). `ProcessLoop`, `ProcessRing`
-and `ProcessRail` are deleted. Each `ProcessStep` renders a `ProcessBot`: a vector SVG built from
-the logo's MW strips, hardcoded in `lib/processBots.ts`, sized 136×88 from `lg` so its feet sit on
-the ground line, holding all four frames (idle, blink, act, sleep) as groups with three breath
-groups each (body, hand, hat); the SVG is `overflow-visible` so the update wrench's jaw isn't
-clipped.
+`ProcessSection` (server) stacks the label and heading above `ProcessFlow` at every width (no
+pinning), with `ProcessMotion` (renders nothing) after them. `ProcessFlow` (client) reads the shown
+set (`useShownSet`, the About pick through `pickSet`: `default` with no pick, for Not sure yet and in
+the server markup) and draws, in a wrapper carrying `data-set` and `data-count`: the "Shown for" tag
+(`ShownForTag`, sectionId `process`), the flow's sample-job caption (`process.flows[set].caption`),
+then a body keyed by set, so a pick remounts it. The body is `isolate` and holds `ProcessList`,
+`ProcessReturn` and the hidden `ProcessRelay` layer. Swaps fade: `ProcessFlow` has a ref on the
+`process-flow` root and `useSwapFade` registers `process-caption` and the keyed body (the flow's
+last child) with the shared store (`lib/shownSet.ts`), which fades them out (0.15s), changes the set
+in one commit for Agents, Process and the bots, and fades them in (0.25s); opacity only, the same
+under reduced motion. The tag never fades. Without JavaScript the tag hides and the `default` flow
+shows.
 
-The bots are one static rig each (`lib/processBots.ts` `botRig(role, pose)` and `botPivots`;
-`data-bot` hooks: `rig`, feet, `upper`, `body`, `eyes`/`eye`, arms, `tool`, `hat`, plus per-role
-extras: marks, sparks, page, lens-lit, zzz). Separate feet are cut from the W tips, so at rest each
-looks exactly as before. A hidden `ProcessRelay` layer (the three ghosts, the job, then the lesson
-card) and `process-list/ground/chevron/return` hooks sit alongside.
+Flows are `process.flows.<set>` in `content/home.ts` (caption, steps with title and line, and, for
+the five flows with loops, `loopLabel` and `fixLabel`). Default, online-store, discord and website
+have five steps; service-business and software-builder have six. Bots per step are
+`lib/processFlows.ts` `flowRoles` (type-tied to the steps, so a step can't exist without its bot):
+five flows run intake, rules, team, check; then default, online-store and website add flag,
+service-business adds remind then flag, software-builder adds flag then ship. Discord is its own
+flow, a bot's behaviour and not a job run through checks: Mentioned, Your tone, Remembers,
+Connected, Always on (caption "Example: a member's @mention"), with bots intake, rules, update, ship,
+host. `rolePose` stands `check` and `flag` in `act` and every other role in `idle`;
+`flowSteps(set)` gives each step its copy, role and pose.
 
-`ProcessMotion` runs `useScrollReveal` and `useProcessBots`, which covers:
-- smooth GSAP life: breathing, sway, arm drift, blinks, looks and foot taps
-- role acts
-- naps with z's (rules and update)
-- eyes and lean following the pointer (fine pointers)
-- a hover/tap reaction, the only time a bot jumps — hover/tap skipped while acting or reacting
-- a once-per-load drop-in
-- the crew relay job from `lg`, and a cascade below `lg`, where each bot plays its full role act as
-  it's reached
+Loops: `hasLoops` in `lib/processFlows.ts` (type-tied to whether a flow's copy has both labels) is
+`false` for discord only; `flowLoops(set)` returns the labels or `null`. `ProcessFlow` puts
+`data-loops="on"` or `"off"` on the wrapper and passes the fix label to `ProcessList` and the return
+to `ProcessReturn` only when there are loops, so discord renders no return and no fix elements. The
+return loop's label is the flow's `loopLabel`, and its path lands on step 2, "your rules".
 
-Everything runs in one registry, paused off screen or with the tab hidden. Reduced motion is an
-opacity fade in, then the static pose.
+Layout: `lib/processLayout.ts` `flowLayouts` holds the classes that depend on the step count (grid,
+chevron offset, return box), as literal strings for Tailwind. Below `lg` the steps are rows (an
+88px bot beside the text, then a return row with an icon and the label); from `lg` they stand across
+a 2px ground line with chevrons between them and a dashed return path from the last bot back to
+step 2's, carrying the label. Below `lg` each bot stands on its own ledge (see Phone ledges). Five across uses a 32px gap; six across uses 16px up to `xl`, then
+32px, so six fit at 1024 (lead-checked) with the 136×88 bots. `ProcessReturn` takes the layout and
+the label; its label carries `lg:z-10`.
 
-Build, lint and tsc were green after the motion build. The lead screen-checked headless Chromium at
-1440×900, 360×740 (touch), 3840×2160 and 1440 under reduced motion: no console errors and no
-sideways scroll at any size across 14s of motion; bots are visible after the drop-in and also when
-the page loads already scrolled past the section; without interaction the body only rises ~1.4
-units (breathing, no jumps), while a hover (fine pointer) or tap (touch) jumps ~21 units; the relay
-job runs at 1440 and 4K and stays off at 360; under reduced motion the bots only fade in (the rigs
-keep just `opacity: 1`, no transforms).
+The job is the picked card's emblem: `lib/processEmblems.ts` `processEmblem(set)` returns the card's
+emblem (`aboutReplyProp`, geometry in `lib/rixProps.ts`) or, for `default`, the plain job sheet.
+`ProcessEmblem.tsx` draws it in step 1's (intake) bot's hand, visible at rest
+(`data-bot="prop"`, `data-prop`). `ProcessRelay` holds three ghosts, the job (`ProcessJob`) and the
+lesson (`ProcessLesson`) at `opacity-0`, aria-hidden, which the relay moves.
 
-From `lg`, with full motion, the relay runs every 16.4s (final numbers, screen-checked 2026-09-28). A
-blank 24px cream job pops in at bot 1, on the right of every bot (rules, team and check hold it at
-viewBox x 122, update further right at 126 so the built step clears the wrench), and each bot
-changes it on a beat of its own act, stopping 2s at each stop:
-- bot 1 writes two rules and stamps it
-- bot 2 adds a violet band and a step on its two hammer strikes
-- bot 3 flickers a tick in and flashes an outline glow, in sync with its lens flicker
-- bot 4 folds the corner on its page-flip beat
+Bots: each is a vector SVG built from the logo's MW strips (`lib/processBots.ts`; roles
+`rules`, `team`, `check`, `update`, `host`, `intake`, `flag`, `remind`, `ship`; `update` and `host`
+are used in the Discord flow), with separate feet cut from the W tips, so at rest each looks exactly
+as the logo. `data-bot` hooks: rig, feet, upper, body, eyes, arms, tool, hat, plus per-role extras.
+The SVG is `overflow-visible`.
 
-The acts themselves are retimed to fit inside the 2s dwell (rules ends 1.75s after its start, team
-1.69s, check 1.95s — "found it" pops at 1.55s — update 1.9s). The watching bot's eyes stay on the job
-to its right for what's left of the dwell (`RELAY_WATCH`), but 2s no longer leaves enough over for
-the job's hold bob or a watch blink, so neither plays now. A 3-ghost trail and a lit ground segment
-follow each hop, with the chevrons flashing cream; the job passes behind each bot (relay layer `z-1`,
-above the bots, below the `lg:z-10` loop label, which fully hides it while it crosses behind the
-label). Arrivals at 1440 land about 0.2/2.9/5.6/8.3s into the run.
+Motion (`ProcessMotion` runs `useScrollReveal` and `useProcessBots(section, set)`): header and step
+text reveal on scroll; the bots get smooth GSAP life (breathing, sway, arm drift, blinks, looks, foot
+taps), role acts (the new roles `intake`, `flag`, `remind` and `ship` play the host's nod,
+`lib/processBotFlowActs.ts`), naps, eyes and lean following the pointer (fine pointers), a hover or tap
+reaction (the only time a bot jumps, skipped while acting or reacting) and a once-per-load drop-in.
+Everything runs in one registry, paused off screen or with the tab hidden. On a new set the hook
+re-runs (`revertOnUpdate`, dependency `set`): it lets go of the old bots and rigs the new ones,
+already shown at rest with life started, no second drop-in. Reduced motion is an opacity fade in,
+then the static pose.
 
-At about 10.3s (bot 4's fold settled), the job is complete: it slides right along the ground line to
-14px inside the line's end (0.35s at `lg` and 1440, 0.46s at 4K, trailed by the ghosts and the lit
-ground segment), pops once as done (settling at 11.07s) and fades out there (gone by 11.37s) — no
-sideways scroll. At the same moment a 14px cream lesson card (`ProcessLesson`, a cut corner and one
-violet line) splits off the job's centre at bot 4, pops in and peels 10px up off the sheet, fades out
-leaving bot 4 at 10.8–11.0s (hidden the whole time, so it never crosses step 4's text), drops in at
-the return path's top-right start (R0) at 11.3s, and rides the path itself at 450px/s — no ghosts —
-lighting the path violet as it goes. It reaches the arrowhead (R7) at about 13.72s, where the
-arrowhead flashes and it pops out as it fades (about 13.97s); bot 1 takes the loop back at that
-moment. A run (return included) lasts about 13.7s at `lg`, 14.4s at 1440 and 14.7s at 4K — about 2s
-clear before the next run starts. Below `lg` the cascade stays at 9s.
+The crew relay is on (`RELAY_ON = true` in `lib/processBotMotion.ts`), once the bots have landed
+(from `RELAY_FIRST` 1.5s). `lib/processRelayPlan.ts` gives a run's visits in step order (one stop per
+step, each for its role's `RELAY_DWELL`, a `RELAY_HOP` apart); `processRelayRun.ts` plays them on one
+story shared by both geometries: along the ground line from `lg` (`lib/processRelay.ts`), ledge to
+ledge down the bot column below it (`processRelayColumn.ts`, `processRelayLedge.ts`). Step 1's held emblem (`data-bot="prop"`) is the job:
+at the hand-off (`processRelayHand.ts`) the travelling job takes its place and the emblem hides, and
+it returns, popping in, when the next run starts. At each stop the bot catches the job and the job
+changes on the bot's beat (`processRelayJob.ts`; the new roles `intake`, `flag`, `remind`, `ship` and
+`host` have their own acts in `lib/processBotFlowActs.ts`), then it hops on, bots tapping as it
+heads their way. After the last bot the job slides on to the line's end (from `lg`; below it, on
+the last ledge) and pops "done" and fades. In a flow with the return, the lesson splits off at the last bot and rides the return back; it ends on
+step 2 (`lessonTaker`: the rules bot). Discord is a one-way pass: no lesson and no fix hop. There is
+no fixed rhythm: the next run starts `RELAY_REST` (2s) after the last one ends. Run lengths (the
+animator's measure): five steps about 14.7–16.0s (19.9–21.2s with the fix hop), six steps about
+16.9–18.5s (22.1–23.7s), Discord 11.8s. Reduced motion has no relay.
 
-Lead's check in headless Chromium (2026-09-28, final numbers): screen-checked at 1024, 1440 and 3840
-— no console errors, no sideways scroll, the lesson never shows through the loop label, and the
-below-`lg` and reduced-motion revert are clean (no leftover style, transform, clip or colour on any
-relay element).
+Fix loop: in every flow with loops, step 3 ends with `ProcessFixReturn`
+(`process.flows.<set>.fixLabel`, the box's right edge from `flowLayouts[n].fixBox`), the work going
+back from step 4 to step 3. From `lg` a dashed arch stands over bots 3 and 4 with its label above
+it, on a `bg` mask at `z-10`, and the caption-to-steps gap is `lg:gap-24`; below `lg` it is a marker
+row at the end of step 3 holding the label, beside a dotted `accent` bracket (`process-fix-line`,
+with an arrowhead onto bot 3) down the bot column's left edge from bot 4's hand up to bot 3's. It
+shows at rest. On every second run (`FIX_EVERY = 2`;
+runs 2, 4, 6…), only in a flow with loops, the check finds something (its eyes pop, "found it", only
+on this run), the job shakes and goes back over the arch to step 3, which redoes its act, then
+forward to the check again (`processRelayFix.ts` from `lg`; the hop adds 5.2s there, 5.5s below
+`lg`). `process-fix-lit` lights with a `clip-path` reveal, the same technique as
+`process-return-lit`; below `lg` `process-fix-line-lit` lights behind the job along the dotted line
+and fades as the job hops forward (see Phone ledges). Motion never writes `process-fix`
+or step 3's `<li>`. The Discord flow has no fix loop, and its caption gap is `lg:gap-12` (48px).
 
-The relay now also runs below `lg` (built per `ui-spec/05-process.md` §5.9, choice 27), on the same
-16.4s clock as desktop (arrivals at 0.2/2.9/5.6/8.3s, 2s stops). The 16px job waits at each bot's
-right foot and drops one row per hop down the bot column, trailed by the 16px ghosts; there's no
-ground-lit, return-lit, arrowhead or chevrons below `lg`. At 10.3s, as the job exits, a 10px lesson
-pops in and fades in (0.6 → 1, settling at 10.65s) on bot 4's live rulebook position
-(`COLUMN_LESSON_FROM`, mapped through the `arm-left` group so it follows his breath, drift and sway).
-Bot 4 looks down-left at it (0.3s) and holds it (`acting`, so taps are ignored) until 11.25s
-(`COLUMN_LESSON_HOLD`, 0.6s after the pop settles); the job itself drops to 14px above the return
-row, pops once and fades by about 11.4s. At 11.25s the lesson lifts 4px with no fade (`LESSON_LEAVE`),
-bot 4's eyes ease back to rest, and bot 1's foot tap (`head(0)`) starts at that same moment. It then
-rides straight up the column's left lane at 450px/s (`RETURN_SPEED`, x easing into the lane over 0.3s
-if the live rulebook sits off it — `COLUMN_LESSON_GLIDE`); at bot 1's clipboard it pops out
-(`LESSON_OUT`) and bot 1 squashes (`receive`) as it takes the loop back. Removed on phones: the split
-and peel at the job, the fade-out leaving bot 4, the rise-in at the return icon and the icon's flash
-(it no longer flashes). A phone run is about 12.6–12.9s (360: 12.92s, 390: 12.80s, 768: 12.64s),
-leaving about 3.5s clear before the next run. This replaces the old below-`lg` 9s cascade
-(`cascadeRun`, `CASCADE_EVERY`/`CASCADE_GAP` are removed, and `catchRelay` no longer takes a `relay`
-flag).
+Phone ledges: below `lg` each step's bot stands on its own ledge, `ProcessLedge` (placed by
+`ProcessStep` after the bot; every `<li>` is `relative` with no z-index): a 2px `bg-line` bar
+(`process-ledge`) at x 18–88 of the row, its top on the bot's feet, hidden from `lg` where the ground
+line does this job, holding a lit overlay (`process-ledge-lit`, the ground-lit gradient,
+`opacity-0` at rest). There is no vertical rail. The ledges and the dotted fix line show at rest,
+without JavaScript and under reduced motion. Under full motion the job hops ledge to ledge
+(`lib/processRelayColumn.ts`, `lib/processRelayLedge.ts`): each hop is a thrown arc, `LEDGE_HOP` (6px
+lift above the higher ledge, rise and fall split by the square roots of their heights); stops 2…n
+land at each bot's `JOB_AT` on its ledge's top; at the hand-off the job drops out of the hand onto
+ledge 1 over `JOB_HAND_OFF`, then hops on. Each `process-ledge-lit` fades in as the job lands and out
+as it hops off (`LEDGE_LIT`: 0.15s in, 0.35s out); ledge 1 only flashes at the hand-off; on the last
+ledge the job pops "done" and fades with its light and there is no exit slide. On the fix run the
+job goes back along the dotted fix line (`lib/processRelayFixLine.ts`): left off ledge 4, up the
+bracket, through the arrowhead into bot 3's hand, onto ledge 3, in `FIX_LINE_HOP` (1.1s
+`power1.inOut`). The route is measured from the bracket's box (`process-fix-line`, read only) at
+setup, resize and refresh, and turns 3 points per quarter circle; `process-fix-line-lit` lights
+behind the job by `clip-path` and fades as the job hops forward; the ghosts trail the route. A flow
+with no fix line falls back to the straight rise from ledge 4 to 3 (`FIX_HOP`, 0.8s), unlit. From
+`lg` the fix hop is unchanged. The lesson keeps its lane up the left edge, over the
+fix line's ends. A step with no lit overlay just doesn't light. Under reduced motion nothing hops
+or lights (the relay runs only under full motion). Without the exit drop, Discord's phone run ends
+about 0.35–0.5s sooner than its 11.8s; the other flows' phone run lengths are not re-measured.
 
-Screen-checked at 390px: the lesson appears on bot 4's rulebook, holds, lifts off and rides the left
-lane to bot 1; no overlap with step text or the loop label, no sideways scroll, no console errors;
-reduced motion shows no relay; resizing across `lg` mid-run reverts cleanly both ways. A recheck at
-360 and 768 couldn't run — the dev server returned 500 from separate, in-progress Proofs work
-(`content/home.ts` removed `cardShotAlt`, which `ProofsSection.tsx` still reads); pending.
+Lead check 2026-10-05 (production build, headless Chromium): lint, tsc and build green. Static at
+360, 768, 1024, 1440 and 3840, for three sets: ledges flush under the feet (x 18–88), the fix line
+dotted from bot 3 to bot 4, its label on one line, no sideways scroll, no console errors, and from
+1024 unchanged. Full motion at 360 and 768: the job lands on every ledge in order within about 4px,
+each ledge lights in turn; on the fix run (every second run, `FIX_EVERY`) the job goes 4 to 3 to 4.
+Safari, Firefox and real devices are unchecked.
 
-`ProcessRelay.tsx` shows the relay layer at every width now (`pointer-events-none absolute inset-0
-z-1`), with the ghosts `size-4` below `lg`; `ProcessJob.tsx` is `h-4.75 w-4` below `lg`;
-`ProcessLesson.tsx` is `size-2.5` below `lg`; `ProcessReturn.tsx`'s return row carries
-`data-anim="process-return-row"` so the relay can find the icon it flashes. `lessonEnter` now takes
-a side argument (above on desktop, below on phones). In `hooks/useProcessBots.ts`, the width picks
-the geometry: `wide` (from `lg`) builds `relayParts`/`relayRun` as before, otherwise `columnParts`/
-`columnRun` from the new `lib/processRelayColumn.ts` runs the vertical relay, sharing the job,
-lesson and trail helpers with desktop.
+Lead check 2026-10-05 (production build, headless Chromium, service-business, fix run along the
+line): lint, tsc and build green. At 360 and 768 the job's centre is 0–1.4px off the line on the
+climb, the light fills behind it, no sideways scroll, no console errors. Real devices unchecked.
 
-Lead's check in headless Chromium (2026-09-28): screen-checked at 360, 390, 768, 1023, 1024, 1440 and
-3840 — no console errors and no sideways scroll; below `lg` the job, ghosts and lesson never overlap
-step text or the loop label; reduced motion shows no relay; resizing across `lg` mid-run reverts
-cleanly and restarts in the right geometry; desktop behaviour is unchanged.
+Lead check 2026-10-04 (production build, Discord flow): lint and build pass. At 360, 768, 1024,
+1440 and 3840 discord shows five steps with bots intake, rules, update, ship, host, `data-loops="off"`,
+no return and no fix elements, no sideways scroll and no console errors; online-store and default
+still show both loops (`data-loops="on"`). Section height, discord vs a five-step flow with loops:
+1249 vs 1359 at 360; 1179 vs 1264 at 768; 868 vs 1022 at 1024; 937 vs 1081 at 1440; 945 vs 1089 at
+3840. Switching sets by the tag (Discord, Online store, Discord, Developer or team, Discord) at 1440
+re-rigs the bots with no errors.
+
+Lead check 2026-10-03 (production build, after the fix loop): both loops render at 360, 768, 1024,
+1440 and 3840 (top arch and label from `lg`, marker row in step 3 below it), no sideways scroll, no
+console errors; tsc, lint and build are green.
+
+Lead check 2026-10-03 (production build): at 360, 768, 1024, 1440 and 3840 no sideways scroll, no
+tap target under 44px and no console errors; `?for=` sets the flow; six steps fit at 1024; the tag
+sets the pick by pointer and keyboard; with no JavaScript the `default` flow renders and the tag
+hides.
 
 ## Key Files
 
-- `components/home/process/` — ProcessSection, ProcessList, ProcessStep, ProcessBot, ProcessReturn,
-  ProcessMotion
-- `lib/processBots.ts` — the bots' vector geometry (body strips, eyes, hats, tools) and each step's
-  role/static pose; now also holds the bare `host` role (no hat/tools) used by About's mascot
-- `hooks/useProcessBots.ts` (wiring)
-- `lib/processBotMotion.ts` (constants)
+- `components/home/process/` — ProcessSection, ProcessFlow (the set's flow and the tag),
+  ProcessList, ProcessStep, ProcessBot, ProcessEmblem (the job in step 1's hand), ProcessReturn,
+  ProcessFixReturn (the fix loop, step 4 back to 3; dotted bracket below `lg`), ProcessLedge (the
+  phone ledge under each bot below `lg`),
+  ProcessRelay, ProcessJob, ProcessLesson, ProcessMotion
+- `components/home/pick/ShownForTag.tsx` — the "Shown for" tag (see `sections/02a-about.md`)
+- `hooks/useShownSet.ts` — the set the flow draws (the About pick through `pickSet`)
+- `lib/aboutPick.ts` — `pickSet`, the pick-to-set mapping
+- `lib/processFlows.ts` — each set's roles per step, `hasLoops` and `flowLoops`, `rolePose`,
+  `flowSteps`
+- `lib/processLayout.ts` — the step-count-dependent layout classes
+- `lib/processEmblems.ts` — the job each flow follows (the card's emblem, or the job sheet)
+- `lib/rixProps.ts` — the emblems' geometry (shared with About)
+- `lib/processBots.ts` — the bots' vector geometry (body strips, eyes, hats, tools), the roles and
+  their static poses; also the bare `host` role used by About's mascot
+- `components/home/process/ProcessFlow.tsx` also names the swap-fade wrappers (`useSwapFade`)
+- `hooks/useSwapFade.ts`, `lib/shownSet.ts`, `hooks/useShownForMotion.ts` — the shared swap fade
+  and the tag's open fade (see `../page.md`)
+- `hooks/useProcessBots.ts` (wiring: the relay's runs, `RELAY_REST`, `FIX_EVERY`)
+- `lib/processBotMotion.ts` (constants, including `RELAY_ON`, `RELAY_REST`, `FIX_EVERY`)
 - `lib/processBotRig.ts` (hooks, pivots, summed channels, reset)
 - `lib/processBotLife.ts` (breathing, sway, drift, blinks, looks, taps)
 - `lib/processBotActs.ts` (role acts, the reaction jump, relay catches, naps)
+- `lib/processBotFlowActs.ts` (the acts of `intake`, `flag`, `remind`, `ship`; `host` uses the nod)
+- `lib/processBotMoves.ts` (shared bot moves)
 - `lib/processBotEntrance.ts` (drop-in)
 - `lib/processBotPointer.ts` (pointer to look/lean mapping)
-- `lib/processRelay.ts` (relay waypoints and the ground-line job run — including its
-  slide-to-line-end exit and the lesson's split-off and ride back along the return path)
-- `lib/processRelayColumn.ts` (the same run turned vertical below `lg`: column waypoints,
-  `columnRun`, the job's row-by-row drop, the exit drop to the return row, and the lesson's
-  appearance on bot 4's live rulebook and its ride up the column's left edge to bot 1's clipboard)
 - `lib/processBotCrew.ts` (the one registry that pauses everything)
-- `components/home/process/ProcessRelay.tsx` (the relay layer — ghosts, then the job, then the
-  lesson card)
-- `components/home/process/ProcessJob.tsx` (the job SVG)
-- `lib/processJob.ts` (job paths and pivots)
-- `components/home/process/ProcessLesson.tsx` (the lesson card SVG)
-- `lib/processLesson.ts` (lesson card path and line)
-- `lib/processRelayJob.ts` (the job's blank start, per-bot changes, its wait-bob and its
-  slide/pop/fade exit)
-- `lib/processRelayLesson.ts` (the lesson's split-off/leave/enter for the desktop return, its
-  pop-in/lift for bot 4's rulebook below `lg`, and its pop-out at the arrowhead or bot 1's clipboard)
-- `lib/processRelayTrail.ts` (ghosts and lit ground segment for hops and the job's exit slide,
-  chevron/arrowhead flashes, the return-lit overlay — no ghosts on the return)
-- `hooks/useScrollReveal.ts` — the reusable scroll-reveal hook this section uses (also usable by
-  other sections; see `../page.md`)
+- `lib/processRelayPlan.ts` (a run's visits and clock), `lib/processRelayRun.ts` (the story both
+  geometries share), `lib/processRelay.ts` (ground line, from `lg`), `lib/processRelayColumn.ts`
+  (bot column, below `lg`), `lib/processRelayLedge.ts` (the ledge hop and each ledge's light, below
+  `lg`), `lib/processRelayFixLine.ts` (the way back along the dotted fix line and its light, below
+  `lg`), `lib/processRelayJob.ts` (the job's changes on each bot's beat),
+  `lib/processRelayHand.ts` (the emblem hand-off), `lib/processRelayFix.ts` (the fix hop),
+  `lib/processRelayLesson.ts`, `lib/processRelayTrail.ts`, `lib/processJob.ts`,
+  `lib/processLesson.ts` — the crew relay (on)
+- `hooks/useScrollReveal.ts` — the reusable scroll-reveal hook this section uses (see `../page.md`)
 - `lib/watchLive.ts` — on-screen/tab-visible watcher, reused from elsewhere
 - `components/icons/ChevronRightIcon.tsx`, `components/icons/CornerUpLeftIcon.tsx`
 
 ## Decisions
 
-- 2026-09-24 — Process is a departure from v3: four steps as a loop — written rules → agents do
-  the work → they check themselves → lessons update the rules (then back to step 1). Facts: "How
-  the user works". Numbered label 02 and a big heading; copywriter words it. **Superseded
-  2026-09-25.**
-- 2026-09-25 — Process has four steps, set by the user, in order: (1) work starts with the user's
-  rules enforced; (2) specialized agents follow those rules or work in a defined boundary; (3) a
-  separate agent verifies and validates their work; (4) the workflow is updated each cycle or
-  session. The Plan and Design steps from the first canvas draft are dropped. `copywriter` writes
-  the step copy in `content/home.ts`. Facts: "How the user works". Replaces the 2026-09-24 loop
-  wording (written rules → agents do the work → they check themselves → lessons update the rules)
-  and the 2026-09-25 "steps aren't known yet" line.
-- 2026-09-25 — The design lives on the Claude Design canvas "Process mascots"
-  (https://claude.ai/artifact/7CawmF4tBKgv4ALtJJyE69): desktop and phone boards, a sprite sheet,
-  and a reusable Clawd component. One mascot per step: step 1 wears a peaked cap and holds a
-  clipboard; step 2 a hard hat and hammer; step 3 a magnifier; step 4 a wrench in one hand and the
-  rulebook in the other. Terracotta is the default accent on the canvas, with violet available as
-  a tweak. **Superseded 2026-09-25.**
-- 2026-09-25 — Clawd is dropped (it's Anthropic's trademark; its guidelines forbid implied
-  endorsement and altering the mark). The mascots are now the user's own character, built from
-  their new MW logo: three `/` strips cut from one shape whose top edge is an M and bottom edge a
-  W, with the two gaps opening into square eyes where they cross the midline (reads the same
-  upside down). Logo explored on the Claude Design canvas "MW logo"
-  (https://claude.ai/artifact/8WaNGpr3x7qDFw3qupVTio). The canvas "Process mascots"
-  (https://claude.ai/artifact/7CawmF4tBKgv4ALtJJyE69) now shows this crew with the current step
-  copy — Guardrails, The team, Independent check, Lessons kept — using the site accent (violet),
-  with terracotta available as a tweak. Roles unchanged: step 1 a peaked cap and clipboard; step 2
-  a hard hat and hammer; step 3 a magnifier; step 4 a wrench and rulebook.
-- 2026-09-24 — Process desktop: a ring with the four steps at its quarter points (dot, STEP
-  label, title, one line), the heading beside it, direction shown so it reads as a cycle. New
-  design beyond v3, so ui-designer specs it. **Superseded 2026-09-25.**
-- 2026-09-24 — Process phone: steps stacked in a column on a line down the left, with the line
-  curving from step 4 back up to step 1 so it still reads as a loop. **Superseded 2026-09-25.**
-- 2026-09-24 — Process static state: the loop line is violet and all four dots are lit. Motion
-  (later): GSAP sends a dot travelling round the loop continuously, lighting each step as it
-  passes; under reduced motion it stays fully lit. **Superseded 2026-09-25.**
-- 2026-09-24 — Process is built as one `<ol>` of four steps that CSS places as a column with a
-  bordered return loop below `xl`, or around an `aria-hidden` SVG ring from `xl`; static violet
-  lines, all dots lit, `data-anim` hooks in place.
-- 2026-09-24 — Audit fix: the process loop label stays available to screen readers at `xl`
-  (`xl:sr-only`).
-- 2026-09-25 — Process pins its label and heading at 120px from the top from `xl` (two columns
-  only from `xl`; CSS sticky, no JS), part of the site-wide split/sticky-title pattern (see
-  `../page.md`). Process pins and travels visibly. **Superseded 2026-09-26.**
-- 2026-09-25 — Process is being redesigned: the four-step ring (desktop) and the column with a
-  return loop (phone) are replaced, per the Claude Design canvas above. Replaces the 2026-09-24
-  ring/loop and travelling-dot motion decisions above.
-- 2026-09-25 — Each step gets one pixel mascot: Clawd, the Claude Code pixel mascot (a 12×8 cell
-  sprite), one per step (no new count beyond the steps); his role in the step shows through
-  something he wears or holds; no agent names (facts: "How the user works"). **Superseded
-  2026-09-25.**
-- 2026-09-25 — Mascot sprite: the MW mark drawn as pixels (15×14) on a 21×18 cell sprite — hats
-  above, one arm cell each side, the W's two points are the feet. One mascot per step (no new
-  count beyond the steps); the role shows through what it wears or holds; no agent names (facts:
-  "How the user works"). **Superseded 2026-09-26.**
-- 2026-09-25 — The steps themselves change from the four locked now; the new steps aren't known
-  yet. **Superseded 2026-09-25** (same-day decision above locks the four steps).
-- 2026-09-25 — Mascots keep Clawd's own colour, terracotta #DA7758 — a new colour token, to be
-  added through the `design-tokens` skill before use. **Superseded 2026-09-25.**
-- 2026-09-25 — Mascot rendering: inline SVG of `<rect>`s on a 12×8 viewBox with
-  `shape-rendering="crispEdges"`, scaled in whole-number cell sizes only. Motion is stop-motion:
-  GSAP frame swaps at about 8fps (125ms), moves of whole cells, stepped or no easing, varied holds,
-  from a small set of moves (blink, look, bob, shuffle, wave). Never squash, rotate, blur or
-  ease-slide. Reduced motion = one static pose. Pause when off screen or the tab is hidden.
-  `aria-hidden` unless a label comes from `content/`. **Superseded 2026-09-25.**
-- 2026-09-25 — Mascot motion: stop-motion frames are idle, blink, act and sleep. The eyes slide
-  along the diagonal gaps — up toward tools held on the right, down toward tools held on the left
-  — and a blink closes the eyes back into the gaps. Everything else from the earlier rendering and
-  motion rules still holds: whole cells, about 8fps, reduced motion shows one static pose, pause
-  when off screen, `aria-hidden`. **Superseded 2026-09-27** (stop-motion framing; the eyes-slide-
-  along-the-gaps idea is kept, now as smooth pointer-follow motion — see below).
-- 2026-09-25 — The Process redesign is led by the user's Claude Design export: the export's steps,
-  what each mascot wears or holds, the mascot colour and whether the site accent changes are all
-  taken from the design, not decided ahead of it. **Superseded 2026-09-25** (the export has now
-  landed; see the canvas decision above).
-- 2026-09-26 — Mascot colour: the body uses the existing violet accent; no new token, and
-  terracotta is dropped.
-- 2026-09-26 — Layout: the canvas's stacked layout, replacing the sticky-title split — the heading
-  sits above the steps at every width, and Process no longer pins its title column (`stickyTitleXl`
-  is being removed from `lib/styles.ts`; see `../page.md`). Supersedes the 2026-09-25 pin decision
-  above.
-- 2026-09-26 — Built per `ui-spec/05-process.md` (rewritten 2026-09-26): below `lg`, a phone row
-  shows an 84px bot beside the text, then a return row; from `lg`, four across with 126px bots on
-  a 2px ground line, three chevrons between them, and a dashed violet return path from bot 4 to
-  bot 1 carrying the loop label. Each bot is one `aria-hidden` SVG with four frame groups (idle,
-  blink, act, sleep), only the static pose visible (step 3 `act`, the others `idle`); motion hooks
-  only, no motion yet. **Pixel-cell parts superseded 2026-09-26** (4px/6px cells, `crispEdges`,
-  whole-cell rects — mascots are now vector, see below; the layout otherwise still holds).
-- 2026-09-26 — Step numbers read two digits ("Step 01"), as on the canvas.
-- 2026-09-26 — The lone cream "job block" square from the canvas is left out. **Superseded
-  2026-09-28.**
-- 2026-09-26 — Mascots are a sharp vector, not pixels (the logo is sharp; the mascot was
-  pixelated): the body is the logo's own geometry, with square eye holes in the gaps that jump
-  along them; hats and tools are flat, sharp-cornered shapes using the logo's 45° language. Roles
-  unchanged: a peaked cap and clipboard; a hard hat and hammer; a diamond magnifier; an open-end
-  wrench and rulebook. The canvas "Process mascots"
-  (https://claude.ai/artifact/7CawmF4tBKgv4ALtJJyE69) shows the vector crew. Supersedes the
-  2026-09-25 pixel-sprite decision and the pixel-cell parts of the 2026-09-26 build decision above.
-- 2026-09-26 — Motion: the bots breathe — stop-motion, stepped, no tween: rest → half → full →
-  half over 2.25s (125ms steps); the body stretches up from the feet, with the hat and tools
-  riding along; the four bots run out of phase. Paused off screen or when the tab is hidden; off
-  under reduced motion (one static pose). **Superseded 2026-09-27.**
-- 2026-09-26 — Motion stays stop-motion frame swaps at about 8fps for blink/act/sleep too (user's
-  choice, over smooth tweens). **Superseded 2026-09-27.**
+- 2026-10-05 — User's request ("the object should go back from the dotted route instead of a step back"): below `lg` the fix run's job goes back along the dotted fix line (left off ledge 4, up the bracket, through the arrowhead into bot 3's hand, onto ledge 3) in 1.1s `power1.inOut` (`FIX_LINE_HOP`), with `process-fix-line-lit` lighting behind it, instead of rising straight up the bot column.
+- 2026-10-05 — User's call: below `lg` the phone track is cut. A short 2px `bg-line` ledge under every bot replaces the vertical rail, and the emblem hops ledge to ledge, each ledge lighting violet as it lands (built). The fix loop's ↰ icon becomes a dotted `accent` bracket on the left from step 4's bot up to step 3's bot, with the label "Breaks your rules? Redone." beside it. Nothing changes from `lg`. Spec: `ui-spec/05-process.md` §5.3a, §5.7, §5.9, choices 53–61; the old track spec is `ui-spec/05-process-track-legacy.md`.
+- 2026-10-03 — Process no longer shows one fixed "how I work" flow. Each About card gets its own
+  flow, `process.flows.<set>`, showing the agent doing that visitor's job (following the card's lead
+  offer), with the user's rules; every flow but Discord has a separate check and the lesson loop
+  built into the steps. Flows are illustrations (constitution §7.5).
+- 2026-10-04 — The Discord flow has no check and no loops: it shows the bot's own behaviour in five
+  steps (Mentioned, Your tone, Remembers, Connected, Always on), with no "Second check", fix return
+  or bottom return loop, and `process.flows.discord` has no `loopLabel` or `fixLabel`; the other
+  five flows keep the check and both loops (user's reason: a Discord bot doesn't validate or loop;
+  it stays in chat around the clock, answers mentions in a set tone, can remember past chats and
+  connects to other apps). Its bots are intake, rules, update, ship, host (ui-spec §5.10); data is
+  `hasLoops` and `flowLoops(set)` in `lib/processFlows.ts` and `data-loops` on the flow wrapper.
+- 2026-10-03 — Flows run five or six steps (ui-spec §5.10): service business and developer or team
+  six, the others five. Every flow but Discord starts intake, rules, team, check, then remind and
+  flag (service business), flag and ship (developer or team) or flag (the others). Wording is the
+  copywriter's.
+- 2026-10-03 — "Second check" is backed by the facts line "A separate agent checks the work before
+  it goes out"; "flag" means anything unusual goes to a person, drawn as a bot raising a flag (no
+  person is drawn); the return loop lands on step 2, "your rules".
+- 2026-10-03 — Bot roles: new `intake`, `flag`, `remind`, `ship`; `rules`, `team` and `check` stay
+  (`team` does every "done" step); `update` and `host` are used in the Discord flow only.
+- 2026-10-03 — Every flow but Discord gets a second return line along the top, from step 4 "Second
+  check" back to step 3 (the work step): a problem or broken rule sends the work back until it
+  passes. Its label (`fixLabel`) sits above the arch from `lg`, the caption-to-steps gap becomes
+  `lg:gap-24`, and below `lg` it's a marker row at the end of step 3. The bottom loop (last step to
+  step 2) is unchanged; step 4 lines read "…against your rules" (ui-spec §5.3a).
+- 2026-10-03 — Six bots across from `lg` keep their 136px size with a tighter 16px gap up to `xl`,
+  so no step-title word passes 9 characters.
+- 2026-10-03 — The job the bots pass is the picked card's emblem (the one Rix carries), or the plain
+  job sheet by default; step 1's bot holds it on the static page. Each flow has a "sample job"
+  caption under the tag.
+- 2026-10-03 — The same "Shown for: …" tag as Agents; each flow is written in its card's tone. The
+  tag is hidden without JavaScript, where the default flow shows.
+- 2026-10-04 — Set swaps fade (0.15s out, swap, 0.25s in; opacity only, the same under reduced
+  motion) from one shared store (`lib/shownSet.ts`), so Agents, Process and the bots change in one
+  commit; `holdInView` holds the tag again when the swap lands; the "Shown for" list fades in over
+  0.2s on open with the chevron turning (no turn under reduced motion). In Process the wrappers are
+  `process-caption` and the keyed body.
+- 2026-10-04 — The new roles have their own acts (`intake`, `flag`, `remind`, `ship`, `host`); the
+  check's "found it" eye pop plays on the relay only when the job really goes back.
+- 2026-10-04 — Discord's relay is a one-way pass (no lesson, no fix hop), 11.8s.
+- 2026-10-04 — Step 1's held emblem (`data-bot="prop"`) hides at the hand-off and returns when the
+  next run starts; the job is the emblem travelling.
+- 2026-10-04 — The fix hop (the job going back over the arch from step 4 to step 3, which redoes its
+  act) plays on every second run (`FIX_EVERY = 2`), only in flows with loops, and adds 5.2s;
+  `process-fix-lit` lights with a `clip-path` reveal, like `process-return-lit`.
+- 2026-10-04 — The crew relay is back on (`RELAY_ON = true`; user: "do motion now"), rebuilt for five
+  or six steps. The fixed 16.4s rhythm (`RELAY_EVERY`) is gone: the next run starts `RELAY_REST = 2`
+  seconds after the last one ends, because run length now differs per flow. Discord's naps stay as
+  built (rules and update), the lead's default for ui-spec choice 42. Reduced motion is unchanged.
+- 2026-09-28 — The bots jump only on user interaction (hover or tap); a caught bot plays its full
+  role act instead; waking from a nap is a startle with the feet planted; the magnifier's "found it"
+  is an eye pop. While a bot is active or reacting, hover and tap are ignored (a napping bot still
+  wakes and jumps), and its timed-act scheduler restarts after any catch or reaction
+  (`lib/processBotActs.ts` `nextActAfter`). The scroll-in drop stays (a fall, not a jump).
+- 2026-09-28 — From `lg`, the loop label carries `lg:z-10` (`ProcessReturn.tsx`) so a relay job
+  passes behind it as the dashed line does. Animating transform or opacity on the `process-return`
+  box or its parent would create a stacking context and break this.
+- 2026-09-27 — The bots have separate feet: the W's two bottom points are cut off the strips as
+  their own pieces, so at rest the silhouette is exactly the logo. In motion the feet stay planted
+  while the body breathes, squashes and crouches; on a jump they leave last and land first; they tap
+  during idle and shuffle during hammer strikes. The body stretches from the top of the feet.
+- 2026-09-27 — The bots move with fully smooth GSAP motion (tweens, easing, squash and stretch,
+  rotation), one rig each with movable parts: a living idle, role acts and naps, plus four extras:
+  eyes follow the pointer along their gaps (fine pointers), a scroll-in drop onto the ground line, a
+  crew relay (on, see above), and a hover/tap reaction. Reduced motion stays per constitution §5:
+  fades only, static poses. Spec: `ui-spec/05-process-motion.md`.
+- 2026-09-26 — Process motion: the header and each step's text reveal on scroll (fade only under
+  reduced motion).
 - 2026-09-26 — The bot SVG is `overflow-visible`, not `overflow: hidden`, so the update wrench's
   jaw isn't clipped (lead's decision). `ui-spec/05-process.md` §5.8 choice 8's clipped-jaw choice
   is stale/overridden.
-- 2026-09-26 — Process motion built: the header and each step's text reveal on scroll (fade only
-  under reduced motion). **Bot part (breathe and swap frames in stop-motion on one shared 125ms
-  clock, each looping its own out-of-phase script of blinks, act stretches and occasional naps)
-  superseded 2026-09-27.**
-- 2026-09-26 — Lead's checks: build and lint are green, with no sideways scroll at 360/768/1440/3840.
-  In a real browser, full motion showed breathing and frame swaps; under reduced motion each bot
-  stayed in its static pose with no transforms; the reveals ended at opacity 1.
-- 2026-09-27 — User's decision: the Process bots move to fully smooth GSAP motion (tweens and
-  easing, squash and stretch, rotation), replacing stop-motion. Each bot becomes one rig with
-  movable parts (eyes, arms and tools, hat, per-role effects such as sparks, a flipping page and
-  floating z's) instead of four frame groups. It gets a living idle (breathing, sway, blinks,
-  look-arounds), role acts (clipboard writing, hammer strikes, magnifier scans, wrench ratchets)
-  and naps. On top of that come four extras the user chose: the eyes follow the pointer along
-  their gaps (fine pointers); a scroll-in entrance where the bots drop onto the ground line; a crew
-  relay where an accent dot travels the ground line and return path and each bot reacts as it
-  passes (from `lg`; below `lg` the bots react in turn). **"Below `lg` the bots react in turn"
-  superseded 2026-09-28** (the crew relay now runs below `lg` too, as a vertical relay — see
-  below); and a hover/tap reaction (jump and act).
-  **Jump narrowed 2026-09-28** (see below). Reduced motion stays per constitution §5: fades only,
-  static poses. Spec:
-  `ui-spec/05-process.md` §5.6–5.7 (rewritten 2026-09-27).
-- 2026-09-27 — User's decision: the bots get separate feet — the W's two bottom points are cut off
-  the strips as their own foot pieces, so at rest the silhouette is exactly the logo, with no
-  visible seam. In motion the feet stay planted while the body breathes, squashes and crouches; on
-  a jump they leave last and land first; they tap during idle and shuffle during hammer strikes.
-  The body now stretches from the top of the feet. Spec: `ui-spec/05-process.md` §5.6–5.7.
-- 2026-09-28 — User's change: the bots jump only on user interaction (hover or tap). The relay
-  catch (and the cascade below `lg`) no longer hops — a caught bot plays its full role act instead,
-  "they play their part when it's their step" — and waking from a nap no longer hops either: it's a
-  startle with the feet planted. The magnifier's "found it" is an eye pop, not a hop. The hover/tap
-  reaction stays a jump plus the short act. The scroll-in drop stays (it's a fall, not a jump).
-- 2026-09-28 — After a relay/cascade catch or a hover/tap reaction, the bot's timed act scheduler
-  restarts, so its next random act comes the usual 5–10s after it ends and never stacks right
-  behind it (`lib/processBotActs.ts` `nextActAfter`).
-- 2026-09-28 — From `lg`, the loop label gets `lg:z-10` (`ProcessReturn.tsx`), so the relay dot
-  passes behind it along the return path, as the dashed line does. Animating transform or opacity
-  on the `process-return` box or its parent would create a stacking context and break this.
-- 2026-09-28 — The relay job is built per ui-spec §5.7 (revised 2026-09-28), with the lead accepting
-  its choices 16–24: the job paints behind the bots **(superseded 2026-09-28, see below)**, a cream
-  spark traces the return **(superseded 2026-09-28, see below)**, the return lights violet, chevrons
-  flash cream, team strikes twice on a relay catch, the relay runs every 15s (the run is about 12s;
-  the cascade stays at 9s **(superseded 2026-09-28, see below — the crew relay now runs below `lg`
-  too, as a vertical relay)**), and timed acts and naps keep clear of a bot's catch (`RELAY_CLEAR`).
-  Supersedes the 2026-09-28 "relay dot becomes the job" plan line and the 2026-09-26 "lone cream job
-  block ... left out" line.
-- 2026-09-28 — User revises the relay job: the job paints above the bots and below the loop label
-  (relay layer `z-1`, label `lg:z-10` with a taller `bg-bg` backing: `lg:px-5 lg:py-3`), so it never
-  peeks from behind a bot and is fully hidden while it passes behind the label. It grows to 24px
-  with a clear mark from each bot: rules writes two lines and a violet stamp, team adds the band and
-  step, check adds the tick with an outline glow, update folds the corner. It stays about 3s at each
-  bot **(superseded 2026-09-28, see below)**. After bot 4 the job itself rides the dashed return path
-  (replacing the cream spark, which is removed) back to bot 1 **(superseded 2026-09-28, see below —
-  the job now stops at the ground line's end and a separate lesson card rides the return; the trail
-  ghosts stay with the job, not this return ride)**. Runs are about 20s apart from `lg`
-  **(superseded 2026-09-28, see below)**. Supersedes the "job paints behind the bots" and "a cream
-  spark traces the return" parts of the earlier 2026-09-28 relay-job entry.
-- 2026-09-28 — User revises the relay job's timing and side: it stops 2s at each bot (was 3s), and
-  sits on the right of every bot, bots 1 and 4 included (it was on their left — the clipboard and
-  the rulebook); each bot watches it on that side. It repeats about every 16s, so the gap between
-  runs stays about 2s. Supersedes the "about 3s at each bot" and "Runs are about 20s apart from `lg`"
-  lines from the entry above.
-- 2026-09-28 — While a bot is active (any act: its relay step, the cascade step, its timed acts, the
-  loop-back squash) or already reacting, hover and tap are ignored; there's no queued jump. A napping
-  bot still wakes and jumps on hover or tap. Eye and lean follow are unchanged. **Narrows the
-  2026-09-27 "hover/tap reaction (jump and act)" extra and its "interrupts naps and idle acts" detail
-  in `ui-spec/05-process.md` §5.7 (superseded there, not deleted).**
-- 2026-09-28 — User's decision: after bot 4 the job is complete, not carried back. It slides right
-  along the ground line to the line's end, pops once as done, and fades out there, with no sideways
-  scroll. At the same moment a small lesson card (14px cream card with a cut corner and one violet
-  line, like a rulebook page) splits off at bot 4 and rides the dashed return path back to bot 1,
-  lighting it, hidden behind the loop label as it passes; bot 1 takes it with the squash at the
-  arrowhead. The three trail ghosts stay with the job (its hops and exit slide), not the lesson card
-  — the return path carries the lesson card alone, no ghosts. Supersedes the "After bot 4 the job
-  itself rides the dashed return path ... back to bot 1" clause in the 2026-09-28 relay-job-revision
-  entry above (superseded, not deleted).
-- 2026-09-28 — User's decision: the crew relay runs below `lg` too (phones and tablets), as a
-  vertical relay per `ui-spec/05-process.md` §5.9 (choice 27). The job is 16px, waiting at each
-  bot's right foot and dropping down the bot column past only the next bot's hand and tool.
-  There's no track: the ghosts only show the path, and the static page is unchanged. After bot 4,
-  the job drops to the return row, pops and fades. **A 10px lesson rises in at the return icon
-  (which flashes) and rides the column's left edge up to bot 1's clipboard — superseded
-  2026-09-28** (bot 4 hands the lesson over instead; see below). The clock is the
-  desktop one. It replaces the 9s cascade below `lg`. Supersedes the 2026-09-27 "below `lg` the
-  bots react in turn" clause and the 2026-09-28 "the cascade stays at 9s" clause above (both
-  superseded, not deleted).
-- 2026-09-28 — User's decision: on phones (below `lg`), bot 4 hands the lesson over. As the job
-  leaves, the lesson appears in bot 4's rulebook hand (screen left), and he looks at it briefly
-  (about 0.6s); then it lifts off and rides straight up the column's left edge to bot 1's
-  clipboard, where bot 1 receives it. This replaces, below `lg`, the lesson splitting and peeling
-  off the job beside the wrench, fading there, and rising in at the flashing return icon — the
-  icon no longer flashes. The desktop relay is unchanged. Spec: `ui-spec/05-process.md` §5.9,
-  choice 27(c) (marked superseded there, not deleted).
+- 2026-09-26 — Mascots are a sharp vector, not pixels: the body is the logo's own geometry, with
+  square eye holes in the gaps; hats and tools are flat, sharp-cornered shapes using the logo's 45°
+  language. The canvas "Process mascots" (https://claude.ai/artifact/7CawmF4tBKgv4ALtJJyE69) shows
+  the vector crew; its step-to-role mapping is superseded by the flows above (the drawings stay).
+- 2026-09-26 — Mascot colour: the body uses the existing violet accent; no new token.
+- 2026-09-26 — Layout: the canvas's stacked layout — the heading sits above the steps at every
+  width, and Process does not pin its title column (excluded from the sticky-title pattern, like
+  Proofs; `stickyTitleXl` is gone from `lib/styles.ts`; see `../page.md`).
+- 2026-09-26 — Step numbers read two digits ("Step 01"), as on the canvas.
+- 2026-09-25 — Clawd (Anthropic's trademark) is dropped; the mascots are the user's own character,
+  built from their MW logo: three `/` strips cut from one shape whose top edge is an M and bottom
+  edge a W, with the two gaps opening into square eyes where they cross the midline. Logo explored
+  on the canvas "MW logo" (https://claude.ai/artifact/8WaNGpr3x7qDFw3qupVTio).
 
 ## Open Questions
 
-- **Fact:** `docs/03-facts.md` → "How the user works" doesn't yet back the new step wording. The
-  gaps are specialized agents, a defined boundary, a separate agent that verifies and validates
-  (the facts currently say the agents "check their own work"), rules enforced, and the workflow
-  updated each cycle or session. Also, a single "separate agent" may touch the "no counts" line.
+- **Choice:** the online-store "Flagged" step names "complaints" ("Refunds and complaints are
+  passed to you"), which `docs/03-facts.md` doesn't name; the user keeps it or the line changes.
+- **Review:** Discord step 5 role: `host` (spec's first option) or `remind` (ui-spec §5.8 choice 39).
+- **Review:** Discord step 4 role: `ship` (first option) or a new plug role (choice 40).
+- **Review:** Discord step 3 role: `update` with its wrench (first option) or a book-only role
+  (choice 41).
+- **Review:** whether the bots nap on an "always on" flow (choice 42; the lead took the spec's first
+  option).
+- **Review:** a closing hairline under the last row below `lg` (choice 43; first option taken).
+- **Review:** the relay's pacing, the phone lesson's contrast and arm clearance, and rechecks at
+  360 and 768 return with the rebuilt relay; the user judges them on a real screen.
+- **Note:** known limits: with six steps at 1024 the exit slide is only 1–6px; `jobPivots.rules` and `jobPivots.fold` in `lib/processJob.ts` are unused entries
+  (only the user deletes things); not checked: Safari, Firefox, real devices, the no-JS page, the
+  hammer's lowest strike frame against the job.
 - **To build:** the logo itself (nav, favicon, sharing image) isn't on the site yet; adopting it
   is a separate change that needs the user's yes.
-- **Review:** the user should judge the feel on a real screen: how often the eyes look around
-  (every 0.8–2s), the hammer's pacing, the foot seam during a squash, and full acts on every relay
-  step (every 16.4s at every width); whether 2s stays and 16.4s runs feel right.
-- **To build:** whether to bring back the hold bob and watch blink (shorter `JOB_BOB` / lower
-  `RELAY_WATCH_BLINK`) now that 2s stops leave no time for them.
-- **Review:** the cream lesson sits on the cream rulebook during the phone handover, so it reads
-  subtly, as the rulebook gaining a violet line; the user should judge whether that's enough contrast.
-- **Review:** below `lg`, bots 2 and 3's left arms come within about 0.7px of the lesson's lane (as
-  close as 0.2px with sway) but never touch a face or body; the user should judge whether that's too
-  tight.
-- **To build:** recheck the phone lesson handover at 360 and 768 once the dev server's 500 (from the
-  in-progress Proofs `cardShotAlt` removal) is fixed — only 390 has been screen-checked so far.
+- **Review:** the user should judge the feel of the bots on a real screen: how often the eyes look
+  around (every 0.8–2s), the hammer's pacing, the foot seam during a squash.
+- **Choice:** ledge length below `lg`: x 18–88 (lead's default, choice 55), or the sketch's
+  right-foot end, x 18–58.
+- **Choice:** the ledge's light as a gradient (lead's default, choice 56), or solid accent.
+- **Choice:** the fix line as a bracket with an arrowhead (lead's default, choice 57), or a plain
+  straight dotted line.
+- **Choice:** the fix line dotted on phone (lead's default, choice 58), against the dashed arch from
+  `lg`.
+- **Choice:** step 4's hairline paints over the dotted line (lead's default, choice 59), or the line
+  lifts above it.
+- **Choice:** each step's `<li>` becomes `relative` (lead's default, choice 60).
+- **Choice:** `ProcessLedge` in its own file (lead's default, choice 61).
+- **Choice:** the hop's 6px lift (`LEDGE_HOP.lift`), or 0 if the job touches the leaving bot's tool
+  on a real screen.
+- **Choice:** ledge 1's flash at the hand-off quick (as built, 0.15s in, 0.35s out), or held longer.
+- **Choice:** the ledge's light under reduced motion none (as built, per spec), or a fade.
+- **Choice:** the lesson riding over the fix line's ends below `lg` accepted (as built), or moved
+  into the gutter.
+- **Choice:** below `lg` the job crosses in front of bots 4 and 3's legs and feet on the short legs
+  to and from the fix line: accept (as built), or reroute.
+- **Choice:** the way back's 1.1s (`FIX_LINE_HOP`, as built), or closer to the old 0.8s.

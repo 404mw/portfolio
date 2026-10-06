@@ -6,13 +6,14 @@
 //   (lib/rixTalk.ts); the side is set as the line starts.
 // - `fade` (reduced motion): the short fade in and out.
 // Once a line has gone it's cleared from the store, so the quip is empty again, exactly as
-// server-rendered. Runs in the crew, so it pauses with the instance.
+// server-rendered. Runs in the crew, so it pauses with the instance. Scheduled lines (hover lines,
+// chatter; R5.4) never cut a line: their callers ask `free`, `showing`, `typing` and `lastEnd` first.
 import { gsap } from "@/lib/gsap";
 import { duration, ease } from "@/lib/motion";
 import type { Crew } from "@/lib/processBotCrew";
 import { stripMotion } from "@/lib/processBotRig";
 import { rixQuipLine, sayRix, subscribeRixQuip } from "@/lib/rixQuip";
-import { QUIP_HOLD } from "@/lib/rixMotion";
+import { IDLE_TALK, QUIP_HOLD } from "@/lib/rixMotion";
 import type { SayOptions } from "@/lib/rixRig";
 
 export type QuipMotion = {
@@ -22,6 +23,14 @@ export type QuipMotion = {
   readonly out: (seconds: number) => void;
   /** A line is in, holding or going out. */
   readonly showing: () => boolean;
+  /** A typed line hasn't shown its last character yet. */
+  readonly typing: () => boolean;
+  /** The line in the quip now; empty with none. */
+  readonly line: () => string;
+  /** The live time (the crew's) the last line went; null before any has. */
+  readonly lastEnd: () => number | null;
+  /** Empty, and `IDLE_TALK.minGap` since the last line went: a scheduled line may start (R5.4). */
+  readonly free: () => boolean;
   readonly stop: () => void;
 };
 
@@ -29,16 +38,24 @@ export type QuipMotion = {
 export type QuipTalk = {
   /** Sets the quip's side for a line starting now. */
   readonly side: () => void;
-  /** The typed line's timeline, starting `at` seconds from now, ending with its fade out. */
+  /**
+   * The typed line's timeline, starting `at` seconds from now, ending with its fade out; its
+   * `typed` label marks the last character.
+   */
   readonly type: (line: string, at: number) => gsap.core.Timeline;
 };
 
 export function quipMotion(quip: HTMLElement, key: string, crew: Crew, reduced: boolean, talk?: QuipTalk): QuipMotion {
   let current: gsap.core.Animation | null = null;
   let pending: SayOptions | null = null;
+  /** The current line's `typed` time in its timeline (typed lines only). */
+  let typedAt: number | null = null;
+  let endedAt: number | null = null;
 
   const clear = () => {
     current = null;
+    typedAt = null;
+    endedAt = crew.now();
     sayRix(key, "");
     stripMotion([quip]);
   };
@@ -62,8 +79,10 @@ export function quipMotion(quip: HTMLElement, key: string, crew: Crew, reduced: 
     if (style === "type" && talk) {
       gsap.set(quip, { opacity: 0, y: 0 });
       tl = talk.type(line, at);
+      typedAt = tl.labels.typed ?? null;
     } else {
       tl = fade(at);
+      typedAt = null;
     }
     tl.eventCallback("onComplete", clear);
     current = crew.run(tl);
@@ -80,9 +99,14 @@ export function quipMotion(quip: HTMLElement, key: string, crew: Crew, reduced: 
     out: (seconds) => {
       if (!current) return;
       current.kill();
+      typedAt = null;
       current = crew.run(gsap.to(quip, { opacity: 0, duration: seconds, ease: "power1.in", onComplete: clear }));
     },
     showing: () => current !== null,
+    typing: () => current !== null && typedAt !== null && current.time() < typedAt,
+    line: () => (current ? rixQuipLine(key) : ""),
+    lastEnd: () => endedAt,
+    free: () => current === null && (endedAt === null || crew.now() - endedAt >= IDLE_TALK.minGap),
     stop: () => {
       unsubscribe();
       current?.kill();

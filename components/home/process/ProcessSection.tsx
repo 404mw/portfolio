@@ -1,12 +1,9 @@
 // Section 5, Process: how do they work? (ui-spec §5). The label and heading stacked above the
-// steps at every width (no pinning), then the four steps and the loop's return. `ProcessMotion`
-// (client) renders nothing; it adds the reveals. `ProcessRelay` is the relay job layer (ghosts and job),
-// placed last in the body wrapper, which is `isolate` so the layer's `z-1` (above the bots, below
-// the `lg:z-10` loop label) stays inside it.
-import { ProcessList } from "@/components/home/process/ProcessList";
+// flow at every width (no pinning); the flow (client) is the About pick's, five or six steps and
+// the loop's return to step 2. `ProcessMotion` (client) renders nothing; it adds the reveals and
+// the bots' motion.
+import { ProcessFlow } from "@/components/home/process/ProcessFlow";
 import { ProcessMotion } from "@/components/home/process/ProcessMotion";
-import { ProcessRelay } from "@/components/home/process/ProcessRelay";
-import { ProcessReturn } from "@/components/home/process/ProcessReturn";
 import { SectionHeading } from "@/components/SectionHeading";
 import { SectionLabel } from "@/components/SectionLabel";
 import { process } from "@/content/home";
@@ -23,11 +20,7 @@ export function ProcessSection() {
           <SectionLabel number={process.number} label={process.label} as="p" />
           <SectionHeading lead={process.heading.lead} accent={process.heading.accent} size="heading" />
         </div>
-        <div className="relative isolate flex max-w-2xl flex-col lg:max-w-none lg:gap-10">
-          <ProcessList />
-          <ProcessReturn />
-          <ProcessRelay />
-        </div>
+        <ProcessFlow />
       </div>
       <ProcessMotion />
     </section>

@@ -1,12 +1,14 @@
-// Connected tools demo, finished state (ui-spec §4.4): three tools joined by dashed
-// connectors, each carrying a data packet, then three sync events and the "in sync" pill.
+// Sync demo, finished state (ui-spec §4.4): three linked things (tools, or a workflow's stages)
+// joined by dashed connectors, each carrying a data packet, then three events and the done pill.
 import { Fragment } from "react";
 import { DemoStatusPill } from "@/components/home/agents/DemoStatusPill";
-import { agents } from "@/content/home";
+import type { SyncDemoContent } from "@/lib/agents";
 import { metaLabel } from "@/lib/styles";
 
-export function SyncDemo() {
-  const { tools, events, done } = agents.demos.sync;
+type SyncDemoProps = { readonly demo: SyncDemoContent };
+
+export function SyncDemo({ demo }: SyncDemoProps) {
+  const { tools, events, done } = demo;
   return (
     <div className="flex flex-col gap-6 md:gap-9">
       <ul className="flex items-center">

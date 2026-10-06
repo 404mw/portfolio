@@ -9,6 +9,7 @@ const positionClasses = {
   top: "object-top",
   center: "object-center",
   bottom: "object-bottom",
+  left: "object-left",
 } as const;
 
 const fitClasses = {

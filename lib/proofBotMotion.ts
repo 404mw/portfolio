@@ -28,6 +28,13 @@ export const RISE_FROM = 84;
 /** The rise itself, a soft overshoot, starting this long after its card's reveal starts. */
 export const RISE: Timing & { readonly delay: number } = { duration: 0.9, ease: "back.out(1.3)", delay: 0.15 };
 
+// The duck (user's decision 2026-10-06): a card's click sends its bot's `rise` back down to
+// `RISE_FROM` before its takeover opens; it stays down while any takeover is open.
+/** The duck: quick, accelerating into the floor; the takeover opens when it lands. */
+export const DUCK: Timing = { duration: 0.25, ease: "power2.in" };
+/** The rise back once no takeover is open: the reveal's own rise, without its delay. */
+export const DUCK_RISE: Timing = { duration: RISE.duration, ease: RISE.ease };
+
 // Idle.
 /** Half a breath (`sine.inOut` yoyo); between the Process roles' 1.1 and 1.4. */
 export const BREATH_HALF = 1.3;

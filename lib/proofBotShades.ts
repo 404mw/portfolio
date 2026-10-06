@@ -71,6 +71,8 @@ export const proofBotShades = {
   banner: {
     hatch: `repeating-linear-gradient(135deg, color-mix(in oklab, ${token("text")} 5%, transparent) 0 1px, transparent 1px 13px)`,
     glow: `radial-gradient(90% 110% at 62% 125%, color-mix(in oklab, ${token("accent")} 34%, transparent), transparent 62%)`,
+    /** The glow anchored near the right end, under the spam diagram's phone Eva (spam spec, Review 2). */
+    glowEnd: `radial-gradient(12rem 9rem at calc(100% - 4rem) 130%, color-mix(in oklab, ${token("accent")} 34%, transparent), transparent 62%)`,
   },
 } as const;
 

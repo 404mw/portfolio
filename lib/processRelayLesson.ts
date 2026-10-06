@@ -1,12 +1,13 @@
 // The relay lesson's moves (ui-spec §5.7 layer 10, "The return"; §5.9 below `lg`): the small rule
-// card that rides the return back to bot 1. From `lg` it splits off the finished job at bot 4: it
-// pops in off the sheet's centre and peels up, fades out as it leaves (step 4's text lies between
-// bot 4 and the path, so it never flies across the words), drops onto the dashed path at the
-// return's start (R0), and at the end scales up as it fades. Below `lg` it pops in on bot 4's
-// rulebook instead, lifts off it and rides up the column's left edge. The rides themselves (the
-// legs, the light, the cues) are timed in lib/processRelay.ts (from `lg`) and
-// lib/processRelayColumn.ts (below). The card is anchored at its centre (negative margins), so every
-// point here is where its centre goes. Only the relay timeline writes it; transforms and opacity only.
+// card that rides the return back to step 2, "your rules", in a flow that has the return. From `lg`
+// it splits off the finished job at the last bot: it pops in off the job's centre and peels up,
+// fades out as it leaves (that step's text lies between the bot and the path, so it never flies
+// across the words), drops onto the dashed path at the return's start (R0), and at the end scales
+// up as it fades. Below `lg` it pops in at the last bot's left hand instead, lifts off it and rides
+// up the column's left edge. The rides themselves (the legs, the light, the cues) are timed in
+// lib/processRelay.ts (from `lg`) and lib/processRelayColumn.ts (below). The card is anchored at its
+// centre (negative margins), so every point here is where its centre goes. Only the relay timeline
+// writes it; transforms and opacity only.
 import type { gsap } from "@/lib/gsap";
 import { LESSON_ENTER, LESSON_LEAVE, LESSON_OUT, LESSON_SPLIT } from "@/lib/processBotMotion";
 import type { PointAt } from "@/lib/processRelayJob";
@@ -30,7 +31,7 @@ export function lessonElements(parts: LessonParts): Element[] {
   return written.filter((element): element is Element => element !== null);
 }
 
-/** Run start (`t`): the lesson is hidden until bot 4 is done with the job. */
+/** Run start (`t`): the lesson is hidden until the last bot is done with the job. */
 export function lessonHide(tl: gsap.core.Timeline, lesson: SVGSVGElement, t: number) {
   tl.set(lesson, { opacity: 0 }, t);
 }
@@ -58,14 +59,14 @@ export function lessonSplit(tl: gsap.core.Timeline, lesson: SVGSVGElement, at: P
   return t + duration + hold;
 }
 
-/** From `t`: a small lift as it fades out, leaving bot 4. Returns when it's hidden. */
+/** From `t`: a small lift as it fades out, leaving the last bot. Returns when it's hidden. */
 export function lessonLeave(tl: gsap.core.Timeline, lesson: SVGSVGElement, t: number): number {
   const { lift, duration, ease } = LESSON_LEAVE;
   tl.to(lesson, { y: `-=${lift}`, opacity: 0, duration, ease }, t);
   return t + duration;
 }
 
-/** From `t` (below `lg`): the same small lift, still shown, off bot 4's rulebook. Returns when it's up. */
+/** From `t` (below `lg`): the same small lift, still shown, off the last bot's hand. Returns when it's up. */
 export function lessonLift(tl: gsap.core.Timeline, lesson: SVGSVGElement, t: number): number {
   const { lift, duration, ease } = LESSON_LEAVE;
   tl.to(lesson, { y: `-=${lift}`, duration, ease }, t);
@@ -86,7 +87,7 @@ export function lessonEnter(tl: gsap.core.Timeline, lesson: SVGSVGElement, at: P
   return t + duration;
 }
 
-/** At `t`, at the arrowhead (or bot 1's clipboard): it scales up a little about its centre as it fades out. */
+/** At `t`, at the arrowhead (or the rules bot's clipboard): it scales up a little about its centre as it fades out. */
 export function lessonOut(tl: gsap.core.Timeline, lesson: SVGSVGElement, t: number) {
   const { scale, duration, ease } = LESSON_OUT;
   tl.to(lesson, { scale, opacity: 0, duration, ease }, t);

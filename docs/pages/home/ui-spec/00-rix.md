@@ -3,15 +3,21 @@
 Shared rules (§0): [`../ui-spec.md`](../ui-spec.md). Rig and Process constants: [`05-process.md`](05-process.md) §5.6–5.7.
 About options and the built O4 play: [`02a-about-options.md`](02a-about-options.md). Page doc: [`../sections/02a-about.md`](../sections/02a-about.md).
 
-**Last Updated:** 2026-10-02 (rev 3). Rev 2: the user's decisions of 2026-10-02 (alive and
+**Last Updated:** 2026-10-05 (rev 4). Rev 2: the user's decisions of 2026-10-02 (alive and
 playful; talk is eyes and body; B walks the shelf; idle plays; named emotions; one source for Rix),
 then R12 resolved, P1–P3 approved and P4 dropped, and the poke-mood ladder (R6A). **Rev 3:** the
 user's feedback after trying Rix on `/dev` (R12 rows 12–15): pixel glyphs for the emotions (R3.2),
 a `love` emotion with pets and the pick's hearts (R3.1, R6B), a stride-locked gait with no dash and
-card walks that stop partway (R4.2–R4.6), and no home: he patrols (R4.8). **This file is the single
+card walks that stop partway (R4.2–R4.6), and no home: he patrols (R4.8). **Rev 4 (2026-10-05,
+home's About only; R12 rows 18–24):** a busy tempo for his first 6 live minutes, then a settled one
+(R7); short idle beats built from existing moves (R6.8); hover mode: at a hovered or focused card
+he keeps moving and talks about that card (R4.9); idle chatter, pre-pick and post-pick, with the
+nudges folded in and `NUDGE_MAX` lifted (R5.4, R7); and the pick lock: About's cards can't be
+picked from the tantrum's start to the forgive's end (R6A.9), so calm by a pick (R6A.8) is now
+playground-only. The `/rix` playground is unchanged (schedulers off). **This file is the single
 source for Rix.** A move or rule that isn't here isn't Rix's. Used first by §2a option B. Process
 adopts it in a later pass, and until then keeps §5.7 as it stands. Motion only: the static page
-doesn't change, apart from the hooks in R1.3. No new tokens.
+doesn't change, apart from the hooks in R1.3 and the lock classes in R6A.9. No new tokens.
 
 **Supersedes / extends (02a-about-options.md is not edited; where they differ, this sheet wins):**
 - **O4 "Life: no naps":** B naps (R6.3). The host role gains the zzz group. A and C don't change.
@@ -22,10 +28,16 @@ doesn't change, apart from the hooks in R1.3. No new tokens.
     (R6A.1), so a rapid clicker reaches the tantrum.
   - A poke no longer always cuts: a tantrum or sulk outranks it (R2.1).
 - **O0.1 `RixStatus` "only the poke line":** it now gets the ladder's lines and, when the tantrum
-  throws a pick away, `rix.throwAway` (R1.4).
+  throws a pick away, `rix.throwAway` (R1.4). **Rev 4:** also `lockLine` and `unlockLine` (R6A.9).
 - **O0.2 "only `?for` dispatches an untrusted `change`":** the tantrum's deselect does too (R6A.4).
 - **O4 nudge:** the second bounce (0.55) is replaced by talk bobs, and the line types out.
   `NUDGE_BOUNCE.at` becomes `[0.1]`.
+- **O4 nudge clock (rev 4):** retired on home's About. The nudge act is now the pre-pick chatter
+  act, on the idle talk clock (R7). `NUDGE_MAX` (4, decided 2026-10-01) is lifted: no cap per
+  load. The nudges no longer stop on a pick; the chatter switches to the post-pick pool instead.
+  Under reduced motion, "one nudge line, once" becomes the faded chatter (R8.1).
+- **O0 "never a gate" (rev 4):** still true on arrival and for the whole page, with one exception:
+  About's six cards are locked for about 10s while Rix throws a tantrum (R6A.9).
 - **`QUIP_IN`:** for typed lines the box shows at once and its characters reveal. `QUIP_HOLD`
   counts from the last character. `QUIP_OUT` and reduced motion are unchanged.
 - **`PEEK_SPOT` and the pick's eye pop:** both keep the pop. The peek adds the `surprised` eyes;
@@ -35,6 +47,10 @@ doesn't change, apart from the hooks in R1.3. No new tokens.
 - **Rev 2 → rev 3:** home, the stroll home (`STROLL`, `WALK_HOME_AFTER`), the dash
   (`DASH_PACE`, `WALK.dashAbove`) and speed-based leg durations are removed. The flee and the
   stomp walk are capped in distance (R6A.5). The "no glyph for annoyed or angry" rule is removed.
+- **Rev 3 → rev 4:** the play clock (`PLAY.first`, `PLAY.gap`, `PLAY.retry`) and the nudge clock
+  (`NUDGE_*` except `NUDGE_BOUNCE`) give way to the idle clock (`TEMPO`, `IDLE_MENU`, `IDLE_TALK`,
+  R7). The pointer-near skip (`NUDGE_QUIET`) is gone. "Holds `curious` while the target holds" is
+  replaced by hover mode (R4.9). R6A.8 applies to the playground only.
 
 ---
 
@@ -97,6 +113,9 @@ RixStatus (sibling of the walker, as built)
   each glyph's `fill` in `lib/rixGlyphs.ts`.
 - The poke ladder (R6A) and the pet (R6B) need no other markup. The toss moves the existing
   `prop`, and the deselect works on the option's own radios.
+- **Rev 4:** the beats (R6.8) and hover mode (R4.9) need no new markup. The pick lock (R6A.9)
+  adds `group/board` to the board's fieldset and its state classes to the cards; JS sets
+  `data-locked` and `aria-disabled` only while a tantrum runs.
 
 ### R1.4 Sizes and access
 
@@ -114,11 +133,16 @@ RixStatus (sibling of the walker, as built)
   - the ladder's lines: `pokeLines` (1–3), `annoyedLines` (4–5) and `angryLines` (6+)
   - or, when the tantrum throws a pick away, `throwAway` at the release, in place of the angry
     line
+  - **rev 4, home's About:** `lockLine`, appended to the tantrum's line (the angry line, or
+    `throwAway`), and re-said on a swallowed press; `unlockLine` at the unlock (R6A.9)
   - Never announced: nudges, talk, emotions, glyphs, plays, the patrol, pets and `petLines`, the
-    sulk line, the forgive line and the hmph.
+    sulk line, the forgive line and the hmph. **Rev 4:** nor the beats, hover mode, its lines
+    (`hoverLines`, `hoverAnyLines`, `switchLines`) or the idle chatter (`idleLines`,
+    `afterPickLines`).
 - **Focus:** nothing Rix does moves focus or scrolls. That includes the deselect: focus stays
-  where it is. A focused radio stays focused and tabbable. While Rix has focus the patrol holds
-  still (R4.8), so the ring doesn't wander from a keyboard user.
+  where it is. A focused radio stays focused and tabbable, **including during the pick lock**
+  (`aria-disabled`, never `disabled`, R6A.9). While Rix has focus the patrol holds still (R4.8),
+  so the ring doesn't wander from a keyboard user.
 - **The pet is a pointer extra.** Keyboard users lose nothing: Enter and Space stay pokes.
 - **Contrast:** `fill-muted` glyphs on `bg` about 6.9:1; `fill-accent` glyphs about 8.6:1.
 
@@ -130,15 +154,15 @@ RixStatus (sibling of the walker, as built)
 
 | Rank | Act | Starts on | If a higher act runs | It cuts | Limits |
 |---|---|---|---|---|---|
-| 1 | **pick** | a trusted change on the option's group | never blocked. During a tantrum, flee or sulk it plays `CALM` first (R6A.8) | everything below (a walk, stretch or flee brakes in place, `WALK_STOP.brake`) | none. `?for` shows the prop with no act |
-| 2 | **tantrum** (stomp, toss, flee, sulk, forgive) | poke count ≥ `POKE_LADDER.tantrum`, through its gate (R6A.1) | a pick turns it into `CALM` | walk or stretch (brake), talk (the line is replaced), nudge, play, pet, poke | presses during it don't count (the sulk answers with a hmph). Hover and focus targets, pets, nudges, plays, the patrol and tag are ignored until the forgive ends |
-| 3 | **poke** (happy, annoyed) | click, tap, Enter or Space on Rix | ignored and not counted during a pick, a calm or a tantrum, and before landing | walk or stretch (brake), talk (the line is replaced), nudge, play, pet (`love` Out 0.15) (R2.2) | acts `POKE_COOLDOWN` 0.9 apart; presses inside it queue (R6A.1) |
-| 4 | **pet** (`love`, R6B) | a fine pointer resting on Rix `PET.hover`, or a touch long-press `PET.press` | ignored during a pick, calm, tantrum, flee, sulk or annoyed hold, and before landing. Otherwise the rest timer restarts when the higher act ends, if the pointer still rests | walk or stretch (brake), nudge, play, perk | one per hover or press; `PET.rest` apart; never counts as a poke |
-| 5 | **walk** (to a card) | a card target held `WALK.dwell`; after a pick | waits, and starts when they end if the target still holds | talk (the line fades out over 0.2), nudge (the arm eases back over 0.3), play, stretch (brake) | `WALK.minDist` 12px; at most `WALK.reach` 200px (R4.1) |
-| 6 | **talk** | a poke, nudge, pet, sulk or forgive line | an overlay: the line always types | — | one line at a time; a new line cuts the old |
-| 7 | **nudge** | the nudge clock | skips and retries in `NUDGE_RETRY` (a skip doesn't count). Also skips while the mood isn't neutral | play, stretch (brake). It doesn't wait for either | `NUDGE_MAX` 4, as built |
-| 8 | **play** | the play clock (only while he stands), a pointer approach (tag), visitor idle (nap) | dropped; the clock waits `PLAY.retry` | a patrol pause, idle | R7 |
-| 9 | **patrol** (R4.8) | `PATROL.first` after landing, then each pause's end | a stretch brakes in place (`WALK_STOP.brake`); the patrol resumes `PATROL.resume` after the higher act ends | idle | R4.8 lists when no stretch starts |
+| 1 | **pick** | a trusted change on the option's group | **Home's About:** never blocked, except by the pick lock: from the tantrum's start to the forgive's end the visitor's press is swallowed and nothing changes (R6A.9). **Playground:** never blocked; during a tantrum, flee or sulk it plays `CALM` first (R6A.8) | everything below (a walk, stretch or flee brakes in place, `WALK_STOP.brake`) | none. `?for` shows the prop with no act |
+| 2 | **tantrum** (stomp, toss, flee, sulk, forgive) | poke count ≥ `POKE_LADDER.tantrum`, through its gate (R6A.1) | About: nothing (picks are locked). Playground: a pick turns it into `CALM` | walk or stretch (brake), hover mode, talk (the line is replaced), chatter, beat, play, pet, poke | presses during it don't count (the sulk answers with a hmph). Hover and focus targets, pets, chatter, beats, plays, the patrol and tag are ignored until the forgive ends. On About it locks the picks (R6A.9) |
+| 3 | **poke** (happy, annoyed) | click, tap, Enter or Space on Rix | ignored and not counted during a pick, a calm or a tantrum, and before landing | walk or stretch (brake), hover beat, talk (the line is replaced), chatter, beat, play, pet (`love` Out 0.15) (R2.2) | acts `POKE_COOLDOWN` 0.9 apart; presses inside it queue (R6A.1) |
+| 4 | **pet** (`love`, R6B) | a fine pointer resting on Rix `PET.hover`, or a touch long-press `PET.press` | ignored during a pick, calm, tantrum, flee, sulk or annoyed hold, and before landing. Otherwise the rest timer restarts when the higher act ends, if the pointer still rests | walk or stretch (brake), chatter, beat, play, perk | one per hover or press; `PET.rest` apart; never counts as a poke |
+| 5 | **walk and hover mode** (to a card, R4.9) | a card target held `WALK.dwell`; after a pick | waits, and starts when they end if the target still holds | talk (the line fades out over 0.2), chatter (the arm eases back over 0.3), beat, play, stretch (brake) | `WALK.minDist` 12px; at most `WALK.reach` 200px (R4.1). Hover beats and lines per R4.9 |
+| 6 | **talk** | a poke, pet, sulk, forgive or ladder line (the visitor's own doing); a hover line or chatter line (scheduled) | an overlay: the line always types | — | one line at a time. A visitor-driven line cuts the old one; a scheduled line never starts while a line shows (R5.4) |
+| 7 | **chatter** (was the nudge; R5.4, R7) | the idle talk clock (`IDLE_TALK`) | waits for the current act and any showing line, then takes the next idle slot. Skipped while a card target holds (hover mode talks instead), the mood isn't neutral, or he naps | — (it waits; it never brakes a stretch) | no cap per load (`NUDGE_MAX` lifted) |
+| 8 | **beat or play** (R6, R6.8) | the idle clock (`TEMPO`), a pointer approach (tag), visitor idle (nap, settled phase only) | waits; retried every `TEMPO.retry` | a patrol pause, idle | R7 |
+| 9 | **patrol** (R4.8) | busy phase: a stroll from the idle clock. Settled phase: `PATROL.resume` after the last act, then each pause's end | a stretch brakes in place (`WALK_STOP.brake`); the patrol resumes `PATROL.resume` after the higher act ends | idle | R4.8 lists when no stretch starts |
 | 10 | **idle** | — | — | — | Process life layers 1–4 |
 
 - **Arrival** (`entering`) blocks everything until landing, then plays its ask (as built).
@@ -150,6 +174,8 @@ RixStatus (sibling of the walker, as built)
   - It owns `upper y` for the bobs only while no act holds `upper`; otherwise it skips them.
   - It squishes the eyes only while they're neutral, so never on annoyed, angry or love lines.
   - It never owns the rig, arms or feet.
+- **Never two acts at once (rev 4):** the idle clock runs one item at a time (a beat, a play, a
+  stroll or a chatter act), and hover mode runs one hover beat at a time. Talk stays an overlay.
 
 ### R2.2 Cutting
 
@@ -168,6 +194,8 @@ RixStatus (sibling of the walker, as built)
 - **The walker** never resets in a cut. It holds its `x`.
 - **Napping:** a cutter first adds the wake's zzz fade and eyes open (0.15) at its own time 0,
   so a pick still answers at once.
+- **Beats and hover beats (rev 4)** are cut like plays: `cut()` returns every channel above to
+  rest within 0.1–0.15.
 
 ---
 
@@ -180,17 +208,17 @@ right arm.
 
 | Emotion | L eye | R eye | Look d / p | Body (`upper`, rig tilt) | Arms `actL` / `actR` | Feet / glyph | In | Out | Used in |
 |---|---|---|---|---|---|---|---|---|---|
-| **happy** | 23,48,14,4 | 63,48,14,4 | +2 / 0 | bounce or giggle (from the act) | +20 / −20 | — / `sparkle` (only where listed below) | 0.08 `power2.out` | 0.12 `power2.out` | pokes 1–3, juggle success, after a wake, caught at tag, logo pose, calm (1.25), forgive |
-| **excited** | 21,41,18,18 | 61,41,18,18 | +3 / −1 | held `STRETCH` 0.96×1.05 | +60 / −60 (cheer) | two alternating `TAP_LIFT` taps / `sparkle` (the pick: the heart burst instead) | 0.1 `back.out(2)` | 0.25 `power2.inOut` | pick (0–0.6) |
-| **curious** | 23,43,14,14 | 62,40,16,17 | at the target | tilt ±6 toward the target's side | 0 / −15 | — / — | 0.2 `power2.out` | 0.3 `power2.inOut` | arriving at a card, or stopping partway (held while the target holds) |
-| **shy** | 23,47,14,9 | 63,47,14,9 | −5 / +2 | 1.03×0.95, y +1 | −20 / +20 | `foot-right x` −2 / `dots` | 0.25 `power2.out` | 0.3 `power2.inOut` | caught at tag; the forgive's peek |
-| **surprised** | 24,40,12,18 | 64,40,12,18, with `POP_SCALE` pop | 0 / 0 | `SQUASH` 0.06 then `SETTLE` | +25 / −25 | — / `alert` | 0.06 `power4.out` | 0.25 `power2.inOut` | peek spot, wake, juggle drop, tag dodge, peek-a-boo |
-| **confused** | 23,43,14,14 | 63,47,14,6 | +4 / 0 | tilt −6 | 0 / −80, ±6 wiggle ×3 (0.1 each) | — / `question` | 0.2 `power2.out` | 0.3 `power2.inOut` | walk target flips 3× in 2s |
+| **happy** | 23,48,14,4 | 63,48,14,4 | +2 / 0 | bounce or giggle (from the act) | +20 / −20 | — / `sparkle` (only where listed below) | 0.08 `power2.out` | 0.12 `power2.out` | pokes 1–3, juggle success, after a wake, caught at tag, logo pose, calm (1.25), forgive; **rev 4:** the `hop` beat, hover mode on the picked card |
+| **excited** | 21,41,18,18 | 61,41,18,18 | +3 / −1 | held `STRETCH` 0.96×1.05 | +60 / −60 (cheer) | two alternating `TAP_LIFT` taps / `sparkle` (the pick: the heart burst instead) | 0.1 `back.out(2)` | 0.25 `power2.inOut` | pick (0–0.6); **rev 4:** the `sparkle` beat, the hover `cheer` |
+| **curious** | 23,43,14,14 | 62,40,16,17 | at the target | tilt ±6 toward the target's side | 0 / −15 | — / — (**rev 4:** `question` in the `wonder` beat only) | 0.2 `power2.out` | 0.3 `power2.inOut` | arriving at a card, or stopping partway (the base of hover mode, R4.9); **rev 4:** the `wonder` beat |
+| **shy** | 23,47,14,9 | 63,47,14,9 | −5 / +2 | 1.03×0.95, y +1 | −20 / +20 | `foot-right x` −2 / `dots` | 0.25 `power2.out` | 0.3 `power2.inOut` | caught at tag; the forgive's peek; **rev 4:** the `bashful` beat |
+| **surprised** | 24,40,12,18 | 64,40,12,18, with `POP_SCALE` pop | 0 / 0 | `SQUASH` 0.06 then `SETTLE` | +25 / −25 | — / `alert` | 0.06 `power4.out` | 0.25 `power2.inOut` | peek spot, wake, juggle drop, tag dodge, peek-a-boo; **rev 4:** the `startle` beat |
+| **confused** | 23,43,14,14 | 63,47,14,6 | +4 / 0 | tilt −6 | 0 / −80, ±6 wiggle ×3 (0.1 each) | — / `question` | 0.2 `power2.out` | 0.3 `power2.inOut` | walk target flips 3× in 2s; **rev 4:** the `puzzle` beat |
 | **sleepy** | 23,50,14,7 | 63,50,14,7 | 0 / 0 | the yawn and nods (R6.3) | −15 / +15 | — / the zzz (the nap's, from 3.6) | 0.6 `sine.inOut` | 0.2 `power2.out` | before a nap |
 | **sad** | 24,49,12,8 | 64,49,12,8 | −3 / +3 (straight down) | y +2, scaleY 0.95; sway timeScale 0.6 | −25 / +25 | — / `drop` | 0.4 `power2.inOut` | 0.35 `power2.inOut` | juggle drop |
 | **annoyed** | 23,51,14,6 | 63,52,14,5 | side-eye: at the pointer (fine), else +4 / −1 | stiff: 0.98×1.03, held; breath and sway paused | −25 / +25, held (no drift) | right-foot taps (R6A.2) / `vein` | 0.15 `power2.out` | 0.3 `power2.inOut` | pokes 4–5 and the mood hold; calm (0.35–0.85) |
 | **angry** | 23,47,14,8, `rotation` +18 about 30 51 | 63,47,14,8, `rotation` −18 about 70 51 | glare: at the pointer (fine), else 0 / +1 | puffed 1.03×0.97; shake `upper x` ±1.5 (`TANTRUM.shake`) | −40 / +40, ±6 shake (`TANTRUM.arms`) | stomps (R6A.3) / `grawlix` | 0.06 `power4.out` | 0.3 `power2.inOut` (`rotation` → 0 with it) | the tantrum and flee; calm (0–0.35) |
-| **love** (new) | 24,44,12,12, `rotation` 45 about 30 50 (a diamond) | 64,44,12,12, `rotation` 45 about 70 50 | dreamy, up: +2 / −1 | melt: 1.03×0.96, y +1; sway: rig tilt ±3 (`LOVE.sway`); the eyes beat (`LOVE.beat`) | −35 / +35, held | `foot-right y` −3 (a foot pop) / `hearts` | 0.2 `back.out(2)` | 0.35 `power2.inOut` (`rotation` → 0 with it) | a pet (R6B.2); the pick, eyes only (R6B.4) |
+| **love** (new) | 24,44,12,12, `rotation` 45 about 30 50 (a diamond) | 64,44,12,12, `rotation` 45 about 70 50 | dreamy, up: +2 / −1 | melt: 1.03×0.96, y +1; sway: rig tilt ±3 (`LOVE.sway`); the eyes beat (`LOVE.beat`) | −35 / +35, held | `foot-right y` −3 (a foot pop) / `hearts` | 0.2 `back.out(2)` | 0.35 `power2.inOut` (`rotation` → 0 with it) | a pet (R6B.2); the pick, eyes only (R6B.4); **rev 4:** the `fond` beat (eyes and one heart only) |
 
 - **The eyes' tweens** are `attr` on the two rects. The pose eases over max(In, 0.25), and back
   over Out with `back.out(1.6)`.
@@ -203,6 +231,7 @@ right arm.
   - `happy` shows `sparkle` only on pokes 1–3, juggle success and caught at tag. On pokes 1–2,
     one in three shows a single heart instead (R6B.3). Its other uses show no glyph.
   - `excited` shows `sparkle`, except in the pick, which shows the heart burst (R6B.4).
+  - **Rev 4:** each beat (R6.8) names its own glyph; a hover `cheer` shows `sparkle`.
 - **Checked against the body:** every rect above stays on the strips or over a gap. Any part off
   the body is `bg` on `bg`, so it's invisible and the mark is never cut.
 - **`annoyed` vs `sleepy`:** both have low lids. They're now told apart at a glance by the glyph
@@ -339,13 +368,19 @@ when each leg starts, never inside a tween.
   - lean overshoots by ∓`WALK_STOP.overshoot`, then back to 0 (`WALK_STOP.back`)
   - at a card: `curious`, looking at the card (`LOOK_AT`). At the partway spot it's the same:
     curious's tilt leans him toward the far card while he looks at it. He doesn't walk on.
+    **Rev 4:** from here hover mode runs (R4.9); he no longer holds still.
   - after a pick's walk: `curious` for 0.8, then the patrol resumes after `PATROL.resume`
 
 **R4.7 Keyboard.** Focus on a card is a target, exactly like hover: he looks at once, then walks
-after the dwell (R12.1). An arrow key is a pick, so he picks in place first and walks after.
+after the dwell (R12.1), then runs hover mode (R4.9). An arrow key is a pick, so he picks in place
+first and walks after.
 
 **R4.8 Patrol (replaces home and the stroll home).** When nothing holds his attention he ambles
 the shelf slowly, pausing to look around.
+- **Rev 4, by phase (R7):** in the **busy phase** the stretches are strolls the idle clock picks
+  (`IDLE_MENU.busy`), and the pauses are its busy gaps (`TEMPO.busyGap`), each opening with one
+  `PATROL.looks` look; `PATROL.first` and `PATROL.pause` aren't used. In the **settled phase**
+  the patrol runs as written below, and idle items start in its pauses.
 - **Start:** first paint and landing are unchanged (`x` 0). The first stretch is `PATROL.first`
   (5s) after landing, heading left.
 - **A stretch:** a leg of `PATROL.stretch` (96–240px, random) at `PATROL_PACE`, in his heading,
@@ -357,8 +392,9 @@ the shelf slowly, pausing to look around.
   - the card below him (`LOOK_AT` its centre), 0.4
   - the pointer (fine pointer, if one has been seen; else the card), 0.3
   - out at the visitor (look 0, then a blink), 0.3
-- **Plays and nudges** start only in a pause or while he stands (R7). The nap, juggle, sit,
-  peek-a-boo, logo pose, balance and tag all run where he stands.
+- **Idle items** (beats, plays, chatter) start only while he stands (R7). The nap, juggle, sit,
+  peek-a-boo, logo pose, balance, the beats and tag all run where he stands. An item that comes
+  due mid-stretch waits for the stretch's end.
 - **No stretch starts while:**
   - a quip is showing
   - Rix or a card is hovered or focused
@@ -372,6 +408,46 @@ the shelf slowly, pausing to look around.
   roomier side, or keeps its heading if that side has at least `PATROL.minStretch`.
 - **Carrying a prop:** he patrols carrying it (R4.3).
 - **Budgets:** the patrol is a crew timer. It pauses off screen and in a hidden tab (R7).
+
+**R4.9 Hover mode (rev 4; home's About; replaces "holds `curious` while the target holds").**
+A card target (a fine pointer's hover, or keyboard focus) held `WALK.dwell` walks him toward the
+card as R4.1–R4.6. Once he stops (at the stand spot or partway), or at once if he's within
+`WALK.minDist`, he cheers the pick on while the target holds. He never goes still.
+- **Base expression,** between beats, looking at the card (`LOOK_AT`):
+  - before a pick, or after one on another card: `curious`, tilted toward the card
+  - on the picked card: `happy`, no glyph
+- **Hover beats:** one every `HOVER.beatGap` (1.2–2.0s) from the last one's end, by
+  `HOVER.beats` weights, never the same twice in a row. No beat starts while a line is still
+  typing; beats resume in its hold. Each ends back on the base expression.
+
+| Hover beat | Weight | Built from | Length |
+|---|---|---|---|
+| `hop` | 3 | `HOP` in place, still looking at the card | ≈ 0.6 |
+| `point` | 3 | `WAVE_SMALL` on the arm on the card's side: right arm (`actR` −35) for a card right of or under his eye centre, left arm (`actL` +35, same timings) for one on his left | ≈ 0.74 |
+| `cheer` | 2 | `excited` In with `sparkle` (`TWINKLE`), hold `HOVER.cheer` 0.6, Out | ≈ 0.95 |
+| `perk` | 2 | `PERK` with the eye pop, as the hover perk on Rix | ≈ 0.5 |
+| `glance` | 2 | `LOOK_AT` the pointer (fine pointer seen; else look 0, out at the visitor), hold `HOVER.glanceHold` 0.5, a blink, `LOOK_AT` the card | ≈ 1.1 |
+
+- **Hover lines** (typed, R5; shown, never announced):
+  - **When:** the first once he has stopped **and** the target has held `HOVER.lineDwell` (0.8s)
+    from the hover's start. The next comes `HOVER.lineGap` (1.5–2.5s) after the last line has
+    gone. Per hold, at most `HOVER.lines`: 3 before a pick, 1 on another card after a pick, none
+    on the picked card (its ack already speaks).
+  - **Which, before a pick:** the card's line, a generic line, the card's other line:
+    `hoverLines[key][i]`, then `hoverAnyLines[n]`, then `hoverLines[key][i + 1]`. Each pool runs
+    in turn across holds (a re-hover carries on from where it stopped). A card line said in the
+    last `HOVER.repeatAfter` (20s) is swapped for the next generic line. Never the same line
+    twice in a row.
+  - **Which, after a pick:** `switchLines`, in turn, on any card but the picked one.
+- **Hopping between cards:** a line belongs to its card. When the target leaves that card, a line
+  that hasn't started is dropped, and one that's showing fades out (`TALK.walkOut` 0.2), so a line
+  never sits over the wrong card. The next card waits its own `HOVER.lineDwell`, so a fast scan
+  across the board shows no lines, only the looks and the walk (and `confused` after 3 flips in
+  2s, R4.5).
+- **Release:** the current hover beat finishes; the base expression goes Out; the idle clock
+  resumes after `LOOK_RELEASE` with its next gap (R7). A pick during hover mode cuts it (R2.1).
+- **Not on:** touch (no hover; a tap is a pick), the tantrum through the forgive (targets are
+  ignored, R4.5), reduced motion (no beats or walk; lines only, R8.1).
 
 ---
 
@@ -388,12 +464,15 @@ the shelf slowly, pausing to look around.
 - Eye squish: height 14 → `TALK.squish.height`, `y` + `TALK.squish.y`, so they stay centred
   (in 0.06, out 0.08). Only while the eyes are neutral.
 - At the start, the eyes glance toward the quip's side (d ∓2, p ∓2) and back at the end. Not
-  while the eyes are annoyed, angry, love or hidden (the sulk).
+  while the eyes are annoyed, angry, love or hidden (the sulk). **Rev 4:** nor during a hover
+  line: he keeps looking at the card.
 - **When each line types:**
   - Pokes 1–3 from `TALK.afterPoke` (0.5), nudges from 0.3.
   - Annoyed from `TALK.afterAnnoyed` (0.25), angry from `TALK.afterAngry` (0.15).
   - A pet's line from `TALK.afterPet` (0.6).
   - The sulk line from `TALK.afterSulk` (0.4), the forgive line from `TALK.afterForgive` (0.9).
+  - **Rev 4:** a chatter line from `TALK.afterNudge` (0.3) into its chatter act; a hover line
+    from 0, when R4.9's dwell is met.
 
 **R5.3 Side.**
 - The quip takes the side with room: left (as built), or right when the room on his left is
@@ -403,27 +482,68 @@ the shelf slowly, pausing to look around.
   includes the flee and the stomp walk: the angry line fades as he runs. A patrol stretch never
   starts while a line shows (R4.8).
 
+**R5.4 Line sources (rev 4).** One quip, two kinds of line:
+- **Visitor-driven** (pokes, the ladder, a pet, the sulk, the forgive): as before, a new line
+  cuts the old one.
+- **Scheduled** (hover lines, chatter): never start while a line shows, so no line is cut
+  mid-read. Each waits for the quip to be empty and at least `IDLE_TALK.minGap` (1.5s) since the
+  last line went. Every line still holds `QUIP_HOLD` 2.4 from its last character.
+- **Chatter** (the nudges, folded in): the idle talk clock (R7) gives a chatter act its slot.
+  - **Before a pick** (nothing checked, including after the toss): the nudge act as built (`WAVE`,
+    one `NUDGE_BOUNCE`, `LOOK_AT` the board's centre) with the next `idleLines` line.
+  - **After a pick** (any card, "Not sure yet" included): a look straight down toward the
+    examples below (`IDLE_TALK.lookDown`: d −3, p +3, `LOOK_AT` timing) with `WAVE_SMALL`, and
+    the next `afterPickLines` line. No line asks for a pick once one is made.
+  - Each pool runs in turn and wraps round, never the same line twice in a row.
+- **Sizing note:** B's quip is `max-w-40` (160px), two lines: about 20 Geist Mono characters a
+  line at `text-nav`, so a line of about 40 characters fits. Over that, the lead's screen check
+  decides (`docs/04-voice.md`: no fixed limits).
+
 ---
 
 ## R6. Plays (idle; all are `play`, rank 8)
 
 | Play | Trigger | Timeline (seconds) | Ends |
 |---|---|---|---|
-| **R6.1 Juggle** | play clock | **0:** look up (d 3, p −3, the eyes follow the arcs with p ±1). **0, 0.25, 0.5:** three props `PROP_IN` in the right hand. **Cycle per prop:** a throw over the head (`x` 0 → −134 linear; `y` 0 → −40 `power2.out` / → 0 `power2.in`; 0.5), then a low pass back (`x` → 0, `y` −12; 0.25). A flick on each throw (`actR` −25, 0.08 / 0.12); `actL` +20 on each pass. `JUGGLE.rounds` 2 (≈ 2.0s). Before a pick he juggles the board's first three emblems (R12.6) | each prop `PROP_OUT` in the hand (a picked one stays). `happy` 0.6, with `sparkle` |
+| **R6.1 Juggle** | idle clock | **0:** look up (d 3, p −3, the eyes follow the arcs with p ±1). **0, 0.25, 0.5:** three props `PROP_IN` in the right hand. **Cycle per prop:** a throw over the head (`x` 0 → −134 linear; `y` 0 → −40 `power2.out` / → 0 `power2.in`; 0.5), then a low pass back (`x` → 0, `y` −12; 0.25). A flick on each throw (`actR` −25, 0.08 / 0.12); `actL` +20 on each pass. `JUGGLE.rounds` 2 (≈ 2.0s). Before a pick he juggles the board's first three emblems (R12.6) | each prop `PROP_OUT` in the hand (a picked one stays). `happy` 0.6, with `sparkle` |
 | … **with a drop** | 25% of juggles, never the first of the page load | on the last throw the prop misses: `x` −136, then falls to `y` +42 (its bottom on the line; 0.3 `power2.in`) and bounces 6 (0.1 / 0.12). `surprised` 0.3, then `sad` 0.8 with `drop`, looking down-left (d −7, p +1) | the dropped prop fades (0.3); back to neutral |
-| **R6.2 Sit** | play clock | rig `y` +7 (0.3 `power2.inOut`): the body rests on the line and the feet hang 5.6px below it (the 16px gap above the cards). `upper` 1.04×0.96, arms −30 / +30. The feet swing out of phase: `x` ±3, `y` −1 at each end, half-cycle 0.45 `sine.inOut`. The eyes stay with life (looks and blinks) | after `SIT.length` 6–9s: rig `y` 0 (0.25 `back.out(1.6)`), `SQUASH`, `SETTLE` |
-| **R6.3 Nap** | the visitor idle `NAP_AFTER` (40s), nudges finished, standing where he is (a patrol pause or idle; never mid-stretch), no quip, mood neutral | **0:** `sleepy`. **0.6:** yawn (`upper` 0.95×1.08 with arms +40 / −40: 0.4 up, 0.4 hold, 0.5 down). **1.9:** two nods (tilt +3 over 0.8 `sine.inOut`, snap back 0.15). **3.6:** sit (R6.2 pose, no swing). Eyes go to the Process slit (`eyeAttr` "slit"), `napLife(true)`, the zzz loop (`startZzz`, exported from processBotActs). He sleeps until the visitor returns; the patrol stops while he sleeps | **wake** (below), then the patrol resumes after `PATROL.resume` |
+| **R6.2 Sit** | idle clock | rig `y` +7 (0.3 `power2.inOut`): the body rests on the line and the feet hang 5.6px below it (the 16px gap above the cards). `upper` 1.04×0.96, arms −30 / +30. The feet swing out of phase: `x` ±3, `y` −1 at each end, half-cycle 0.45 `sine.inOut`. The eyes stay with life (looks and blinks) | after `SIT.length` 6–9s: rig `y` 0 (0.25 `back.out(1.6)`), `SQUASH`, `SETTLE` |
+| **R6.3 Nap** | the visitor idle `NAP_AFTER` (40s), **in the settled phase only (rev 4; was "nudges finished")**, standing where he is (a patrol pause or idle; never mid-stretch), no quip, mood neutral | **0:** `sleepy`. **0.6:** yawn (`upper` 0.95×1.08 with arms +40 / −40: 0.4 up, 0.4 hold, 0.5 down). **1.9:** two nods (tilt +3 over 0.8 `sine.inOut`, snap back 0.15). **3.6:** sit (R6.2 pose, no swing). Eyes go to the Process slit (`eyeAttr` "slit"), `napLife(true)`, the zzz loop (`startZzz`, exported from processBotActs). He sleeps until the visitor returns; the patrol stops while he sleeps | **wake** (below), then the patrol resumes after `PATROL.resume` |
 | **Wake with a start** | the visitor returns: pointer move, pointer down, key, wheel or scroll, focus in, or the option going live again (back on screen, or the tab visible again) | **0:** zzz fade 0.15; `surprised` + `alert`; a hop from sitting (rig `y` +7 → −8, 0.18 `power2.out`, then 0, 0.16 `power2.in`), `SQUASH`, `SETTLE`. **0.3:** look at the pointer, or d 0. **0.6:** `alert` out. **0.8:** double blink. **1.0:** `happy` 0.5. `napLife(false)` | ≈ 1.5s |
 | **R6.4 Tag** | fine pointer only: it comes within `TAG.near` × scale of his eye centre, approaching at ≥ `TAG.speed`, not over him | **dodge:** `surprised` 0.06; a hop away from the pointer's side (walker `x` ±48, clamped; `upper y` −10 `STRETCH`, feet −6; 0.3), then `happy`. **No room:** a duck (`upper y` +6, scaleY 0.85, 0.12; hold 0.4; back with `SETTLE`) | after `TAG.dodges` (2) in one 8s session he lets himself be caught: hovering him then plays `shy` 0.8 (with `dots`), then `happy` with `sparkle` (this replaces the perk). Then `TAG.rest` 20s with no dodges |
-| **R6.5 Peek-a-boo** (approved) | play clock; where he stands | **0:** the stage clip `PEEKABOO.clip`. Sink: rig `y` 0 → 88 (0.35 `power2.in`); hold 0.6. **0.95:** rise to 32, eyes only (`PEEK_OUT`). **1.4:** `PEEK_SEARCH`. **2.5:** pop up: `PEEK_HOP` on `y` (32 → −18 → 0), with the clip cleared at the peak; `surprised`, then `happy` 0.4 | ≈ 3.0s; the clip is always cleared (a cut clears it too) |
-| **R6.6 Logo pose and wink** (approved) | play clock | **0:** life share → 0 (0.3), look 0. **0.3:** the arms' `scaleX` 0 about the shoulders (0.2 `power2.in`), so he **is** the mark. Hold 0.8. **1.3:** right-eye wink (shut 0.07, hold 0.25, open 0.12). **1.75:** arms back (0.3 `back.out(2)`), life back, `happy` 0.3 | ≈ 2.1s |
-| **R6.7 Balance an emblem** (approved) | play clock | **0:** a prop (the picked one, or before a pick the board's first) is tossed to his head: `x` −68, `y` −43, 0.4, an arc (`x` linear, `y` `power2.out`). **0.4:** wobble: rig tilt ±3 with the prop counter-rotating ∓8° about `PROP_PIVOT`, 3 × 0.25 half-cycles, arms +30 / −30. **1.15:** back to the hand (0.35), or `PROP_OUT` if not picked; `happy` 0.4 | ≈ 2.5s |
+| **R6.5 Peek-a-boo** (approved) | idle clock; where he stands | **0:** the stage clip `PEEKABOO.clip`. Sink: rig `y` 0 → 88 (0.35 `power2.in`); hold 0.6. **0.95:** rise to 32, eyes only (`PEEK_OUT`). **1.4:** `PEEK_SEARCH`. **2.5:** pop up: `PEEK_HOP` on `y` (32 → −18 → 0), with the clip cleared at the peak; `surprised`, then `happy` 0.4 | ≈ 3.0s; the clip is always cleared (a cut clears it too) |
+| **R6.6 Logo pose and wink** (approved) | idle clock | **0:** life share → 0 (0.3), look 0. **0.3:** the arms' `scaleX` 0 about the shoulders (0.2 `power2.in`), so he **is** the mark. Hold 0.8. **1.3:** right-eye wink (shut 0.07, hold 0.25, open 0.12). **1.75:** arms back (0.3 `back.out(2)`), life back, `happy` 0.3 | ≈ 2.1s |
+| **R6.7 Balance an emblem** (approved) | idle clock | **0:** a prop (the picked one, or before a pick the board's first) is tossed to his head: `x` −68, `y` −43, 0.4, an arc (`x` linear, `y` `power2.out`). **0.4:** wobble: rig tilt ±3 with the prop counter-rotating ∓8° about `PROP_PIVOT`, 3 × 0.25 half-cycles, arms +30 / −30. **1.15:** back to the hand (0.35), or `PROP_OUT` if not picked; `happy` 0.4 | ≈ 2.5s |
 
 - **Visitor idle** counts live time only: it's a crew timer, so it pauses off screen and in a
   hidden tab.
 - **Napping out of view:** if the option leaves the screen while he naps, he wakes with a start
   when it comes back.
 - **P4 Foot drum** was rejected (2026-10-02) and isn't built.
+
+### R6.8 Beats (rev 4; idle, rank 8, on the idle clock beside the plays)
+
+Short in-place moments built only from moves already in this sheet. Each emotion uses its own
+`EMOTION_TIMING` In and Out and its glyph's own loop (R3.2); `BEAT.hold` is the only new number.
+Length = In + hold + Out.
+
+| Beat | Weight | Built from | Glyph | Length |
+|---|---|---|---|---|
+| `wave` | 2 | `LOOK_AT` look 0 (out at the visitor), `WAVE` at 0.1 | — | ≈ 1.1 |
+| `perk` | 2 | `PERK` with the eye pop | — | ≈ 0.5 |
+| `hop` | 2 | `happy` In (no glyph), `HOP`, `happy` Out | — | ≈ 0.75 |
+| `look` | 2 | `PEEK_SEARCH` (left, hold, right, hold), look 0, a blink | — | ≈ 1.3 |
+| `sparkle` | 2 | `excited` with two `TAP_LIFT` taps, hold 0.8 | `sparkle` (`TWINKLE`) | ≈ 1.15 |
+| `wonder` | 2 | `curious` at a random card (`LOOK_AT`, tilt toward it), hold 1.0 | `question` | ≈ 1.5 |
+| `startle` | 1 | `surprised` with the pop, `SQUASH` then `SETTLE`, hold 0.6 | `alert` | ≈ 0.9 |
+| `bashful` | 1 | `shy`, hold 1.4 (one `DOTS` cycle) | `dots` (`DOTS`) | ≈ 1.95 |
+| `puzzle` | 1 | `confused` with its arm wiggle, hold 0.8 | `question` | ≈ 1.3 |
+| `fond` | 1 | `love` eyes only (diamonds and one `LOVE.beat`; no melt, sway or foot pop), hold 1.0 | one heart (`HEART_ONE`) | ≈ 1.55 |
+
+- **Never the same beat twice in a row,** and never two glyph beats in a row with the same glyph
+  (`wonder` and `puzzle` both show `question`).
+- A beat may run while a line holds (talk is an overlay); a play may not (R7).
+- `fond` never meets a pet: it doesn't start while the pointer is over Rix (R7 gates).
 
 ---
 
@@ -473,7 +593,7 @@ the shelf slowly, pausing to look around.
 
 | At | Move |
 |---|---|
-| 0 | `cut()` (a walk or stretch brakes, `WALK_STOP.brake`); the mood hold ends. `angry` In, with the `grawlix`. Glare at the pointer (fine) or 0 / +1. The quip is replaced. `RixStatus` gets the angry line, unless a prop is about to be thrown (R6A.4) |
+| 0 | `cut()` (a walk or stretch brakes, `WALK_STOP.brake`); the mood hold ends. `angry` In, with the `grawlix`. Glare at the pointer (fine) or 0 / +1. The quip is replaced. **Home's About: the picks lock (R6A.9).** `RixStatus` gets the angry line followed by `lockLine`, unless a prop is about to be thrown (R6A.4) |
 | 0.1, 0.4, 0.7, 1.0 | stomps, L R L R: the foot `y` `TANTRUM.stomp.lift` −7 (0.12 `power2.out`), slammed to 0 (0.06 `power4.in`). On each slam, `upper` `SQUASH` 0.05, then `SETTLE` |
 | 0.1 → 1.9 | shake: `upper x` ±1.5, half-cycle 0.04 `sine.inOut`, yoyo. The arms shake ±6 about −40 / +40, half-cycle 0.08 |
 | 0.15 | the next `angryLines` line types |
@@ -500,9 +620,10 @@ the shelf slowly, pausing to look around.
    - The pick act and `AboutStatus` ignore untrusted changes, so nothing plays and no ack is
      announced.
    - The URL's `?for` is never rewritten, as before.
+   - **Rev 4:** the pick lock (R6A.9) only swallows trusted input, so the deselect goes through.
 3. Motion's remembered previous pick becomes null, so the next pick has no old prop to
    `PROP_OUT`.
-4. `RixStatus` gets `about.rix.throwAway`.
+4. `RixStatus` gets `about.rix.throwAway`, followed by `lockLine` on home's About (R6A.9).
 5. Focus and scroll don't move.
 
 The ack is gone by `:has` (its fade finished at the release). After its inline `opacity` is
@@ -546,12 +667,13 @@ flee, it's the shelf end nearer to him. Then:
 | 0 | the `grawlix` out (`EMOTE_OUT`). `angry` `rotation` → 0 and the rects to rest (0.15). Look to the wall (`face`: d ±3, p ±3, 0.15 `power2.inOut`) |
 | 0.15 | the rects collapse (0.25 `power2.in`). **Wall left:** `x` 23 / 63 stay, `width` → 0. **Wall right:** `x` → 37 / 77, `width` → 0. `upper` `scaleX` 0.92 (0.3 `power2.inOut`); slump `upper y` +1.5 and `scaleY` 0.97; arms −20 / +20; rig tilt ±3 toward the wall |
 | 0.4 | `sulkLine` types (side per R5.3). Breath at timeScale 0.6; no blinks or looks |
-| 0.4 → 6.4 | hold `SULK.hold` (6, live time). He ignores hover, focus, pets, nudges, plays, the patrol, tag and pokes |
+| 0.4 → 6.4 | hold `SULK.hold` (6, live time). He ignores hover, focus, pets, chatter, beats, plays, the patrol, tag and pokes |
 
 - **Hmph** (a press during the sulk, at most one per `HMPH.gap` 0.5):
   - rig tilt ±2, two half-cycles of 0.06 `sine.inOut`
   - `upper` `scaleY` 0.96 (0.06), then `SETTLE`
   - No count, no line, no announcement, and the hold doesn't extend.
+  - **Rev 4:** a swallowed press on a locked card during the sulk plays the hmph too (R6A.9).
 - **A pet during the sulk** is ignored: no love, no hmph, and the hold doesn't change.
 
 ### R6A.7 Forgive (after the sulk; ≈ 1.8s)
@@ -563,9 +685,12 @@ flee, it's the shelf end nearer to him. Then:
 | 0.7 | the turn back: `upper` `scaleX` 1 (0.3 `back.out(1.6)`), rig tilt 0, slump off, look to 0 (0.3 `power2.inOut`) |
 | 0.85 | `happy` In (no glyph) |
 | 0.9 | a small wave, `WAVE_SMALL`: `actR` −35 (0.2 `power2.out`), two swings ±8 (0.12 `sine.inOut`), back (0.3 `back.out(1.6)`), ≈ 0.74. `forgiveLine` types |
-| 1.8 | `happy` Out. Mood neutral, count 0. If no target holds, the patrol resumes after `PATROL.resume` from where he stands |
+| 1.8 | `happy` Out. Mood neutral, count 0. **Home's About: the picks unlock and `RixStatus` gets `unlockLine` (R6A.9).** If a target holds, hover mode starts (R4.9); if not, the idle clock resumes (R7) from where he stands |
 
-### R6A.8 Calm by a pick (a trusted pick during the tantrum, flee or sulk; 1.6s, then the pick)
+### R6A.8 Calm by a pick (the `/rix` playground only since rev 4; a pick during the tantrum, flee or sulk; 1.6s, then the pick)
+
+> **Rev 4:** on home's About the picks are locked through the tantrum (R6A.9), so this never runs
+> there. It stays for the playground's "Calm with prop" button and its other calm paths.
 
 | At | Move |
 |---|---|
@@ -579,6 +704,70 @@ flee, it's the shelf end nearer to him. Then:
 
 - A toss in flight runs to its end (R2.2). It ends by 1.45 from its release, which is always
   before the calm's `PROP_IN`, so re-picking the same card is safe.
+
+### R6A.9 The pick lock (rev 4; home's About only)
+
+**Span:** from the tantrum's 0 to the forgive's end. Full motion: 1.9 + the flee (0–2.2) + the
+sulk (6.4) + the forgive (1.8), about 10–12s of live time. Reduced motion: 0 to
+`REDUCED_SULK.end` (7.9). It pauses with the crew off screen and in a hidden tab, like the chain
+it follows. Failsafe: it always unlocks after `PICK_LOCK.max` (16s live), and teardown
+(`resetRix`) strips `data-locked` and every `aria-disabled`.
+
+**What's locked:** only the visitor's own (trusted) input on About's six radios. Untrusted
+changes still apply: the toss's deselect (R6A.4); the "Shown for" tag (another section, not
+locked); `?for=` and the session memory, which apply once after mount, before he can land and be
+poked, so in practice they never meet the lock (if one did, it applies silently, as built).
+
+**How (chosen: `aria-disabled` plus swallowing, not native `disabled`):**
+- Each radio gets `aria-disabled="true"`. Screen readers say each card is unavailable, and the
+  radios keep their place in the tab order.
+- One capture-phase listener set on the option root, added first, swallows while locked:
+  - `click` inside a card (`preventDefault`): the label's click never checks the radio, by
+    pointer or tap
+  - `keydown` of Space and the four arrow keys on a radio (`preventDefault`): no check and no
+    roving move, so arrows do nothing. Tab and Shift+Tab work as normal
+  - any trusted `change` that slips through (the safety net): the previous radio is re-checked
+    and `stopImmediatePropagation()`, so the memory, `AboutStatus` and the motion never see it
+- **Why not `disabled`:** a disabled radio drops out of the tab order and loses focus if it has
+  it (focus falls to `body`, breaking R1.4). With all six disabled the group leaves the tab
+  order, and a screen reader user can't reach the cards to learn why. `aria-disabled` keeps
+  focus where it is, and the visible ring stays.
+- **Rix:** card hover and focus are ignored, as R4.5. A swallowed press during the sulk plays the
+  hmph (`HMPH.gap`); during the stomp and flee it does nothing.
+
+**Visible state** (`AboutPosterBoard` fieldset gains `group/board`; JS sets `data-locked` only
+while locked; no JS, no lock):
+
+| Card part | Unlocked (as built) | Locked |
+|---|---|---|
+| Label | `cursor-pointer` | `group-data-locked/board:cursor-not-allowed` |
+| Span, not checked | `border-line bg-band text-text` | `group-data-locked/board:peer-not-checked:opacity-60` |
+| Hover | `peer-not-checked:hover:border-muted` | none: `group-data-locked/board:peer-not-checked:hover:border-line` |
+| Active | `peer-not-checked:active:bg-line` | none: `group-data-locked/board:peer-not-checked:active:bg-band` |
+| Focus-visible | the 2px `text` outline, offset 4 | unchanged: focus always shows |
+| Checked | accent card and tick | unchanged and not dimmed (only "Not sure yet" stays checked through a toss; a prop card is unchecked at the release) |
+
+- **Tokens:** `line`, `band`, `text`, `muted`, `accent`, `on-accent`, and `opacity-60` as a
+  utility only. No new token. The `group-data-locked` variant (one attribute) outranks the
+  card's own hover and active classes by specificity, so their order doesn't matter.
+- **Contrast:** `text` on `band` at 60% over `bg` is about 6.6:1, so dimmed labels stay above
+  4.5:1. The tick and the dim mean the state isn't shown by colour alone.
+- **Sizes:** nothing moves or resizes. The board is as built at every width (2 × 3 at 360,
+  154 × min 144; 3 × 2 from 768, 225 × min 208; 432 × min 256 at 1440; 501 × min 288 at 3840),
+  and Rix stays 136×88.
+- **Motion (later):** none. The class switch is instant in both motion modes; Rix's tantrum is
+  what the eye follows.
+
+**Announcements** (`RixStatus`, polite, one whole line each, so a screen reader hears one
+utterance and not two racing ones):
+- **Lock:** `lockLine` is appended to the line the tantrum already announces: "{angry line}
+  {lockLine}" at 0, or "{throwAway} {lockLine}" at the release (0.75; reduced 0.4) when a prop is
+  thrown.
+- **A swallowed press:** `lockLine` again, at most once per `PICK_LOCK.remind` (3s). The status
+  clears first, so the same text reads again.
+- **Unlock:** `unlockLine`, at the forgive's 1.8 (reduced: 7.9).
+- `throwAway` no longer says "you can pick again", because the cards are locked at that moment;
+  `unlockLine` says it (copywriter).
 
 ---
 
@@ -631,27 +820,50 @@ flee, it's the shelf end nearer to him. Then:
 
 ## R7. Budgets (all in the crew: everything pauses off screen and in a hidden tab)
 
-- **Play clock:**
-  - the first play `PLAY.first` (8s) after landing
-  - then `PLAY.gap` (12–20s) after any act, play or walk ends. A patrol stretch doesn't reset it
-  - at most `PLAY.max` (3) per 60s of live time
-  - never the same play twice in a row
-  - weights: juggle 3, sit 3, peek-a-boo 1, logo pose 1, balance 1
-- **Skips:** a play skips, and retries after `PLAY.retry` (4s), if any of these holds:
-  - a patrol stretch is running (plays start only while he stands)
-  - the pointer was over the picks or Rix within `NUDGE_QUIET`
-  - focus is inside the option
-  - a quip is showing
-  - the mood isn't neutral (an annoyed hold, or a tantrum through the end of the forgive)
+**Rev 4 replaces the play clock and the nudge clock on home's About with one idle clock**
+(`lib/rixIdle.ts`). The playground keeps its schedulers off.
+
+- **Two phases, by live time** (crew time: on screen, tab visible), counted from landing whatever
+  he's doing:
+  - **busy:** the first `TEMPO.busy` (360s, 6 minutes)
+  - **settled:** after that, for the rest of the page load
+- **The idle clock** runs one item at a time: a beat (R6.8), a play (R6), a stroll (one patrol
+  stretch, busy phase only) or a chatter act (R5.4).
+  - The first item `TEMPO.first` (2s) after the ask ends.
+  - **Busy:** the next item `TEMPO.busyGap` (2–4s) after the last item, act or walk ends. Each
+    gap opens with one `PATROL.looks` look. Picked by `IDLE_MENU.busy`: beat 10, stroll 4,
+    play 3.
+  - **Settled:** the next item `TEMPO.settledGap` (10–15s) after the last item, act or walk ends;
+    the patrol (R4.8) fills the time between. Picked by `IDLE_MENU.settled`: beat 1, play 2. An
+    item due mid-stretch waits for the stretch's end.
+  - Inside a kind: plays by `PLAY.weights` (juggle 3, sit 3, peek-a-boo 1, logo pose 1,
+    balance 1), beats by `BEAT.weights`.
+  - Never the same item twice in a row (by name; "stroll" counts as one name). Plays stay at most
+    `PLAY.max` (3) per 60s of live time; past that, a beat goes instead.
+- **The idle talk clock** (`IDLE_TALK`) decides when chatter is due: first `IDLE_TALK.first` (4s)
+  after landing, then `IDLE_TALK.busyGap` (8–12s) in the busy phase or `IDLE_TALK.settledGap`
+  (20–30s) settled, each measured from the last line's end, whatever its source. When due, the
+  next idle slot is the chatter act in place of the menu's pick. A hover line or a poke line
+  resets it.
+- **Gates.** An idle item starts only when all hold; otherwise it waits and re-checks every
+  `TEMPO.retry` (0.5s), and a wait doesn't count as an item:
+  - landed; no act running; mood neutral; no held emotion; not napping
+  - no card target holds (hover mode owns him, R4.9)
+  - the pointer isn't over Rix (the perk and the pet own that)
+  - for a play, a stroll or a chatter act: no quip is showing
+  - for a stroll: Rix doesn't have keyboard focus (the menu picks a beat instead)
+- **Dropped in rev 4:** the pointer-near skip (`NUDGE_QUIET`), the "focus inside" skip, the 4s
+  retry, `NUDGE_MAX` and the end of chatter on a pick.
+- **Hover mode** (R4.9) is visitor-driven and isn't on the idle clock. It runs the same in both
+  phases. The idle clock waits while a target holds, then resumes with its gap after
+  `LOOK_RELEASE`.
 - **Pointer-driven:** tag, the nap and the pet aren't on the clock. Tag is limited by `TAG`, the
-  nap needs 40s of visitor idle, and the pet is limited by `PET.rest`.
-- **Patrol:** stretches aren't plays and don't count toward `PLAY.max`. At most one stretch
-  starts every ≈ 4.5s (the shortest stretch, 2.0s, plus the shortest pause, 2.5s).
-- **Unchanged:** nudges (`NUDGE_*`, cap 4, end on any pick). They skip while the mood isn't
-  neutral, and the skip doesn't count.
-- **Rough ceiling:** in a minute of an idle, visible page, at most 3 plays, 3–4 nudges and about
-  a dozen slow stretches, and never two acts at once. The ladder and the pet run only on the
-  visitor's own input.
+  nap needs 40s of visitor idle **in the settled phase**, and the pet is limited by `PET.rest`.
+- **Rough ceiling, one idle visible minute:**
+  - **busy:** about 10–12 items (about 5–6 beats, 2 strolls and at most 3 plays) and about
+    4 chatter lines, plus up to one hover line every 5–6s while a card is held (3 per hold)
+  - **settled:** about 4–5 items (at most 3 plays), the slow patrol, and about 2 chatter lines
+  - never two acts at once. The ladder and the pet run only on the visitor's own input.
 
 ## R8. Move library: new constants for `lib/rixMotion.ts`
 
@@ -660,7 +872,7 @@ flee, it's the shelf end nearer to him. Then:
     `POP_SCALE`, `REACT_COOLDOWN`, `BLINK_*`, `TAP_LIFT` / `TAP_UP` / `TAP_DOWN`, `NAP_*`, `Z_*`,
     `LOOK_MAX`
   - from `lib/rixMotion.ts`, as built: `PEEK_*`, `WAVE`, `PERK`, `POKE`, `POKE_COOLDOWN`,
-    `QUIP_*`, `NUDGE_*`, `LOOK_*`, `PROP_*`, `ACK_IN`
+    `QUIP_*`, `NUDGE_BOUNCE`, `LOOK_*`, `PROP_*`, `ACK_IN`
 - **Emotion eye rects and poses** (R3.1) go in `lib/rixEmotions.ts` (geometry, like
   `rixProps.ts`). That includes the angry slits' and love diamonds' `rotation` and `svgOrigin`,
   and the sulk's collapsed rects. **Glyph geometry** (R3.2: paths, parts, pivots, fills) moves to
@@ -668,14 +880,24 @@ flee, it's the shelf end nearer to him. Then:
 - **Removed (rev 3):** `STROLL`, `WALK_HOME_AFTER`, `DASH_PACE`, and `WALK`'s `speed`, `min`,
   `max`, `ease`, `dashStep`, `dashAbove` and `dashLean`. `Pace` loses `speed`, `min`, `max` and
   `ease`, and gains `footReach` and an optional `maxDist`.
+- **Removed (rev 4):** `NUDGE_FIRST`, `NUDGE_EVERY`, `NUDGE_MAX`, `NUDGE_MAX_REDUCED`,
+  `NUDGE_QUIET`, `NUDGE_RETRY`, and `PLAY.first`, `PLAY.gap` and `PLAY.retry`. `NUDGE_BOUNCE` stays
+  (the pre-pick chatter act).
 
 | Constant | Value |
 |---|---|
+| **`TEMPO`** (rev 4) | busy 360 (live s from landing) · first 2 (after the ask) · busyGap 2–4 · settledGap 10–15 · retry 0.5 |
+| **`IDLE_MENU`** (rev 4) | busy { beat 10, stroll 4, play 3 } · settled { beat 1, play 2 } |
+| **`BEAT`** (rev 4) | weights { wave 2, perk 2, hop 2, look 2, sparkle 2, wonder 2, startle 1, bashful 1, puzzle 1, fond 1 } · hold { sparkle 0.8, wonder 1.0, startle 0.6, bashful 1.4, puzzle 0.8, fond 1.0 } · In and Out from `EMOTION_TIMING`; glyph loops by name (R3.2) |
+| **`HOP`** (rev 4) | `PICK_BOUNCE` (anticipate 0.1, lift −8, up 0.18, down 0.16, squash 0.06) with the feet at `POKE.feet` −6 (up 0.14 `power2.out`, down 0.12 `power2.in`, as the poke) |
+| **`HOVER`** (rev 4) | lineDwell 0.8 · beatGap 1.2–2.0 · lineGap 1.5–2.5 · lines per hold { before 3, switch 1, picked 0 } · repeatAfter 20 · glanceHold 0.5 · cheer 0.6 · beats { hop 3, point 3, cheer 2, perk 2, glance 2 } |
+| **`IDLE_TALK`** (rev 4) | first 4 (after landing; reduced: after the stage shows) · busyGap 8–12 · settledGap 20–30 · reducedGap 20–30 (each from the last line's end, any source) · minGap 1.5 · lookDown { d −3, p 3 } |
+| **`PICK_LOCK`** (rev 4) | remind 3 · max 16 (live s) |
 | `WALK` | dwell 0.25 · **reach 200px** · minDist 12px · step 0.15 · footReach 9 · footLift 4 · bob 1.5 · lean 3 · armSwing 14 · carry −10 · face { d 3, p 3 } (96 px/s at 136px) |
 | `GAIT` | unit = box width ÷ 170 · stride = 2 × footReach × unit · n = max(1, round(D ÷ stride)) · r = D ÷ (2 n unit) · steps n + 1 · duration (n + 1) × step · ease { start `power1.in`, mid `none`, stop `power1.out` } |
-| `PATROL_PACE` / `PATROL` | footReach 7 · step 0.2 · footLift 3 · bob 1 · lean 1.5 · armSwing 8 (56 px/s) · first 5 · heading left · stretch 96–240px · minStretch 48px · pause 2.5–6 · looks { card 0.4, pointer 0.3, out 0.3 } · resume 3 |
+| `PATROL_PACE` / `PATROL` | footReach 7 · step 0.2 · footLift 3 · bob 1 · lean 1.5 · armSwing 8 (56 px/s) · first 5 · heading left · stretch 96–240px · minStretch 48px · pause 2.5–6 · looks { card 0.4, pointer 0.3, out 0.3 } · resume 3 (**rev 4:** first and pause apply in the settled phase only) |
 | `WALK_START` / `WALK_STOP` / `WALK_TURN` | anticipate 0.08, faceLead 0.08 · brake 0.15 `power2.out` (slide 4px), overshoot 1.5 (0.12), back 0.3 `back.out(1.6)` · eyes 0.12 `power2.inOut` |
-| `TALK` | char 0.035 · pause 0.14 · bob −1.5 · squish { height 10, y 2 } · afterPoke 0.5 · afterNudge 0.3 · afterAnnoyed 0.25 · afterAngry 0.15 · **afterPet 0.6** · afterSulk 0.4 · afterForgive 0.9 |
+| `TALK` | char 0.035 · pause 0.14 · bob −1.5 · squish { height 10, y 2 } · afterPoke 0.5 · afterNudge 0.3 (also chatter) · afterAnnoyed 0.25 · afterAngry 0.15 · **afterPet 0.6** · afterSulk 0.4 · afterForgive 0.9 |
 | `EMOTION_TIMING` / `EMOTE_IN` / `EMOTE_OUT` | R3.1 In/Out per emotion (11, `love` added) · R3.2 |
 | `PET` | hover 1.5 · drift 8px · press 0.6 · slop 10px · rest 4 · pokeHeart 0.33 |
 | `LOVE` | length 2.4 · max 4.0 · melt { 1.03×0.96, y 1, 0.4 `sine.inOut` } · arms −35 / 35 (0.2 `power2.out`) · footPop −3 · sway { tilt 3, half 0.6 `sine.inOut`, from 0.3 } · beat { scale 1.12, up 0.1 `power2.out`, down 0.2 `power2.in`, ×2, 0.35 apart, every 1.2 } · heartsAt 0.1 · lineAt 0.6 · pick { eyesAt 0.6 (0.15), outAt 1.3 } |
@@ -689,13 +911,13 @@ flee, it's the shelf end nearer to him. Then:
 | `GRAWLIX` | frame 0.12: each frame, slots A and B (`x` +12) each show a random symbol, never repeating their own last and never the same as each other, by `gsap.set` (no tween) · its vein throbs scale 1.2, half 0.12 `sine.inOut`, yoyo |
 | `JUGGLE` | props 3 · stagger 0.25 · throw { x −134, rise −40, 0.5 } · pass { rise −12, 0.25 } · rounds 2 · flick { r −25, l 20, 0.08 / 0.12 } · drop 0.25 · fall { x −136, y 42, 0.3 `power2.in` } · bounce 6 |
 | `SIT` | lower 7 · in 0.3 `power2.inOut` · pose 1.04×0.96 · arms −30 / 30 · swing { x 3, y 1, half 0.45 } · length 6–9 · up 0.25 `back.out(1.6)` |
-| `NAP_AFTER` / `YAWN` / `NOD` / `WAKE_START` | 40 · R6.3 · tilt 3, 0.8 / 0.15, ×2 · hop −8, 0.18 / 0.16, alert 0.6, glad at 1.0 |
+| `NAP_AFTER` / `YAWN` / `NOD` / `WAKE_START` | 40 (settled phase only, rev 4) · R6.3 · tilt 3, 0.8 / 0.15, ×2 · hop −8, 0.18 / 0.16, alert 0.6, glad at 1.0 |
 | `TAG` | near 110px · speed 500 px/s · hop 48px, 0.3 · duck 6 / 0.85, hold 0.4 · dodges 2 · session 8 · rest 20 |
 | `PEEKABOO` | clip `inset(-100% -100% 0 -100%)` · sink 88, 0.35 `power2.in` · hold 0.6 · rise 32 (`PEEK_OUT`) · then `PEEK_SEARCH`, `PEEK_HOP` · happy 0.4 |
 | `LOGO_POSE` | lifeOut 0.3 · arms scaleX 0, 0.2 `power2.in` · hold 0.8 · wink { shut 0.07, hold 0.25, open 0.12 } · back 0.3 `back.out(2)` · happy 0.3 |
 | `BALANCE` | to { x −68, y −43, 0.4 } · wobble { tilt 3, prop 8, half 0.25, ×3 } · arms 30 / −30 · back 0.35 · happy 0.4 |
-| `PLAY` | first 8 · gap 12–20 · max 3 per 60 · retry 4 · weights as R7 |
-| `NUDGE_BOUNCE.at` | `[0.1]` (was `[0.1, 0.55]`) |
+| `PLAY` | ~~first 8 · gap 12–20~~ (rev 4: `TEMPO`) · max 3 per 60 · ~~retry 4~~ (rev 4: `TEMPO.retry`) · weights as R7 |
+| `NUDGE_BOUNCE.at` | `[0.1]` (was `[0.1, 0.55]`); the pre-pick chatter act (rev 4) |
 | `POKE_WINDOW` / `POKE_REPEAT` / `POKE_LADDER` / `ANNOYED_MIN` | 4.0 · 0.15 (and key repeats never count) · { annoyed 4, tantrum 6 } · 0.6 |
 | `POKE_COOLDOWN` (kept) | 0.9, now the gap between poke **acts**; presses inside it queue (R6A.1) |
 | `ANNOYED_POKE` | stiff { 0.98×1.03, 0.12 `power2.out` } · arms −25 / 25, 0.15 · huff { y −1.5, at 0.15, 0.08 / 0.2 } · taps at [0.2, 0.45] · length 0.9 |
@@ -703,29 +925,32 @@ flee, it's the shelf end nearer to him. Then:
 | `TOSS` / `ACK_OUT` | windup { r 25, at 0.55, 0.15 `power2.in` } · fling { r −80, at 0.7, 0.1 `power3.out` } · release 0.75 · x 150 (max; roomier side, clamped to room − 8px) · rise −36 (0.25 `power2.out`) · fall +60 (0.45 `power2.in`) · spin 540 · scale 0.8 · fade { at 1.05, 0.4 `power1.in` } · origin "118 36.5" · armBack { at 0.95, 0.3 `back.out(1.6)` } · ack out 0.2 `power1.in`, ending at the release |
 | `FLEE` / `STOMP_WALK` | footReach 12 · step 0.1 · footLift 6 · bob 2 · lean 7 · armSwing 20 · **maxDist 400px** (192 px/s) · footReach 9 · step 0.22 · footLift 7 · slam 0.06 `power4.in` · squash 0.05 · lean 2 · arms −40 / 40 · **maxDist 120px** (65 px/s) |
 | `SULK` / `HMPH` | slide 0.15 `power2.inOut` · collapse 0.25 `power2.in`, at 0.15 · squeeze 0.92, 0.3 `power2.inOut` · slump { y 1.5, scaleY 0.97 } · arms −20 / 20 · tilt 3 · hold 6 · breath 0.6 · hmph { tilt 2, half 0.06, dip 0.96 (0.06), gap 0.5 } |
-| `FORGIVE` / `WAVE_SMALL` | peek { width 7, 0.2 `power2.out` } · hold 0.5 · turnAt 0.7 (0.3 `back.out(1.6)`) · happyAt 0.85 · waveAt 0.9 · length 1.8 · up −35, 0.2 `power2.out` · swing 8, 0.12 `sine.inOut` ×2 · back 0.3 `back.out(1.6)` |
-| `CALM` | angryHold 0.35 · annoyedAt 0.35 (0.25) · sigh { at 0.6, in 1.04 0.3, out 0.97 0.35 } · neutralAt 0.85 (0.25) · happyAt 1.25 · pickAt 1.6 · sulkTurn 0.3 `back.out(1.6)` |
+| `FORGIVE` / `WAVE_SMALL` | peek { width 7, 0.2 `power2.out` } · hold 0.5 · turnAt 0.7 (0.3 `back.out(1.6)`) · happyAt 0.85 · waveAt 0.9 · length 1.8 · up −35, 0.2 `power2.out` · swing 8, 0.12 `sine.inOut` ×2 · back 0.3 `back.out(1.6)` (rev 4: also the hover `point`, on either arm, and the post-pick chatter act) |
+| `CALM` | angryHold 0.35 · annoyedAt 0.35 (0.25) · sigh { at 0.6, in 1.04 0.3, out 0.97 0.35 } · neutralAt 0.85 (0.25) · happyAt 1.25 · pickAt 1.6 · sulkTurn 0.3 `back.out(1.6)` (playground only, rev 4) |
 
 ### R8.1 Reduced motion and no JS
 
 | Move | Reduced motion (fades only) |
 |---|---|
-| arrival, pick, nudge | as built: static pose, the prop and ack fade, one nudge line. No heart burst |
+| arrival, pick | as built: static pose, the prop and ack fade. No heart burst |
+| chatter (rev 4; was "one nudge line, once") | the line fades (0.4 in, 2.4 hold, 0.4 out), never announced: first `IDLE_TALK.first` after the stage shows, then every `IDLE_TALK.reducedGap` (20–30s live) in both phases. Pools by the pick state, as R5.4. No act |
+| hover lines (rev 4) | detection as R4.9, with no walk: the first line fades in once the target has held `HOVER.lineDwell`, the next per `HOVER.lineGap` and `HOVER.lines`, never announced. A line fades out (0.4) when its card's target leaves. No beats, no look |
 | pokes 1–3 | as built: the line fades (0.4 in, 2.4 hold, 0.4 out) and is announced |
 | annoyed (4–5) | the `annoyedLines` line fades the same way and is announced. No stiffen, taps, eyes or vein |
-| tantrum (6+) | the `angryLines` line fades and is announced. No stomp, shake, flee, slant or grawlix |
-| the toss | no throw. **The deselect still happens:** at 0 the prop and the ack fade out (`duration.fade` 0.4, inline). At 0.4 comes the deselect (R6A.4, steps 1–5), and `throwAway` is announced. Opacity is allowed, and the pick's state must match full motion |
+| tantrum (6+) | the `angryLines` line fades and is announced (with `lockLine` on About). No stomp, shake, flee, slant or grawlix |
+| the toss | no throw. **The deselect still happens:** at 0 the prop and the ack fade out (`duration.fade` 0.4, inline). At 0.4 comes the deselect (R6A.4, steps 1–5), and `throwAway` is announced (with `lockLine` on About). Opacity is allowed, and the pick's state must match full motion |
 | sulk, forgive | no turn and no hmph. The sulk window runs `TANTRUM.fleeAt` + `SULK.hold` (7.9s) from the tantrum's start. Presses in it do nothing. The `sulkLine` fades in after the angry line ends (3.2), and the `forgiveLine` fades in at 7.9 |
-| calm by a pick | none. The prop and ack fade as built; any Rix line fades out (0.4); mood neutral, count 0 |
+| the pick lock (rev 4, About) | **applies,** 0 → 7.9: the same `aria-disabled`, swallowing, dimmed classes (an instant class switch, no fade) and announcements; `unlockLine` at 7.9 |
+| calm by a pick | the playground only (rev 4): none. The prop and ack fade as built; any Rix line fades out (0.4); mood neutral, count 0 |
 | pet | detection as R6B.1. The `petLines` line fades (0.4 in, 2.4 hold, 0.4 out), never announced. No eyes, hearts, melt or sway |
-| talk | the whole line fades in (0.4), holds 2.4, fades out (0.4): no typing, no bob |
+| talk | the whole line fades in (0.4), holds 2.4, fades out (0.4): no typing, no bob. A scheduled line still never starts while one shows (R5.4) |
 | walk, patrol, turn, tag | off: he stays at `x` 0 (the first-paint spot) and doesn't look |
 | emotions, glyphs | off: the static pose, no glyphs |
-| juggle, sit, nap, wake, peek-a-boo, logo pose, balance | off |
+| juggle, sit, nap, wake, peek-a-boo, logo pose, balance, beats, hover beats | off |
 
 **No JS:** he stands in the static pose at `x` 0, as a decorative span. The quip is empty, the
 zzz and glyphs are hidden, and the picked prop shows by CSS `:has`. There is no poke, pet,
-ladder, tantrum, patrol or deselect.
+ladder, tantrum, patrol, deselect, chatter or pick lock.
 
 ---
 
@@ -733,13 +958,13 @@ ladder, tantrum, patrol or deselect.
 
 | Moment | B does |
 |---|---|
-| Arrival | Peeks round the shelf's right end (as built), with `surprised` at the spot. Hops, lands, then the ask (the wave, looking at the board). The patrol starts `PATROL.first` later |
-| Hover or focus on a card | Looks at once (as built); a stretch brakes. After `WALK.dwell` he walks toward the card's stand spot, at most `WALK.reach`. He arrives over it, or stops partway, `curious` and looking at it, and holds while the target holds. The patrol resumes `PATROL.resume` after release. Ignored during a tantrum or sulk |
-| Pick | The pick act where he stands: `excited` eyes, then `love` eyes and the heart burst (R6B.4). Then he walks toward the picked card (at most `WALK.reach`) carrying the prop, and patrols once quiet. Phones: a tap is the pick, so he walks after it. During a tantrum or sulk: `CALM` first (R6A.8) |
+| Arrival | Peeks round the shelf's right end (as built), with `surprised` at the spot. Hops, lands, then the ask (the wave, looking at the board). The idle clock starts `TEMPO.first` after the ask (R7) |
+| Hover or focus on a card | Looks at once (as built); a stretch brakes. After `WALK.dwell` he walks toward the card's stand spot, at most `WALK.reach`. He arrives over it, or stops partway, then runs **hover mode (R4.9)** while the target holds: hover beats aimed at the card and typed lines about it (before a pick), a "switching?" line (after one, on another card), happy beats on the picked card. The idle clock resumes after release. Ignored during a tantrum or sulk |
+| Pick | The pick act where he stands: `excited` eyes, then `love` eyes and the heart burst (R6B.4). Then he walks toward the picked card (at most `WALK.reach`) carrying the prop, and patrols once quiet. Phones: a tap is the pick, so he walks after it. **From the tantrum's start to the forgive's end the cards are locked (R6A.9)** |
 | Poke | The ladder (R6A): happy 1–3, annoyed 4–5, then the tantrum, the toss (if he holds a prop), the flee, the sulk and the forgive |
 | Pet | Rest a fine pointer on him 1.5s, or long-press 0.6s on touch: `love` with rising hearts (R6B) |
-| Nudge | From wherever he stands (a stretch brakes). The wave and one bounce, then talk. He looks at the board's centre (as built) |
-| Idle | The patrol (R4.8). Juggle, sit, peek-a-boo, logo pose, balance and the nap play where he stands, in its pauses. Tag with a fine pointer only |
+| Chatter (was the nudge) | On the idle talk clock, from wherever he stands, never mid-stretch. Before a pick: the wave, one bounce and an `idleLines` line, looking at the board's centre. After a pick: a look down toward the examples, the small wave and an `afterPickLines` line (R5.4). No cap |
+| Idle | **Busy (first 6 live minutes):** an item every 2–4s: beats, strolls and plays (R7). **Settled:** the patrol (R4.8), with a beat or play every 10–15s in its pauses, and the nap after 40s of visitor idle. Tag with a fine pointer only |
 
 #### Sizes (B; Rix 136×88 at every width, 1 unit = 0.8px)
 
@@ -757,6 +982,7 @@ ladder, tantrum, patrol or deselect.
 | Toss, sideways (at most 120px, clamped to room − 8px) | from the start 120px left; from col 1, 120px right | 120px | 120px | 120px |
 | Quip | left; right at col 1 (171px of room: it fits, or overhangs the container by ≤ 1px into the 20px gutter) | left, or right near col 1 | same | same |
 | Paint outside the box | up ≤ 8px (zzz; rising hearts ≤ 4.8px), into the 24px gap under the prompt. Down ≤ 6px (sit feet) and ≤ 14.4px (the toss's fading end), both inside the 16px gap above the cards. None sideways past the shelf | same | same | same |
+| Hover `point` (rev 4) | either arm, inside the box (arms span x −4..104) | same | same | same |
 
 - **B quip placement (`AboutPosterShelf`):** `top-2 w-max max-w-40 right-full mr-3 text-right data-[side=right]:right-auto data-[side=right]:left-full data-[side=right]:mr-0 data-[side=right]:ml-3 data-[side=right]:text-left`.
 - **States:** as O4.1.
@@ -766,6 +992,7 @@ ladder, tantrum, patrol or deselect.
     a pet, not a press.
   - The focus ring (`focusRingCard`) travels with the walker, through the flee too. The patrol
     holds still while Rix has focus.
+  - **Cards (rev 4):** as §2a.B, plus the locked state (R6A.9).
 
 ---
 
@@ -775,6 +1002,9 @@ ladder, tantrum, patrol or deselect.
 > `docs/pages/rix/ui-spec.md` (file plan in its §0.3). The `sheet` host is renamed `playground`.
 > The `Dev*` components, `useRixSheet`, `rixSheet*` and `content/dev.ts` are retired, and `/dev`
 > is a 404 stub. The text below is kept as the record of the `/dev` build.
+>
+> **Rev 4:** nothing changes on the playground. Its schedulers stay off (no idle clock, chatter,
+> hover mode or pick lock), and it keeps its Calm and "Tantrum, toss prop" buttons (R6A.8).
 
 - **Place:** the first block on `/dev`, before the option frames. `app/dev/page.tsx` only adds
   `<DevRixSheet />`.
@@ -873,6 +1103,37 @@ Contrast: `muted` on `bg` about 6.9:1, `accent` about 8.6:1, `on-accent` on `acc
 > `hooks/useRixPlayground.ts`, `lib/rixPlayground.ts` and `lib/rixPlaygroundMoves.ts` (see
 > `docs/pages/rix/ui-spec.md` §0.3). The host is `playground`, not `sheet`.
 
+- **Rev 4 (home's About; one job per file):**
+  - **New logic:**
+    - `lib/rixIdle.ts`: the idle clock (R7): the phases, the menu, the gaps, the gates and the
+      chatter slot. It takes over `lib/rixPlays.ts`'s weighted pick, which folds into it
+    - `lib/rixIdleTalk.ts`: the idle talk clock (`IDLE_TALK`): when chatter is due
+    - `lib/rixBeats.ts`: the R6.8 beats
+    - `lib/rixHover.ts`: hover mode (R4.9): the base expression and the hover beats
+    - `lib/rixLines.ts`: which line next (R4.9, R5.4): the pools by pick state, in turn,
+      `repeatAfter`, never twice in a row (pure)
+    - `lib/aboutPickLock.ts`: the pick lock (R6A.9): `data-locked`, `aria-disabled`, the
+      capture-phase swallowing, the reminder and the failsafe
+  - **Extended:**
+    - `lib/rixFull.ts` (wires the idle clock, idle talk, hover mode and the lock; the nudge and
+      play clocks are gone; calm by a pick only on the playground host)
+    - `lib/rixFade.ts` (the faded chatter and hover lines, the lock)
+    - `lib/rixWander.ts` (hands a stopped card walk to hover mode instead of holding `curious`)
+    - `lib/rixPatrol.ts` (busy phase: one stroll on request; settled: as R4.8)
+    - `lib/rixPriority.ts` (`beat` at rank 8; `chatter` replaces `nudge` at 7; hover beats ride
+      the walk's rank 5)
+    - `lib/rixRig.ts` (`RixAct` gains `beat` and `hover`; `nudge` becomes `chatter`;
+      `resetRix` strips `data-locked` and `aria-disabled`)
+    - `lib/rixTantrum.ts`, `lib/rixForgive.ts`, `lib/rixFadeTantrum.ts` (the lock and unlock
+      cues), `lib/rixStatus.ts` (clear, then set, so a repeated line is read again)
+    - `lib/rixMotion.ts` (R8, rev 4 rows and removals)
+    - `components/home/about/poster/AboutPosterBoard.tsx` (`group/board`) and
+      `AboutPosterCard.tsx` (the locked classes, R6A.9)
+    - `content/home.ts → about.rix` (the R12.2 slots, copywriter)
+  - **Retired:** `lib/rixNudges.ts` (no users left) and `lib/rixPlays.ts` (folded into
+    `lib/rixIdle.ts`).
+  - **New hooks:** none. The lock's listeners live in `lib/aboutPickLock.ts`, wired by
+    `lib/rixFull.ts` and `lib/rixFade.ts` (constitution §9).
 - **Extended:**
   - `RixButton` (the walker wrapper; `[-webkit-touch-callout:none]` on the button)
   - `RixQuip` (the anchor hook, character spans, side classes)
@@ -940,12 +1201,13 @@ Contrast: `muted` on `bg` about 6.9:1, `accent` about 8.6:1, `on-accent` on `acc
 - **New hooks:** none in rev 3. The pet's listeners live in `lib/rixPet.ts` and are wired by
   `lib/rixFull.ts`, like tag and the visitor clock: they aren't React hooks (constitution §9).
 - **Content:**
-  - `content/home.ts → about.rix` gains the R12.1 slots (copywriter).
+  - `content/home.ts → about.rix` gains the R12.1 slots (copywriter), and in rev 4 the R12.2
+    slots.
   - `content/dev.ts → rixSheet` per R10.
 - **Images:** none.
 - **Retired with `/dev`:** the R10 files and `content/dev.ts → rixSheet`.
 
-## R12. Choices: resolved (the user's answers, 2026-10-02)
+## R12. Choices: resolved (the user's answers, 2026-10-02; rev 4 rows 2026-10-05)
 
 | # | Question | Answer |
 |---|---|---|
@@ -955,17 +1217,24 @@ Contrast: `muted` on `bg` about 6.9:1, `accent` about 8.6:1, `on-accent` on `acc
 | 4 | Long walks capped at 2.0s (dash), or a constant 360 px/s | **The 2.0s cap and dash.** Superseded 2026-10-02 by #14 |
 | 5 | Emote glyphs `!` and `?`, or eyes only | **Glyphs, as specced** (R3.2); extended by #12 |
 | 6 | Juggle with the board's emblems before a pick, or only after | **Emblems before a pick** (R6.1) |
-| 7 | The nap after nudges are done + 40s of idle; wake on any return | **As specced** (R6.3); anywhere he stands since #15 |
+| 7 | The nap after nudges are done + 40s of idle; wake on any return | **As specced** (R6.3); anywhere he stands since #15. **Rev 4:** "nudges done" becomes "the settled phase" (#18) |
 | 8 | Tag dodges only fast approaches, ≤ 2 per session | **As specced** (R6.4) |
 | 9 | Proposals P1–P4 | **P1 peek-a-boo, P2 logo pose and P3 balance approved** (R6.5–R6.7). **P4 foot drum rejected** and removed |
 | 10 | Talk at 0.035s per character; pokes type from 0.5 | **As specced** (R5) |
-| 11 | The poke ladder (new) | **Approved as R6A:** happy 1–3, annoyed 4–5, tantrum 6+, toss and deselect, flee, sulk, forgive, calm by a pick |
+| 11 | The poke ladder (new) | **Approved as R6A:** happy 1–3, annoyed 4–5, tantrum 6+, toss and deselect, flee, sulk, forgive, calm by a pick. **Rev 4:** calm by a pick is playground-only (#24) |
 | 12 | (2026-10-02, after trying `/dev`) Icons for the emotions | **Pixel glyphs** in the `!`/`?` style: hearts and the grawlix in `fill-accent`, the rest `fill-muted`; no emoji characters; one at a time, never with the zzz (R3.2) |
 | 13 | (2026-10-02) A love emotion with hearts: when does it play | **Both:** a pet (resting the pointer, or a long-press) and the pick's heart burst (R3.1, R6B) |
 | 14 | (2026-10-02) Walks are too long and skate | **A stride-locked gait and "walk partway":** no dash; card walks at most 200px, then he stops and looks (R4.1–R4.6) |
 | 15 | (2026-10-02) Slow walking as an idle | **No home: he patrols** the shelf, pausing to look around; plays run in the pauses (R4.8) |
 | 16 | (2026-10-02) Love eyes: diamonds, or soft happy slits looking up | **Pulsing diamonds** (R3.1, `LOVE.beat`) |
 | 17 | (2026-10-02) Flee distance: capped, or to the far end as before | **Capped: 400px (`FLEE`), 120px (`STOMP_WALK`)** (R6A.5) |
+| 18 | (2026-10-05) "It takes forever to do an act" | **Busy for his first 6 live minutes** (an item every 2–4s), **then settled** (a play every 10–15s). Budgets stay crew-timed (R7) |
+| 19 | (2026-10-05) He only ever does 5 plays | **New idle beats** from existing moves (wave, perk, hop, looks, emotion and glyph flickers) beside the plays (R6.8) |
+| 20 | (2026-10-05) He goes still when a card is hovered | **Hover mode:** he walks over as now, then keeps moving and talks about that card while the hover or focus holds (R4.9) |
+| 21 | (2026-10-05) After a pick | **After-pick lines:** "switching?" on another card, idle chatter points at the examples and the contact; no "pick one" lines once picked (R4.9, R5.4) |
+| 22 | (2026-10-05) Speak more | **Idle chatter** on its own, pre-pick and post-pick pools; hover and idle lines shown, never announced (R5.4) |
+| 23 | (2026-10-05) Nudge cap | **`NUDGE_MAX` lifted** (was 4, decided 2026-10-01); nudges become the pre-pick chatter (R5.4, R7) |
+| 24 | (2026-10-05) A pick cuts his tantrum | **Picks are locked on About** from the tantrum's start to the forgive's end; the toss's deselect still happens; calm by a pick is playground-only (R6A.8, R6A.9) |
 
 **Decisions inside the spec, the lead's to review:**
 - Under reduced motion, a held pick is still deselected, with a fade (R8.1).
@@ -975,6 +1244,14 @@ Contrast: `muted` on `bg` about 6.9:1, `accent` about 8.6:1, `on-accent` on `acc
 - `happy` shows the sparkle only on pokes 1–3, juggle success and caught at tag, so it doesn't
   sparkle eight times a minute (R3.1).
 - The pick shows love eyes from 0.6, so the pick reads as the second love trigger (R6B.4).
+- **Rev 4:**
+  - The lock uses `aria-disabled` plus swallowing, never native `disabled` (focus, R6A.9).
+  - The lock's announcement rides on the tantrum's own line (one utterance, not two).
+  - The nap waits for the settled phase, so the busy 6 minutes never fall asleep.
+  - After the toss deselects, nothing is picked, so the pre-pick pools come back.
+  - Hovering the picked card shows happy beats and no line (its ack already speaks).
+  - A hover line belongs to its card and fades when the target leaves it.
+  - Scheduled lines never cut a showing line; visitor-driven lines still do.
 
 ### R12.1 New content slots (`content/home.ts → about.rix`; copywriter; playful, no claims)
 
@@ -984,7 +1261,26 @@ Contrast: `muted` on `bg` about 6.9:1, `accent` about 8.6:1, `on-accent` on `acc
 | **`angryLines[2]`** | The tantrum's outburst on poke 6+, shown in turn. Shown and announced, unless a pick is thrown (then `throwAway` is announced in its place) | 4 words / 24 characters each |
 | **`sulkLine`** | One line as he turns his back: he isn't talking to you. Shown, never announced | 3 words / 18 characters |
 | **`forgiveLine`** | One line as he turns back and waves: he's over it. Shown, never announced | 4 words / 24 characters |
-| **`throwAway`** | Screen-reader only (`RixStatus`), never shown. Says, in the third person ("Rix…"), that he threw the visitor's pick away and that they can pick again | 12 words / 80 characters |
+| **`throwAway`** | Screen-reader only (`RixStatus`), never shown. Says, in the third person ("Rix…"), that he threw the visitor's pick away and that they can pick again. **Rev 4:** drop "you can pick again" (the cards are locked then; `unlockLine` says it) | 12 words / 80 characters |
 | **`petLines[2]`** (rev 3) | Shown in turn when he's petted: he's charmed and a little bashful. Shown, never announced. Warm, not soppy; no claims | 3 words / 18 characters each |
 
-The quip limits keep A's quip on one line at 360 and B's within `max-w-40`, as O0.3.
+The quip limits keep A's quip on one line at 360 and B's within `max-w-40`, as O0.3. **Rev 4:**
+`docs/04-voice.md` sets no length limits (2026-10-05); the "Limit" column is a sizing note only.
+
+### R12.2 Rev 4 content slots (`content/home.ts → about.rix`; copywriter; playful, no claims)
+
+Rix's own voice. No line states what MARWIX does or claims a result (the acks carry the offers;
+constitution §7). Every shown line fits B's quip: two lines of about 20 characters (R5.4).
+
+| Key | Count | When it's used | Announced | Meaning |
+|---|---|---|---|---|
+| **`idleLines`** | 6 | Chatter while nothing is checked (before any pick, and after the toss) | no, shown only | Invites a pick: "which one are you?". **Takes in the three `nudgeLines`;** `nudgeLines` is retired |
+| **`afterPickLines`** | 5 | Chatter once any card is checked, "Not sure yet" included | no | Points down at the examples below, now set for them, and at booking a call. Never asks for a pick |
+| **`hoverLines.service-business`**, **`.online-store`**, **`.discord`**, **`.software-builder`**, **`.website`**, **`.not-sure`** | 2 each (12) | Hover or focus on that card, before a pick (R4.9) | no | Recognises that reader and urges them to tap it, in that card's tone (`docs/04-voice.md` Tone per card). Recognition only, no offer |
+| **`hoverAnyLines`** | 4 | Hover or focus on any card before a pick, between that card's own lines (R4.9) | no | Generic cheering for the hovered card: "that one?", "go on" |
+| **`switchLines`** | 3 | Hover or focus on a card other than the picked one (one per hold) | no | Playful "switching?": changing is fine |
+| **`lockLine`** | 1 | Appended to the tantrum's announced line, and re-said on a swallowed card press (R6A.9) | **yes, screen-reader only, never shown** | Third person: Rix is in a huff, and the cards are locked for a moment |
+| **`unlockLine`** | 1 | When the forgive ends (R6A.9) | **yes, screen-reader only, never shown** | Third person: Rix has calmed down, and the cards can be picked again |
+
+- **`pokeLines`:** shown both before and after a pick now. Line 5 ("Fun. Now pick one?") asks for a
+  pick, so copywriter rewrites it to read in both states (R5.4: no pick lines once picked).

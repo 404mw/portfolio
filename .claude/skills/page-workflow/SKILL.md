@@ -92,7 +92,7 @@ Constraints: <anything from the constitution or page doc that applies>
 ```
 Page doc: docs/pages/<page>/page.md + sections/NN-<slug>.md
 UI spec: docs/pages/<page>/ui-spec/NN-<slug>.md (or "none")
-Slots: <content keys to write or change, each with its one question and length limit>
+Slots: <content keys to write or change, each with its one question; no length limits>
 Facts: <the lines in docs/03-facts.md they draw on, and any still [FILL: …]>
 User lines: <lines the user edited, to leave alone>
 ```

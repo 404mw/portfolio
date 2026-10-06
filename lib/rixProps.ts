@@ -4,7 +4,20 @@
 // gives its pivot, so the motion never measures the SVG. Shared by RixProps and AboutPropGlyph.
 import type { BotColour } from "@/lib/processBots";
 
-export type RixPropName = "calendar" | "shield" | "send" | "report" | "envelope";
+/**
+ * The cards' emblems (02a-about-options §2a.R2): `calendar`, `parcel`, `bubble`, `code`, `window`.
+ * `shield`, `send`, `report` and `envelope` are held by no card; they stay for the motion pass.
+ */
+export type RixPropName =
+  | "calendar"
+  | "parcel"
+  | "bubble"
+  | "code"
+  | "window"
+  | "shield"
+  | "send"
+  | "report"
+  | "envelope";
 
 /** A flourish part's hook (`data-prop-part`); "whole" props flourish as one group. */
 export type RixPropPartHook = "tick" | "bar" | "flap";
@@ -30,6 +43,41 @@ export const rixProps: Record<RixPropName, RixProp> = {
       { d: "M112 39L114.5 36.5L117 39L122.5 33.5L125 36L117 44Z", colour: "I", hook: "tick" },
     ],
     pivots: [[118.5, 38.5]],
+  },
+  parcel: {
+    parts: [
+      { d: "M106 30H130V50H106Z", colour: "C" }, // box
+      { d: "M106 30L110 26H126L130 30Z", colour: "M" }, // lid
+      { d: "M116 26h4v12h-4Z", colour: "I" }, // tape
+      { d: "M109 43h7v3h-7Z", colour: "D" }, // label
+    ],
+    pivots: [[118, 50]],
+  },
+  bubble: {
+    parts: [
+      { d: "M106 24H130V42H118L112 48V42H106Z", colour: "C" },
+      { d: "M110 29h16v3h-16Z", colour: "I" },
+      { d: "M110 35h10v3h-10Z", colour: "I" },
+    ],
+    pivots: [[118, 50]],
+  },
+  code: {
+    parts: [
+      { d: "M106 24H130V48H106Z", colour: "C" }, // tile
+      { d: "M115 30L109 36L115 42L117 40L113 36L117 32Z", colour: "I" },
+      { d: "M121 30L127 36L121 42L119 40L123 36L119 32Z", colour: "I" },
+    ],
+    pivots: [[118, 50]],
+  },
+  window: {
+    parts: [
+      { d: "M106 25H130V49H106Z", colour: "C" }, // frame
+      { d: "M106 25H130V31H106Z", colour: "I" }, // bar
+      { d: "M108.5 27h2v2h-2Z M112.5 27h2v2h-2Z M116.5 27h2v2h-2Z", colour: "C" }, // dots
+      { d: "M110 35h16v3h-16Z", colour: "D" },
+      { d: "M110 41h9v3h-9Z", colour: "D" },
+    ],
+    pivots: [[118, 50]],
   },
   shield: {
     parts: [

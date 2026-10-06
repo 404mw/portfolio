@@ -1,4 +1,4 @@
-// Rix's tag (ui-spec/00-rix.md R6.4), full motion, fine pointer only, not on the play clock. When
+// Rix's tag (ui-spec/00-rix.md R6.4), full motion, fine pointer only, not on the idle clock. When
 // the pointer comes within `TAG.near` × his scale of his eye centre, approaching at `TAG.speed` or
 // more and not over him, he dodges: `surprised`, a hop away from the pointer's side along the shelf,
 // then `happy`; with no room on that side, a duck. After `TAG.dodges` in one `TAG.session` he lets

@@ -1,10 +1,11 @@
 # Proofs
 
-**Last Updated:** 2026-09-28 (side-face extrusion replaces the stacked depth steps)
+**Last Updated:** 2026-10-06
 
 **The one question:** Have they built something real that people use?
 
-See `../page.md` for the site-wide index. Spec: `../ui-spec/07-proofs.md`.
+See `../page.md` for the site-wide index. Spec: `../ui-spec/07-proofs.md`; the spam diagram:
+`../ui-spec/07-proofs-spam.md`.
 
 ## Current State
 
@@ -186,6 +187,86 @@ a production build: the side faces are solid with no stair steps or colour bands
 the hover acts work, the takeover opens and closes, no console errors; nothing scrolls sideways at
 360/767/1440/3840; reduced motion leaves 0 hooks with inline motion.
 
+Built 2026-10-06: the card bots duck before a takeover opens (full motion only;
+`lib/proofBotDuck.ts`, started in `hooks/useProofBots.ts`). A plain click (primary button, no
+modifier) or Enter on a card is held: its bot ducks to the banner floor (`DUCK`, 0.25s `power2.in`
+to `RISE_FROM` 84), then the hash is set as the link would, so the growing clip never shows a head
+above the card. Each open takeover's bot stays down by any route (`lib/watchOpenTakeovers.ts` reports
+the open dialogs' ids), including bots left by Next, and once no takeover is open every held bot
+rises back with the reveal's own rise (`DUCK_RISE`) and is stripped to server markup. Modifier and
+middle clicks are left to the link. Reduced motion is unchanged. Lead-checked 2026-10-06: lint and
+build pass; in Edge at 1440 the bot is fully down (y 84) before the dialog opens and the clip grows;
+on Esc it rises only after the dialog closes and its inline style is cleared after; Enter, Back and a
+page loaded on `#exile` all behave; no console errors. `ui-spec/07-proofs.md` is updated to match.
+
+Exile Bot's card copy (2026-10-05, `content/home.ts` `proofs.projects.exile`) states its real use.
+Tag: "Discord platform". Title: "Exile Bot". Visit button: "Visit Exile Bot". Card line: "Runs in-game
+calculations and simulations for Idle Heroes players." In use row: "In Discord communities for Idle
+Heroes, a mobile game." The `summary` slot is gone (see the takeover below).
+
+The project takeover is rebuilt static as up to seven parts (2026-10-05), the same order for every
+project, all direct children of the column beside the title so the open, close and Next motion
+works unchanged (`ProjectTakeover.tsx`): (1) `TakeoverIntro` — intro plus the info rows; (2)
+problem, (3) what I built (shots and the Visit button in the wide slot), (4) what it took
+(`TakeoverTook`, a grid of `TakeoverItem`s; only when `whatItTook` exists, Exile Bot today), (5)
+what I learned (`TakeoverLearned`: a numbered `<ol>` in one column on the `max-w-xl` measure, each
+`TakeoverItem` with an `aria-hidden` ordinal from `listNumber`; only when `whatILearned` exists,
+Exile Bot today, three lessons) and (6) showcase
+(`TakeoverShowcase`'s status pill and paragraph, plus the `SpamDiagram` in the wide slot; only when
+`showcase` exists, Exile Bot today), each in the shared `TakeoverPart` frame (mono label over a
+per-project headline, body beside it from `lg`, `data-part` on the section); (7) `TakeoverMeans`,
+the ink "means for you" panel: eyebrow, the closing line (`TakeoverMeansLine`, the one part that
+follows the About pick, falling back to `default`) and a Book a call button, then the Next link.
+The shape of every project is `ProofProject` in `lib/proofProject.ts` (a project that drifts fails
+the type check). Every project has three shots in one layout (`TakeoverShots`: one 2:1, then two
+4:3 details side by side from `sm`); `shots` and `shotAlts` are three-tuples (`ProofShots`), and each
+shot carries the edge its frame keeps (`ProofShot` = name + `position`, `top | center | left`;
+`lib/proofs.ts`). Exile Bot's positions are center / top / left (home, dashboard, spam-raid);
+the others keep the slot defaults top / center / center. `SiteImage` gained a `left` position key
+for this. Exile Bot's three shots load from `public/images/exile/` (`home.webp`, `dashboard.webp`,
+`spam-raid.webp`) and all three alts are written; Design Vault's and MARWIX-SKILLS' are `null`
+placeholders. The spam diagram (`SpamDiagram`, `SpamStage`, `SpamStep`, `SpamStepFigure`,
+`SpamStepLink`, `SpamStepDown`, `SpamReturn`; keys and the step-to-image map in `lib/spamDiagram.ts`;
+spec `../ui-spec/07-proofs-spam.md`) is three numbered steps with a dashed "Temporary" return line,
+drawn as an ink stage (2026-10-06). From `md` it is one ink band (`SpamStage`, hidden on phones)
+behind three columns: Exile Bot's mascot Eva (`eva-watch.png`, `eva-spot.png`, `eva-stop.png`;
+`SpamStepFigure`, `fit="contain"`, bottom-anchored, empty alt) stands on the band's floor, 144 / 192 /
+248px at `md` / `lg` / `xl`, her head breaking out above the band's top (28 / 36 / 48px); a hairline
+and chevron (`SpamStepLink`) runs inside the band between figures; the step text sits on cream below.
+On a phone each `<li>` is its own ink band with Eva 148px flush at its right end, head breaking out
+above, the ordinal, title and line on the band, 40px apart with a cream down chevron
+(`SpamStepDown`) under steps 1 and 2. The ink ground is the shared `InkStageGround` (floor or end
+glow; `lib/proofBotShades.ts` `banner.glowEnd`), which `ProofBanner` also uses, so it is never
+forked. Exile Bot's in-use numbers are 18+ and 3.9K+
+and the showcase status reads "Live in communities that use it"; no `[FILL:` marker is left in
+Exile Bot's content. Static only; the motion pass for the parts (5 and 6 included) is not built.
+`SpamStepTile.tsx` and `EyeIcon.tsx`, `AlertIcon.tsx` and `LockIcon.tsx` are imported nowhere now but
+still exist.
+
+Lead's check 2026-10-05: lint, tsc and a production build pass. On the dev server (headless
+Chromium) at 360, 768, 1024, 1440 and 3840 in reduced motion, and 360 and 1440 in full motion:
+Exile Bot shows all seven parts, Design Vault four; no
+sideways scroll on the page or in either takeover, nothing outside the viewport, no tap target
+under 44px, no console errors; open from the card, Next to Design Vault, and Esc all end in the
+right state (closed, `#projects`, page scroll unlocked). The closing line shows the default set with
+no pick and the Discord line with `?for=discord`. With the learned part added (reduced motion; 360,
+768, 1024, 1440, 3840): no sideways scroll or overflow, the three lesson titles each sit on one line
+beside their ordinal at every width, and the phone Exile Bot takeover is about 4,800px tall (was
+about 4,200px). Still to do: the motion pass for parts 5 and 6, and re-testing `useTakeoverMotion`
+(Next from the bottom of the taller takeover).
+
+Lead's check 2026-10-06 on the production build: lint and build pass; at 360, 768, 1440 and 3840
+the Exile Bot takeover has no sideways scroll, the three shots measure 320×160 / 320×240 (phone) up
+to 1536×768 / 758×569 (4K), the tiles 96 (phone) and 128 (from tablet; since replaced by the ink stage, see above), all three screenshots and
+all three Eva images load, and no placeholder shows in the Exile Bot view. Not yet done: no
+code-auditor pass on this round (it runs before the push).
+
+Lead's check 2026-10-06 on the production build, after the ink-stage rebuild of the spam diagram:
+lint and build pass; at 360 three bands with Eva 148px breaking out and the step text on the band;
+at 768 one band with 144px figures; at 1440 and 3840 one band with 248px figures, heads about 48px
+above it; no sideways scroll at any width; the diagram is about 599 / 382 / 434 / 434px tall; the
+proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
+
 ## Key Files
 
 - `components/home/proofs/` — ProofsSection (label/heading/hint above the cards, no split, not
@@ -199,9 +280,33 @@ the hover acts work, the takeover opens and closes, no console errors; nothing s
   (the takeover layer, rendered once after Contact), ProjectTakeover (one project's `<dialog>`),
   TakeoverController (runs `useHashTakeover`), TakeoverTopBar, TakeoverCloseLink,
   TakeoverNextLink, TakeoverInfoRows, TakeoverInfoRow, TakeoverStats (Exile's IN USE numbers),
-  TakeoverShots, ProjectVisitLink, ProofsMotion (client, mounts the reveal, `useProofCards` and
+  TakeoverIntro (part 1), TakeoverPart (frame of parts 2–6), TakeoverTook (part 4),
+  TakeoverItem (renamed from TakeoverTookItem; the item shared by parts 4 and 5, optional
+  ordinal), TakeoverLearned (part 5, new), TakeoverShowcase (part 6's status and paragraph),
+  SpamDiagram, SpamStage (the shared band from `md`), SpamStep, SpamStepFigure (Eva, 148 / 144 /
+  192 / 248px), SpamStepLink (the band's arrow), SpamStepDown (the phone's down chevron) and
+  SpamReturn (part 6's diagram), InkStageGround (the ink ground shared with ProofBanner),
+  TakeoverMeans and TakeoverMeansLine (part 7), TakeoverShots (part 3, one big-plus-two-details
+  layout, per-shot crop position),
+  ProjectVisitLink, ProofsMotion (client, mounts the reveal, `useProofCards` and
   `useProofBots`, renders nothing); `ProofCard`'s h3 carries `data-anim="proof-card-title"`, the
   card-open morph's source
+- `lib/proofProject.ts` — the `ProofProject` type every project must fit, and `proofProject(key)`
+- `lib/spamDiagram.ts` — the diagram's step keys (`watch`, `spot`, `stop`), each step's Eva image
+  name (`spamStepImage`) and `spamStepPointsOn`
+- `lib/images.ts` — the image-name-to-file map: Exile Bot's three shots (`exileShot1–3`) and Eva
+  images (`exileEvaWatch/Spot/Stop`) are filled; Design Vault's and MARWIX-SKILLS' shots are `null`
+- `components/SiteImage.tsx` — the shared image component; `position` takes `top`, `center`,
+  `bottom` and `left` (new)
+- `public/images/exile/` — `home.webp`, `dashboard.webp`, `spam-raid.webp` (the shots) and
+  `eva-watch.png`, `eva-spot.png`, `eva-stop.png` (the tiles)
+- `components/home/proofs/SpamStepTile.tsx`, `components/icons/EyeIcon.tsx`, `AlertIcon.tsx`,
+  `LockIcon.tsx` — unused (no longer imported), awaiting the user's delete (the project's delete hook
+  lets only the user delete files)
+- `docs/pages/home/ui-spec/07-proofs-spam.md` — the spam diagram's spec (ink stage); supersedes
+  `07-proofs.md` §7.3.2 and §7.6.1
+- `docs/pages/home/ui-spec/07-proofs-bot.md` — the spec's card-bot block (§7.2.1–§7.2.3), moved out
+  of `07-proofs.md`; the §7.x numbers are unchanged
 - `lib/proofBotBody.ts` — the card bot's viewBox, static pose (10° lean, look 7), arms, glints and
   eye positions, reading the MW strips/feet/eyes unchanged from `lib/processBots.ts`
 - `lib/proofBotProps.ts` — the three hardcoded prop drawings (Exile's phone, Design Vault's fan,
@@ -216,7 +321,7 @@ the hover acts work, the takeover opens and closes, no console errors; nothing s
   `color-mix()` of existing tokens only, in one table
 - `lib/proofs.ts` — the project order/keys (`proofKeys`, all three), the temporary hide flag
   (`hiddenProofs`) and the shown list it derives (`shownProofKeys`), each shown project's dialog id,
-  image names, two-digit number and total, next-project wraparound, the grid's column count
+  image names and crop positions (`ProofShots` is a three-tuple, `proofImages`), two-digit number and total, next-project wraparound, the grid's column count
   (`proofGridColumns`: two from `md`, three from `lg` only when three or more are shown), card bot
   prop (`proofProp`), the card bot's per-card SVG ids (`proofBotIds`) and `proofCardSelector()` (the
   card that opens a given takeover, used for focus return and the clip's source rect) — every one of
@@ -231,8 +336,15 @@ the hover acts work, the takeover opens and closes, no console errors; nothing s
 - `hooks/useProofCards.ts` — the cards' staggered reveal (`lib/revealBatch.ts`, `stagger.card`) and
   fine-pointer hover lift
 - `hooks/useProofBots.ts` — the card bots' motion: wires the rise (with the cards' reveal batch),
+  the duck (`duckProofBots`, started before the reveal so the reveal skips bots the duck `owns`),
   the idle/pointer branch and the hover listeners; reduced motion runs none of it
-- `lib/proofBotMotion.ts` — the card bots' own motion constants (rise, hover lean, the prop acts),
+- `lib/proofBotDuck.ts` — the click duck: holds a plain card click or Enter, ducks the bot to
+  `RISE_FROM`, then sets the hash; keeps each open takeover's bot down and rises all back when none
+  is open; `stop` strips held bots and, unless unmounting, still opens a duck cut short
+- `lib/watchOpenTakeovers.ts` — reports which takeover dialogs are open (by id, via each `open`
+  attribute), once at start and on every change; the duck's source, unlike `lib/watchTakeovers.ts`
+  (any open or not)
+- `lib/proofBotMotion.ts` — the card bots' own motion constants (rise, `DUCK`, `DUCK_RISE`, hover lean, the prop acts),
   re-exporting the Process bots' idle/pointer numbers (`lib/processBotMotion.ts`) so every proof-bot
   file reads one place
 - `lib/proofBotRig.ts` — finds a bot's `data-bot` hooks, sets every pivot once with `svgOrigin`, owns
@@ -266,6 +378,95 @@ the hover acts work, the takeover opens and closes, no console errors; nothing s
 
 ## Decisions
 
+- 2026-10-06 — Clicking a proof card first ducks its bot below the banner floor (0.25s), then opens
+  the takeover; each open takeover's bot stays down by any route (hash link or load, Next), and all
+  rise back with the reveal's soft bounce once no takeover is open. Replaces the break-out
+  staying outside the clip at the first frame and reappearing as the clip shrinks. Reduced motion
+  unchanged: no duck, no delay (the user).
+- 2026-10-06 — The spam diagram is an ink stage (the user, after rejecting boxed Eva tiles as "not
+  as good as everything we have built"): from `md` one ink band with three Evas rising from its floor
+  and their heads breaking out above it (sample "2 · Ink stage"); on phones one ink band per step with
+  Eva at its right end, head breaking out above like the big screen (phone sample "C"). Spec
+  `../ui-spec/07-proofs-spam.md`. The ink ground is the shared `InkStageGround`, also used by
+  `ProofBanner`.
+- 2026-10-06 — `SpamReturn.tsx`'s class typo (`md:ml-16md:justify-center`) is fixed to
+  `md:ml-16 md:justify-center`; lead-checked at 768 and 1440: the return line's left leg sits under
+  tile 1's centre and the pill and line are centred.
+- 2026-10-05 — The project's name is "Exile Bot" (the user; exile.marwix.dev is only the short
+  form): the title is "Exile Bot", the visit button reads
+  "Visit Exile Bot", and the tag changes from "Bot platform" to "Discord platform" so "bot" isn't
+  repeated directly above the title; `rows.whatItIs` and the shot-alt markers are unchanged, and no
+  key, hash (#exile) or file was renamed. `docs/03-facts.md` was updated to the name with the
+  user's say. Lead's screen check done 2026-10-05: the title sits on one line at 360, 768, 1440 and
+  3840, and the card open/close title morph works.
+- 2026-10-05 — The project takeover is rebuilt into seven parts (the user's call; the sixth part
+  grew a seventh, see below), superseding the 2026-09-24 seven-part template: (1) what it is — intro
+  plus the info rows; (2) the problem; (3) what I built, with the screenshots and the Visit button;
+  (4) what it took (optional; Exile Bot only today: the four capabilities from `docs/03-facts.md`);
+  (5) what I learned (optional; see the next line); (6) showcase (optional; Exile Bot only: its
+  spam and raid protection, live in the communities that use it, with a drawn diagram); (7) what
+  this means for you — one closing line and a Book a call button. Same structure and order for
+  every project; a project without the facts for an optional part doesn't render it. The single
+  `summary` slot is retired.
+- 2026-10-05 — New optional part 5, "What I learned", sits between "What it took" and the Showcase
+  (Showcase is part 6, the closing panel part 7). Exile Bot has it: headline "Running a live app
+  changed how I build yours.", three numbered lessons written as how the user works now — build the
+  system first; keep only the data an app needs (EU servers, encrypted backups, deletion within 48
+  hours, never stated as compliance); keep heavy pages fast (700+ images, the method never stated).
+  Design Vault skips it for now (the user), so its takeover keeps four parts. The facts went into
+  `docs/03-facts.md` with the user's permission ("do as you see fits"). It reuses the "What it took"
+  item, renamed `TakeoverTookItem` → `TakeoverItem`, with an optional ordinal.
+- 2026-10-05 — Parts 2–7 are headed by a small mono label (the same on every project) over a
+  headline written per project, so a reader skimming only the headlines gets the story (the user
+  chose this over the same big labels on every project).
+- 2026-10-05 — The closing line is the only part of a takeover that follows the About pick (one
+  line per card, falling back to the default line when a card has none); the rest reads the same
+  for everyone. Constitution §3 was amended at the user's instruction, and now also says each
+  takeover ends with its own Book a call button because the takeover covers the nav.
+- 2026-10-06 — The spam diagram's three steps show Eva, Exile Bot's own mascot, holding each
+  step's symbol, replacing the Eye, Alert and Lock icons (the user); the images are decorative
+  (empty alt). This is the user's one
+  exception to "no generated art on the site", covering the Exile Bot view only; the site's own
+  mascot stays everywhere else.
+- 2026-10-06 — The spam status pill carries no community count; it reads "Live in communities that
+  use it" (the user). The user confirmed spam and raid protection is active in communities.
+- 2026-10-06 — Exile Bot's in-use numbers are 18+ communities and 3.9K+ commands run, replacing ~20
+  and 4k+ (the user): floors matching the live Exile Bot site's stats strip, raised only when the
+  user says so, belonging to the calculations and simulations use only. `docs/03-facts.md` was
+  changed with the user's permission.
+- 2026-10-06 — The dashboard screenshot is used as the user supplied it, not pre-cropped; the user
+  accepted that it shows the community's name, server ID, member count and credit balance ("a server
+  id does no harm").
+- 2026-10-06 — Exile Bot's takeover shows three screenshots in the three-shot layout (one wide 2:1,
+  two 4:3 details), like Design Vault (the user): the Exile Bot website home page, the owner
+  dashboard's home view, and the spam and raid protection settings page. The two-shot layout is
+  removed.
+- 2026-10-05 — The spam diagram is sample "D" (`temp/spam-diagram-samples.html`): three numbered
+  steps (Watches, Spots, Shuts it down) and a dashed return line marked "Temporary". The figure is
+  one swappable component (`SpamStepFigure`). It carries no sample names or messages.
+- 2026-10-05 — `docs/03-facts.md` gained, with the user's say: the problem Exile Bot solved and what
+  it changed; why Design Vault was built; that Design Vault holds UI screens and components, colour
+  palettes and fonts only (never photos of real-life things, so the site never says so).
+- 2026-10-05 — Copy is written to the six-part shape: Exile Bot's story is "the calculations were
+  brought into the chat players already use"; spam protection appears in its showcase part and,
+  from 2026-10-06, as a screenshot in the shots part, never in a closing line; Exile Bot has a closing line for all five cards, Design Vault for the default
+  and software-builder only (the other four fall back); MARWIX-SKILLS' new slots are `[FILL]`
+  markers (it stays hidden). Spec: `../ui-spec/07-proofs.md` §7.3–7.8.
+- 2026-10-05 — Deviations from the six-part build (recorded so audits don't flag them): canonical
+  `aspect-2/1` / `aspect-4/3` classes; the `ProofProject` type lives in `lib/proofProject.ts`, not
+  `content/`; `TakeoverShots` checks `shots` or `alts` length for type narrowing; pill dots carry
+  `shrink-0`.
+- 2026-10-05 — No length limits (site-wide, see page.md).
+- 2026-10-05 — The user confirmed all of Exile Bot's communities are Idle Heroes communities and every Exile
+  calculator and simulation is for Idle Heroes.
+- 2026-10-05 — Exile's card line, In use row and takeover copy state its real use (in-game calculations
+  and simulations for Idle Heroes players in their Discord communities, plus routine moderation
+  around the clock); spam protection appears only in the takeover (its showcase part and, from
+  2026-10-06, a screenshot in the shots part), never in the card line or In use row. The page may name "Idle Heroes".
+- 2026-10-05 — The user corrected the facts: Exile Bot's spam and raid protection is active in the
+  communities that use it. `docs/03-facts.md` is updated and the Discord card's "never an offer"
+  line about it is removed. Part 5's headline, status pill and paragraph are rewritten to say it's
+  live; the layout and the diagram are unchanged.
 - 2026-09-28 — User's choice: MARWIX-SKILLS is hidden temporarily, card and takeover, behind one
   flag (`hiddenProofs` in `lib/proofs.ts`); its content and code stay. With two projects shown, the
   cards sit two across from `md` up at full width, no empty third slot (three across from `lg` only
@@ -302,7 +503,7 @@ the hover acts work, the takeover opens and closes, no console errors; nothing s
   with AI." so it doesn't repeat the proof line.
 - 2026-09-28 — The cards' bot shades use no new tokens: every shade is a `color-mix()` of existing
   tokens, kept in one table (`lib/proofBotShades.ts`) so real tokens can replace it later if wanted.
-- 2026-09-24 — Proofs takeover template, the same for every project: (1) top bar "PROJECT 0n / 03 ·
+- 2026-09-24 — (takeover template superseded 2026-10-05) Proofs takeover template, the same for every project: (1) top bar "PROJECT 0n / 03 ·
   tag" plus a Close button; (2) big title; (3) three info rows WHAT IT IS / BUILT / IN USE, facts
   only; (4) one summary paragraph on what it does for its users; (5) shots, one big and two
   details; (6) a Visit button (Exile: exile.marwix.dev, the only
@@ -315,8 +516,8 @@ the hover acts work, the takeover opens and closes, no console errors; nothing s
   (later): v3's clip-path expand from the card and collapse back, content rising in, and
   next-project transition.
 - 2026-09-24 — Proofs: every project gets the same image set, a card shot plus three takeover
-  shots (one big, two details), MARWIX-SKILLS included. All three projects stay identical in
-  structure and are kept in sync. This replaces the earlier "skipped for MARWIX-SKILLS" in the
+  shots (one big, two details), MARWIX-SKILLS included. Projects keep the same structure with
+  optional parts (2026-10-05), kept in sync. This replaces the earlier "skipped for MARWIX-SKILLS" in the
   takeover template.
 - 2026-09-24 — Proofs built: three identical `ProofCard`s and one native `<dialog>` takeover per
   project, driven by the hash (`:target` without JS, `showModal` with JS). Every open takeover
@@ -326,7 +527,8 @@ the hover acts work, the takeover opens and closes, no console errors; nothing s
   hairline (the blurred 85% bar failed contrast).
 - 2026-09-24 — The user accepted that the full-screen takeover covers the nav's Book a call while
   a project is open (Close is one tap away). The user will add this to the constitution §3
-  themselves; until then audits may flag it.
+  themselves; until then audits may flag it (done 2026-10-05: §3 now says each takeover ends with
+  its own Book a call).
 - 2026-09-25 — The ProofCard image `sizes` hint is back to the original
   `(min-width:1536px) 500px, (min-width:1024px) 33vw, (min-width:768px) 50vw, 100vw` (no longer
   affected by the split/sticky-title pattern, since Proofs doesn't use it).
@@ -413,12 +615,22 @@ the hover acts work, the takeover opens and closes, no console errors; nothing s
 - **Fact:** the user is adding MARWIX-SKILLS details (BUILT / IN USE) to `docs/03-facts.md`; its
   rows show `[FILL]` until then and can't ship. MARWIX-SKILLS is hidden for now (see Decisions), so
   this doesn't block launch.
-- **Fact:** the user is adding Exile facts (Idle Heroes, the mobile game it serves, and its
-  in-game resource calculations) to `docs/03-facts.md`; once they land, copywriter updates Exile's
-  card line, summary and rows.
-- **To build:** Proofs — Exile, Design Vault and MARWIX-SKILLS takeover screenshots (pending from
-  the user; cards no longer carry a screenshot); their shot alt-text `[FILL]` markers clear when
-  the images arrive.
+- **To build (waiting on the user):** Design Vault's three screenshots and alt text (its shots are
+  still `null` placeholders; this holds the next push); MARWIX-SKILLS' takeover shots too (hidden).
+- **To build (waiting on the user):** a sharper retake of the Exile home page shot (the supplied
+  file is 1908×728, about 80px under the 4K slot's width after the crop).
+- **To build:** delete the unused `components/home/proofs/SpamStepTile.tsx` and
+  `components/icons/EyeIcon.tsx`, `AlertIcon.tsx` and `LockIcon.tsx` (waiting on the user: the delete
+  hook lets only the user delete files).
+- **To build:** the code-auditor pass on the Exile Bot three-shot, Eva and ink-stage round (runs
+  before the push).
+- **To build:** `../ui-spec/07-proofs.md` still has stale tile references in §7.3.4, the §7.6
+  source-size row, the §7.7 file list and motion rows, §7.5 sizing notes and bullet, and the intro
+  paragraph; the ui-designer points them to `07-proofs-spam.md`.
+- **Choice:** the ui-designer's open items in ui-spec §7.8 23–33 (Eva crop, step number place, shot
+  anchors, source resolution) are built with the spec's first option and await the user's review.
+- **Choice:** "no generated art on the site" is not written in the constitution or any doc; does
+  the user want it added as a rule (the user's own constitution edit) with the Exile exception?
 - **Choice (later):** replace the color-mix shades in `lib/proofBotShades.ts` with named tokens.
 - **Note:** after Back on a direct-load takeover, focus isn't returned to the card (minor).
 - **Note:** at 1440 the Design Vault proof line wraps to two lines while Exile's takes one, so its
@@ -436,3 +648,16 @@ the hover acts work, the takeover opens and closes, no console errors; nothing s
 - **To build:** check the Next slide-up and both title morphs (Next and card-open) on a real
   Safari/iPhone before launch — only tested in headless Chromium so far; stacked-modal
   (`showModal()` under an open dialog) behaviour on Safari and Firefox is unverified.
+- **To build:** the motion pass for the new takeover parts (hooks are in the spec §7.7), parts 5 and
+  6 included, then re-test `useTakeoverMotion` (Next from the bottom of the taller takeover).
+- **Choice:** the tag "Discord platform" is the copywriter's pick; alternatives "Discord tools"
+  and "Gaming communities". The user confirms or picks.
+- **Choice:** copy calls for the user on the new takeover text — the Hosting item says "When it
+  crashed"; Payments drops "usage metering"; the connections item names no kinds of service; Design
+  Vault's software-builder closing line is the weakest of the set. The lead is putting these to the
+  user.
+- **Choice:** should spam and raid protection now become an offer on the Discord card? The facts
+  list it nowhere as an offer; the user's call.
+- **Fact:** Design Vault: lessons for its What I learned part (skipped for now).
+- **Note:** Design Vault's card line lists "screens, colour palettes and fonts" without components,
+  while the new takeover text includes components.

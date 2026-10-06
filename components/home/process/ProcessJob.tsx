@@ -1,11 +1,15 @@
-// The relay job (ui-spec §5.7, §5.9): the cream sheet the bots pass along, 16px wide below `lg`
-// (down the bot column) and 24px from `lg` (along the ground line, leaving right after bot 4).
-// Drawn finished (static = final state) except the glow flash, and hidden at rest; motion sets the
-// blank state before each run. Its anchor is the bottom centre (negative margins), so motion owns
-// `transform` alone. Decorative: `aria-hidden`, never focusable.
+// The relay job (ui-spec §5.7): what the bots pass along, hidden at rest (the relay's motion shows
+// it). In `default` it's the built cream sheet, drawn finished with one mark per bot, 16px wide
+// below `lg` and 24px from `lg`; in a card's flow it's that card's emblem (`data-emblem`), its base
+// parts `data-job="base"`, its marks `data-job="mark"`, and the base outline again as the glow.
+// Its anchor is the bottom centre (negative margins), so motion owns `transform` alone.
+// Decorative: `aria-hidden`, never focusable.
+import { botFills } from "@/lib/botFills";
+import type { FlowEmblem } from "@/lib/processEmblems";
 import { jobBase, jobParts } from "@/lib/processJob";
+import { isBasePart } from "@/lib/rixProps";
 
-export function ProcessJob() {
+function JobSheet() {
   return (
     <svg
       aria-hidden="true"
@@ -29,6 +33,42 @@ export function ProcessJob() {
         strokeWidth={1.5}
         className="fill-none stroke-accent opacity-0"
       />
+    </svg>
+  );
+}
+
+type ProcessJobProps = { readonly emblem: FlowEmblem };
+
+export function ProcessJob({ emblem }: ProcessJobProps) {
+  if (emblem.name === "job") return <JobSheet />;
+  const base = emblem.parts.filter(isBasePart);
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      data-anim="process-relay"
+      data-emblem={emblem.name}
+      viewBox="104 21 28 31"
+      className="absolute left-0 top-0 -ml-2.25 -mt-5 h-5 w-4.5 overflow-visible opacity-0 lg:-ml-3.5 lg:-mt-7.75 lg:h-7.75 lg:w-7"
+    >
+      {emblem.parts.map((part) => (
+        <path
+          key={part.d}
+          data-job={isBasePart(part) ? "base" : "mark"}
+          d={part.d}
+          fillRule="evenodd"
+          className={botFills[part.colour]}
+        />
+      ))}
+      {base.map((part) => (
+        <path
+          key={`glow-${part.d}`}
+          data-job="glow"
+          d={part.d}
+          strokeWidth={1.5}
+          className="fill-none stroke-accent opacity-0"
+        />
+      ))}
     </svg>
   );
 }

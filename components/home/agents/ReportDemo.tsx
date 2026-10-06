@@ -1,13 +1,16 @@
-// Recurring reports demo, finished state (ui-spec §4.4): the week's chart, this week in the
-// accent, then the "sent" pill. The chart is decorative; its text alternative sits beside it.
+// Report demo, finished state (ui-spec §4.4): the period's chart, the latest bar in the accent,
+// then the "sent" pill. The chart is decorative; its text alternative sits beside it.
 // Bars sit in a grid, not a flex row, so their percentage heights resolve against the chart's
-// height at every width (a flex row has no definite height below `lg`).
+// height at every width (a flex row has no definite height below `lg`). Each bar carries
+// `demo-bar` for the motion pass's hover; the latest also carries `data-bar="latest"`.
 import { DemoStatusPill } from "@/components/home/agents/DemoStatusPill";
-import { agents } from "@/content/home";
+import type { ReportDemoContent } from "@/lib/agents";
 import { metaLabel } from "@/lib/styles";
 
-export function ReportDemo() {
-  const { title, week, bars, chartAlt, sent } = agents.demos.report;
+type ReportDemoProps = { readonly demo: ReportDemoContent };
+
+export function ReportDemo({ demo }: ReportDemoProps) {
+  const { title, week, bars, chartAlt, sent } = demo;
   const lastBar = bars.length - 1;
   return (
     <div className="flex h-full flex-col justify-end gap-5">
@@ -25,6 +28,8 @@ export function ReportDemo() {
           <span
             key={index}
             data-demo-order={index + 1}
+            data-anim="demo-bar"
+            data-bar={index === lastBar ? "latest" : undefined}
             style={{ height: `${height}%` }}
             className={`block rounded-t-md ${index === lastBar ? "bg-accent" : "bg-line"}`}
           />

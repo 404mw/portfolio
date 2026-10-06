@@ -1,51 +1,75 @@
 "use client";
-// Agents variant A (ui-spec §4.2): a vertical tab list of the four offers beside one demo
-// panel; the label and tab list stay sticky from `lg` while the panel scrolls. The panels are
-// rendered on the server and passed in. Without JavaScript the tab list
-// and panels hide (`noscript:`), and `fallback` (variant B's list) shows in their place.
+// Agents variant A (ui-spec §4.2): a vertical tab list of one set's offers beside one demo panel;
+// the label, the "Shown for" tag and the tab list stay sticky from `lg` while the panel scrolls.
+// The set is the About pick's (ui-spec §0.5): four or five offers, `default` with no pick and in
+// the server markup. The root carries `data-set`; the rows and panels are keyed by set, so a
+// change remounts them inside the two wrappers, which persist. A change puts the selection back
+// on row 1 and moves no focus. The swap fades (`useSwapFade`, ui-spec §0.5): the tab list, the
+// stepper and the panels fade out, the set changes, and they fade back in; the label and the tag
+// stay as they are. Below `lg` the tab list hides and `AgentsStepper` (§4.2a), the first
+// child of the panels wrapper and outside the per-offer panels, moves between offers instead.
+// Without JavaScript the tag, tab list and panels hide (`noscript:`),
+// and `fallback` (variant B's list) shows in their place.
 // Motion (entrance, auto-advance, demo replays) comes from `useAgentsMotion`, through the
 // `data-anim` hooks below; the markup is the static layout either way.
 import { useRef, type ReactNode } from "react";
+import { AgentDemo } from "@/components/home/agents/AgentDemo";
 import { AgentRowText } from "@/components/home/agents/AgentRowText";
+import { AgentsStepper } from "@/components/home/agents/AgentsStepper";
+import { ShownForTag } from "@/components/home/pick/ShownForTag";
 import { SectionLabel } from "@/components/SectionLabel";
 import { agents } from "@/content/home";
 import { useAgentsMotion } from "@/hooks/useAgentsMotion";
 import { useRovingTabs } from "@/hooks/useRovingTabs";
-import { agentRowIds } from "@/lib/agents";
+import { useShownSet } from "@/hooks/useShownSet";
+import { useSwapFade } from "@/hooks/useSwapFade";
+import { agentPanels, agentRowIds } from "@/lib/agents";
 import { listNumber } from "@/lib/listNumber";
+import { animTargets } from "@/lib/motion";
 import { focusRing, splitColumns, stickyTitle } from "@/lib/styles";
 
 type AgentsTabsProps = {
+  /** The section's id: the prefix of every id here, and of the tag's radio group. */
   readonly idPrefix: string;
-  readonly panels: readonly ReactNode[];
   readonly fallback: ReactNode;
 };
 
-export function AgentsTabs({ idPrefix, panels, fallback }: AgentsTabsProps) {
-  const { selected, select, onKeyDown, tabRef } = useRovingTabs(agents.items.length);
+/** What fades across a set swap: wrappers the section's own motion writes no opacity on. */
+const swapWrappers = (root: HTMLElement) =>
+  ["agents-tablist", "agents-stepper", "agent-panel"].flatMap((name) => animTargets(root, name));
+
+export function AgentsTabs({ idPrefix, fallback }: AgentsTabsProps) {
+  const set = useShownSet();
+  const panels = agentPanels(set);
+  const { selected, select, step, onKeyDown, tabRef } = useRovingTabs(panels.length, set);
   const labelId = `${idPrefix}-label`;
+  const panelsId = `${idPrefix}-panels`;
   const tabId = (index: number) => `${idPrefix}-tab-${index}`;
   const panelId = (index: number) => `${idPrefix}-panel-${index}`;
   const nameId = (index: number) => `${idPrefix}-name-${index}`;
   const root = useRef<HTMLDivElement>(null);
-  useAgentsMotion(root, { selected, select, labelId });
+  useAgentsMotion(root, { selected, select, labelId, set, kinds: panels.map((panel) => panel.kind) });
+  useSwapFade(root, swapWrappers);
 
   return (
-    <div ref={root} className={`${splitColumns} noscript:block lg:items-center`}>
+    <div ref={root} data-set={set} className={`${splitColumns} noscript:block lg:items-center`}>
       <div className={`flex flex-col gap-10 ${stickyTitle}`}>
-        <SectionLabel as="h2" id={labelId} number={agents.number} label={agents.label} />
+        <div className="flex flex-col gap-4">
+          <SectionLabel as="h2" id={labelId} number={agents.number} label={agents.label} />
+          <ShownForTag sectionId={idPrefix} />
+        </div>
         <div
           role="tablist"
           aria-orientation="vertical"
           aria-labelledby={labelId}
           data-anim="agents-tablist"
-          className="noscript:hidden"
+          className="max-lg:hidden noscript:hidden"
         >
-          {agents.items.map((item, index) => {
+          {panels.map((panel, index) => {
             const isSelected = index === selected;
             return (
               <button
-                key={item.slug}
+                key={`${set}-${index}`}
                 ref={tabRef(index)}
                 type="button"
                 role="tab"
@@ -66,8 +90,8 @@ export function AgentsTabs({ idPrefix, panels, fallback }: AgentsTabsProps) {
                 />
                 <AgentRowText
                   number={listNumber(index)}
-                  title={item.title}
-                  line={isSelected ? item.line : undefined}
+                  title={panel.title}
+                  line={isSelected ? panel.line : undefined}
                   titleAs="span"
                   active={isSelected}
                   labelId={nameId(index)}
@@ -78,19 +102,20 @@ export function AgentsTabs({ idPrefix, panels, fallback }: AgentsTabsProps) {
         </div>
         <noscript>{fallback}</noscript>
       </div>
-      <div data-anim="agents-panels" className="noscript:hidden">
+      <div id={panelsId} data-anim="agents-panels" className="noscript:hidden">
+        <AgentsStepper set={set} panels={panels} selected={selected} step={step} panelsId={panelsId} />
         {panels.map((panel, index) => (
           <div
-            key={panelId(index)}
+            key={`${set}-${index}`}
             role="tabpanel"
             id={panelId(index)}
             aria-labelledby={agentRowIds(nameId(index)).labelledBy}
             tabIndex={0}
             hidden={index !== selected}
             data-anim="agent-panel"
-            className={`rounded-3xl ${focusRing}`}
+            className={`rounded-3xl max-lg:rounded-t-none ${focusRing}`}
           >
-            {panel}
+            <AgentDemo panel={panel} variant="tabs" />
           </div>
         ))}
       </div>

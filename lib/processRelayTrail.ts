@@ -1,8 +1,10 @@
 // The relay's trail and lit lines (ui-spec §5.7 layer 10, "Hops" and "The return"): the three
-// ghosts that run each hop (and the job's exit slide) a little behind the job, the ground-lit
-// segment under it, the chevron and arrowhead flash, and the return-lit overlay that turns the
-// dashed path solid violet behind the lesson (no ghosts on the return). Transforms, opacity and (for the return) `clip-path` only; no filters. The flash
-// colours are read from the tokens at setup, and `clearProps` hands the icons back to their class.
+// ghosts that repeat each of the job's moves (its hops, the fix hop, its exit slide) a little
+// behind it, the ground-lit segment under it (from `lg`; below it the ledges light instead,
+// lib/processRelayLedge.ts), the chevron and arrowhead flash, and the return-lit overlay that turns
+// the dashed path solid violet behind the lesson (no ghosts on the return).
+// Transforms, opacity and (for the return) `clip-path` only; no filters. The flash colours are
+// read from the tokens at setup, and `clearProps` hands the icons back to their class.
 import { gsap } from "@/lib/gsap";
 import {
   CHEVRON_PULSE,
@@ -30,22 +32,32 @@ export function readLights(): Lights | null {
   return cream && accent ? { cream, accent } : null;
 }
 
-/** One leg of a run: where it ends, and how long it takes. */
-export type Leg = { readonly to: PointAt; readonly duration: number; readonly ease: string };
+/**
+ * One move of the job's position (`x` and `y` only), written so it can be played again on another
+ * element from another start time: the ghosts repeat whatever the job does, a little later.
+ */
+export type Mover = (target: Element, at: number) => void;
+
+/** The plain move: straight to `to` (a hop, or the exit slide with its own `timing`). */
+export function straight(tl: gsap.core.Timeline, to: PointAt, timing: Timing = RELAY_HOP): Mover {
+  return (target, at) => {
+    tl.to(target, { x: () => to().x, y: () => to().y, duration: timing.duration, ease: timing.ease }, at);
+  };
+}
 
 /**
- * Ghost k (1–3) runs the job's `legs` from `from`, `GHOST_LAG` × k after `t`, smaller and fainter
- * (scaled about its bottom centre on the ground line), fading in at its start and out as it
- * catches up at the end.
+ * Ghost k (1–3) repeats the job's `move` from `from`, `GHOST_LAG` × k after `t`, smaller and fainter
+ * (scaled about its bottom centre), fading in at its start and out as it catches up at the end,
+ * `length` seconds later.
  */
-export function ghostRun(
+export function ghostFollow(
   tl: gsap.core.Timeline,
   ghosts: readonly Element[],
   from: PointAt,
-  legs: readonly Leg[],
+  move: Mover,
+  length: number,
   t: number,
 ) {
-  const length = legs.reduce((sum, leg) => sum + leg.duration, 0);
   ghosts.forEach((ghost, i) => {
     const start = t + GHOST_LAG * (i + 1);
     tl.set(
@@ -55,24 +67,8 @@ export function ghostRun(
     )
       .to(ghost, { opacity: GHOST_OPACITY[i] ?? 0, duration: GHOST_IN, ease: "none" }, start)
       .to(ghost, { opacity: 0, duration: GHOST_OUT, ease: "none" }, start + length - GHOST_OUT);
-    let at = start;
-    legs.forEach((leg) => {
-      tl.to(ghost, { x: () => leg.to().x, y: () => leg.to().y, duration: leg.duration, ease: leg.ease }, at);
-      at += leg.duration;
-    });
+    move(ghost, start);
   });
-}
-
-/** Ghost k runs one hop (or the exit slide, with its `timing`) `from` → `to` along the ground line. */
-export function ghostHop(
-  tl: gsap.core.Timeline,
-  ghosts: readonly Element[],
-  from: PointAt,
-  to: PointAt,
-  t: number,
-  timing: Timing = RELAY_HOP,
-) {
-  ghostRun(tl, ghosts, from, [{ to, ...timing }], t);
 }
 
 /**

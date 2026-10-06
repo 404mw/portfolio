@@ -31,6 +31,8 @@ export type BotParts = {
   readonly armLeft: SVGGElement;
   readonly armRight: SVGGElement;
   readonly tool: SVGGElement;
+  /** Intake only: the held emblem (`data-bot="prop"`), the job in its hand. Null on every other role. */
+  readonly prop: SVGGElement | null;
   readonly hat: SVGGElement;
   readonly marks: readonly SVGElement[];
   readonly page: SVGElement | null;
@@ -112,8 +114,18 @@ const restChannels = (restLook: number): BotChannels => ({
   perp: 0,
 });
 
-const isRole = (value: string | undefined): value is BotRole =>
-  value === "rules" || value === "team" || value === "check" || value === "update" || value === "host";
+const roles: Record<BotRole, true> = {
+  rules: true,
+  team: true,
+  check: true,
+  update: true,
+  host: true,
+  intake: true,
+  flag: true,
+  remind: true,
+  ship: true,
+};
+const isRole = (value: string | undefined): value is BotRole => value !== undefined && Object.hasOwn(roles, value);
 
 /** The bot in `svg` (a `[data-anim="process-bot"]`), or null if its rig is incomplete. */
 export function findBot(svg: SVGSVGElement, index: number): Bot | null {
@@ -152,6 +164,8 @@ export function findBot(svg: SVGSVGElement, index: number): Bot | null {
       armLeft,
       armRight,
       tool,
+      // Only intake's: About's host carries a `prop` per reply, which are Rix's own to move.
+      prop: role === "intake" ? one<SVGGElement>("prop") : null,
       hat,
       marks: all<SVGElement>("mark"),
       page: one<SVGElement>("page"),
@@ -201,7 +215,8 @@ export function rigBot(bot: Bot) {
   eyePivots(bot.restLook).forEach((point, i) => pivot(parts.eye[i] ?? null, point));
   pivot(parts.armLeft, botPivots.armLeft);
   pivot(parts.armRight, botPivots.armRight);
-  if (role !== "rules" && role !== "host") pivot(parts.tool, botPivots.tool[role]);
+  if (role !== "rules" && role !== "host" && role !== "intake") pivot(parts.tool, botPivots.tool[role]);
+  pivot(parts.prop, botPivots.prop);
   pivot(parts.hat, botPivots.hat);
   if (role === "rules" || role === "update") {
     botPivots.marks[role].forEach((point, i) => pivot(parts.marks[i] ?? null, point));

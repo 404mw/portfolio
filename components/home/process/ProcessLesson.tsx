@@ -1,5 +1,5 @@
-// The relay lesson (ui-spec §5.7, §5.9): the cream card that leaves bot 4 and rides back to bot 1:
-// 10px below `lg` (from bot 4's rulebook up the bot column's left edge), 14px from `lg` (split off
+// The relay lesson (ui-spec §5.7, §5.9): the cream card that leaves the last bot and rides back to
+// step 2: 10px below `lg` (from the last bot's left hand up the bot column's left edge), 14px from `lg` (split off
 // the job, along the dashed return path). Drawn finished and hidden at rest. Its anchor is
 // the centre (negative margins), so motion owns `transform` alone. Decorative: `aria-hidden`,
 // never focusable.

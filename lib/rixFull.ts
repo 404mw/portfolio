@@ -1,43 +1,50 @@
 // One Rix's full-motion run (ui-spec 02a-about-options §2a.O4; ui-spec/00-rix.md R9, R10): the
-// arrival, life, pointer and target looks, the perk, nudges and pick acts, and the character
-// sheet's emotions and glyphs, card walks, the patrol, typed talk, plays, nap, tag, the poke
-// ladder, and the pet and its love (lib/rixFeatures.ts sets the schedulers and the patrol per
-// host: home's About Rix or the /rix playground). The registry and the
-// per-frame channel writer run only while the instance is on screen and the tab visible
-// (`watchLive`). Returns the teardown, which kills everything and puts the instance back exactly
-// as server-rendered, and the playground's kit (the services its buttons drive).
+// arrival, life, pointer and target looks, the perk and pick acts, and the character sheet's
+// emotions and glyphs, card walks, the patrol, typed talk, plays, nap, tag, the poke ladder, and the
+// pet and its love (lib/rixFeatures.ts sets the schedulers and the patrol per host: home's About Rix
+// or the /rix playground). Home's About also gets rev 4: the idle clock (beats, strolls, plays and
+// chatter, lib/rixIdle.ts), hover mode at a held card (lib/rixHover.ts) and the pick lock through
+// the tantrum (lib/aboutPickLock.ts); the playground gets none of them, and keeps calm by a pick.
+// The registry and the per-frame channel writer run only while the instance is on screen and the
+// tab visible (`watchLive`). Returns the teardown, which kills everything and puts the instance
+// back exactly as server-rendered, and the playground's kit (the services its buttons drive).
 //
 // Tweens made later by handlers and timers live in the crew; the crew, `resetRix` and the quip's
 // `stop` clean them up.
 import { about } from "@/content/home";
 import { deselectAbout } from "@/lib/aboutDeselect";
+import { pickLock } from "@/lib/aboutPickLock";
 import { isAboutChange } from "@/lib/aboutReplies";
 import type { AboutScope } from "@/lib/aboutScope";
 import { gsap } from "@/lib/gsap";
 import { createCrew } from "@/lib/processBotCrew";
 import { startLife } from "@/lib/processBotLife";
 import { announceRix } from "@/lib/rixStatus";
-import { ask, happyPoke, nudge, perk, releaseHold } from "@/lib/rixActs";
+import { ask, chatter, happyPoke, perk, releaseHold } from "@/lib/rixActs";
 import { annoyedPoke } from "@/lib/rixAnnoyed";
 import { balance } from "@/lib/rixBalance";
+import { beat } from "@/lib/rixBeats";
 import { calm } from "@/lib/rixCalm";
 import type { Wall } from "@/lib/rixEmotions";
 import { rixFeatures, type RixHost } from "@/lib/rixFeatures";
 import { rixEyes } from "@/lib/rixFollow";
 import { forgive } from "@/lib/rixForgive";
+import { hoverMode, type HoverMode } from "@/lib/rixHover";
+import { hoverLines } from "@/lib/rixHoverLines";
+import { idleClock, type IdleClock } from "@/lib/rixIdle";
+import { idleTalk } from "@/lib/rixIdleTalk";
 import { juggle } from "@/lib/rixJuggle";
+import { chatterLine, type LineMemo } from "@/lib/rixLines";
 import { logoPose } from "@/lib/rixLogoPose";
 import { love } from "@/lib/rixLove";
 import { moodLadder, type MoodLadder, type PressVerdict } from "@/lib/rixMood";
-import { JUGGLE, NUDGE_MAX, NUDGE_QUIET, TALK, type PlayName } from "@/lib/rixMotion";
+import { IDLE_TALK, JUGGLE, TALK, type PlayName } from "@/lib/rixMotion";
 import { nap, wake } from "@/lib/rixNap";
-import { nudgeClock, type NudgeMemo } from "@/lib/rixNudges";
 import { hideForPeek, onceAtStage, peekIn } from "@/lib/rixPeek";
 import { peekaboo } from "@/lib/rixPeekaboo";
 import { patrol, type Patrol } from "@/lib/rixPatrol";
 import { petWatch, type PetWatch } from "@/lib/rixPet";
 import { pickAct, revealAck } from "@/lib/rixPick";
-import { playClock } from "@/lib/rixPlays";
 import { inTantrum, mayStart } from "@/lib/rixPriority";
 import { quipMotion } from "@/lib/rixQuipMotion";
 import { checkedIndex, createRix, resetRix, type Rix, type RixAct, type RixParts } from "@/lib/rixRig";
@@ -46,7 +53,7 @@ import { hmph, sulk } from "@/lib/rixSulk";
 import { tagWatch, type TagWatch } from "@/lib/rixTag";
 import { setQuipSide, typeLine } from "@/lib/rixTalk";
 import { tantrum, type TantrumCues } from "@/lib/rixTantrum";
-import { nearTargets, pickedLook, picksLook } from "@/lib/rixTargets";
+import { pickedLook, picksLook } from "@/lib/rixTargets";
 import { visitorClock } from "@/lib/rixVisitor";
 import { wander, type Wander } from "@/lib/rixWander";
 import { watchLive } from "@/lib/watchLive";
@@ -56,7 +63,10 @@ type Flag = { current: boolean };
 /** Per page load: survives motion-mode re-runs. */
 export type RixMemo = {
   readonly entered: Flag;
-  readonly nudges: NudgeMemo;
+  /** Where each pool of scheduled lines has got to (lib/rixLines.ts). */
+  readonly lines: LineMemo;
+  /** Live seconds since landing: the busy phase is the first `TEMPO.busy` of them (R7). */
+  live: number;
   /** Juggles played: the first of the page load never drops. */
   juggles: number;
 };
@@ -87,8 +97,6 @@ export type RixKit = {
 
 export type RixRun = { readonly stop: () => void; readonly kit: RixKit | null };
 
-const seconds = () => performance.now() / 1000;
-const nudgeLine = (count: number) => about.rix.nudgeLines[count % about.rix.nudgeLines.length] ?? "";
 const petLine = (count: number) => about.rix.petLines[count % about.rix.petLines.length] ?? "";
 
 /** The picked radio and its reply index, for a change on the instance's group; null otherwise. */
@@ -98,23 +106,6 @@ export function pickOf(event: Event, name: string): { input: HTMLInputElement; i
   return Number.isInteger(index) ? { input: event.target, index } : null;
 }
 
-/** Tracks when the pointer was last over the picks or Rix, and whether focus is in the instance. */
-export function watchNear(root: HTMLElement) {
-  let last = -Infinity;
-  const onPointer = (event: PointerEvent) => {
-    if (event.target instanceof Element && event.target.closest(nearTargets)) last = seconds();
-  };
-  root.addEventListener("pointerover", onPointer);
-  root.addEventListener("pointermove", onPointer, { passive: true });
-  return {
-    busy: () => seconds() - last < NUDGE_QUIET || root.contains(document.activeElement),
-    stop: () => {
-      root.removeEventListener("pointerover", onPointer);
-      root.removeEventListener("pointermove", onPointer);
-    },
-  };
-}
-
 /** A press came from a fine pointer (mouse or pen), not touch or a key (a key's click has no detail). */
 const fromFine = (event: MouseEvent, fine: boolean) =>
   "pointerType" in event ? event.pointerType === "mouse" || event.pointerType === "pen" : fine && event.detail > 0;
@@ -122,7 +113,7 @@ const fromFine = (event: MouseEvent, fine: boolean) =>
 export function rixFull({ parts, scope, host, memo, fine }: RixRunOptions): RixRun {
   const { root, button } = parts;
   const { name, sectionId } = scope;
-  // The playground has no radios: no deselect, and `throwAway` ("you can pick again") is never said.
+  // The playground has no radios: no deselect, no pick lock, and `throwAway` is never said.
   const onAbout = host !== "playground";
   const key = onAbout ? sectionId : parts.root.id;
   const features = rixFeatures[host];
@@ -134,6 +125,24 @@ export function rixFull({ parts, scope, host, memo, fine }: RixRunOptions): RixR
   }
   const { bot } = rix;
   const schedulers = features.schedulers;
+  const announce = (line: string) => announceRix(key, line);
+  // The pick lock (R6A.9), home's About only. Its capture listeners go on the root first; a
+  // swallowed press during the sulk gets the hmph.
+  const lock = onAbout
+    ? pickLock({
+        root,
+        name,
+        crew,
+        lockLine: about.rix.lockLine,
+        unlockLine: about.rix.unlockLine,
+        announce,
+        pressed: () => {
+          if (rix.mood === "sulk") hmph(rix);
+        },
+      })
+    : null;
+  /** The tantrum's announced line, with `lockLine` after it while the picks lock: one utterance. */
+  const withLock = (line: string) => (lock ? `${line} ${about.rix.lockLine}` : line);
   const eyes = rixEyes(rix, fine);
   const quip = quipMotion(parts.quip, key, crew, false, {
     side: () => setQuipSide(rix),
@@ -142,28 +151,16 @@ export function rixFull({ parts, scope, host, memo, fine }: RixRunOptions): RixR
   rix.say = quip.say;
   rix.quipOut = quip.out;
   rix.quipShowing = quip.showing;
-  const near = watchNear(root);
-  const announce = (line: string) => announceRix(key, line);
+  rix.quipTyping = quip.typing;
   rix.picked = onAbout ? checkedIndex(root, name) : null;
 
-  const nudges = nudgeClock(crew, memo.nudges, {
-    max: schedulers ? NUDGE_MAX : 0,
-    // A nudge starts while he stands, or from a patrol stretch, which brakes (R2.1).
-    quiet: () =>
-      near.busy() ||
-      quip.showing() ||
-      (rix.act === "patrol" ? false : bot.state !== "idle" || rix.act !== null) ||
-      rix.mood !== "neutral" ||
-      rix.hold !== null,
-    nudge: (count) => {
-      nudge(rix, picksLook(rix));
-      quip.say(nudgeLine(count), { at: TALK.afterNudge, style: "type" });
-    },
-  });
-
-  // The character sheet's walks, patrol, plays, nap, tag and pet.
-  const walks: Wander = wander(rix);
-  const patrols: Patrol = patrol(rix, features.patrol === "auto");
+  // The character sheet's walks, hover mode, patrol, plays, nap, tag and pet.
+  const lines = schedulers
+    ? hoverLines({ crew, quip, memo: memo.lines, picked: () => rix.picked !== null, out: TALK.walkOut })
+    : null;
+  const hover: HoverMode | null = lines ? hoverMode(rix, lines) : null;
+  const walks: Wander = wander(rix, hover?.begin);
+  const patrols: Patrol = patrol(rix, features.patrol === "auto", () => clock?.settled() ?? true);
   const playFor: Record<PlayName, () => void> = {
     juggle: () => {
       juggle(rix, memo.juggles > 0 && Math.random() < JUGGLE.drop);
@@ -174,31 +171,6 @@ export function rixFull({ parts, scope, host, memo, fine }: RixRunOptions): RixR
     logoPose: () => logoPose(rix),
     balance: () => balance(rix),
   };
-  const plays = schedulers
-    ? playClock({
-        crew,
-        may: () => mayStart(rix, "play"),
-        quiet: () => near.busy() || quip.showing() || rix.mood !== "neutral",
-        play: (play) => playFor[play](),
-      })
-    : null;
-  const napDone = () => memo.nudges.done || memo.nudges.count >= NUDGE_MAX;
-  const stopVisitor = schedulers
-    ? visitorClock({
-        crew,
-        idle: () => {
-          // Wherever he stands: in a patrol pause or idle, never mid-stretch (`mayStart`).
-          if (bot.state === "napping" || !napDone() || quip.showing()) return;
-          if (mayStart(rix, "play")) nap(rix);
-        },
-        back: () => {
-          // Asleep, or still nodding off.
-          if (bot.state === "napping" || rix.emotion === "sleepy") wake(rix);
-        },
-      })
-    : () => {};
-  const tag: TagWatch | null =
-    schedulers && fine ? tagWatch(rix, () => mayStart(rix, "play") && bot.state === "idle") : null;
 
   // The pet (R6B): gated by R2.1 (rank 4), and never in a mood, a hold, a wake or before landing.
   let pets: PetWatch | null = null;
@@ -217,34 +189,101 @@ export function rixFull({ parts, scope, host, memo, fine }: RixRunOptions): RixR
     pet: () => playLove(petLine(petCount++)),
   });
 
-  // A patrol stretch ending doesn't reset the play clock (R7).
+  /**
+   * The mouse is on him: it came in and hasn't left, and he hasn't walked out from under it (a
+   * pointer that stays still gets no leave when he's the one who moves).
+   */
+  const pointerOnRix = () => {
+    if (!(pets?.resting() ?? false)) return false;
+    const at = rix.pointerAt;
+    if (!at) return true;
+    const box = button.getBoundingClientRect();
+    return at.x >= box.left && at.x <= box.right && at.y >= box.top && at.y <= box.bottom;
+  };
+
+  // The idle clock and its talk clock (R7), home's About only: beats, strolls, plays and chatter.
+  const talk = schedulers
+    ? idleTalk({ crew, quip, gap: () => (clock?.settled() ? IDLE_TALK.settledGap : IDLE_TALK.busyGap) })
+    : null;
+  const clock: IdleClock | null = schedulers
+    ? idleClock({
+        crew,
+        lived: memo.live,
+        // He stands free (`mayStart`), no card holds him (hover mode's), and the pointer isn't on him
+        // (the perk's and the pet's).
+        may: () => mayStart(rix, "beat") && rix.target === null && rix.hovering === null && !pointerOnRix(),
+        talking: quip.showing,
+        focused: () => document.activeElement === button && button.matches(":focus-visible"),
+        chatterDue: () => talk?.due() ?? false,
+        beat: (name) => beat(rix, name),
+        play: (name) => playFor[name](),
+        stroll: patrols.stroll,
+        chatter: () => {
+          const picked = rix.picked !== null;
+          chatter(rix, picked, picked ? null : picksLook(rix));
+          quip.say(chatterLine(memo.lines, picked), { at: TALK.afterNudge, style: "type" });
+        },
+        look: patrols.look,
+      })
+    : null;
+  const stopVisitor = schedulers
+    ? visitorClock({
+        crew,
+        idle: () => {
+          // In the settled phase only (R6.3), wherever he stands: in a patrol pause or idle, never
+          // mid-stretch (`mayStart`).
+          if (bot.state === "napping" || !clock?.settled() || quip.showing()) return;
+          if (mayStart(rix, "play")) nap(rix);
+        },
+        back: () => {
+          // Asleep, or still nodding off.
+          if (bot.state === "napping" || rix.emotion === "sleepy") wake(rix);
+        },
+      })
+    : () => {};
+  const tag: TagWatch | null =
+    schedulers && fine ? tagWatch(rix, () => mayStart(rix, "play") && bot.state === "idle") : null;
+
+  // Every act's start and end: the eyes hand over, hover mode keeps or loses its hold, a waiting
+  // walk may start, and the idle clock's next gap opens.
   let lastAct: RixAct | null = null;
   rix.onState = () => {
     eyes.settle();
+    hover?.state();
     if (rix.act !== null) {
       lastAct = rix.act;
       return;
     }
-    walks.idle();
-    if (lastAct !== "patrol") plays?.rest();
+    const ended = lastAct;
     lastAct = null;
+    walks.idle();
+    clock?.rest(ended);
   };
-  if (schedulers) rix.onTarget = walks.target;
+  if (schedulers) {
+    rix.onTarget = (target) => {
+      walks.target(target);
+      hover?.target(target);
+      // Released: the idle clock resumes with its next gap (R7).
+      if (target === null) clock?.rest();
+    };
+  }
 
-  // The poke ladder and its tantrum chain.
+  // The poke ladder and its tantrum chain. The forgive's end resets the ladder and unlocks the picks.
   const endMood = () => {
     ladder.reset();
+    lock?.unlock();
     walks.settle();
   };
   const forgiveAt = (wall: Wall) => forgive(rix, wall, about.rix.forgiveLine, endMood);
   const sulkAt = (wall: Wall) => sulk(rix, wall, about.rix.sulkLine, () => forgiveAt(wall));
   const cues: TantrumCues = {
-    announce,
+    lock: lock?.lock,
+    announce: (line) => announce(withLock(line)),
     release: () => {
       rix.picked = null;
       if (!onAbout) return;
       deselectAbout(root, name);
-      announce(about.rix.throwAway);
+      announce(withLock(about.rix.throwAway));
     },
     sulk: sulkAt,
   };
@@ -262,13 +301,11 @@ export function rixFull({ parts, scope, host, memo, fine }: RixRunOptions): RixR
         happyPoke(rix, count);
         quip.say(line, { at: TALK.afterPoke, style: "type" });
         announce(line);
-        nudges.restart();
       },
       annoyed: (line) => {
         annoyedPoke(rix);
         quip.say(line, { at: TALK.afterAnnoyed, style: "type" });
         announce(line);
-        nudges.restart();
       },
       tantrum: (line) => tantrum(rix, line, cues),
       hmph: () => hmph(rix),
@@ -300,13 +337,13 @@ export function rixFull({ parts, scope, host, memo, fine }: RixRunOptions): RixR
     if (live && bot.state === "napping") wake(rix);
   });
 
-  // The arrival, then life, the nudge clock and the play clock.
+  // The arrival, then life, the idle clock, its talk clock and the patrol.
   const land = () => {
     startLife(bot, crew);
     bot.state = "idle";
     rix.onState();
-    nudges.start();
-    plays?.start();
+    clock?.start();
+    talk?.start();
     patrols.start();
   };
   // The playground has no arrival on load: he's there, at rest (its button replays the arrival).
@@ -340,14 +377,14 @@ export function rixFull({ parts, scope, host, memo, fine }: RixRunOptions): RixR
   button.addEventListener("keydown", onKey);
   button.addEventListener("pointerenter", onEnter);
 
-  // A pick: the nudges end; a visitor's pick plays the act and reveals the ack (`?for=` doesn't).
-  // The tantrum's deselect is a change with nothing checked: no pick left, nothing plays.
+  // A pick: a visitor's pick plays the act and reveals the ack (`?for=` doesn't). The tantrum's
+  // deselect is a change with nothing checked: no pick left, nothing plays. On home's About no
+  // visitor's pick arrives from the tantrum's start to the forgive's end: the lock swallows it.
   const onChange = (event: Event) => {
     const pick = pickOf(event, name);
     if (!pick) return;
     const previous = rix.picked;
     rix.picked = pick.input.checked ? pick.index : null;
-    nudges.end();
     if (!event.isTrusted) return;
     revealAck(parts, pick.index, false);
     if (bot.state === "entering") return;
@@ -357,11 +394,14 @@ export function rixFull({ parts, scope, host, memo, fine }: RixRunOptions): RixR
       pickAct(rix, pick.index, previous, look);
       walks.afterPick(card);
     };
-    if (inTantrum(rix) && rix.mood !== "calm") {
+    // Calm by a pick (R6A.8): the playground only since rev 4.
+    if (!onAbout && inTantrum(rix) && rix.mood !== "calm") {
       ladder.reset();
       calm(rix, look, ladder.reset, play);
       return;
     }
+    // Past the lock's failsafe a pick may still meet the chain: it cuts it, and he faces front again.
+    rix.wall = null;
     ladder.reset();
     play();
   };
@@ -377,15 +417,18 @@ export function rixFull({ parts, scope, host, memo, fine }: RixRunOptions): RixR
       stopArrival();
       stopWatching();
       tick(false);
-      near.stop();
-      nudges.stop();
-      plays?.stop();
+      if (clock) memo.live = clock.lived();
+      clock?.stop();
+      talk?.stop();
       stopVisitor();
       tag?.stop();
+      hover?.stop();
+      lines?.stop();
       walks.stop();
       patrols.stop();
       pets?.stop();
       ladder.stop();
+      lock?.stop();
       eyes.stop();
       quip.stop();
       peek?.kill();

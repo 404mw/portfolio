@@ -2,7 +2,9 @@
 // §2a.O4, ui-spec/00-rix.md R1.3, R11): finds the instance's Rix hooks (`about-rix-stage`, the
 // `rix-walker`, the hydrated `about-rix` button, its host bot SVG with the emotes, the quip anchor
 // and quip, the props and the acks), holds what Rix is doing, and puts everything back exactly as
-// server-rendered on teardown. The bot's own rig is Process's (lib/processBotRig.ts), reused.
+// server-rendered on teardown (the pick lock's `data-locked` and `aria-disabled` included, R6A.9).
+// The bot's own rig is Process's (lib/processBotRig.ts), reused.
+import { stripPickLock } from "@/lib/aboutPickLock";
 import type { gsap } from "@/lib/gsap";
 import { animTargets } from "@/lib/motion";
 import type { Crew } from "@/lib/processBotCrew";
@@ -39,23 +41,27 @@ export type RixParts = {
 
 /**
  * What Rix is doing: one act at a time (R2.1). `tantrum` runs the stomp, toss, flee, sulk and
- * forgive; `calm` is the pick's calm-down (R6A.8); `play` is an idle play (R6); `pet` is love after
- * a pet (R6B); `patrol` is one stretch of the patrol (R4.8), or its brake.
+ * forgive; `calm` is the pick's calm-down (R6A.8); `play` is an idle play (R6) and `beat` an idle
+ * beat (R6.8); `chatter` is an idle chatter act (R5.4; was the nudge); `hover` is one hover beat at
+ * a held card (R4.9); `pet` is love after a pet (R6B); `patrol` is one stretch of the patrol (R4.8,
+ * a stroll in the busy phase), or its brake.
  */
 export type RixAct =
   | "ask"
-  | "nudge"
+  | "chatter"
   | "perk"
   | "poke"
   | "pick"
   | "walk"
+  | "hover"
   | "play"
+  | "beat"
   | "tantrum"
   | "calm"
   | "pet"
   | "patrol";
 
-/** The poke ladder's mood (R6A); anything but `neutral` blocks nudges and plays. */
+/** The poke ladder's mood (R6A); anything but `neutral` blocks chatter, beats and plays. */
 export type RixMood = "neutral" | "annoyed" | "tantrum" | "flee" | "sulk" | "forgive" | "calm";
 
 /** How a line is shown: typed with body talk (R5) or faded whole (R8.1). */
@@ -84,8 +90,10 @@ export type Rix = RixParts & {
   // The character sheet.
   /** The emotion his eyes and pose show now, if any. */
   emotion: EmotionName | null;
-  /** An emotion held after its act ended (curious at a card, the annoyed mood hold). */
+  /** An emotion held after its act ended (hover mode's base at a card, a curious glance, the annoyed mood hold). */
   hold: EmotionName | null;
+  /** The card hover mode holds him at (R4.9), while its hover or focus holds. */
+  hovering: Element | null;
   mood: RixMood;
   /** The shelf end he sulks at. */
   wall: Wall | null;
@@ -120,6 +128,8 @@ export type Rix = RixParts & {
   quipOut: (seconds: number) => void;
   /** A line is in, holding or going out. */
   quipShowing: () => boolean;
+  /** A line is still typing out (hover beats wait for its hold, R4.9). */
+  quipTyping: () => boolean;
 };
 
 /** The instance's Rix parts, or null until the button has hydrated (or if a hook is missing). */
@@ -193,6 +203,7 @@ export function createRix(parts: RixParts, crew: Crew, host: RixHost): Rix | nul
     lastPerk: -Infinity,
     emotion: null,
     hold: null,
+    hovering: null,
     mood: "neutral",
     wall: null,
     picked: null,
@@ -211,6 +222,7 @@ export function createRix(parts: RixParts, crew: Crew, host: RixHost): Rix | nul
     say: noop,
     quipOut: noop,
     quipShowing: () => false,
+    quipTyping: () => false,
   };
 }
 
@@ -241,9 +253,10 @@ function looseParts(parts: RixParts): Element[] {
 /**
  * Puts the instance back exactly as server-rendered: the bot (props and emotes included, the eye
  * rects' `x`/`y`/`width`/`height`, no rotation or scale), the glyphs' parts, the walker, the quip's
- * side and characters, the acks and the stage's clip.
+ * side and characters, the acks, the stage's clip and the pick lock's attributes.
  */
 export function resetRix(parts: RixParts, bot: Bot | null) {
+  stripPickLock(parts.root);
   if (bot) resetBot(bot);
   else stripMotion([...parts.props, ...Object.values(parts.emotes)]);
   stripMotion(looseParts(parts));

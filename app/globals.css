@@ -95,6 +95,39 @@
     user-select: text;
   }
 
+  /* Selected text: always on the accent background, instead of the browser's blue. Its colour
+     follows the text's own colour: text that was light (`text`, `cream`, `muted`) turns ink,
+     text that was dark (`ink`, `on-accent`, `bg`, `cream-muted`) turns off-white.
+     CSS can't read a colour, so each text-colour class sets `--selection-text` and ::selection
+     reads it. A custom property inherits, so the nearest colour class wins at any depth (the
+     takeover's ink panel inside the cream dialog, and its accent button inside that panel). With
+     no class above it, text is on the dark page and turns ink. */
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--selection-text, var(--color-ink));
+  }
+
+  .text-text,
+  .text-cream,
+  .text-muted {
+    --selection-text: var(--color-ink);
+  }
+
+  .text-ink,
+  .text-on-accent,
+  .text-bg,
+  .text-cream-muted {
+    --selection-text: var(--color-text);
+  }
+
+  /* State-variant dark text (checked chips and segments, a pressed pill): the state selector
+     outranks the element's own light class, as the colour classes themselves do. */
+  :where(.peer):checked ~ .peer-checked\:text-on-accent,
+  :where(.peer):checked ~ .peer-checked\:text-bg,
+  .aria-pressed\:text-on-accent[aria-pressed="true"] {
+    --selection-text: var(--color-text);
+  }
+
   /* Images can't be dragged out (Chromium and Safari; no standard property exists). */
   img {
     -webkit-user-drag: none;

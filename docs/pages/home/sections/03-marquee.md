@@ -1,6 +1,6 @@
 # Marquee
 
-**Last Updated:** 2026-09-26
+**Last Updated:** 2026-10-05
 
 **The one question:** (transition, no claim)
 
@@ -42,6 +42,8 @@ hover stops it, no sideways scroll, same loop under reduced motion.
 - 2026-09-26 — Marquee loop: `marquee-track` moves `xPercent` 0 to -50 at a steady 70px/s, re-
   measured on resize or font load (keeping position); pauses on hover (eased 0.4s in full motion,
   instant under reduce) and while off screen or the tab is hidden; found by `data-anim="marquee"`.
+
+- 2026-10-05 — Marquee typo "Webs apps" fixed to "Web apps" (`marquee.items`).
 
 ## Open Questions
 

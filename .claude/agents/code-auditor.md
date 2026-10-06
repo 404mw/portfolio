@@ -38,7 +38,8 @@ Read in this order:
 
 **Copy (`docs/04-voice.md`)**
 - Hype words, posture words, em dashes, "etc.".
-- Slots over their length limit.
+- Slots longer than their idea needs. There are no fixed length limits (`docs/04-voice.md` →
+  Length); never flag a slot only for passing a UI spec's "Limit" column.
 
 **Build quality**
 - Duplicated components or JSX that should be one component, or an existing component forked

@@ -6,10 +6,28 @@ edits it whenever they want. **The user's edits are final:** before changing any
 
 ## The reader
 
-Someone who isn't technical and might hire the user: a small-business owner, a community owner,
-a founder, an agency or a creator (constitution §3). Someone sent them the link. They skim each section
+Someone who might hire the user, one of five audiences (constitution §3): a service business, an
+online store, a Discord server owner, a software builder or someone who needs a website. Only the
+software builder is technical. Someone sent them the link. They skim each section
 for 3–5 seconds and decide whether to keep going. Every section answers **one question**, the
 question in its page doc.
+
+## Tone per card
+
+The shared page keeps one voice, written so all five audiences follow it. A picked card's own
+content (its acknowledgement, its offers and demos in Agents, its flow in Process, its WhatsApp
+message, and the closing line of each project's takeover) takes that audience's tone. The rest of
+a project's takeover is shared and reads the same for everyone. Every rule below still applies to
+every card.
+
+| Card | Tone |
+|---|---|
+| Service business | Plain and practical: customers, appointments, the day's work. |
+| Online store | Plain and practical: orders, deliveries, customers. |
+| Discord | Casual, in a server owner's words: members, mods, roles, channels. |
+| Software builder | Peer to peer, one builder to another: app, feature, ship, review, production. No tool, model or stack names. |
+| I need a website | Plain: visitors, enquiries, the site. |
+| Not sure yet, or no pick | The shared voice. |
 
 ## Rules you can check
 
@@ -35,24 +53,22 @@ question in its page doc.
 13. **The button always says "Book a call".**
 14. **Hunt for one compressed line under 12 words per page,** the line a reader would remember.
 
-## Length limits
+## Length
 
-| Slot | Limit |
-|---|---|
-| Hero line | 12 words |
-| Section heading (giant rows) | 1–3 words |
-| Section heading (other) | 6 words |
-| Body under a section | 40 words |
-| One automation row's short line | 12 words |
-| Page title (browser tab and search) | 60 characters |
-| Page description (search and sharing) | 155 characters |
-| Image alt text | 125 characters, says what's in the image |
+**There are no fixed length limits** (the user, 2026-10-05). A slot is as long as its idea needs
+and no longer: say everything the facts and the brief ask for, in a line or paragraph a reader
+finishes in a few seconds. Never cut a fact the brief asked for to hit a word count.
 
-If a line won't fit, cut ideas, not letters. Never shrink the type to fit words.
+- A "Limit" column in any UI spec is a sizing note from when the layout was drawn, not a rule.
+- Whether words fit is judged on screen, by the lead's screen check. If a line overflows its box
+  or looks heavy there, cut ideas, not letters. Never shrink the type to fit words.
+- Search and sharing previews cut long text: a page title near 60 characters, a description near
+  155. That's how they display, so put the important words first.
+- Alt text says what's in the image.
 
 ## Before you hand copy over
 
 - Every claim traces to a line in `docs/03-facts.md`.
 - None of the rules above is broken; check rules 6, 8, 10 and 11 by searching.
-- Every slot is within its limit.
+- No slot is longer than its idea needs.
 - `[FILL: …]` markers are left as markers, never guessed.

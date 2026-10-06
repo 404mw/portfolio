@@ -33,7 +33,8 @@ summary, tokens and choices go in the index `docs/pages/<page>/ui-spec.md`). Kee
 - **Sizes table:** phone (360px), tablet, desktop, 4K (3840px) for every element.
 - **States:** default, hover, focus-visible and active for every interactive element.
 - **Content slots:** the `content/<page>.ts` key each piece of text comes from, and that slot's
-  one-line meaning and length limit from `docs/04-voice.md`, for `copywriter`.
+  one-line meaning, for `copywriter`. No length limits: `docs/04-voice.md` sets none. Where the
+  layout only holds so much text, say so as a sizing note (such as "one line at 360"), not a rule.
 - **Images:** size, crop and alt-text meaning, routed through the shared image component.
 - **Components:** the existing components to reuse or extend, and any new one, one UI part per
   file.

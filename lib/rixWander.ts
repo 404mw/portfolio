@@ -1,14 +1,16 @@
-// When Rix walks to a card (ui-spec/00-rix.md R4.1, R4.5–R4.7, R9), character sheet: a card hovered
-// or focused for `WALK.dwell` sends him toward its stand spot, at most `WALK.reach` (R4.1): he
-// arrives over it, or stops partway, `curious` and looking at it, and holds that while the target
-// holds; a pick sends him toward the picked card once the pick act ends, carrying the prop. There's
-// no home: quiet time belongs to the patrol (lib/rixPatrol.ts), which resumes on its own once
-// nothing holds him. A walk waits for a higher act and starts when it ends if its target still holds
-// (R2.1). Three flips of direction within 2s: he stops, `confused`, then walks on. During a
-// tantrum, flee or sulk targets are ignored; after the forgive a target that still holds starts a
-// walk as normal. On resize (R4.1) he's clamped to the new shelf: over a card he holds he snaps to
-// its recomputed stand spot; a patrol stretch brakes; the sulk stays where it is, clamped. The legs
-// themselves are lib/rixWalk.ts. Timers run in the crew.
+// When Rix walks to a card (ui-spec/00-rix.md R4.1, R4.5–R4.7, R4.9, R9), character sheet: a card
+// hovered or focused for `WALK.dwell` sends him toward its stand spot, at most `WALK.reach` (R4.1):
+// he arrives over it, or stops partway, and from there hover mode has him (lib/rixHover.ts; at once
+// if he already stands within `WALK.minDist`) while the target holds; a pick sends him toward the
+// picked card once the pick act ends, carrying the prop, for a `curious` glance (or hover mode, if
+// the pointer is still on it). There's no home: quiet time belongs to the idle clock and the patrol,
+// which resume on their own once nothing holds him. A walk waits for a higher act and starts when it
+// ends if its target still holds (R2.1); so does hover mode after an act cut it. Three flips of
+// direction within 2s: he stops, `confused`, then walks on. During a tantrum, flee or sulk targets
+// are ignored; after the forgive a target that still holds starts a walk as normal. On resize (R4.1)
+// he's clamped to the new shelf: over a card he holds he snaps to its recomputed stand spot; a
+// patrol stretch brakes; the sulk stays where it is, clamped. The legs themselves are
+// lib/rixWalk.ts. Timers run in the crew.
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { brake, cut, play, releaseHold, timeline } from "@/lib/rixActs";
 import { emotionIn, emotionOut } from "@/lib/rixEmote";
@@ -39,7 +41,8 @@ export type Wander = {
   readonly stop: () => void;
 };
 
-export function wander(rix: Rix): Wander {
+/** `hover` hands him to hover mode at a card (R4.9; home's About); true if it took him. */
+export function wander(rix: Rix, hover?: (card: Element) => boolean): Wander {
   const { crew } = rix;
   let pending: Goal | null = null;
   let goal: Goal | null = null;
@@ -48,7 +51,8 @@ export function wander(rix: Rix): Wander {
   let dwell: gsap.core.Tween | null = null;
   let flips: number[] = [];
 
-  const stillHolds = (wanted: Goal) => !wanted.held || rix.target?.closest(chipHook) === wanted.card;
+  const targetCard = () => rix.target?.closest(chipHook) ?? null;
+  const stillHolds = (wanted: Goal) => !wanted.held || targetCard() === wanted.card;
 
   /** Three flips of direction within `WALK_FLIPS.window`: stop, `confused`, then on to `next`. */
   const flipped = (dir: number): boolean => {
@@ -86,7 +90,12 @@ export function wander(rix: Rix): Wander {
     goal = wanted;
     reached = Math.abs(x - spot) < 0.5;
     const { card } = wanted;
-    walkTo(rix, x, { card, holdCurious: () => rix.target?.closest(chipHook) === card });
+    const leg = walkTo(rix, x, { card, hover });
+    // Already within `WALK.minDist` of the spot: hover mode at once (R4.9), cutting what he plays
+    // or holds as the walk's start would have (a hover beat at the card he leaves finishes).
+    if (leg || !hover || targetCard() !== card) return;
+    if (rix.act !== "hover" && (rix.act !== null || rix.hold !== null)) brake(rix);
+    hover(card);
   };
 
   function request(wanted: Goal) {
@@ -110,7 +119,7 @@ export function wander(rix: Rix): Wander {
     const track = measureTrack(rix);
     let x = clampX(track, track.x);
     const card = goal?.card;
-    if (!rix.wall && card && reached && rix.hold === "curious" && rix.target?.closest(chipHook) === card) {
+    if (!rix.wall && card && reached && rix.hovering === card) {
       x = spotFor(track, card);
     }
     if (Math.abs(x - track.x) <= 0.5) return;
@@ -135,22 +144,29 @@ export function wander(rix: Rix): Wander {
         return;
       }
       if (pending?.held) pending = null;
-      if (rix.hold === "curious") releaseHold(rix);
+      // A glance left over from a pick's walk; hover mode lets its own expression go.
+      if (rix.hold === "curious" && rix.hovering === null) releaseHold(rix);
     },
     afterPick: (card) => {
       pending = card ? { card, held: false } : null;
     },
     idle: () => {
-      if (rix.act !== null || !pending) return;
-      const wanted = pending;
-      if (!stillHolds(wanted)) {
-        pending = null;
+      if (rix.act !== null) return;
+      if (pending) {
+        const wanted = pending;
+        if (!stillHolds(wanted)) {
+          pending = null;
+          return;
+        }
+        request(wanted);
         return;
       }
-      request(wanted);
+      // A higher act cut hover mode (R2.1): it starts again if the target still holds.
+      const card = hover && !dwell && rix.hovering === null && rix.hold === null && rix.mood === "neutral" ? targetCard() : null;
+      if (card) request({ card, held: true });
     },
     settle: () => {
-      const card = rix.target?.closest(chipHook) ?? null;
+      const card = targetCard();
       if (card) request({ card, held: true });
     },
     stop: () => {

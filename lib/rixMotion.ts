@@ -86,7 +86,7 @@ export type Bounce = {
   readonly down: number;
   readonly squash: number;
 };
-/** A nudge's bounce (00-rix.md R8): one, at `at`; the talk bobs replace a second. */
+/** The pre-pick chatter act's bounce (00-rix.md R5.4, R8; was the nudge's): one, at `at`. */
 export const NUDGE_BOUNCE = {
   at: 0.1,
   anticipate: 0.08,
@@ -97,6 +97,17 @@ export const NUDGE_BOUNCE = {
 } as const;
 /** A pick's happy bounce, from 0.05 (its squash lands at 0.49). */
 export const PICK_BOUNCE = { at: 0.05, anticipate: 0.1, lift: -8, up: 0.18, down: 0.16, squash: 0.06 } as const;
+/** A hop in place (R6.8, R4.9): the pick's bounce with the feet off the floor, as the poke lifts them. */
+export const HOP = {
+  anticipate: PICK_BOUNCE.anticipate,
+  lift: PICK_BOUNCE.lift,
+  up: PICK_BOUNCE.up,
+  down: PICK_BOUNCE.down,
+  squash: PICK_BOUNCE.squash,
+  feet: POKE.feet,
+  feetUp: { duration: 0.14, ease: "power2.out" },
+  feetDown: { duration: 0.12, ease: "power2.in" },
+} as const;
 /** The pick's beats: the arm holds the prop out (and `PROP_IN`), the flourish, the arm back. */
 export const PICK_ARM = {
   at: 0.2,
@@ -150,16 +161,6 @@ export const FLOURISH = {
 // The quip.
 export const QUIP_HOLD = 2.4;
 export const QUIP_OUT: Timing = { duration: 0.3, ease: "power1.in" };
-
-// Nudges.
-export const NUDGE_FIRST: Range = [15, 20];
-export const NUDGE_EVERY: Range = [15, 20];
-/** No more nudges for this page load after this many (decided 2026-10-01). Reduced motion: one. */
-export const NUDGE_MAX = 4;
-export const NUDGE_MAX_REDUCED = 1;
-/** Skip a nudge if the pointer was over the picks or Rix this recently; retry after `NUDGE_RETRY`. */
-export const NUDGE_QUIET = 4;
-export const NUDGE_RETRY = 4;
 
 // Looks at a target (a pick under the pointer or focus).
 export const LOOK_AT: Timing = { duration: 0.3, ease: "power3.out" };
@@ -376,7 +377,7 @@ export const WALK_STOP = {
 export const WALK_TURN = { eyes: { duration: 0.12, ease: "power2.inOut" }, squash: 0.06 } as const;
 /** Three target flips within `window` s: he stops, `confused` for `hold`, then walks on. */
 export const WALK_FLIPS = { count: 3, window: 2, hold: 0.8 } as const;
-/** How long he shows `curious` at a card nobody holds (after a pick's walk) before letting go. */
+/** How long he shows `curious` at a card nobody holds (after a pick's walk) before letting go; a held card gets hover mode (`HOVER`). */
 export const CURIOUS_GLANCE = 0.8;
 export const WALK_PACE: Pace = {
   step: WALK.step,
@@ -392,8 +393,9 @@ export const WALK_RAMP: Ramp = { steps: 3, slow: 0.4, surge: 0.12, lean: 1.5, bo
 export const WALK_FAR: Pace = { ...WALK_PACE, ramp: WALK_RAMP };
 /** The patrol's amble (56 px/s at 136px). */
 export const PATROL_PACE: Pace = { step: 0.2, footReach: 7, footLift: 3, bob: 1, lean: 1.5, armSwing: 8 };
+/** Rev 4: `first` and `pause` apply in the settled phase only (busy: the idle clock's strolls and gaps, R7). */
 export const PATROL = {
-  /** The first stretch, after landing. */
+  /** The first stretch, after landing (the settled phase's start on home's About). */
   first: 5,
   /** The first stretch's heading (left). */
   heading: -1,
@@ -483,7 +485,7 @@ export const SIT = {
   length: [6, 9] as Range,
   up: { duration: 0.25, ease: "back.out(1.6)" },
 } as const;
-/** Seconds of visitor idle (live time) before the nap. */
+/** Seconds of visitor idle (live time) before the nap (home's About: in the settled phase only, R7). */
 export const NAP_AFTER = 40;
 export const YAWN = {
   at: 0.6,
@@ -554,14 +556,71 @@ export const BALANCE = {
   happy: 0.4,
 } as const;
 export type PlayName = "juggle" | "sit" | "peekaboo" | "logoPose" | "balance";
+/** At most `max` plays per `per` live seconds, picked by `weights` (R7); the idle clock (`TEMPO`) times them. */
 export const PLAY = {
-  first: 8,
-  gap: [12, 20] as Range,
   max: 3,
   per: 60,
-  retry: 4,
   weights: { juggle: 3, sit: 3, peekaboo: 1, logoPose: 1, balance: 1 } as Readonly<Record<PlayName, number>>,
 } as const;
+
+// The idle clock, the beats, hover mode and the idle talk (R7, R6.8, R4.9, R5.4; rev 4, home's About).
+/** The two tempos by live time from landing, and the gaps between idle items. */
+export const TEMPO = {
+  /** The busy phase: the first this many live seconds after landing; settled after. */
+  busy: 360,
+  /** The first item, after the ask ends. */
+  first: 2,
+  busyGap: [2, 4] as Range,
+  settledGap: [10, 15] as Range,
+  /** A waiting item's re-check. */
+  retry: 0.5,
+} as const;
+/** What an idle slot holds, by weight; strolls replace the patrol in the busy phase. */
+export const IDLE_MENU = {
+  busy: { beat: 10, stroll: 4, play: 3 },
+  settled: { beat: 1, stroll: 0, play: 2 },
+} as const;
+export type BeatName = "wave" | "perk" | "hop" | "look" | "sparkle" | "wonder" | "startle" | "bashful" | "puzzle" | "fond";
+/** The beats (R6.8): each emotion keeps its own In and Out; `hold` is the time between them. */
+export const BEAT = {
+  weights: { wave: 2, perk: 2, hop: 2, look: 2, sparkle: 2, wonder: 2, startle: 1, bashful: 1, puzzle: 1, fond: 1 } as Readonly<
+    Record<BeatName, number>
+  >,
+  hold: { sparkle: 0.8, wonder: 1.0, startle: 0.6, bashful: 1.4, puzzle: 0.8, fond: 1.0 },
+  /** The `wave` beat's wave starts here, after the look out at the visitor. */
+  waveAt: 0.1,
+} as const;
+export type HoverBeatName = "hop" | "point" | "cheer" | "perk" | "glance";
+export type HoverState = "before" | "switch" | "picked";
+/** Hover mode (R4.9): the beats and typed lines while a card's hover or focus holds. */
+export const HOVER = {
+  /** The target must have held this long before its first line. */
+  lineDwell: 0.8,
+  beatGap: [1.2, 2.0] as Range,
+  /** From the last line's end to the next. */
+  lineGap: [1.5, 2.5] as Range,
+  /** Lines per hold: before a pick, on another card after one, on the picked card. */
+  lines: { before: 3, switch: 1, picked: 0 } as Readonly<Record<HoverState, number>>,
+  /** A card line said this recently (live s) is swapped for a generic one. */
+  repeatAfter: 20,
+  glanceHold: 0.5,
+  cheer: 0.6,
+  beats: { hop: 3, point: 3, cheer: 2, perk: 2, glance: 2 } as Readonly<Record<HoverBeatName, number>>,
+} as const;
+/** The idle talk clock (R5.4, R7): when chatter is due, each gap from the last line's end. */
+export const IDLE_TALK = {
+  /** After landing (reduced motion: after the stage shows). */
+  first: 4,
+  busyGap: [8, 12] as Range,
+  settledGap: [20, 30] as Range,
+  reducedGap: [20, 30] as Range,
+  /** A scheduled line waits at least this long after the last line went. */
+  minGap: 1.5,
+  /** The post-pick chatter's look, straight down toward the examples below. */
+  lookDown: { d: -3, p: 3 },
+} as const;
+/** The pick lock (R6A.9): the reminder's spacing and the failsafe unlock, in live seconds. */
+export const PICK_LOCK = { remind: 3, max: 16 } as const;
 
 // Moods: the poke ladder (R6A).
 export const POKE_WINDOW = 4.0;
@@ -627,11 +686,13 @@ export const FORGIVE = {
   waveAt: 0.9,
   length: 1.8,
 } as const;
+/** The forgive's small wave; rev 4: also the hover `point` (either arm) and the post-pick chatter act. */
 export const WAVE_SMALL = {
   up: { angle: -35, duration: 0.2, ease: "power2.out" },
   swing: { by: 8, duration: 0.12, ease: "sine.inOut" },
   back: { duration: 0.3, ease: "back.out(1.6)" },
 } as const;
+/** Calm by a pick (R6A.8): the /rix playground only since rev 4 (home's About locks its picks). */
 export const CALM = {
   angryHold: 0.35,
   arms: { l: -25, r: 25, duration: 0.35 },

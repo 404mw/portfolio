@@ -5,10 +5,14 @@ type ImageEntry = { readonly dark: string | null };
 
 export const images = {
   portrait: { dark: "/images/portrait.png" },
-  // Proofs (ui-spec §7.6): each project's takeover big shot and two details.
-  exileShot1: { dark: null },
-  exileShot2: { dark: null },
-  exileShot3: { dark: null },
+  // Proofs (ui-spec §7.6): each project's takeover shots, three each: a big shot and two details.
+  exileShot1: { dark: "/images/exile/home.webp" },
+  exileShot2: { dark: "/images/exile/dashboard.webp" },
+  exileShot3: { dark: "/images/exile/spam-raid.webp" },
+  // The spam diagram's tiles (ui-spec §7.6.1): Exile Bot's mascot, one per step. The Exile view only.
+  exileEvaWatch: { dark: "/images/exile/eva-watch.png" },
+  exileEvaSpot: { dark: "/images/exile/eva-spot.png" },
+  exileEvaStop: { dark: "/images/exile/eva-stop.png" },
   designVaultShot1: { dark: null },
   designVaultShot2: { dark: null },
   designVaultShot3: { dark: null },

@@ -3,8 +3,10 @@
 // (R4.2, lib/rixGait.ts) and stepped by lib/rixStep.ts, facing by the eyes and the lean, never a
 // mirror (R4.4), the start and stop (R4.6), and target changes mid-leg (R4.5): the same way runs on
 // from the next foot plant with no start step; the other way is a turn (brake, eyes across, squash,
-// the lean flips, a fresh leg). A cut brakes a walk where it is (lib/rixActs.ts `cut`). The walker
-// is the walk's only writer; a cut never resets it. There's no dash: every pace has its own step.
+// the lean flips, a fresh leg). At a card's stop the caller's hover mode takes him over (R4.9) if
+// the card's target still holds; if not he glances at it, `curious`, and lets go. A cut brakes a
+// walk where it is (lib/rixActs.ts `cut`). The walker is the walk's only writer; a cut never resets
+// it. There's no dash: every pace has its own step.
 import type { gsap } from "@/lib/gsap";
 import { ANTICIPATE, SETTLE, SQUASH } from "@/lib/processBotMotion";
 import { cut, feet, play, releaseHold, timeline } from "@/lib/rixActs";
@@ -29,10 +31,10 @@ import { clampX, measureTrack, type Track } from "@/lib/rixTrack";
 export type WalkOptions = {
   /** The leg's pace; the walk's own by default. */
   readonly pace?: Pace;
-  /** The card he's walking toward: he stops `curious`, looking at it (over it, or partway). */
+  /** The card he's walking toward: he stops looking at it (over it, or partway). */
   readonly card?: Element | null;
-  /** At the stop: true while the card's target still holds (he holds `curious`). */
-  readonly holdCurious?: () => boolean;
+  /** At the card's stop: hands him to hover mode (R4.9); false if it didn't take him (a `curious` glance instead). */
+  readonly hover?: (card: Element) => boolean;
   /** The flee (R6A.5): no cut first (the angry pose rides along), a plain brake, then `onArrive`. */
   readonly flee?: boolean;
   /** The act it plays as (`walk`; the flee is part of the `tantrum`; a stretch is the `patrol`). */
@@ -110,15 +112,13 @@ function fleeStop(rix: Rix, tl: gsap.core.Timeline, at: number, onArrive?: () =>
   );
 }
 
-/** Curious at the card (R4.6): held while its target holds, else a glance and let go. */
-function stopCurious(rix: Rix, card: Element, holds: () => boolean) {
+/** Curious at a card nobody holds (R4.6, after a pick's walk): a glance, then he lets go. */
+function glanceCurious(rix: Rix, card: Element) {
   rix.crew.run(emotionIn(rix, "curious", { look: lookAt(rix, [card]), side: sideOf(rix, card) }));
   rix.hold = "curious";
-  if (!holds()) {
-    rix.crew.after(CURIOUS_GLANCE, () => {
-      if (rix.hold === "curious") releaseHold(rix);
-    });
-  }
+  rix.crew.after(CURIOUS_GLANCE, () => {
+    if (rix.hold === "curious" && rix.hovering === null) releaseHold(rix);
+  });
 }
 
 /**
@@ -165,12 +165,12 @@ function leg(
   if (options.flee) {
     fleeStop(rix, tl, end, options.onArrive);
   } else {
-    const { card, holdCurious } = options;
+    const { card, hover } = options;
     stop(rix, tl, end, dir, Boolean(card));
     tl.call(
       () => {
         options.onArrive?.();
-        if (card) stopCurious(rix, card, holdCurious ?? (() => false));
+        if (card && !(hover?.(card) ?? false)) glanceCurious(rix, card);
       },
       [],
       end + WALK_STOP.overshootTime,

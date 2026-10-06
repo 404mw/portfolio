@@ -7,8 +7,13 @@
 // ProcessBot maps them to token fill classes. `botPivots` gives the motion every pivot, so it
 // never measures the SVG.
 
-/** A bot's job: one per Process step, plus About's `host` (no hat, no tools, idle arms). */
-export type BotRole = "rules" | "team" | "check" | "update" | "host";
+/**
+ * A bot's job. Process' flows use `intake` (holds the job that just arrived), `rules`, `team`,
+ * `check`, `remind` (rings a bell), `flag` (raises a flag: this one needs a person) and `ship`
+ * (sends it out), and the Discord flow also `update` (wrench and rulebook) and `host` (no hat, no
+ * tools, idle arms; also About's Rix). Which step gets which is lib/processFlows.ts.
+ */
+export type BotRole = "rules" | "team" | "check" | "update" | "host" | "intake" | "flag" | "remind" | "ship";
 
 /** A bot's static pose. */
 export type BotPose = "idle" | "act";
@@ -105,6 +110,10 @@ const looks: Record<BotRole, Record<BotPose, Look>> = {
   check: { idle: 0, act: 7 },
   update: { idle: 0, act: -7 },
   host: { idle: 0, act: 7 },
+  intake: { idle: 0, act: 7 },
+  flag: { idle: 0, act: 7 },
+  remind: { idle: 0, act: 7 },
+  ship: { idle: 0, act: 7 },
 };
 
 /** Each role's hat parts. */
@@ -122,6 +131,10 @@ const hats: Record<BotRole, readonly BotShape[]> = {
   check: [],
   update: [],
   host: [],
+  intake: [],
+  flag: [],
+  remind: [],
+  ship: [],
 };
 
 /** Each role's left-hand tools, after the left arm. */
@@ -143,6 +156,10 @@ const leftTools: Record<BotRole, readonly BotShape[]> = {
     path("M-21 40h13v24h-13Z", "D", { hook: "page", shownIn: hidden }),
   ],
   host: [],
+  intake: [],
+  flag: [],
+  remind: [],
+  ship: [],
 };
 
 /** Each role's right-hand tool, at its idle geometry (the `tool` group). */
@@ -166,7 +183,25 @@ const tools: Record<BotRole, readonly BotShape[]> = {
     ), // wrench jaws
   ],
   host: [],
+  // Intake's hand holds the flow's emblem, drawn by `ProcessEmblem` as the bot's child.
+  intake: [],
+  flag: [
+    path("M106 4h4v52h-4Z", "M"), // pole
+    path("M110 6H134L126 14L134 22H110Z", "C"), // pennant
+    path("M117 9h3v6h-3Z M117 17h3v2h-3Z", "I"), // mark
+  ],
+  remind: [
+    path("M114 22H122L126 26V38L130 42V45H106V42L110 38V26Z", "C"), // bell
+    path("M116 18h4v4h-4Z", "M"), // loop
+    path("M115 45h6v4h-6Z", "M"), // clapper
+  ],
+  ship: [
+    path("M106 44L120 30H113V25H130V42H125V35L111 49Z", "C"), // arrow (the `send` prop's path)
+  ],
 };
+
+/** The right arm's length: team's reaches the hammer, flag's meets the pole. */
+const armRightWidth = (role: BotRole) => (role === "team" ? 18 : role === "flag" ? 12 : 10);
 
 /** Team's sparks at the hammer's strike point (the group is hidden at rest). */
 const sparks: readonly BotShape[] = [
@@ -191,7 +226,7 @@ export function botRig(role: BotRole, pose: BotPose): BotRig {
     look,
     eyes: eyesAt[look],
     armLeft: [rect(-4, 50, 10, 6, "B"), ...leftTools[role]],
-    armRight: [rect(94, 50, role === "team" ? 18 : 10, 6, "B")],
+    armRight: [rect(94, 50, armRightWidth(role), 6, "B")],
     tool: tools[role],
     hat: hats[role],
     sparks: role === "team" ? sparks : null,
@@ -229,8 +264,17 @@ export const botPivots = {
   },
   armLeft: [6, 53],
   armRight: [94, 53],
-  /** The tool's grip; rules has no tool. */
-  tool: { team: [112.5, 53], check: [101, 55], update: [104, 53] },
+  /** The tool's grip; rules and host have no tool, and intake holds the emblem instead. */
+  tool: {
+    team: [112.5, 53],
+    check: [101, 55],
+    update: [104, 53],
+    flag: [108, 53],
+    remind: [118, 20],
+    ship: [118, 50],
+  },
+  /** Intake's held emblem: the prop slot's bottom centre (as Rix's `PROP_PIVOT`). */
+  prop: [118, 50],
   hat: [50, 10],
   /** Each mark's left end, centre y. */
   marks: {
@@ -258,18 +302,11 @@ export const botPivots = {
   readonly eye: Record<Look, readonly [BotPoint, BotPoint]>;
   readonly armLeft: BotPoint;
   readonly armRight: BotPoint;
-  readonly tool: Record<"team" | "check" | "update", BotPoint>;
+  readonly tool: Record<Exclude<BotRole, "rules" | "host" | "intake">, BotPoint>;
+  readonly prop: BotPoint;
   readonly hat: BotPoint;
   readonly marks: Record<"rules" | "update", readonly BotPoint[]>;
   readonly page: BotPoint;
   readonly sparks: BotPoint;
   readonly z: readonly [BotPoint, BotPoint, BotPoint];
 };
-
-/** Each step's bot and its static pose, in step order. */
-export const stepBots: readonly { readonly role: BotRole; readonly pose: BotPose }[] = [
-  { role: "rules", pose: "idle" },
-  { role: "team", pose: "idle" },
-  { role: "check", pose: "act" },
-  { role: "update", pose: "idle" },
-];

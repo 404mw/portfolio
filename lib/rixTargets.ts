@@ -11,9 +11,6 @@ import type { Rix } from "@/lib/rixRig";
 /** The elements whose pointer or focus Rix looks at: the picks. */
 export const lookTargets = '[data-anim="about-chip"]';
 
-/** Where the pointer counts as "over the picks or Rix" for the nudge's quiet check. */
-export const nearTargets = `${lookTargets}, [data-anim="about-rix"]`;
-
 const visual = (element: Element) => element.lastElementChild ?? element;
 
 /** The centre of the elements' visible boxes (client px), or null if none is showing. */
@@ -63,7 +60,7 @@ export function sideOf(rix: Rix, element: Element): -1 | 1 {
   return box.left + box.width / 2 < eye.x ? -1 : 1;
 }
 
-/** The picks as a group: the board's centre (the ask's glance and a nudge's look). */
+/** The picks as a group: the board's centre (the ask's glance and the pre-pick chatter's look). */
 export function picksLook(rix: Rix): RixLook | null {
   return lookAt(rix, animTargets(rix.root, "about-chip"));
 }

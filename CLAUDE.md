@@ -43,7 +43,7 @@ Single Next.js app (App Router, TypeScript, Tailwind v4):
 | `docs/00-constitution.md` | Hard rules. Read first. |
 | `docs/01-design-system.md` | Tokens, type, layout |
 | `docs/03-facts.md` | The only claims the site may make. Any agent may edit it, only with the user's explicit permission. |
-| `docs/04-voice.md` | How the site's words are written, with length limits |
+| `docs/04-voice.md` | How the site's words are written (no fixed length limits) |
 | `temp/claude-design/Portfolio Redesign v3.dc.html` | Reference design, layout and behaviour only (local, gitignored) |
 | `docs/pages/<page>/page.md` | Page index: sections table, site-wide state, decisions, open-question roll-up |
 | `docs/pages/<page>/sections/NN-<slug>.md` | One per section: its current state, key files, decisions, open questions |

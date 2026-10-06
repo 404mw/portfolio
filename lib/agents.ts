@@ -1,16 +1,145 @@
-// Agents section wiring (ui-spec §4): the two layouts under review, and which demo each offer
-// shows. `agentDemoKinds[i]` belongs to `agents.items[i]` in content/home.ts; its type is tied
-// to that list's length, so adding or removing an offer without its demo fails `tsc`.
+// Agents section wiring (ui-spec §4, §4.8): the two layouts, the panel kinds, the shape of each
+// kind's sample content, and which panel each offer shows, per set. `agentPanelKinds[set][i]`
+// belongs to `agents.cards[set][i]` in content/home.ts. Each list's type is tied to that list:
+// its length, and each kind to the shape of that row's `demo` (a row with none is the pointer).
+// So adding or removing an offer without its panel, or giving it the wrong kind, fails `tsc`.
 import { agents } from "@/content/home";
+import type { AboutSet } from "@/lib/aboutPick";
 
 export type AgentsVariant = "tabs" | "stack";
 
-export type AgentDemoKind = "chat" | "leads" | "report" | "sync";
+/** The demo kinds: a sample of an agent at work. */
+export type AgentDemoKind = "chat" | "leads" | "report" | "sync" | "checklist" | "orchestra";
 
-/** One demo kind per entry of a tuple, same length (a generic, so the mapping keeps the tuple). */
-type DemoPer<Items extends readonly unknown[]> = { readonly [K in keyof Items]: AgentDemoKind };
+/** A panel kind: a demo, or `pointer` (the website card's last row, which points to section 03). */
+export type AgentPanelKind = AgentDemoKind | "pointer";
 
-export const agentDemoKinds: DemoPer<typeof agents.items> = ["chat", "leads", "report", "sync"];
+/** One short exchange, in order; either side may open it. */
+export type ChatDemoContent = {
+  /** Screen-reader name of the other side (customer, member, visitor). */
+  readonly asker: string;
+  readonly messages: readonly {
+    readonly from: "them" | "agent";
+    readonly text: string;
+    /** A mono note under an agent line. */
+    readonly meta?: string;
+  }[];
+};
+
+/**
+ * People, where each came from, and the pill before and after the agent acts. A row may carry its
+ * own done-pill label (`done`); a row without one shows `statusDone`.
+ */
+export type LeadsDemoContent = {
+  readonly rows: readonly {
+    readonly initials: string;
+    readonly name: string;
+    readonly source: string;
+    readonly done?: string;
+  }[];
+  readonly statusNew: string;
+  readonly statusDone: string;
+};
+
+/** A report: its title, period, bar heights (%), hidden chart text and sent status. */
+export type ReportDemoContent = {
+  readonly title: string;
+  readonly week: string;
+  readonly bars: readonly number[];
+  readonly chartAlt: string;
+  readonly sent: string;
+};
+
+/** Three linked things, three events and the final status. */
+export type SyncDemoContent = {
+  readonly tools: readonly string[];
+  readonly events: readonly { readonly kind: string; readonly result: string }[];
+  readonly done: string;
+};
+
+/** Pieces of work, each with the one-word result its tick stands for, and the final status. */
+export type ChecklistDemoContent = {
+  readonly title: string;
+  readonly meta: string;
+  readonly items: readonly { readonly text: string; readonly note: string }[];
+  readonly done: string;
+};
+
+/** A group of agents under the lead: its label and its three roles. */
+type OrchestraTier = { readonly label: string; readonly roles: readonly string[] };
+
+/** The six numbered step labels, in order: ① out … ⑥ pass (ui-spec §4.4, the swimlanes). */
+export type OrchestraRing = {
+  readonly out: string;
+  readonly rules: string;
+  readonly work: string;
+  readonly check: string;
+  readonly fix: string;
+  readonly pass: string;
+};
+
+/**
+ * A lead over a team and the checkers, as swimlanes: the lane titles, the six step labels, the six
+ * screen-reader sentences (same order as `ring`) and the final status.
+ */
+export type OrchestraDemoContent = {
+  readonly lead: string;
+  readonly team: OrchestraTier;
+  readonly checks: OrchestraTier;
+  readonly ring: OrchestraRing;
+  readonly steps: readonly [string, string, string, string, string, string];
+  readonly done: string;
+};
+
+/** Each demo kind's content shape. */
+export type AgentDemoContent = {
+  readonly chat: ChatDemoContent;
+  readonly leads: LeadsDemoContent;
+  readonly report: ReportDemoContent;
+  readonly sync: SyncDemoContent;
+  readonly checklist: ChecklistDemoContent;
+  readonly orchestra: OrchestraDemoContent;
+};
+
+type AgentRowText = { readonly title: string; readonly line: string };
+
+/** One offer with its panel: a demo kind with that kind's content and slug, or the pointer. */
+export type AgentPanel =
+  | {
+      readonly [K in AgentDemoKind]: AgentRowText & {
+        readonly kind: K;
+        readonly slug: string;
+        readonly demo: AgentDemoContent[K];
+      };
+    }[AgentDemoKind]
+  | (AgentRowText & { readonly kind: "pointer" });
+
+/** The one kind a content row can take: the demo kind whose shape its `demo` has, else `pointer`. */
+type KindFor<Row> = Row extends { readonly demo: infer Demo }
+  ? { [K in AgentDemoKind]: Demo extends AgentDemoContent[K] ? K : never }[AgentDemoKind]
+  : "pointer";
+
+/** One kind per row of a set's list, same length (a generic, so the mapping keeps the tuple). */
+type KindsPer<Rows extends readonly unknown[]> = { readonly [I in keyof Rows]: KindFor<Rows[I]> };
+
+/** Each set's panel kinds, lead offer first (ui-spec §4.8). */
+export const agentPanelKinds: { readonly [S in AboutSet]: KindsPer<(typeof agents.cards)[S]> } = {
+  default: ["leads", "chat", "chat", "orchestra"],
+  "service-business": ["leads", "chat", "chat", "leads"],
+  "online-store": ["chat", "report", "sync", "leads"],
+  discord: ["chat", "checklist", "leads", "report", "sync"],
+  "software-builder": ["orchestra", "checklist", "checklist", "report"],
+  website: ["chat", "leads", "leads", "report", "pointer"],
+};
+
+/**
+ * A set's offers, each with its panel kind. The cast pairs a row with its kind; `KindFor` above is
+ * what makes the pair true, row by row.
+ */
+export function agentPanels(set: AboutSet): readonly AgentPanel[] {
+  const kinds: readonly AgentPanelKind[] = agentPanelKinds[set];
+  return agents.cards[set].map((row, index) => ({ ...row, kind: kinds[index] }) as AgentPanel);
+}
 
 /** The ids of an offer row's number and title, so a tab and its panel are named by them only. */
 export function agentRowIds(labelId: string) {

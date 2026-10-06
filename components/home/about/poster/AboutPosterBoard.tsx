@@ -11,7 +11,7 @@ export function AboutPosterBoard({ scope }: AboutPosterBoardProps) {
   return (
     <fieldset
       aria-labelledby={scope.id("prompt")}
-      className="mt-4 grid min-w-0 grid-cols-2 gap-3 md:grid-cols-3 md:gap-4"
+      className="group/board mt-4 grid min-w-0 grid-cols-2 gap-3 md:grid-cols-3 md:gap-4"
     >
       {about.replies.map((reply, index) => (
         <AboutPosterCard

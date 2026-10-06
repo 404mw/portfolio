@@ -3,13 +3,133 @@
 Shared rules and parts (§0): [`../ui-spec.md`](../ui-spec.md). Current built spec: [`02a-about.md`](02a-about.md).
 Page doc: [`../sections/02a-about.md`](../sections/02a-about.md). Rix's rig: [`05-process.md`](05-process.md) §5.6–5.7.
 
-**Last Updated:** 2026-10-01 (new, temporary). The user compares A, B and C on `/dev`. The winner is
-merged into `02a-about.md`; this file, `/dev` and the two losing options are deleted. `/` keeps the
-current About build until the user picks. The user's answers (2026-10-01) are applied: O7 is decided.
+**Last Updated:** 2026-10-03 (§2a.R added: option B's redesign; its choices decided the same day).
+2026-10-01 (new, temporary): the user compares A, B and C on `/dev`. The winner is merged into
+`02a-about.md`; this file, `/dev` and the two losing options are deleted. `/` keeps the current
+About build until the user picks. The user's answers (2026-10-01) are applied: O7 is decided.
 
 > **Superseded 2026-10-03:** `/dev` is deleted. `useAboutPick(name)`, `WhatsAppLink`'s `pickName`
 > and `pageMetadata`'s `noindex` (lines ~88, 93, 389-390, 405, 432, 435) no longer exist;
 > `useAboutPick` now always reads home's About group. Kept as the record of the option build.
+
+> **2026-10-03:** option B is the live About on `/`. Its redesign (six new cards, a pick that also
+> drives Agents and Process) is **§2a.R**, right below. Where §2a.R and the older sections differ,
+> §2a.R wins. Options A and C, `/dev` and the sample groups stay below as a record only.
+
+## 2a.R Option B, the 2026-10-03 redesign (static round; not built yet)
+
+**The one question:** "Can he help someone like me?" (unchanged). **What changes:** the six cards,
+four emblems, a second line in the ack, and the pick's reach (shared rules: `../ui-spec.md` §0.5).
+B's layout, classes and states (§2a.B) and Rix (`00-rix.md`) are otherwise as built.
+
+### R.1 The six cards (board order; replaces the six sample groups)
+
+| # | Key (radio `value`, `?for=`) | Label slot | Emblem (`aboutReplyProp`) | Set in Agents and Process |
+|---|---|---|---|---|
+| 0 | `service-business` | `replies[0].label` | `calendar` (built) | its own |
+| 1 | `online-store` | `replies[1].label` | `parcel` (new) | its own |
+| 2 | `discord` | `replies[2].label` | `bubble` (new) | its own |
+| 3 | `software-builder` | `replies[3].label` (decided 2026-10-03: "Developer or team") | `code` (new) | its own |
+| 4 | `website` | `replies[4].label` | `window` (new) | its own |
+| 5 | `not-sure` | `replies[5].label` | none: the gap eyes, and Rix shrugs | `default` |
+
+- **Layout:** `AboutPosterBoard` as built: `grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4`, six
+  `AboutPosterCard`s, 2 × 3 on phones and 3 × 2 from `md`. No class changes.
+- **Keys are fixed once shared.** The old sample keys are dropped; an unknown `?for` is ignored.
+
+### R.2 New emblems (`lib/rixProps.ts`; the bots' viewBox, the prop slot x 106–130, y 23–50)
+
+| `data-prop` | Parts `d` (fill key), in paint order | Flourish (later), pivot |
+|---|---|---|
+| `parcel` | box `M106 30H130V50H106Z` (C); lid `M106 30L110 26H126L130 30Z` (M); tape `M116 26h4v12h-4Z` (I); label `M109 43h7v3h-7Z` (D) | whole, 118 50 |
+| `bubble` | bubble `M106 24H130V42H118L112 48V42H106Z` (C); lines `M110 29h16v3h-16Z` · `M110 35h10v3h-10Z` (I) | whole, 118 50 |
+| `code` | tile `M106 24H130V48H106Z` (C); chevrons `M115 30L109 36L115 42L117 40L113 36L117 32Z` · `M121 30L127 36L121 42L119 40L123 36L119 32Z` (I) | whole, 118 50 |
+| `window` | frame `M106 25H130V49H106Z` (C); bar `M106 25H130V31H106Z` (I); dots `M108.5 27h2v2h-2Z M112.5 27h2v2h-2Z M116.5 27h2v2h-2Z` (C); lines `M110 35h16v3h-16Z` · `M110 41h9v3h-9Z` (D) | whole, 118 50 |
+
+- Flat token fills, 45° cuts, `fill-rule="evenodd"`, as O0.1. Fill keys map through `botFills`
+  on Rix and through `AboutPropGlyph`'s two fills on the card (C and M are base, the rest marks).
+- **`RixPropName`** gains the four names. `calendar` is unchanged. `shield`, `send`, `report` and
+  `envelope` stay in the file, used by no card; `send` is also Process' "shipped" tool
+  (`05-process.md` §5.6). The motion pass removes the unused ones with their flourishes.
+- Same emblem in four places: the card, Rix's hand, the "Shown for" tag and Process' step 1.
+
+### R.3 The ack (`AboutAck`)
+
+- One `<p data-anim="about-ack" class="hidden {replyShow.block[i]} text-summary leading-snug text-pretty text-text">`
+  per reply, as built: the accent hairline, then `replies[i].ack`.
+- **New, cards 0–4 only:** `<span data-anim="about-ack-set" class="mt-3 block text-lead leading-normal text-muted noscript:hidden">`
+  = `about.ackSet`. It tells the visitor the examples below are now set for them. Hidden without
+  JavaScript, where Agents and Process stay on the default. `not-sure` has no set line.
+- `AboutStatus` announces `ack` plus `ackSet` on a visitor's own (trusted) pick, as one line.
+
+### R.4 Behaviour (About's part of `../ui-spec.md` §0.5)
+
+- The radios stay the one source of truth. A pick also sets Agents' offers and Process' flow.
+- **Memory:** `AboutForParam` (client, renders nothing) calls `useAboutFor` (the link, else the
+  remembered pick) and the new `useAboutRemember` (writes each change to session storage).
+- **Tantrum:** `deselectAbout` as built. The memory clears, and both sections fall to `default`.
+- **Never a gate, works without JS, no focus move or scroll:** as O0.
+
+### R.5 Sizes
+
+| Element | Phone 360 | Tablet 768 | Desktop 1440 | 4K 3840 |
+|---|---|---|---|---|
+| Intro | stacked | stacked | split, bottom-aligned | same |
+| Prompt (`text-card`) | 30 | 35 | 44 | 44 |
+| Rix | 136×88, on the shelf | same | same | same |
+| Shelf | 2px, 320 | 706 | 1328 | 1536 |
+| Cards (six) | 2 × 3, 154 wide, min 144 tall | 3 × 2, 225 × min 208 | 432 × min 256 | 501 × min 288 |
+| Emblem / label | 40 / 20 (`text-summary`) | 48 / 35 (`text-card`) | 56 / 44 | 56 / 44 |
+| Ack (`text-summary`) | 20, max 768 | 23 | 26 | 26 |
+| Set line (`text-lead`) | 17, 12 under the ack | 17 | 17 | 17 |
+
+Label width is 122 at 360 and 185 at 768, so no word may pass 9 characters (R.6). Labels wrap by
+word and a card grows before it clips. "Developer" is 9 characters and fits.
+
+### R.6 States, content slots
+
+- **States:** the cards as the §2a.B table (default, hover, focus-visible, checked, active). Rix as
+  O4.1 and `00-rix.md` R9. The ack and the set line are static text.
+
+| Key (`content/home.ts → about`) | Meaning | Limit |
+|---|---|---|
+| `label`, `heading`, `lines`, `prompt` | As §2a.5. `lines` must now speak to builders as well as business owners | as §2a.5 |
+| `replies[0–5].key` | The six keys in R.1, fixed | not copy |
+| `replies[0–5].label` | The card's name, in the visitor's words. Also the "Shown for" tag's value. `replies[3].label` is decided: "Developer or team" | 3 words / 20 characters, no word over 9 characters |
+| `replies[0–4].ack` | Rix ties that audience to what MARWIX builds for it, in the card's tone (`04-voice.md`); facts → What the user builds, that card's group | 14 words / 90 characters |
+| `replies[5].ack` | "Not sure yet": the page below shows a mix; no claim | 14 words / 90 characters |
+| **`ackSet`** (new) | One shared line, Rix's voice: the examples below are now set for you | 8 words / 50 characters |
+| `replies[0–5].whatsappText` | That audience's default WhatsApp message, in the visitor's voice; `not-sure` keeps the site default | 20 words |
+| `rix.*` | As `00-rix.md` R12.1 and O0.3. `rix.nudgeLines` must not name the old "Just looking" card | as before |
+
+### R.7 Components, images, motion
+
+- **Extended:** `lib/rixProps.ts` (R.2), `lib/aboutReplies.ts` (`aboutReplyProp` for the new
+  keys; `replyShow` unchanged), `AboutAck` (the set line), `hooks/useAboutFor.ts` (link, else
+  memory), `hooks/useAboutAnnouncement.ts` (adds the set line), `AboutForParam` (also calls
+  `useAboutRemember`).
+- **New:** `lib/aboutPick.ts` (`pickSet`, `setAboutPick`), `lib/aboutMemory.ts`,
+  `hooks/useAboutRemember.ts`. **Unchanged:** the poster section, board, card and shelf, every
+  `Rix*` part, `AboutPropGlyph`, `WhatsAppLink`.
+- **Images:** none.
+- **Hooks that stay valid:** all of them (`about-prompt`, `about-rix-stage`, `rix-walker`,
+  `about-rix`, `about-quip-anchor`, `about-quip`, `about-chip`, `about-ack`, every `data-bot`,
+  `data-prop`, `data-prop-for`, `data-prop-part`). About's motion keeps running as built
+  (decided 2026-10-03: build nothing new, keep what is there).
+- **Motion (later):** the set line fades in with its ack (`ACK_IN` already moves the whole
+  paragraph; `about-ack-set` is there if it needs its own delay). The four new emblems pop in
+  with `PROP_IN` and no flourish until the motion pass gives each one (the parts above are
+  whole-prop flourishes, pivot 118 50). `lib/rixPick.ts` switches on the emblem's name and has
+  no case for the new four, so nothing breaks and nothing new is built.
+
+### R.8 Choices (all decided by the user, 2026-10-03; also in `../ui-spec.md`)
+
+1. **The Software builder label — decided:** "Developer or team". The key stays `software-builder`.
+2. **`?for=` against the memory — decided:** the link wins once per visit and link value.
+3. **The ack — decided:** two parts; the set line is shared and hidden without JS.
+4. **Emblems — decided:** four new ones (R.2).
+
+---
 
 ## 2a.O0 Shared by every option
 
@@ -57,6 +177,8 @@ picks. **Rules carried over unchanged from §2a.2:**
   flat token fills with 45° cuts (the bots' language). Each one sits just right of the hand tip
   (x 104, y 50–56), clear of strip C and inside the viewBox (x ≤ 130).
   The reply-key → prop map lives in `lib/aboutReplies.ts` (sample keys; real groups need their own).
+  **2026-10-03:** the real cards and their emblems are §2a.R (R.1, R.2); the "Sample group"
+  column below is superseded, the geometry stays.
 
 | `data-prop` | Sample group | Parts `d` (fill) | Flourish part, pivot |
 |---|---|---|---|
@@ -460,6 +582,7 @@ The tap target is the full SVG box: at least 136×88, never under 44. The button
    "Just looking".
 4. **Props — decided:** the group props are samples, kept as specced (calendar, shield, send
    arrow, report, envelope; a shrug for "Just looking") until the real groups come in.
+   **2026-10-03:** the real groups are in; see §2a.R (R.1, R.2).
 5. **`/dev` — decided:** dev only under `next dev`, 404 in every build; no env flag or preview deploy.
 6. **Lead's choices — decided, all defaults:**
    - C's blank is a `<details>` disclosure (not a `<select>` or an always-open list).

@@ -1,9 +1,9 @@
 // Rix's eyes and lean (ui-spec 02a-about-options §2a.O4 "Pointer follow" and "Look at a pick"),
 // full motion only. Process's layer 7 pointer follow, with its ranges scaled by Rix's width; and
-// the target look: while a pick is under a fine pointer or has keyboard focus, his eyes hold on it
-// (the perpendicular channel included) and the lean follows it; 0.6s after it loses both they ease
-// back. The target wins over the pointer. While Rix acts, his act owns the eyes; when it
-// ends (`rix.onState`), they go back to the target or to rest.
+// the target look: while a pick is under a fine pointer or has keyboard focus
+// (lib/rixTargetWatch.ts), his eyes hold on it (the perpendicular channel included) and the lean
+// follows it; 0.6s after it loses both they ease back. The target wins over the pointer. While Rix
+// acts, his act owns the eyes; when it ends (`rix.onState`), they go back to the target or to rest.
 //
 // `bot.pointer` is true while anything outside the bot drives his eyes, so Process's autonomous
 // looks (lib/processBotLife.ts) wait; the pointer's share of the eyes is 1 only when idle,
@@ -14,9 +14,10 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { EYE_FOLLOW, FOLLOW_EASE, LEAN_FOLLOW, POINTER_IDLE } from "@/lib/processBotMotion";
 import { eyeCentre } from "@/lib/processBotPointer";
 import { rixLook } from "@/lib/rixLook";
-import { LOOK_AT, LOOK_BACK, LOOK_RELEASE } from "@/lib/rixMotion";
+import { LOOK_AT, LOOK_BACK } from "@/lib/rixMotion";
 import { measureScale, type Rix } from "@/lib/rixRig";
-import { lookAt, lookTargets } from "@/lib/rixTargets";
+import { watchTargets } from "@/lib/rixTargetWatch";
+import { lookAt } from "@/lib/rixTargets";
 
 export type RixEyes = {
   /** Per frame, while live: hand the eyes back after `POINTER_IDLE` without movement. */
@@ -54,54 +55,18 @@ export function rixEyes(rix: Rix, fine: boolean): RixEyes {
   };
   rix.onState = settle;
 
-  // Targets: the hovered one wins over the focused one; released `LOOK_RELEASE` after both leave.
-  let hovered: Element | null = null;
-  let focused: Element | null = null;
-  let release: gsap.core.Tween | null = null;
-  const targetOf = (node: EventTarget | null) =>
-    node instanceof Element && root.contains(node) ? node.closest(lookTargets) : null;
-  const update = () => {
-    const next = hovered ?? focused;
-    if (next) {
-      release?.kill();
-      release = null;
-      if (next !== rix.target) {
-        rix.target = next;
-        settle();
-        rix.onTarget(next);
-      }
-      return;
-    }
-    if (rix.target && !release) {
-      release = crew.after(LOOK_RELEASE, () => {
-        release = null;
-        rix.target = null;
-        settle();
-        rix.onTarget(null);
-      });
-    }
-  };
-  const onOver = (event: PointerEvent) => {
-    if (!fine || event.pointerType === "touch") return;
-    hovered = targetOf(event.target);
-    update();
-  };
-  const onLeave = () => {
-    hovered = null;
-    update();
-  };
-  // Only keyboard focus is a target (R4.7): a card a mouse clicked keeps focus, and would
-  // otherwise hold him there (and the patrol still) until it blurs.
-  const keyboard = (node: EventTarget | null) => node instanceof Element && node.matches(":focus-visible");
-  const onFocusIn = (event: FocusEvent) => {
-    focused = keyboard(event.target) ? targetOf(event.target) : null;
-    update();
-  };
-  const onFocusOut = () => {
-    // The next card's own `focusin` sets it (its `:focus-visible` isn't known yet).
-    focused = null;
-    update();
-  };
+  // Targets (lib/rixTargetWatch.ts): the hovered pick wins over the focused one; released
+  // `LOOK_RELEASE` after both leave.
+  const stopTargets = watchTargets({
+    root,
+    fine,
+    crew,
+    onChange: (next) => {
+      rix.target = next;
+      settle();
+      rix.onTarget(next);
+    },
+  });
 
   // Pointer follow (fine pointer only): the eye centre is cached in page px, as on Process.
   let eye = { x: 0, y: 0 };
@@ -151,11 +116,7 @@ export function rixEyes(rix: Rix, fine: boolean): RixEyes {
   const resize = new ResizeObserver(measure);
   resize.observe(root);
   ScrollTrigger.addEventListener("refresh", measure);
-  root.addEventListener("focusin", onFocusIn);
-  root.addEventListener("focusout", onFocusOut);
   if (fine) {
-    root.addEventListener("pointerover", onOver);
-    root.addEventListener("pointerleave", onLeave);
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
     document.addEventListener("pointerout", onOut);
@@ -169,15 +130,11 @@ export function rixEyes(rix: Rix, fine: boolean): RixEyes {
     stop: () => {
       resize.disconnect();
       ScrollTrigger.removeEventListener("refresh", measure);
-      root.removeEventListener("focusin", onFocusIn);
-      root.removeEventListener("focusout", onFocusOut);
-      root.removeEventListener("pointerover", onOver);
-      root.removeEventListener("pointerleave", onLeave);
+      stopTargets();
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("scroll", onScroll);
       document.removeEventListener("pointerout", onOut);
       if (raf) cancelAnimationFrame(raf);
-      release?.kill();
       lookTo.tween.kill();
       leanTo.tween.kill();
       rix.onState = () => {};

@@ -5,8 +5,13 @@
 // under `PATROL.minStretch` of room ahead he turns round. After each stretch, a pause of
 // `PATROL.pause` with one look (the card below him, the pointer, or out at the visitor and a
 // blink; on the playground's bare floor, `PATROL.floorLooks`: the pointer, out at the visitor, or
-// down the floor to the shelf end he'll head for next); plays and nudges run in the pauses (they
-// start only while he stands, R7).
+// down the floor to the shelf end he'll head for next); idle items run in the pauses (they start
+// only while he stands, R7).
+//
+// On home's About (rev 4, R7) that's the settled phase. In the busy phase he takes no stretch of his
+// own: the idle clock (lib/rixIdle.ts) asks for one stroll at a time (`stroll`) and for one of the
+// pause's looks as each of its gaps opens (`look`); `PATROL.first` and `PATROL.pause` aren't used,
+// and the first stretch of his own comes `PATROL.first` after the settled phase starts.
 //
 // No stretch starts while a quip shows, Rix or a card is hovered or focused, the mood isn't
 // neutral, he naps, an emotion is held or an act runs. Hovering or focusing Rix mid-stretch brakes
@@ -17,6 +22,7 @@
 // has none (lib/rixFade.ts doesn't start it).
 import { gsap } from "@/lib/gsap";
 import { blink } from "@/lib/processBotLife";
+import { setTimer } from "@/lib/processBotRig";
 import { animTargets } from "@/lib/motion";
 import { brake } from "@/lib/rixActs";
 import { rixFeatures } from "@/lib/rixFeatures";
@@ -32,6 +38,10 @@ export type Patrol = {
   readonly start: () => void;
   /** The playground's toggle: on, the first stretch `PATROL.toggle` from now; off, a stretch brakes. */
   readonly setOn: (on: boolean) => void;
+  /** One stretch now, for the idle clock (the busy phase's stroll); false if none could start. */
+  readonly stroll: () => boolean;
+  /** One of the pause's looks, for the idle clock's gap: `PATROL.lookAt` from now, back within `seconds`. */
+  readonly look: (seconds: number) => void;
   readonly stop: () => void;
 };
 
@@ -72,7 +82,8 @@ function cardBelow(rix: Rix, track: Track): Element | null {
   return best;
 }
 
-export function patrol(rix: Rix, on: boolean): Patrol {
+/** `settled` is false while the idle clock's busy phase runs (home's About): he waits for `stroll`. */
+export function patrol(rix: Rix, on: boolean, settled: () => boolean = () => true): Patrol {
   const { crew, bot, button } = rix;
   let enabled = on;
   let started = false;
@@ -102,10 +113,12 @@ export function patrol(rix: Rix, on: boolean): Patrol {
     timer = crew.after(Math.max(0.05, Math.min(delay, PATROL.poll)), tick);
   };
 
-  /** The pause's one look, `PATROL.lookAt` in, held at most `PATROL.lookHold`. */
-  const lookAround = () => {
-    look = null;
-    if (phase !== "pause" || rix.act !== null || bot.state !== "idle" || held()) return;
+  /**
+   * One look around, held at most `PATROL.lookHold` and back by `until`. Like life's own looks it
+   * is one of the bot's idle moves, so the next act stops it where it is.
+   */
+  const lookAround = (until: number) => {
+    if (rix.act !== null || bot.state !== "idle" || held()) return;
     const { ch } = bot;
     const track = measureTrack(rix);
     const kind = rollLook(rix);
@@ -120,45 +133,63 @@ export function patrol(rix: Rix, on: boolean): Patrol {
     const wanted =
       kind === "card" ? fallback() : kind === "pointer" ? (pointerLookOf(rix) ?? fallback()) : kind === "end" ? end() : { d: 0, p: 0 };
     if (!wanted) return;
-    const hold = Math.min(PATROL.lookHold, Math.max(0, due - crew.now() - LOOK_AT.duration - LOOK_BACK.duration));
+    const hold = Math.min(PATROL.lookHold, Math.max(0, until - crew.now() - LOOK_AT.duration - LOOK_BACK.duration));
     const tl = gsap
       .timeline()
       .to(ch, { look: wanted.d, perp: wanted.p, ...LOOK_AT, overwrite: "auto" }, 0)
       .to(ch, { look: bot.restLook, perp: 0, ...LOOK_BACK, overwrite: "auto" }, LOOK_AT.duration + hold);
+    setTimer(bot, "lookMove", crew.run(tl));
     // Out at the visitor: the look, then a blink.
-    if (kind === "out") tl.add(blink(bot, false), LOOK_AT.duration);
-    crew.run(tl);
+    if (kind === "out") setTimer(bot, "blinkMove", crew.run(gsap.timeline().add(blink(bot, false), LOOK_AT.duration)));
+  };
+
+  /** One look `PATROL.lookAt` from now (after the stop's own look back) if `when` still holds, back by `until`. */
+  const lookSoon = (until: () => number, when: () => boolean) => {
+    look?.kill();
+    look = crew.after(PATROL.lookAt, () => {
+      look = null;
+      if (when()) lookAround(until());
+    });
   };
 
   const beginPause = () => {
     phase = "pause";
     leg = null;
     due = crew.now() + gsap.utils.random(PATROL.pause[0], PATROL.pause[1]);
-    look?.kill();
-    look = crew.after(PATROL.lookAt, lookAround);
+    lookSoon(
+      () => due,
+      () => phase === "pause",
+    );
+  };
+
+  /** Waiting for the settled phase: his first stretch of his own comes `PATROL.first` after it starts. */
+  const standBy = (now: number) => {
+    phase = "first";
+    leg = null;
+    due = now + PATROL.first;
   };
 
   const roomOf = (track: Track, dir: -1 | 1) => (dir < 0 ? track.x - track.minX : -track.x);
 
-  const stretch = () => {
+  /** One stretch in his heading; false if there's no room either way. Settled, a pause follows it. */
+  const stretch = (): boolean => {
     const track = measureTrack(rix);
     // At an end (or resuming toward too little room) he turns round.
     if (roomOf(track, heading) < PATROL.minStretch) heading = heading < 0 ? 1 : -1;
     const room = roomOf(track, heading);
-    if (room < PATROL.minStretch) {
-      beginPause();
-      return;
-    }
+    if (room < PATROL.minStretch) return false;
     const distance = Math.min(room, gsap.utils.random(PATROL.stretch[0], PATROL.stretch[1]));
-    phase = "walk";
     leg = walkTo(rix, track.x + heading * distance, {
       pace: PATROL_PACE,
       act: "patrol",
       onArrive: () => {
-        if (phase === "walk") beginPause();
+        if (phase !== "walk") return;
+        if (settled()) beginPause();
+        else standBy(crew.now());
       },
     });
-    if (!leg) beginPause();
+    if (leg) phase = "walk";
+    return leg !== null;
   };
 
   function tick() {
@@ -181,6 +212,12 @@ export function patrol(rix: Rix, on: boolean): Patrol {
       lastBusy = now;
       leg = null;
     }
+    // The busy phase (R7): no stretch of his own; the idle clock asks for strolls.
+    if (!settled()) {
+      standBy(now);
+      schedule(PATROL.poll);
+      return;
+    }
     if (held()) {
       lastBusy = now;
       if (phase === "pause" || (phase === "first" && now >= due)) phase = "resume";
@@ -199,7 +236,7 @@ export function patrol(rix: Rix, on: boolean): Patrol {
       schedule(due - now);
       return;
     }
-    stretch();
+    if (!stretch()) beginPause();
     schedule(PATROL.poll);
   }
 
@@ -247,6 +284,21 @@ export function patrol(rix: Rix, on: boolean): Patrol {
       look = null;
       if (walking()) brake(rix);
       leg = null;
+    },
+    stroll: () => {
+      if (!enabled || !started || walking() || held()) return false;
+      if (!stretch()) return false;
+      // The tick keeps watch over it: hovering or focusing Rix brakes it.
+      schedule(PATROL.poll);
+      return true;
+    },
+    look: (seconds) => {
+      if (!enabled || !started) return;
+      const until = crew.now() + seconds;
+      lookSoon(
+        () => until,
+        () => phase !== "walk",
+      );
     },
     stop: () => {
       timer?.kill();

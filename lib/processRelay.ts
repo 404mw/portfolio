@@ -1,41 +1,50 @@
-// The crew relay (ui-spec §5.7 layer 10, revised 2026-09-28). From `lg`, a cream job is passed
-// along the ground line from bot to bot, in front of them: each bot catches it at its stop and
-// changes it on a beat of its full act (lib/processRelayJob.ts), and on each hop a trail of ghosts,
-// a lit ground segment and a chevron flash follow it (lib/processRelayTrail.ts). After bot 4's
-// change the job is done: it slides right to the ground line's end, trailed as on a hop, pops once
-// and fades out there (never past the line, so never a sideways scroll). At the same moment a small
-// lesson card splits off it (lib/processRelayLesson.ts), fades out leaving bot 4, drops in at the
-// dashed return path's right end (below step 4's text, never across it) and rides the path back,
-// lighting it violet, passing behind the loop label, with no ghosts; at the arrowhead it pops out as
-// the arrowhead flashes and bot 1 takes it. Below `lg` the same run turns down the bot column
-// (lib/processRelayColumn.ts, ui-spec §5.9).
+// The crew relay from `lg` (ui-spec §5.7 "the relay's rebuild", §5.3, §5.3a, §5.3b), on the flow's
+// five or six stops. The job (the flow's emblem, or the default sheet) leaves step 1's hand
+// (lib/processRelayHand.ts), drops onto the ground line and is passed along it from bot to bot, in
+// front of them: each bot catches it at its stop and changes it on a beat of its act
+// (lib/processRelayJob.ts), and on each hop a trail of ghosts, a lit ground segment and a chevron
+// flash follow it (lib/processRelayTrail.ts). On a fix run the check sends it back over the fix
+// arch to the work step and takes it again (lib/processRelayFix.ts). After the last bot's change
+// the job is done: it slides right to the ground line's end, trailed as on a hop, pops once and
+// fades out there (never past the line, so never a sideways scroll).
+//
+// In a flow with the return, a small lesson card splits off the job at that moment
+// (lib/processRelayLesson.ts), fades out leaving the last bot, drops in at the dashed return path's
+// right end (below the steps' text, never across it) and rides the path back, lighting it violet,
+// passing behind the loop label, with no ghosts; at the arrowhead, on step 2's end, it pops out as
+// the arrowhead flashes and the rules bot takes it. A flow with no loops (`data-loops="off"`) has
+// no return path and no fix arch in its markup: their absence means "skip those parts", so its run
+// is a one-way pass that ends with the job's fade. Below `lg` the same run turns down the bot
+// column (lib/processRelayColumn.ts, ui-spec §5.9).
 //
 // Waypoints are measured from the DOM relative to the relay layer (its box is the body wrapper's;
 // the job, ghosts and lesson sit in it). They're read through a getter, so a re-measure after a
 // resize reaches every tween that hasn't started yet. The bots' side of the story comes in through
-// `cues`.
+// `cues`; the order and timing of the stops is the plan's (lib/processRelayPlan.ts).
 import { gsap } from "@/lib/gsap";
 import { animTargets } from "@/lib/motion";
 import type { BotRole } from "@/lib/processBots";
 import {
+  FIX_HOP,
   JOB_AT,
+  JOB_DONE,
   JOB_EXIT,
   JOB_EXIT_INSET,
+  JOB_HAND_OFF,
   LIT_LENGTH,
-  RELAY_DWELL,
-  RELAY_FADE,
   RELAY_HOP,
   RETURN_SPEED,
 } from "@/lib/processBotMotion";
 import { BOT_VIEWBOX } from "@/lib/processBotPointer";
+import { arc, fixLitFade, fixLitSweep } from "@/lib/processRelayFix";
+import { findProp, handArrive, handOff, measureHand, type Hand } from "@/lib/processRelayHand";
 import {
   findJob,
-  jobBeat,
   jobElements,
   jobExit,
-  jobHold,
-  jobStart,
+  measureJob,
   type JobParts,
+  type JobSize,
   type Point,
   type PointAt,
 } from "@/lib/processRelayJob";
@@ -49,130 +58,152 @@ import {
   lessonSplit,
   type LessonParts,
 } from "@/lib/processRelayLesson";
+import { lessonTaker } from "@/lib/processRelayPlan";
+import { runVisits, type Course, type RelayCues, type RunOptions } from "@/lib/processRelayRun";
 import {
   flash,
-  ghostHop,
+  ghostFollow,
   litHop,
   readLights,
   returnLitFade,
   returnLitStart,
   returnLitTo,
+  straight,
   type Lights,
+  type Mover,
 } from "@/lib/processRelayTrail";
 
 /**
- * Tailwind's `lg`: the ground line, chevrons and return path show from here, and the relay runs
- * along them; below it the relay runs down the bot column instead (lib/processRelayColumn.ts).
+ * Tailwind's `lg`: the ground line, chevrons, return path and fix arch show from here, and the
+ * relay runs along them; below it the relay runs down the bot column instead
+ * (lib/processRelayColumn.ts).
  */
 export const relayQuery = "(min-width: 64rem)";
 
 /** The return path's corner radius (16px) and its 45° point's inset, 16 × (1 − cos 45°). */
 const CORNER = 16;
 const CORNER_MID = CORNER * (1 - Math.SQRT1_2);
-/**
- * The sheet's centre above the job's bottom-centre anchor: half its 24px height (lib/processJob.ts).
- * The lesson splits off here.
- */
-const SHEET_CENTRE = 12;
 const ORIGIN: Point = { x: 0, y: 0 };
 
 /** A bot the job stops at: its SVG and role, in step order. */
 export type RelayStop = { readonly svg: SVGSVGElement; readonly role: BotRole };
 
+/** The return's elements: only in a flow with loops. */
+type ReturnParts = {
+  /** The dashed path's box (`process-return`), step 2's bot to the last one's. */
+  readonly box: HTMLElement;
+  readonly lit: HTMLElement;
+  /** The arrowhead on step 2's end (the box's first child). */
+  readonly arrowhead: Element | null;
+  /** The rule card that rides the path after the last bot. */
+  readonly lesson: LessonParts;
+};
+
+/** The fix loop's elements: only in a flow with loops. */
+type FixParts = {
+  /** The dashed arch's box (`process-fix`), read for its place only: never written. */
+  readonly box: HTMLElement;
+  readonly lit: HTMLElement;
+};
+
 export type RelayParts = {
   /** The relay layer (the job's parent), every waypoint's coordinate box. */
   readonly layer: HTMLElement;
   readonly job: JobParts;
-  /** The rule card that rides the return path after bot 4. */
-  readonly lesson: LessonParts;
   readonly ghosts: readonly Element[];
   readonly ground: HTMLElement;
   readonly groundLit: HTMLElement;
   /** The ground-lit segment's clip box (the ground line's box). */
   readonly groundClip: HTMLElement;
-  readonly returnBox: HTMLElement;
-  readonly returnLit: HTMLElement;
   readonly stops: readonly RelayStop[];
+  /** Intake's held emblem (`data-bot="prop"`), or null. */
+  readonly prop: SVGGElement | null;
   /** The icon inside each chevron span (the span masks the line, so it stays put). */
   readonly icons: readonly Element[];
-  readonly arrowhead: Element | null;
   /** The flash colours, read from the tokens at setup. */
   readonly lights: Lights | null;
+  /** The return, or null in a flow with no loops: then there is no lesson and no ride back. */
+  readonly back: ReturnParts | null;
+  /** The fix arch, or null in a flow with no loops: then no run is a fix run. */
+  readonly fix: FixParts | null;
 };
 
 /** Every waypoint, in the relay layer's coordinates. */
 export type RelayWaypoints = {
-  /** J1–J4: each bot's stop, bottom centre on the ground line. */
+  /** Each bot's stop: stop 1's is the hand at rest, the others the job's bottom centre on the ground line. */
   readonly stops: readonly Point[];
-  /** K1–K3: the chevron centres. */
+  readonly hand: Hand;
+  readonly job: JobSize;
+  /** The chevron centres. */
   readonly chevrons: readonly Point[];
   /** The ground-lit clip box's left edge. */
   readonly litLeft: number;
-  /** Where the job's exit slide stops: the ground line's right end, less `JOB_EXIT_INSET`. */
+  /** Where the job's exit slide stops: inside the ground line's right end, by its inset. */
   readonly groundEnd: number;
-  /** R0–R7, on the path's centre line: down the right side, round the corners, along the bottom, up to the arrowhead. */
-  readonly path: readonly Point[];
-  /** The return-lit overlay's left edge and width. */
-  readonly returnLeft: number;
-  readonly returnWidth: number;
+  readonly back: {
+    /** R0–R7, on the path's centre line: down the right side, round the corners, along the bottom, up to the arrowhead. */
+    readonly path: readonly Point[];
+    /** The return-lit overlay's left edge and width. */
+    readonly left: number;
+    readonly width: number;
+  } | null;
+  readonly fix: {
+    /** The job's anchor `y` at the top of the hop back: hanging inside the arch. */
+    readonly apex: number;
+    /** The fix-lit overlay's left edge. */
+    readonly left: number;
+  } | null;
 };
 
-/** Whichever bot reacts at each moment of a run; bot indexes are in step order. */
-export type RelayCues = {
-  /** The job heads this bot's way (bot 1's when the lesson leaves bot 4 for the return). */
-  readonly head: (index: number) => void;
-  /** The job reaches this bot: its catch. */
-  readonly arrive: (index: number) => void;
-  /** The lesson reaches the arrowhead: this bot takes the loop back. */
-  readonly receive: (index: number) => void;
-  /**
-   * Below `lg`: the lesson pops in on this bot's rulebook and stays `seconds`; the bot looks at it,
-   * then back to rest as it lifts off.
-   */
-  readonly holdLesson: (index: number, seconds: number) => void;
-};
-
-/** The relay's elements inside `root`, or null if any is missing. */
+/**
+ * The relay's elements inside `root`, or null if the job, its layer or the ground line is missing.
+ * The return's and the fix arch's parts are each all there or left out.
+ */
 export function relayParts(root: HTMLElement, stops: readonly RelayStop[]): RelayParts | null {
   const [job] = animTargets<SVGSVGElement>(root, "process-relay");
-  const [lesson] = animTargets<SVGSVGElement>(root, "process-lesson");
   const [ground] = animTargets(root, "process-ground");
   const [groundLit] = animTargets(root, "process-ground-lit");
-  const [returnBox] = animTargets(root, "process-return");
-  const [returnLit] = animTargets(root, "process-return-lit");
   const layer = job?.parentElement;
   const groundClip = groundLit?.parentElement;
-  if (!job || !lesson || !ground || !groundLit || !returnBox || !returnLit) return null;
-  if (!layer || !groundClip) return null;
+  if (!job || !ground || !groundLit || !layer || !groundClip) return null;
+
+  const [lesson] = animTargets<SVGSVGElement>(root, "process-lesson");
+  const [returnBox] = animTargets(root, "process-return");
+  const [returnLit] = animTargets(root, "process-return-lit");
+  const [fixBox] = animTargets(root, "process-fix");
+  const [fixLit] = animTargets(root, "process-fix-lit");
   return {
     layer,
     job: findJob(job),
-    lesson: findLesson(lesson),
     ghosts: animTargets(layer, "process-relay-ghost"),
     ground,
     groundLit,
     groundClip,
-    returnBox,
-    returnLit,
     stops,
+    prop: findProp(stops[0]),
     icons: animTargets(root, "process-chevron")
       .map((chevron) => chevron.firstElementChild)
       .filter((icon): icon is Element => icon !== null),
-    arrowhead: returnBox.firstElementChild,
     lights: readLights(),
+    back:
+      lesson && returnBox && returnLit
+        ? { box: returnBox, lit: returnLit, arrowhead: returnBox.firstElementChild, lesson: findLesson(lesson) }
+        : null,
+    fix: fixBox && fixLit ? { box: fixBox, lit: fixLit } : null,
   };
 }
 
-/** Every element the relay writes, for the strip on revert. */
+/** Every element the relay writes, for the strip on revert (the held emblem is the bot's to reset). */
 export function relayElements(parts: RelayParts): Element[] {
+  const { back, fix } = parts;
   return [
     ...jobElements(parts.job),
-    ...lessonElements(parts.lesson),
     ...parts.ghosts,
     parts.groundLit,
-    parts.returnLit,
     ...parts.icons,
-    ...(parts.arrowhead ? [parts.arrowhead] : []),
+    ...(back ? [...lessonElements(back.lesson), back.lit] : []),
+    ...(back?.arrowhead ? [back.arrowhead] : []),
+    ...(fix ? [fix.lit] : []),
   ];
 }
 
@@ -182,42 +213,63 @@ export function measureRelay(parts: RelayParts): RelayWaypoints {
   const inLayer = (x: number, y: number): Point => ({ x: x - layer.left, y: y - layer.top });
   const shareX = (x: number) => (x - BOT_VIEWBOX.x) / BOT_VIEWBOX.width;
 
+  const job = measureJob(parts.job);
+  const first = parts.stops[0];
   const groundBox = parts.ground.getBoundingClientRect();
-  const groundTop = groundBox.top;
-  const stops = parts.stops.map((stop) => {
+  const ground = (stop: RelayStop) => {
     const box = stop.svg.getBoundingClientRect();
-    return inLayer(box.left + shareX(JOB_AT[stop.role]) * box.width, groundTop);
-  });
+    return inLayer(box.left + shareX(JOB_AT[stop.role]) * box.width, groundBox.top);
+  };
+  // With no held emblem the job starts on the ground at stop 1, at its own size.
+  const hand: Hand =
+    parts.prop && first ? measureHand(first.svg, job, layer) : { ...(first ? ground(first) : ORIGIN), scale: 1 };
+  const stops = parts.stops.map((stop, i) => (i === 0 ? { x: hand.x, y: hand.y } : ground(stop)));
 
   const chevrons = parts.icons.map((icon) => {
     const box = (icon.parentElement ?? icon).getBoundingClientRect();
     return inLayer(box.left + box.width / 2, box.top + box.height / 2);
   });
   const litLeft = inLayer(parts.groundClip.getBoundingClientRect().left, 0).x;
+  // The job's half width at the done pop's peak stays on the line.
+  const inset = Math.max(JOB_EXIT_INSET, Math.ceil((job.width / 2) * JOB_DONE.scale));
 
-  const box = parts.returnBox.getBoundingClientRect();
+  return {
+    stops,
+    hand,
+    job,
+    chevrons,
+    litLeft,
+    groundEnd: inLayer(groundBox.right - inset, 0).x,
+    back: parts.back ? measureReturn(parts.back, inLayer) : null,
+    fix: parts.fix
+      ? {
+          apex: inLayer(0, parts.fix.box.getBoundingClientRect().top).y + FIX_HOP.clear + job.height,
+          left: inLayer(parts.fix.lit.getBoundingClientRect().left, 0).x,
+        }
+      : null,
+  };
+}
+
+/** The return path's waypoints and its lit overlay's box. */
+function measureReturn(back: ReturnParts, inLayer: (x: number, y: number) => Point) {
+  const box = back.box.getBoundingClientRect();
   const right = box.right - 1;
   const left = box.left + 1;
   const bottom = box.bottom - 1;
-  const path = [
-    inLayer(right, box.top),
-    inLayer(right, bottom - CORNER),
-    inLayer(right - CORNER_MID, bottom - CORNER_MID),
-    inLayer(right - CORNER, bottom),
-    inLayer(left + CORNER, bottom),
-    inLayer(left + CORNER_MID, bottom - CORNER_MID),
-    inLayer(left, bottom - CORNER),
-    inLayer(left, box.top),
-  ];
-  const lit = parts.returnLit.getBoundingClientRect();
+  const lit = back.lit.getBoundingClientRect();
   return {
-    stops,
-    chevrons,
-    litLeft,
-    groundEnd: inLayer(groundBox.right - JOB_EXIT_INSET, 0).x,
-    path,
-    returnLeft: inLayer(lit.left, 0).x,
-    returnWidth: lit.width,
+    path: [
+      inLayer(right, box.top),
+      inLayer(right, bottom - CORNER),
+      inLayer(right - CORNER_MID, bottom - CORNER_MID),
+      inLayer(right - CORNER, bottom),
+      inLayer(left + CORNER, bottom),
+      inLayer(left + CORNER_MID, bottom - CORNER_MID),
+      inLayer(left, bottom - CORNER),
+      inLayer(left, box.top),
+    ],
+    left: inLayer(lit.left, 0).x,
+    width: lit.width,
   };
 }
 
@@ -237,120 +289,134 @@ function crossTime(progress: number, ease: string): number {
 
 const distance = (a: Point, b: Point) => Math.hypot(b.x - a.x, b.y - a.y);
 
-/** Seconds from a run's start at which the job reaches each stop (A1–A4), for `roles` in order. */
-export function relayArrivals(roles: readonly BotRole[]): number[] {
-  let t = RELAY_FADE;
-  return roles.map((role) => {
-    const arrival = t;
-    t += RELAY_DWELL[role] + RELAY_HOP.duration;
-    return arrival;
-  });
+/**
+ * The hand-off's move: across to `to` on the hop's timing while it drops onto the ground line
+ * early (`JOB_HAND_OFF`), so it is on the line well before the next bot.
+ */
+function dropTo(tl: gsap.core.Timeline, to: PointAt): Mover {
+  return (target, at) => {
+    tl.to(target, { x: () => to().x, ...RELAY_HOP }, at).to(target, { y: () => to().y, ...JOB_HAND_OFF }, at);
+  };
 }
 
 /**
- * From `t`, when bot 4 is done with the job: the lesson splits off the sheet (`from` is the job's
- * anchor there), fades out leaving bot 4, drops in at R0 and rides the path to R7 at
+ * From `t`, when the last bot is done with the job: the lesson splits off the job (`from` is the
+ * job's anchor there), fades out leaving the bot, drops in at R0 and rides the path to R7 at
  * `RETURN_SPEED`, lighting it, with no ghosts; at R7 the arrowhead flashes and the lesson pops out
- * as bot 1 takes the loop back.
+ * as the rules bot takes the loop back.
  */
 function rideReturn(
   tl: gsap.core.Timeline,
   parts: RelayParts,
+  back: ReturnParts,
   waypoints: () => RelayWaypoints,
   cues: RelayCues,
   from: PointAt,
   t: number,
 ) {
-  const { lesson, returnLit, arrowhead, lights } = parts;
-  const card = lesson.lesson;
-  const path = waypoints().path;
+  const card = back.lesson.lesson;
+  const path = waypoints().back?.path ?? [];
+  const takes = lessonTaker(parts.stops.map((stop) => stop.role));
   // The lesson's centre goes on the path line itself.
-  const on = (j: number) => () => waypoints().path[j] ?? ORIGIN;
-  const insetAt = (j: number) => () => (waypoints().path[j] ?? ORIGIN).x - waypoints().returnLeft - 2;
-  const sheet = () => {
+  const on = (j: number) => () => waypoints().back?.path[j] ?? ORIGIN;
+  const insetAt = (j: number) => () => on(j)().x - (waypoints().back?.left ?? 0) - 2;
+  const centre = () => {
     const point = from();
-    return { x: point.x, y: point.y - SHEET_CENTRE };
+    return { x: point.x, y: point.y - waypoints().job.centre };
   };
 
-  // Off the job, then off bot 4 (bot 1 hears it coming), then onto the path at R0.
-  let at = lessonSplit(tl, card, sheet, t);
-  tl.call(cues.head, [0], at);
+  // Off the job, then off the last bot (the rules bot hears it coming), then onto the path at R0.
+  let at = lessonSplit(tl, card, centre, t);
+  tl.call(cues.head, [takes], at);
   at = lessonLeave(tl, card, at);
   at = lessonEnter(tl, card, on(0), at);
 
   // R0 → R7, linear, each leg timed by its length; the light follows.
-  returnLitStart(tl, returnLit, () => waypoints().returnWidth, at);
+  returnLitStart(tl, back.lit, () => waypoints().back?.width ?? 0, at);
   for (let j = 1; j < path.length; j += 1) {
     const a = path[j - 1];
     const b = path[j];
     const to = on(j);
     const duration = a && b ? Math.max(distance(a, b) / RETURN_SPEED, 0.01) : 0.01;
     tl.to(card, { x: () => to().x, y: () => to().y, duration, ease: "none" }, at);
-    returnLitTo(tl, returnLit, insetAt(j), duration, at);
+    returnLitTo(tl, back.lit, insetAt(j), duration, at);
     at += duration;
   }
 
-  // At the arrowhead: the flash, the pop out, bot 1's catch of the loop.
-  if (arrowhead) flash(tl, arrowhead, at, lights);
-  returnLitFade(tl, returnLit, at);
+  // At the arrowhead: the flash, the pop out, the rules bot's catch of the loop.
+  if (back.arrowhead) flash(tl, back.arrowhead, at, parts.lights);
+  returnLitFade(tl, back.lit, at);
   lessonOut(tl, card, at);
-  tl.call(cues.receive, [0], at);
+  tl.call(cues.receive, [takes], at);
 }
 
 /** One relay run with the job (from `lg`). `waypoints` returns the latest measurement. */
-export function relayRun(parts: RelayParts, waypoints: () => RelayWaypoints, cues: RelayCues): gsap.core.Timeline {
-  const { job, lesson, ghosts, groundLit, icons, lights } = parts;
+export function relayRun(
+  parts: RelayParts,
+  waypoints: () => RelayWaypoints,
+  cues: RelayCues,
+  { visits, first }: RunOptions,
+): gsap.core.Timeline {
+  const { job, ghosts, groundLit, icons, lights, back, fix } = parts;
   const tl = gsap.timeline();
   const now = waypoints();
-  const roles = parts.stops.map((stop) => stop.role);
-  const count = Math.min(roles.length, now.stops.length);
-  if (count === 0) return tl;
-  const arrivals = relayArrivals(roles);
+  if (visits.length < 2 || now.stops.length < 2) return tl;
   const stop = (i: number) => () => waypoints().stops[i] ?? ORIGIN;
-  const litX = (i: number) => () => stop(i)().x - waypoints().litLeft - LIT_LENGTH;
+  const litX = (at: PointAt) => () => at().x - waypoints().litLeft - LIT_LENGTH;
 
-  // A fresh blank job at stop 1 (the lesson hidden); each bot catches and changes it, it waits a
-  // moment, then hops on.
-  jobStart(tl, job, stop(0), 0);
-  lessonHide(tl, lesson.lesson, 0);
-  let t = 0;
-  for (let i = 0; i < count; i += 1) {
-    const role = roles[i];
-    const arrival = arrivals[i];
-    if (!role || arrival === undefined) break;
-    tl.call(cues.arrive, [i], arrival);
-    const settled = jobBeat(tl, job, role, arrival);
-    t = arrival + RELAY_DWELL[role];
-    jobHold(tl, job.job, stop(i), settled, t);
-    if (i === count - 1) break;
+  // A new job in intake's hand (the lesson hidden); each bot catches and changes it, then it hops on.
+  handArrive(tl, parts.prop, first, 0);
+  if (back) lessonHide(tl, back.lesson.lesson, 0);
 
-    const next = i + 1;
-    tl.call(cues.head, [next], t).to(job.job, { x: () => stop(next)().x, y: () => stop(next)().y, ...RELAY_HOP }, t);
-    ghostHop(tl, ghosts, stop(i), stop(next), t);
-    litHop(tl, groundLit, litX(i), litX(next), t);
-    const from = now.stops[i];
-    const ahead = now.stops[next];
-    const chevron = now.chevrons[i];
-    const icon = icons[i];
-    if (from && ahead && chevron && icon && ahead.x !== from.x) {
-      flash(tl, icon, t + RELAY_HOP.duration * crossTime((chevron.x - from.x) / (ahead.x - from.x), RELAY_HOP.ease), lights);
-    }
-  }
+  const course: Course = {
+    stop,
+    hop: ({ from, to, kind }, t) => {
+      const target = stop(to);
+      if (kind === "back") {
+        // The fix hop: back over the arch, the arch lighting behind it. No ground light, no chevron.
+        const fixLeft = () => waypoints().fix?.left ?? 0;
+        const move = fix ? arc(tl, target, () => waypoints().fix?.apex ?? target().y) : straight(tl, target, FIX_HOP);
+        move(job.job, t);
+        ghostFollow(tl, ghosts, stop(from), move, FIX_HOP.duration, t);
+        if (fix) fixLitSweep(tl, fix.lit, () => stop(from)().x - fixLeft(), () => target().x - fixLeft(), t);
+        return;
+      }
 
-  // Bot 4 is done. The job leaves right to the ground line's end, trailed as on a hop (the slide
-  // timed by its length at setup), pops as done and fades there...
-  const last = count - 1;
+      // Out of the hand (read live, dropping onto the line) or along the ground line.
+      const start = kind === "hand" ? handOff(tl, parts, waypoints, t) : stop(from);
+      const move = kind === "hand" ? dropTo(tl, target) : straight(tl, target);
+      if (kind === "retry" && fix) fixLitFade(tl, fix.lit, t);
+      move(job.job, t);
+      ghostFollow(tl, ghosts, start, move, RELAY_HOP.duration, t);
+      litHop(tl, groundLit, litX(start), litX(target), t);
+      const a = now.stops[from];
+      const b = now.stops[to];
+      const chevron = now.chevrons[from];
+      const icon = icons[from];
+      if (to === from + 1 && a && b && chevron && icon && b.x !== a.x) {
+        const crossing = crossTime((chevron.x - a.x) / (b.x - a.x), RELAY_HOP.ease);
+        flash(tl, icon, t + RELAY_HOP.duration * crossing, lights);
+      }
+    },
+  };
+  const last = runVisits(tl, job, visits, cues, course);
+  if (!last) return tl;
+
+  // The last bot is done. The job leaves right to the ground line's end, trailed as on a hop (the
+  // slide timed by its length at setup), pops as done and fades there...
+  const t = last.leave;
+  const from = stop(last.stop);
   const end = () => {
-    const at = stop(last)();
+    const at = from();
     return { x: Math.max(at.x, waypoints().groundEnd), y: at.y };
   };
-  const slide = Math.max(0, now.groundEnd - (now.stops[last]?.x ?? now.groundEnd)) / JOB_EXIT.speed;
+  const slide = Math.max(0, now.groundEnd - (now.stops[last.stop]?.x ?? now.groundEnd)) / JOB_EXIT.speed;
   const exit = { duration: Math.max(JOB_EXIT.min, slide), ease: JOB_EXIT.ease };
   jobExit(tl, job.job, end, exit.duration, t);
-  ghostHop(tl, ghosts, stop(last), end, t, exit);
-  litHop(tl, groundLit, litX(last), () => end().x - waypoints().litLeft - LIT_LENGTH, t, exit);
+  ghostFollow(tl, ghosts, from, straight(tl, end, exit), exit.duration, t);
+  litHop(tl, groundLit, litX(from), litX(end), t, exit);
 
-  // ...while the lesson splits off it and rides the return path back to bot 1.
-  rideReturn(tl, parts, waypoints, cues, stop(last), t);
+  // ...while, in a flow with the return, the lesson splits off it and rides the path back to step 2.
+  if (back && now.back) rideReturn(tl, parts, back, waypoints, cues, from, t);
   return tl;
 }

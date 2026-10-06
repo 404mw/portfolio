@@ -6,7 +6,8 @@
 // fine pointer (a scramble, `FLEE`), or from himself on touch and keyboard (a stomp walk,
 // `STOMP_WALK`), both stride-locked and capped at the pace's `maxDist`; with under `WALK.minDist`
 // of room he sulks where he stands, at the nearer end's side. The sulk is the caller's hand-off.
-// The whole chain plays as one `tantrum` act (rank 2): only a pick outranks it.
+// The whole chain plays as one `tantrum` act (rank 2): only a pick outranks it, and on home's About
+// the picks lock as it starts (`cues.lock`, R6A.9), so nothing cuts it there.
 import { gsap } from "@/lib/gsap";
 import { SETTLE, SQUASH } from "@/lib/processBotMotion";
 import { cut, play, timeline } from "@/lib/rixActs";
@@ -19,6 +20,8 @@ import { measureTrack } from "@/lib/rixTrack";
 import { walkTo } from "@/lib/rixWalk";
 
 export type TantrumCues = {
+  /** The tantrum's start on home's About: the picks lock until the forgive ends (R6A.9). */
+  readonly lock?: () => void;
   /** Announces a whole line in `RixStatus`. */
   readonly announce: (line: string) => void;
   /** The toss's release: the deselect and `throwAway` (R6A.4). */
@@ -57,6 +60,7 @@ export function tantrum(rix: Rix, line: string, cues: TantrumCues) {
   const { stomps, stomp, shake, arms, fleeAt } = TANTRUM;
   const plan = planToss(rix);
   rix.mood = "tantrum";
+  cues.lock?.();
   const tl = timeline();
   const settle = cut(rix);
   if (settle) tl.add(settle, 0);

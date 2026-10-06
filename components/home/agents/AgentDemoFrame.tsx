@@ -1,24 +1,29 @@
 // The demo panel (ui-spec §4.1): a raised card with a status header ("agent running" and the
-// agent's slug) over the demo. Below `lg` it's at least 384px tall; from `lg` it keeps a shape,
-// 10:9 beside the tab list (variant A), 16:10 beside each stack row (variant B), as a minimum:
-// `min-h-auto` and no overflow clipping let aspect-ratio grow the panel when the demo needs it.
+// agent's slug) over the demo. `header` replaces the header row's content (the pointer panel has
+// no status dot). Below `lg` it's at least 384px tall; from `lg` it keeps a shape, 10:9 beside the
+// tab list (variant A), 16:10 beside each stack row (variant B), as a minimum: `min-h-auto` and no
+// overflow clipping let aspect-ratio grow the panel when the demo needs it. Below `lg` the `tabs`
+// panel has square top corners: the stepper above it is the card's rounded top (§4.2a).
 import type { ReactNode } from "react";
 import { agents } from "@/content/home";
 import type { AgentsVariant } from "@/lib/agents";
 import { metaLabel } from "@/lib/styles";
 
 const shape: Record<AgentsVariant, string> = {
-  tabs: "lg:aspect-[10/9]",
+  tabs: "max-lg:rounded-t-none lg:aspect-[10/9]",
   stack: "lg:aspect-[16/10]",
 };
 
 type AgentDemoFrameProps = {
-  readonly slug: string;
   readonly variant: AgentsVariant;
+  /** The sample agent's name, on the right of the status header. */
+  readonly slug?: string;
+  /** The header row's content, in place of the status dot, status and slug. */
+  readonly header?: ReactNode;
   readonly children: ReactNode;
 };
 
-export function AgentDemoFrame({ slug, variant, children }: AgentDemoFrameProps) {
+export function AgentDemoFrame({ variant, slug, header, children }: AgentDemoFrameProps) {
   return (
     <div
       className={`flex min-h-96 flex-col rounded-3xl border border-line bg-band lg:min-h-auto ${shape[variant]}`}
@@ -26,15 +31,19 @@ export function AgentDemoFrame({ slug, variant, children }: AgentDemoFrameProps)
       <div
         className={`flex items-center justify-between gap-4 border-b border-line px-5 py-4 ${metaLabel}`}
       >
-        <span className="flex items-center gap-2">
-          <span
-            aria-hidden="true"
-            data-anim="demo-status-dot"
-            className="size-1.5 rounded-full bg-accent"
-          />
-          {agents.demoStatus}
-        </span>
-        <span>{slug}</span>
+        {header ?? (
+          <>
+            <span className="flex items-center gap-2">
+              <span
+                aria-hidden="true"
+                data-anim="demo-status-dot"
+                className="size-1.5 rounded-full bg-accent"
+              />
+              {agents.demoStatus}
+            </span>
+            <span>{slug}</span>
+          </>
+        )}
       </div>
       <div className="relative flex flex-1 flex-col justify-center p-5 md:p-8 xl:p-9">
         {children}

@@ -1,6 +1,6 @@
 # Constitution
 
-**Last Updated:** 2026-10-02
+**Last Updated:** 2026-10-05
 
 The non-negotiable rules for `marwix.dev`. Every implementation decision is checked against them.
 They exist to stop scope creep, unsupported claims and rework.
@@ -32,14 +32,25 @@ mascot act out its emotions, moves and plays. It makes no claims and has its own
 
 ## 3. The reader and the main action
 
-The reader is **someone who isn't technical and might hire the user**: a small-business owner, a
-community owner, a founder, an agency or a creator, usually sent the link directly. Every section
-is written so any of them can follow it. **"Book a call" is the main action** and stays visible in
-the nav.
+The reader is **someone who might hire the user**, usually sent the link directly. They are one
+of five audiences, the About cards: a service business (a clinic, a salon, a tutor), an online
+store, a Discord server owner, a software builder (a developer, a vibe coder, a software company)
+or someone who needs a website. Only the software builder is technical. **"Book a call" is the
+main action** and stays visible in the nav.
+
+- **The shared page is written so all five can follow it.** A reader who has picked no card, or
+  "Not sure yet", sees only shared content.
+- **A picked card's own content is written for that audience, in its tone:** its acknowledgement,
+  its offers and demos in Agents, its flow in Process, its WhatsApp message and the closing line
+  of each project's takeover (what the project means for that reader). Nothing else on the page
+  changes with a pick; the rest of a project's takeover reads the same for everyone. The tones
+  live in `docs/04-voice.md`.
+- **A project's takeover covers the nav while it is open,** so each takeover ends with its own
+  Book a call button, after that closing line.
 
 - Section order lives in `docs/pages/home/page.md`; the nav and every section's content live in its
   file under `docs/pages/home/sections/`, not here.
-- **`https://exile.marwix.dev` is linked from the Exile takeover only**, never from the nav.
+- **`https://exile.marwix.dev` is linked from the Exile Bot takeover only**, never from the nav.
 - Booking uses **Cal.com**. The link is in `docs/03-facts.md`.
 
 ## 4. Tokens only
@@ -80,12 +91,19 @@ or helpful it seems. In particular:
 1. **No money figures of any kind:** no prices, rates or earnings. The site takes no payment.
 2. **No numbers except the ones filled in the facts file**, shown exactly as filled.
 3. **Offers are stated plainly, in the present tense** ("I build AI agents that…"). No specific
-   client, project or result is claimed unless it's in the facts file.
-4. **Outcomes, not tech.** The reader isn't technical; no tech-stack lists.
-5. **Demo panels are illustrations.** The Agents section's demo panels show what an agent could
-   do, not work delivered for anyone. Their sample content (messages, first names, times, week
-   numbers) is exempt from the facts file and from item 2, but never names a real client,
-   business or result.
+   client, project or result is claimed unless it's in the facts file. A result the facts file
+   does state (such as lower cost or faster delivery) is said in the facts' words, with no figure.
+4. **Outcomes, not tech.** No tech-stack lists and no tool, model or vendor names, on any card.
+   The one exception is sample content inside a demo panel, which may name an everyday product a
+   reader already uses (such as "instagram DM" or "Sheets").
+   The software-builder card's own content may use the words builders use for their work (app,
+   feature, ship, review, production); everything else stays in plain words.
+5. **Demo panels and flows are illustrations.** The Agents section's demo panels and the Process
+   section's per-card flows show what an agent could do, not work delivered for anyone. Their
+   sample content (messages, first names, times, week numbers, the steps of a sample job) is
+   exempt from the facts file and from item 2, but never names a real client, business or result.
+   Each offer a demo illustrates, and how the user works as shown in a flow, must still be in the
+   facts file.
 
 A hook blocks money amounts in site files. The rest is on `copywriter` and `code-auditor`.
 

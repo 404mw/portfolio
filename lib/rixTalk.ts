@@ -4,7 +4,8 @@
 // laid out from the first character and nothing re-wraps. On each word's first character his body
 // talks: `upper` bobs (only while no act holds it) and the eyes squish (only while neutral). At the
 // start the eyes glance toward the quip's side and back at the end (not while annoyed, angry, in
-// love or turned away). `QUIP_HOLD` counts from the last character, then `QUIP_OUT`. The quip takes the
+// love or turned away, nor during a hover line: he keeps looking at the card, R4.9). `QUIP_HOLD`
+// counts from the last character (the timeline's `typed` label), then `QUIP_OUT`. The quip takes the
 // side with room (R5.3), set on the anchor as each line starts. Talk never owns the rig, arms or
 // feet. The spans are queried when the line starts (React has rendered them by then). Where the
 // quip sits above him (the /rix playground, lib/rixFeatures.ts) there's no side: the anchor carries
@@ -42,11 +43,15 @@ export function setQuipSide(rix: Rix) {
   rix.anchor.dataset.side = left < TALK.sideRoom && roomRight(track) > left ? "right" : "left";
 }
 
-/** True while no act holds `upper` and the mood is neutral: the bobs may run. */
+/**
+ * True while no act holds `upper` and the mood is neutral: the bobs may run. Hover mode's base
+ * expression (R4.9) leaves `upper` free between its beats.
+ */
 function upperFree(rix: Rix): boolean {
   const { act, hold, mood, bot } = rix;
-  const talking = act === null || act === "nudge" || act === "poke" || act === "ask";
-  return talking && hold === null && mood === "neutral" && bot.state !== "napping" && !gsap.isTweening(bot.parts.upper);
+  const talking = act === null || act === "chatter" || act === "poke" || act === "ask";
+  const free = hold === null || (rix.hovering !== null && act === null);
+  return talking && free && mood === "neutral" && bot.state !== "napping" && !gsap.isTweening(bot.parts.upper);
 }
 
 /** True while the eyes are neutral and still (not turned away, not mid-move): the squish may run. */
@@ -57,9 +62,10 @@ const eyesNeutral = (rix: Rix) =>
   rix.bot.state !== "napping" &&
   !rix.bot.parts.eye.some((eye) => gsap.isTweening(eye));
 
-/** True while the eyes may glance: not annoyed, angry, in love or turned away. */
+/** True while the eyes may glance: not annoyed, angry, in love or turned away, nor held on a card. */
 const mayGlance = (rix: Rix) =>
   rix.wall === null &&
+  rix.hovering === null &&
   rix.emotion !== "annoyed" &&
   rix.emotion !== "angry" &&
   rix.emotion !== "love" &&
@@ -132,14 +138,16 @@ export function typeLine(rix: Rix, line: string, at: number): gsap.core.Timeline
       times[i],
     );
   });
-  tl.call(
-    () => {
-      if (mayGlance(rix) && bot.state === "idle" && rix.target === null) {
-        rix.crew.run(gsap.to(bot.ch, { look: bot.restLook, perp: 0, ...LOOK_BACK, overwrite: "auto" }));
-      }
-    },
-    [],
-    last,
-  ).to(quip, { opacity: 0, ...QUIP_OUT }, last + QUIP_HOLD);
+  tl.addLabel("typed", last)
+    .call(
+      () => {
+        if (mayGlance(rix) && bot.state === "idle" && rix.target === null) {
+          rix.crew.run(gsap.to(bot.ch, { look: bot.restLook, perp: 0, ...LOOK_BACK, overwrite: "auto" }));
+        }
+      },
+      [],
+      last,
+    )
+    .to(quip, { opacity: 0, ...QUIP_OUT }, last + QUIP_HOLD);
   return tl;
 }
