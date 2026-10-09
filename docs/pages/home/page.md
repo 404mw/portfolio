@@ -165,7 +165,7 @@ depth-copy steps that showed stair steps and colour bands at two-across sizes. L
 production build: solid side faces with no stair steps at 1440 and in a 3840 close-up, the motion
 test passes, and no sideways scroll at 360/767/1440/3840. See `sections/07-proofs.md`.
 
-The workflow offer's `orchestra` demo (three swimlanes, eight rows) and Process' step 4-to-3 fix
+The workflow offer's `orchestra` demo (three swimlanes, eight rows) and Process' step 5-to-4 fix
 loop are built, with motion (the orchestra's token run; the fix hop on every second relay run).
 Below `lg`, Agents swaps its tab list for one shared stepper above the panel (‹ / ›, counter and
 title, bars filling on the 6s clock, the offer's line). Lead-checked 2026-10-04 at 360 to 3840: no
@@ -181,7 +181,7 @@ pill per row. Lead-checked 2026-10-04 on a production build at 360 to 3840: lint
 sideways scroll, no console errors, set switching re-rigs the bots cleanly.
 
 Below `lg`, Process stands each bot on its own short ledge (`ProcessLedge`) and draws the fix loop as
-a dotted bracket from bot 4 up to bot 3; under full motion the relay's job hops ledge to ledge, each
+a dotted bracket from bot 5 up to bot 4; under full motion the relay's job hops ledge to ledge, each
 ledge lighting as it lands; on the fix run the job goes back along the dotted fix line, which lights
 behind it (reduced motion: static only).
 Lead-checked 2026-10-05 in headless Chromium on a production build, static at 360 to 3840 and full
@@ -281,6 +281,7 @@ Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live si
 
 - 2026-10-09 — User's call: the word "rules" is replaced by "standards" everywhere on the home page except the Discord demo's "#rules" channel (Process step, lead, loop and fix labels in every flow; the software-builder card incl. the Review gate role; the Exile Bot proof line). Copywriter writing; the facts file is unchanged ("standards" paraphrases its "rules"). Supersedes the "your rules" wording in the 2026-10-08 Process decision. See `sections/04-agents.md`, `05-process.md`, `07-proofs.md`.
 - 2026-10-09 — User's calls: the facts line "Sensitive actions, like refunds and complaints, are passed to a person instead of being handled by an agent" stands as worded; the new round 1 Marquee and About lines stay (nothing restored); home `meta.title` stays "Muhammad Waqas | AI Agents and Automations" and need not echo the description; the software-builder "inside your team" line stays (see `sections/04-agents.md`, `05-process.md`).
+- 2026-10-09 — Lead's call (user delegated): audit copy fixes where the facts or voice rule 17 didn't back the wording: Process default step 3 ("passed to you, not handled by an agent"), Agents online-store "Orders to stock" line and demo result ("Sheet updated"), Web label ("Websites and web apps"), Exile takeover and proof line ("from plan to launch"; "Agents that each do one part"). "To you or your staff" stays. See `sections/04-agents.md`, `05-process.md`, `06-web.md`, `07-proofs.md`.
 
 - 2026-10-08 — User's calls: the shared voice is written first for everyday business owners who know AI only as a chat box (ChatGPT); developer and Discord content stays inside their own cards. "AI agent" stays, defined once in Agents by comparison with ChatGPT, then the copy talks in jobs; tone is calm proof (their job done, they stay in charge), no grand claims. Round 1: words plus Agents' heading and bridge line; round 2: demos show the action taken (a "Done" receipt) and Process is recast around control, one question "Can I trust it with my customers?" (built; heading changed to "Hard calls / come to you." on 2026-10-09). `docs/04-voice.md` gained the chat-box reader line and rules 15-17 (show the job done; define "AI agent" once; builders' words only in the software-builder card); `docs/03-facts.md` gained "What an AI agent is", around-the-clock lines for service business and online store, and the new default set line. See `sections/02-hero.md`, `02a-about.md`, `03-marquee.md`, `04-agents.md`, `05-process.md`, `06-web.md`, `08-contact.md`.
 - 2026-10-07 — User's call: the entry to `/rix` moves from a footer-row link to a second Rix standing on the footer's top line; see `sections/09-footer.md`.
@@ -427,8 +428,8 @@ Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live si
 - **Choice:** the reference design file `temp/claude-design/Portfolio Redesign v3.dc.html` is
   missing on disk (constitution §5 names it); the user restores it or says to drop it.
 - **Roll-up:** section-specific open questions remain in `sections/02-hero.md` (5),
-  `sections/02a-about.md` (10), `sections/03-marquee.md` (1), `sections/04-agents.md` (16),
-  `sections/05-process.md` (24), `sections/07-proofs.md` (34), `sections/08-contact.md` (1) and `sections/09-footer.md` (3). The
+  `sections/02a-about.md` (10), `sections/03-marquee.md` (1), `sections/04-agents.md` (17),
+  `sections/05-process.md` (25), `sections/07-proofs.md` (34), `sections/08-contact.md` (1) and `sections/09-footer.md` (3). The
   pre-deploy check reads this roll-up and every section file; the page ships with none open
   anywhere.
 - **To build:** `lib/takeoverTitleMorph.ts` still carries logic for Bricolage's `opsz`/`wdth` axes
@@ -441,6 +442,7 @@ Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live si
 - **To build:** the ui-spec files still quote the old sizes and fonts (e.g. `ui-spec.md`
   `condensedMark`, `ui-spec/09-footer.md` "25vw", `ui-spec/00-rix.md`, `docs/pages/rix/ui-spec.md`);
   ui-designer updates them.
+- **To build:** `ui-spec/05-process.md` (§5.4 Sizes and elsewhere: "across from 1024", `lg:` names) and `ui-spec/04-agents.md` (`AgentPointerPanel`, kind `pointer`, `agents.pointer.*`, removed 2026-10-07) are out of date; ui-designer updates them (see `sections/05-process.md`, `04-agents.md`).
 - **Choice:** the hero portrait is taller on phones and tablets than before (about 100px at 360)
   because the name block above it is shorter: keep, or bring back the old size.
 - **To build:** Safari, Firefox and real-device check of the new fonts, plus the Design Vault
@@ -450,4 +452,4 @@ Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live si
 - **Review (rolled up):** Agents: sticky column at 1024x768 re-measured 2026-10-09, still 38px over;
   the reminder chat's "reminder sent" note was dropped. Process (flow side by side from `wide`, 1440,
   since 2026-10-09): layout lead-checked 2026-10-09; browser check pending (animation at 1440 and 3840, two accepted
-  overlaps), and "To you or your staff" may be too long at 1440.
+  overlaps), and "To you or your staff" may be too long at 1440 (not measured).

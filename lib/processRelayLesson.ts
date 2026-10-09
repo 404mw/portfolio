@@ -1,5 +1,5 @@
 // The relay lesson's moves (ui-spec §5.7 layer 10, "The return"; §5.9 below `wide`): the small rule
-// card that rides the return back to step 2, "your rules", in a flow that has the return. From `wide`
+// card that rides the return back to step 2, "your standards", in a flow that has the return. From `wide`
 // it splits off the finished job at the last bot: it pops in off the job's centre and peels up,
 // fades out as it leaves (that step's text lies between the bot and the path, so it never flies
 // across the words), drops onto the dashed path at the return's start (R0), and at the end scales

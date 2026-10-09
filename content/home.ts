@@ -321,14 +321,14 @@ export const agents = {
       },
       {
         title: "Orders to stock",
-        line: "A new order updates your stock and your sheet, and the customer hears when it ships.",
+        line: "A new order updates your stock and your sheet, so all your tools stay up to date.",
         slug: "orders to stock",
         demo: {
           tools: ["Store", "Stock", "Sheets"],
           events: [
             { kind: "new order", result: "Stock updated" },
             { kind: "order paid", result: "Row in Sheets" },
-            { kind: "item shipped", result: "Customer told" },
+            { kind: "item shipped", result: "Sheet updated" },
           ],
           done: "all up to date",
         },
@@ -519,7 +519,7 @@ export const process = {
       steps: [
         { title: "Job arrives", line: "A job comes in: a booking, a question, a request." },
         { title: "Your standards", line: "Every job follows standards written for your business." },
-        { title: "Hard calls", line: "Anything sensitive or unusual is passed to you before any work starts." },
+        { title: "Hard calls", line: "Anything sensitive or unusual is passed to you, not handled by an agent." },
         { title: "Done", line: "Routine jobs get done to those standards." },
         { title: "Checked", line: "A separate agent checks the work before it goes out." },
       ],
@@ -584,7 +584,7 @@ export const process = {
 // Facts → What the user can build. An offer.
 export const web = {
   number: "03",
-  label: "Websites, end to end",
+  label: "Websites and web apps",
   heading: { lead: "Your website,", accent: "start to finish." },
   lead: "One person, from plan to launch: your website or web app, ready to take bookings and answer visitors from the start.",
   steps: [
@@ -645,7 +645,7 @@ export const proofs = {
           },
           {
             title: "Websites and web apps",
-            line: "I built Exile Bot's public website alone. I build websites and web apps end to end.",
+            line: "I built Exile Bot's public website alone. I build websites and web apps from plan to launch.",
           },
         ],
       },
@@ -655,7 +655,7 @@ export const proofs = {
         items: [
           {
             title: "I build the system before the app",
-            line: "Specialist agents, written standards, automatic checks and a review loop built Exile Bot and ran it live, with real users.",
+            line: "Agents that each do one part, written standards, automatic checks and a review loop built Exile Bot and ran it live, with real users.",
           },
           {
             title: "I keep only the data an app needs",

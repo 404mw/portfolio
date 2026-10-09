@@ -1,5 +1,5 @@
-// The loop's return to step 2, "your rules" (ui-spec §5.3): what the job taught goes back into the
-// rules. Below `wide`: an icon and the label in a row. From `wide`: a dashed path from the last bot's
+// The loop's return to step 2, "your standards" (ui-spec §5.3): what the job taught goes back into the
+// standards. Below `wide`: an icon and the label in a row. From `wide`: a dashed path from the last bot's
 // centre back to step 2's, on the list's own column grid, with an arrowhead on step 2's end (the
 // box's first child) and the label centred on its bottom edge, then the relay's return-lit overlay
 // (hidden at rest; last, under the label). One label element at every width.

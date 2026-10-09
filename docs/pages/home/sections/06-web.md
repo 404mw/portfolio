@@ -54,6 +54,8 @@ motion: fades only, no rise, no indent. Everything shows as built with no JS.
 
 - 2026-10-08 — User's call (`../page.md`): the lead now ends "ready to take bookings and answer visitors from the start."
 
+- 2026-10-09 — Lead's call (user delegated; voice rule 17): the label `web.label` reads "Websites and web apps" (was "Websites, end to end"). Landed in `content/home.ts`.
+
 ## Open Questions
 
 None.

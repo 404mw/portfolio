@@ -13,7 +13,7 @@
 > (2026-10-04, 2026-10-05; Safari, Firefox and real devices unchecked). Open: the user's calls on
 > copy, the new emblems and the ledges, and the known limits below.
 
-**The one question:** How do they work?
+**The one question:** Can I trust it with my customers?
 
 See `../page.md` for the site-wide index. Spec: `../ui-spec/05-process.md` (§5.10 flows and
 roles, §5.7 motion); the bots' built motion is `../ui-spec/05-process-motion.md`; the earlier
@@ -109,19 +109,21 @@ On a send run the flag bot raises its flag and the job climbs the stem
 1440: send 7.48s, straight 15.23s, fix 20.45s; Discord about 11.8s (older measures for the six-step
 flows are stale). Reduced motion has no relay.
 
-Fix loop: in every flow with loops, step 3 ends with `ProcessFixReturn`
+Fix loop: in every flow with loops, step 4 (the team step, `FIX_STEP = 3` zero-based in
+`lib/processFlows.ts`, rendered after it by `ProcessList`) ends with `ProcessFixReturn`
 (`process.flows.<set>.fixLabel`, the box's right edge from `flowLayouts[n].fixBox`), the work going
-back from step 4 to step 3. From `wide` a dashed arch stands over bots 3 and 4 with its label above
+back from the check at step 5 (`FIX_STEP + 1`, `fixStop` in `lib/processRelayPlan.ts`) to step 4. From
+`wide` a dashed arch stands over bots 4 and 5 with its label above
 it, on a `bg` mask at `z-10`, and the caption-to-steps gap is `wide:gap-24`; below `wide` it is a marker
-row at the end of step 3 holding the label, beside a dotted `accent` bracket (`process-fix-line`,
-with an arrowhead onto bot 3) down the bot column's left edge from bot 4's hand up to bot 3's. It
-shows at rest. On each fix run in the cycle (`RUN_CYCLE`; `FIX_STEP = 3`, the team step; the check follows it), only in a flow with loops, the check finds something (its eyes pop, "found it", only
-on this run), the job shakes and goes back over the arch to step 3, which redoes its act, then
+row at the end of step 4 holding the label, beside a dotted `accent` bracket (`process-fix-line`,
+with an arrowhead onto bot 4) down the bot column's left edge from bot 5's hand up to bot 4's. It
+shows at rest. On each fix run in the cycle (`RUN_CYCLE`), only in a flow with loops, the check at step 5 finds something (its eyes pop, "found it", only
+on this run), the job shakes and goes back over the arch to step 4, which redoes its act, then
 forward to the check again (`processRelayFix.ts` from `wide`; the hop adds 5.2s there, 5.5s below
 `wide`). `process-fix-lit` lights with a `clip-path` reveal, the same technique as
 `process-return-lit`; below `wide` `process-fix-line-lit` lights behind the job along the dotted line
 and fades as the job hops forward (see Phone ledges). Motion never writes `process-fix`
-or step 3's `<li>`. The Discord flow has no fix loop, and its caption gap is `wide:gap-12` (48px).
+or step 4's `<li>`. The Discord flow has no fix loop, and its caption gap is `wide:gap-12` (48px).
 
 Phone ledges: below `wide` each step's bot stands on its own ledge, `ProcessLedge` (placed by
 `ProcessStep` after the bot; every `<li>` is `relative` with no z-index): a 2px `bg-line` bar
@@ -135,12 +137,12 @@ land at each bot's `JOB_AT` on its ledge's top; at the hand-off the job drops ou
 ledge 1 over `JOB_HAND_OFF`, then hops on. Each `process-ledge-lit` fades in as the job lands and out
 as it hops off (`LEDGE_LIT`: 0.15s in, 0.35s out); ledge 1 only flashes at the hand-off; on the last
 ledge the job pops "done" and fades with its light and there is no exit slide. On the fix run the
-job goes back along the dotted fix line (`lib/processRelayFixLine.ts`): left off ledge 4, up the
-bracket, through the arrowhead into bot 3's hand, onto ledge 3, in `FIX_LINE_HOP` (1.1s
+job goes back along the dotted fix line (`lib/processRelayFixLine.ts`): left off ledge 5, up the
+bracket, through the arrowhead into bot 4's hand, onto ledge 4, in `FIX_LINE_HOP` (1.1s
 `power1.inOut`). The route is measured from the bracket's box (`process-fix-line`, read only) at
 setup, resize and refresh, and turns 3 points per quarter circle; `process-fix-line-lit` lights
 behind the job by `clip-path` and fades as the job hops forward; the ghosts trail the route. A flow
-with no fix line falls back to the straight rise from ledge 4 to 3 (`FIX_HOP`, 0.8s), unlit. From
+with no fix line falls back to the straight rise from ledge 5 to 4 (`FIX_HOP`, 0.8s), unlit. From
 `wide` the fix hop is unchanged. The lesson keeps its lane up the left edge, over the
 fix line's ends. A step with no lit overlay just doesn't light. Under reduced motion nothing hops
 or lights (the relay runs only under full motion). Without the exit drop, Discord's phone run ends
@@ -180,7 +182,7 @@ hides.
 
 - `components/home/process/` — ProcessSection, ProcessFlow (the set's flow and the tag),
   ProcessList, ProcessStep, ProcessBot, ProcessEmblem (the job in step 1's hand), ProcessReturn,
-  ProcessFixReturn (the fix loop, step 4 back to 3; dotted bracket below `wide`), ProcessLedge (the
+  ProcessFixReturn (the fix loop, step 5 back to 4; dotted bracket below `wide`), ProcessLedge (the
   phone ledge under each bot below `wide`),
   ProcessRelay, ProcessJob, ProcessLesson, ProcessMotion
 - `components/home/process/ProcessHandoff.tsx` — the hand-off at step 3 (dashed stem from `wide`,
@@ -247,6 +249,7 @@ hides.
   connects to other apps). Its bots are intake, rules, update, ship, host (ui-spec §5.10); data is
   `hasLoops` and `flowLoops(set)` in `lib/processFlows.ts` and `data-loops` on the flow wrapper.
 - 2026-10-08 — User's calls (spec `../ui-spec/05-process.md` §5.10, §5.11, choices 69–80, all first options): the one question becomes "Can I trust it with my customers?"; Process is recast with control first: label "You stay in charge", a heading (since 2026-10-09 "Hard calls / come to you."), a new `process.lead` line. Order: job arrives, your rules, hard calls / to you (flag), done (team), checked (check, fix loop back to step 4), then remind / ship for six-step flows; software-builder reorders too in peer words; Discord unchanged. The hand-off is a dashed accent stem with a label from `lg` and a marker row with an arrow below `lg` (breakpoint now `wide`, see the first 2026-10-09 line), no person drawn; each looped flow gains `handoffLabel` ("To you", "To you or your staff", "To a person"). Supersedes the earlier step order, the "AI agents run / every job." heading and the `FIX_EVERY` fix-hop cadence. The online-store "complaints" line stands: the facts gained "Sensitive actions, like refunds and complaints, are passed to a person instead of being handled by an agent". Built.
+- 2026-10-09 — Lead's call (user delegated; audit copy fix): the default flow's step 3 line reads "Anything sensitive or unusual is passed to you, not handled by an agent." (was "...before any work starts"; the facts don't back that). Landed in `content/home.ts`. "To you or your staff" stays as voice (user approved, round 2); its width at 1440 is still an open question.
 - 2026-10-09 — User's call: the software-builder first step's "inside your team" stays; builders' words belong in that card (voice rule 17).
 - 2026-10-09 — Heading "Hard calls / **come to you.**" (second line accent) supersedes "Your rules run it. / You make the hard calls."; it sets on two lines at 360, 768, 1440 and 3840 and one at 1024.
 - 2026-10-03 — "Second check" is backed by the facts line "A separate agent checks the work before
@@ -318,7 +321,7 @@ hides.
 ## Open Questions
 
 - **To build:** browser check pending: the Process animation run-through at 1440 and 3840, and the two spec-accepted overlaps (the job crossing the pennant for about 0.2s; in the stacked layout the lesson over the end of the dotted fix line).
-- **Review:** `handoffLabel` "To you or your staff" (service-business only) may be too long at 1440 six-across; fallback "You or your staff".
+- **Review:** `handoffLabel` "To you or your staff" (service-business only) may be too long at 1440 six-across (width not measured); fallback "You or your staff".
 - **Review:** Discord step 5 role: `host` (spec's first option) or `remind` (ui-spec §5.8 choice 39).
 - **Review:** Discord step 4 role: `ship` (first option) or a new plug role (choice 40).
 - **Review:** Discord step 3 role: `update` with its wrench (first option) or a book-only role
@@ -355,3 +358,4 @@ hides.
 - **Choice:** below `wide` the job crosses in front of bots 4 and 3's legs and feet on the short legs
   to and from the fix line: accept (as built), or reroute.
 - **Choice:** the way back's 1.1s (`FIX_LINE_HOP`, as built), or closer to the old 0.8s.
+- **To build:** `ui-spec/05-process.md` is out of date (§5.4 Sizes and elsewhere: "across from 1024", `lg:` names; the breakpoint is `wide`, 1440); ui-designer updates it.

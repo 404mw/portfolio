@@ -107,7 +107,7 @@ export function relayPlan(
 }
 
 /**
- * The bot that takes the lesson back at the return's end: the rules bot (step 2, "your rules"), or
+ * The bot that takes the lesson back at the return's end: the rules bot (step 2, "your standards"), or
  * the second bot if a flow had none.
  */
 export function lessonTaker(roles: readonly BotRole[]): number {

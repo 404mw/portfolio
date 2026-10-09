@@ -15,7 +15,7 @@ export type FlowLayout = {
   readonly chevron: string;
   /** The return path's box: from the last bot back to step 2's. */
   readonly returnBox: string;
-  /** The fix arch's right edge: from step 3's bot over to step 4's (one gap + 64px past step 3). */
+  /** The fix arch's right edge: from step 4's bot over to step 5's (one gap + 64px past step 4, `FIX_STEP`). */
   readonly fixBox: string;
 };
 

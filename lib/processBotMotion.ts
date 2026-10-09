@@ -408,7 +408,7 @@ export const JOB_DONE = {
 /** Then the job fades out where it stands. */
 export const JOB_FADE: Timing = { duration: 0.3, ease: "power1.in" };
 
-// The relay lesson (the small rule card that rides the return back to step 2, "your rules"), in a
+// The relay lesson (the small rule card that rides the return back to step 2, "your standards"), in a
 // flow that has the return.
 /**
  * At the last bot, as the job leaves: the lesson splits off the job's centre, popping in from
