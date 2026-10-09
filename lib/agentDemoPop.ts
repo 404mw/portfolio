@@ -8,7 +8,7 @@ import { ease } from "@/lib/motion";
 export type DemoPlayback = {
   /** The one-off sequence. */
   readonly sequence: gsap.core.Timeline;
-  /** Loops that keep running after it (Sync's packets), for pausing off screen. */
+  /** Loops that keep running after it, for pausing off screen (no demo has one today). */
   readonly loops: readonly gsap.core.Animation[];
 };
 

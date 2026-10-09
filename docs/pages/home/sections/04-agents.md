@@ -126,14 +126,14 @@ ones keep their minimums, the sum never over the longest time), drawn at build s
 differs. Longest times and ranges (seconds): chat 5 (gap after each message [0.3, 1.1], typing-dots
 hold [0.5, 1.4]); leads 3.2 (each pill swap after [0.16, 0.8], from 0.8); checklist 3.4 (each tick
 after [0.15, 0.7], from 0.65; the pill 0.25 after the last tick); report 2.4 (gap before each next
-bar [0.03, 0.25]; each bar grows 0.6); sync 3 (each event after [0.15, 0.7], from 0.6; the packet
-loop is untouched); orchestra 5 (ride pace [0.65, 1.3] times each link, dwells per card
+bar [0.03, 0.25]; each bar grows 0.6); sync 4 (starts 0.35; each event's dot crosses its connectors at 0.4s each, linear, then a wait
+[0.2, 0.7] from each pop to the next dot; both demos have 4 crossings); orchestra 5 (ride pace [0.65, 1.3] times each link, dwells per card
 [0.04, 0.2], finding [0.34, 0.5], ticks [0.16, 0.36]). Measured
 over 22+ replays: chat 2.05-3.89 with three messages, 3.63-5.00 with four; leads 1.89-3.19;
-checklist 2.51-3.40; report 1.60-2.39; sync 1.95-2.98; orchestra 4.55-5.00; none passed its
-longest. Chat shows typing dots before each agent line, then the line; Leads' pills flip from
+checklist 2.51-3.40; report 1.60-2.39; orchestra 4.55-5.00; none passed its
+longest (sync, rebuilt 2026-10-09, runs 3.2-4.0 by design, not measured on screen). Chat shows typing dots before each agent line, then the line; Leads' pills flip from
 "new" to "followed up"; the Checklist pops its lines with empty boxes, turns each to its tick, then
-pops the pill; Report's bars grow; Sync's packets loop along their connectors; the Orchestra
+pops the pill; Report's bars grow; Sync runs one event at a time (below); the Orchestra
 (`lib/orchestraRun.ts`) pops its rows in, then a token rides each link, flashing each card it reaches, the finding is an accent
 fill blink on one check chip, the token rides the two dashed fix links, row 7's ticks pop in order,
 the last link runs back to the Lead, then the pill pops. When earlier steps run long, later ones are squeezed (most visible in the
@@ -172,6 +172,17 @@ latest bar only stretches. Reduced motion fades the fill only; touch does nothin
 growing in the replay lights at once and stretches once it lands; every replay start or revert
 resets the bars first. At 1024 and 1440 a hovered bar grew (225 to 243px at 1440) and none was left
 lit after fast sweeps.
+
+Sync demo (built 2026-10-09, build and lint green, not yet seen on screen): markup hooks in
+`SyncDemo.tsx` are `data-sync-tool` on each tool, a hidden `data-anim="sync-lit"` accent overlay in
+each tool, `data-sync-link` on each connector and `data-sync-from`/`data-sync-to` on each event.
+In `lib/agents.ts` events carry `from`/`to`; `syncToolIndex` and a load-time check fail the build if
+a name isn't one of the demo's tools. In `sync()` there is no packet loop: each event runs one dot
+from `from` to `to`, 0.4s per connector, linear, the next connector's packet taking over at the
+middle tool; it fades in over the route's first 0.12s and out over its last 0.12s. As it lands the
+`to` tool lights (rise 0.15s, hold 0.2s, fade 0.5s) and the event's box pops; the pill pops 0.2s
+before the last pop ends. `loops` is empty. Revert gives the static finished state; reduced motion
+is unchanged.
 
 ## Key Files
 
@@ -264,6 +275,7 @@ lit after fast sweeps.
 - 2026-10-09 — User's call: the online-store "Orders to stock" offer is reworked within the facts (`docs/03-facts.md:132`, tools connected so data moves between them): the card names the owner's benefit (nothing typed by hand) and each demo event lands in a different tool (new order → stock count lowered; order paid → added to your sales sheet; item shipped → order marked shipped), replacing "Row in Sheets" / "Sheet updated". Supersedes the earlier 2026-10-09 audit wording for that card; final wording is in `content/home.ts` (copywriter writing).
 - 2026-10-09 — User's call (after the lead's recommendation): the default set's "Order questions" demo shows the agent stopping: a customer asks for a refund and the agent passes it to the owner, ending on a hand-off receipt (named by the next decision; wording in `content/home.ts`); the card's line covers routine questions answered and refunds passed to you (facts :89, :133). Why: every default demo was the happy path, and owners who know only ChatGPT fear a bot improvising with customers. No new UI (the receipt reuses the tick line, as online-store Returns does); the online-store "Order questions" card keeps its tracking-link demo.
 - 2026-10-09 — User's call (on seeing "Passed to you" in the default "Order questions" demo: "who??? name them"): demo hand-off receipts and replies name the person they go to, with a fictional sample owner name and role (e.g. "Passed to Sam, the owner"), not "you"; applies to the default "Order questions" demo and the online-store "Returns" receipt (was "Passed to you to decide"); exact wording in `content/home.ts` (copywriter writing). "You" stays where the page speaks to the visitor: Process `handoffLabel`, the Process lead, the Agents lead and the card lines. See `../page.md`.
+- 2026-10-09 — User's call: the `sync` demo (online-store "Orders to stock", discord "Custom commands") stops looping packets along the connectors; each event drives its own dot, one event at a time, from the event's `from` tool to its `to` tool (one or two connectors, either direction), the `to` tool lights briefly, the event's box pops in, then the pill. Each event in `content/home.ts` gains `from`/`to` tool names (Orders to stock: new order Store→Stock, order paid Store→Sheets, item shipped Stock→Store; Custom commands: /signup used Server→Sheets, /stock used Sheets→Server, Stream goes live Twitch→Server). Why: the loop wasn't tied to the events, and "item shipped" lands back in the Store while the dots only ran left to right. Reduced motion and the no-JS finished state are unchanged. Supersedes the earlier sync packet-loop motion. Built; see Current State.
 - 2026-10-09 — User's call: the software-builder row 1 line "I set up the agent workflow I use inside your team." stays; builders' words belong in that card.
 - 2026-10-03 — Demo kinds: the four built (chat, leads, report, sync) are reused with new sample
   content; a new `checklist` kind (four lines whose boxes turn to ticks) serves the software-builder
@@ -340,11 +352,14 @@ lit after fast sweeps.
   time to about 5.4s, or leave it.
 - **Review:** the orchestra token's ride speed now varies per link; keep it, or vary only the
   dwells.
-- **Review:** Report and Sync now run about 0.5s and 0.7s longer on average; keep, or pull back.
+- **Review:** Report now runs about 0.5s longer on average; keep, or pull back.
+- **Review:** screen check on :3000 for both sync demos (Orders to stock, Custom commands), at desktop and phone.
+- **Review:** on a two-connector route the dot jumps across the middle tool's width at the hand-off; check it on screen.
+- **Note:** the sync replay has no loop to pause off screen; like chat, leads, checklist and report, a one-off replay can finish while off screen.
 - **Review:** the latest (already violet) bar shows no hover at all under reduced motion; a signal
   would need a second colour.
 - **Review:** the tallest bar's stretch is capped at 1.053 against 1.08 for the rest; raising the
   ceiling would put it about 8px into the 20px gap under the title at 1440.
 - **Note:** the bar hover binds on `(pointer: fine)` only; Firefox, Safari and a real mouse are
   unchecked (the lead check used headless Chromium).
-- **To build:** `ui-spec/04-agents.md` is out of date (~348-357, 471, 510, 619, 642 still name `AgentPointerPanel`, kind `pointer` and `agents.pointer.*`, all removed 2026-10-07); ui-designer updates it.
+- **To build:** `ui-spec/04-agents.md` is out of date: ~348-357, 471, 510, 619, 642 still name `AgentPointerPanel`, kind `pointer` and `agents.pointer.*` (all removed 2026-10-07), and ~232-236, 547, 558, 585 still describe the sync packet loop (replaced 2026-10-09); ui-designer updates it.

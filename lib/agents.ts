@@ -61,12 +61,32 @@ export type ReportDemoContent = {
   readonly sent: string;
 };
 
-/** Three linked things, three events and the final status. */
+/**
+ * Three linked things, three events and the final status. Each event names the tool it starts at
+ * (`from`) and the tool it lands in (`to`), both one of `tools`.
+ */
 export type SyncDemoContent = {
   readonly tools: readonly string[];
-  readonly events: readonly { readonly kind: string; readonly result: string }[];
+  readonly events: readonly {
+    readonly kind: string;
+    readonly result: string;
+    readonly from: string;
+    readonly to: string;
+  }[];
   readonly done: string;
 };
+
+/**
+ * The index in `tools` of a tool an event names. A name that isn't one of the tools throws (the
+ * check below runs it over every sync event at build time).
+ */
+export function syncToolIndex(tools: readonly string[], name: string): number {
+  const index = tools.indexOf(name);
+  if (index === -1) {
+    throw new Error(`Sync demo event names "${name}", which is not one of its tools (${tools.join(", ")}).`);
+  }
+  return index;
+}
 
 /** Pieces of work, each with the one-word result its tick stands for, and the final status. */
 export type ChecklistDemoContent = {
@@ -147,6 +167,18 @@ export const agentPanelKinds: { readonly [S in AboutSet]: KindsPer<(typeof agent
 export function agentPanels(set: AboutSet): readonly AgentPanel[] {
   const kinds: readonly AgentPanelKind[] = agentPanelKinds[set];
   return agents.cards[set].map((row, index) => ({ ...row, kind: kinds[index] }) as AgentPanel);
+}
+
+// Every sync event's `from` and `to` must be one of its demo's tools: checked once when this module
+// loads (the static build loads it), so a mismatch fails `npm run build`, not a reader's panel.
+for (const set of Object.keys(agentPanelKinds) as AboutSet[]) {
+  for (const panel of agentPanels(set)) {
+    if (panel.kind !== "sync") continue;
+    for (const event of panel.demo.events) {
+      syncToolIndex(panel.demo.tools, event.from);
+      syncToolIndex(panel.demo.tools, event.to);
+    }
+  }
 }
 
 /** The ids of an offer row's number and title, so a tab and its panel are named by them only. */

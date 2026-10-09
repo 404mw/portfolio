@@ -326,9 +326,9 @@ export const agents = {
         demo: {
           tools: ["Store", "Stock", "Sheets"],
           events: [
-            { kind: "new order", result: "Stock count lowered" },
-            { kind: "order paid", result: "Added to your sales sheet" },
-            { kind: "item shipped", result: "Order marked shipped" },
+            { kind: "new order", result: "Stock count lowered", from: "Store", to: "Stock" },
+            { kind: "order paid", result: "Added to your sales sheet", from: "Store", to: "Sheets" },
+            { kind: "item shipped", result: "Order marked shipped", from: "Stock", to: "Store" },
           ],
           done: "nothing to copy over",
         },
@@ -413,9 +413,9 @@ export const agents = {
         demo: {
           tools: ["Server", "Sheets", "Twitch"],
           events: [
-            { kind: "/signup used", result: "Row in Sheets" },
-            { kind: "/stock used", result: "Read from Sheets" },
-            { kind: "Stream goes live", result: "Posted in #live" },
+            { kind: "/signup used", result: "Row in Sheets", from: "Server", to: "Sheets" },
+            { kind: "/stock used", result: "Read from Sheets", from: "Sheets", to: "Server" },
+            { kind: "Stream goes live", result: "Posted in #live", from: "Twitch", to: "Server" },
           ],
           done: "all up to date",
         },

@@ -279,6 +279,7 @@ Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live si
 
 ## Decisions (site-wide)
 
+- 2026-10-09 — User's call: Agents' `sync` demo (online-store "Orders to stock", discord "Custom commands") drops the looping packets; each event drives its own dot from its `from` tool to its `to` tool, then its box pops in. Built (build and lint green; screen check pending). See `sections/04-agents.md`.
 - 2026-10-09 — User's call: Agents' online-store "Orders to stock" offer is reworked within the facts (benefit: nothing typed by hand; each demo event lands in a different tool); supersedes the audit wording for that card. See `sections/04-agents.md`.
 - 2026-10-09 — User's call: the default set's Agents "Order questions" demo now shows a refund passed to the owner, not a happy-path answer; the online-store card keeps its tracking-link demo. See `sections/04-agents.md`.
 - 2026-10-09 — User's call: Agents demo hand-off receipts and replies (default "Order questions", online-store "Returns") name the person they go to, a fictional sample owner with role ("Passed to Sam, the owner"), not "you"; "you" stays where the page speaks to the visitor (Process `handoffLabel`, Process and Agents leads, card lines). See `sections/04-agents.md`.
@@ -431,7 +432,7 @@ Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live si
 - **Choice:** the reference design file `temp/claude-design/Portfolio Redesign v3.dc.html` is
   missing on disk (constitution §5 names it); the user restores it or says to drop it.
 - **Roll-up:** section-specific open questions remain in `sections/02-hero.md` (5),
-  `sections/02a-about.md` (10), `sections/03-marquee.md` (1), `sections/04-agents.md` (17),
+  `sections/02a-about.md` (10), `sections/03-marquee.md` (1), `sections/04-agents.md` (20),
   `sections/05-process.md` (25), `sections/07-proofs.md` (34), `sections/08-contact.md` (1) and `sections/09-footer.md` (3). The
   pre-deploy check reads this roll-up and every section file; the page ships with none open
   anywhere.
@@ -445,7 +446,7 @@ Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live si
 - **To build:** the ui-spec files still quote the old sizes and fonts (e.g. `ui-spec.md`
   `condensedMark`, `ui-spec/09-footer.md` "25vw", `ui-spec/00-rix.md`, `docs/pages/rix/ui-spec.md`);
   ui-designer updates them.
-- **To build:** `ui-spec/05-process.md` (§5.4 Sizes and elsewhere: "across from 1024", `lg:` names) and `ui-spec/04-agents.md` (`AgentPointerPanel`, kind `pointer`, `agents.pointer.*`, removed 2026-10-07) are out of date; ui-designer updates them (see `sections/05-process.md`, `04-agents.md`).
+- **To build:** `ui-spec/05-process.md` (§5.4 Sizes and elsewhere: "across from 1024", `lg:` names) and `ui-spec/04-agents.md` (`AgentPointerPanel`, kind `pointer`, `agents.pointer.*`, removed 2026-10-07; the sync packet loop, replaced 2026-10-09) are out of date; ui-designer updates them (see `sections/05-process.md`, `04-agents.md`).
 - **Choice:** the hero portrait is taller on phones and tablets than before (about 100px at 360)
   because the name block above it is shorter: keep, or bring back the old size.
 - **To build:** Safari, Firefox and real-device check of the new fonts, plus the Design Vault
