@@ -203,15 +203,15 @@ export const agents = {
       },
       {
         title: "Order questions",
-        line: "Order and delivery questions get answered, day and night.",
+        line: "Order questions get answered day and night, and refund requests are passed to you.",
         slug: "order questions",
         demo: {
           asker: "Customer",
           messages: [
-            { from: "them", text: "Hi, has my order shipped yet?" },
-            { from: "agent", text: "Yes, it left this morning. Here's your tracking link." },
-            { from: "action", text: "Tracking link sent", where: "your orders" },
-            { from: "them", text: "Perfect, thanks!" },
+            { from: "them", text: "Hi, my order arrived damaged. Can I get a refund?" },
+            { from: "agent", text: "Sorry about that. Refunds are decided by the owner, so I've passed your request on with your order details." },
+            { from: "action", text: "Passed to you", where: "your inbox" },
+            { from: "them", text: "Okay, thank you." },
           ],
         },
       },
