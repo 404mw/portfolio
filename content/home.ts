@@ -321,16 +321,16 @@ export const agents = {
       },
       {
         title: "Orders to stock",
-        line: "A new order updates your stock and your sheet, so all your tools stay up to date.",
+        line: "Every order updates your stock and your sales sheet, so you don't copy it over by hand.",
         slug: "orders to stock",
         demo: {
           tools: ["Store", "Stock", "Sheets"],
           events: [
-            { kind: "new order", result: "Stock updated" },
-            { kind: "order paid", result: "Row in Sheets" },
-            { kind: "item shipped", result: "Sheet updated" },
+            { kind: "new order", result: "Stock count lowered" },
+            { kind: "order paid", result: "Added to your sales sheet" },
+            { kind: "item shipped", result: "Order marked shipped" },
           ],
-          done: "all up to date",
+          done: "nothing to copy over",
         },
       },
       {
