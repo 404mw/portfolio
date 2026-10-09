@@ -5,8 +5,8 @@
 // action line, §4.10) pops with its box empty and ticks it off after a drawn hold
 // (lib/agentDemoReceipt.ts); the Checklist pops its lines with empty boxes, then turns each box
 // to its tick; Report grows its bars from the bottom; Sync runs one dot per event, from the tool
-// the event starts in to the one it lands in, lights that tool and pops the event's box
-// (2026-10-09); the Orchestra runs its token down the swimlanes (lib/orchestraRun.ts). Reduced
+// the event starts in to the one it lands in, lights that tool and pops the event's box, then
+// fades every packet back in at its midpoint as the pill pops (2026-10-09); the Orchestra runs its token down the swimlanes (lib/orchestraRun.ts). Reduced
 // motion: the finished state, its parts fading in by order with no pop, rise or scale, no typing
 // dots, no swaps, no packets moving, no tool lit, no token moving and every receipt already
 // ticked. Every sequence ends well inside the 6s auto-advance slot.
@@ -15,9 +15,10 @@
 // Each one (a chat gap or the typing dots, a lead handled, a line ticked off, a bar's turn, a sync
 // event) takes a random time from its `[min, max]` range, drawn from the demo's budget
 // (lib/demoBudget.ts): its `longest` time less the fixed parts around the steps. Every time is
-// drawn here, as the sequence is built, so a replay is paced afresh each time its panel shows and
-// a paused one resumes exactly where it stopped. The parts' first pop-in keeps its tight, even
-// stagger.
+// drawn here, as the sequence is built, so a replay is paced afresh each time its panel shows. A
+// sequence is never paused: hovering or focusing the Agents tabs pauses only the advance line (and
+// any `loops`, which no demo has), so a replay always runs to its end. The parts' first pop-in
+// keeps its tight, even stagger.
 //
 // All starting states are set here, in JS: without JS, or before a replay, the panel shows its
 // finished state. Reverting what this returns puts the panel back to that state.
@@ -97,9 +98,10 @@ const REPORT = { bar: 0.6, barGap: [0.03, 0.25], pillLap: 0.15, longest: 2.4 } a
  * Sync: seconds for the dot to cross one connector, its fade in at its route's start and out at
  * its end, when the first event's dot sets off, the wait from one event's box popping to the next
  * event's dot setting off (drawn from the range), the landing tool's light coming up, holding and
- * fading, how long before the last event's pop ends the pill pops, and the longest the whole
- * sequence may take (to the pill's pop or the last light's fade, whichever ends later). Both demos
- * cross four connectors over three events: 3.2s to 4s.
+ * fading, how long before the last event's pop ends the pill pops, the packets' fade back in at
+ * their midpoints as the pill pops, and the longest the whole sequence may take (to the pill's pop,
+ * the packets' return or the last light's fade, whichever ends latest: the light). Both demos cross
+ * four connectors over three events: 3.2s to 4s.
  */
 const SYNC = {
   cross: 0.4,
@@ -110,6 +112,7 @@ const SYNC = {
   litHold: 0.2,
   litOut: 0.5,
   pillLap: 0.2,
+  packetBack: 0.3,
   longest: 4,
 } as const;
 /** Reduced motion: seconds between parts fading in. */
@@ -343,7 +346,9 @@ function syncRoute(from: number, to: number, packets: ReadonlyMap<number, HTMLEl
  * fade, so a two-connector route reads as one dot. It fades in at the route's start and out as it
  * lands, and that moment the landing tool lights up (holds, then fades) and the event's box pops
  * in. The next dot sets off a drawn wait after that pop starts; the pill pops over the last
- * event's pop. Every packet starts hidden and every light off. A packet sits at its connector's
+ * event's pop, and as it does every packet fades back in at its connector's midpoint, all
+ * together and without travel, so the replay ends on the static picture (2026-10-09). Every
+ * packet starts hidden and every light off. A packet sits at its connector's
  * midpoint in static, centred by a CSS translate that GSAP folds into `x`, so the travel
  * re-centres it with `xPercent`; each crossing reads its connector's width as it starts. Nothing
  * loops.
@@ -367,10 +372,13 @@ function sync(panel: HTMLElement, parts: HTMLElement[]): DemoPlayback {
   sequence.set([...packets.values(), ...lights.values()], { opacity: 0, immediateRender: true }, 0);
 
   // What is fixed around the waits: the first dot's start, every crossing, and what follows the
-  // last landing (the pill's pop over the last event's, or the last light, whichever ends later).
+  // last landing (the pill's pop over the last event's, the packets' return as it pops, or the
+  // last light, whichever ends latest).
   const crossings = runs.reduce((sum, { route }) => sum + route.length, 0);
+  const pillAt = POP_SECONDS - SYNC.pillLap;
   const tail = Math.max(
-    POP_SECONDS - SYNC.pillLap + POP_SECONDS,
+    pillAt + POP_SECONDS,
+    pillAt + SYNC.packetBack,
     SYNC.litUp + SYNC.litHold + SYNC.litOut,
   );
   const waits = spendBudget(
@@ -432,7 +440,21 @@ function sync(panel: HTMLElement, parts: HTMLElement[]): DemoPlayback {
     }
   });
 
-  sequence.from(pill, POP_FROM, at + POP_SECONDS - SYNC.pillLap);
+  sequence.from(pill, POP_FROM, at + pillAt);
+  // Back to rest: each packet, still hidden, moves to its midpoint, then fades in there.
+  sequence.fromTo(
+    [...packets.values()],
+    { xPercent: -50, x: 0, opacity: 0 },
+    {
+      xPercent: -50,
+      x: 0,
+      opacity: 1,
+      duration: SYNC.packetBack,
+      ease: ease.out,
+      immediateRender: false,
+    },
+    at + pillAt,
+  );
   return { sequence, loops: [] };
 }
 
