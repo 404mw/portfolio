@@ -1,4 +1,5 @@
-// Rix for the /rix sharing image (docs/pages/rix/ui-spec.md §0.5): the host bot's idle pose, drawn
+// Rix for both sharing images, home's (app/opengraph-image.tsx, docs/pages/home/ui-spec.md §0.7)
+// and /rix's (docs/pages/rix/ui-spec.md §0.5), each sizing him: the host bot's idle pose, drawn
 // from ProcessBot's own geometry (lib/processBots.ts) with token colour values (lib/tokens.ts, via
 // lib/botTokenColours.ts), since the image can't read CSS. At rest look his silhouette is the logo.
 // One glyph: the first of the rising hearts (lib/rixGlyphs.ts). No hooks or classes: ImageResponse

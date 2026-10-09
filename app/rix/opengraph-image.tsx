@@ -1,31 +1,27 @@
 // The /rix sharing preview (1200×630, docs/pages/rix/ui-spec.md §0.5): the wordmark, the page's
 // title and its address down the left; Rix standing on a floor line on the right. Colours come
 // from lib/tokens.ts, the token mirror for OG images; the font is Acosta, the display face
-// (assets/fonts/acosta.otf, one weight: regular 400), read from disk when the image is built.
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+// (lib/ogFonts.ts).
 import { ImageResponse } from "next/og";
+import { OgAddress } from "@/components/og/OgAddress";
+import { OgFloorLine } from "@/components/og/OgFloorLine";
+import { OgWordmark } from "@/components/og/OgWordmark";
 import { RixOgFigure } from "@/components/rix/RixOgFigure";
 import { intro, meta } from "@/content/rix";
-import { footer } from "@/content/shared";
+import { ogDisplayFamily, ogFonts } from "@/lib/ogFonts";
 import { rixPath } from "@/lib/publishedRoutes";
-import { siteUrl } from "@/lib/site";
+import { siteAddress } from "@/lib/site";
 import { tokens } from "@/lib/tokens";
 
 export const alt = meta.ogAlt;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const fontPath = join(process.cwd(), "assets", "fonts", "acosta.otf");
-
 /** Rix's box: 510 × 330 (1 unit = 3px), right edge at x 1120, feet on the floor at y 500. */
 const rixBox = { width: 510, height: 330, right: 1120, floor: 500 };
 
 export default async function OpengraphImage() {
   const { colors } = tokens;
-  const { lead, accent, tail } = footer.wordmark;
-  const address = `${new URL(siteUrl).host}${rixPath}`;
-  const acosta = await readFile(fontPath);
 
   return new ImageResponse(
     (
@@ -37,15 +33,11 @@ export default async function OpengraphImage() {
           display: "flex",
           background: colors.bg,
           color: colors.text,
-          fontFamily: "Acosta",
+          fontFamily: ogDisplayFamily,
           fontWeight: 400,
         }}
       >
-        <div style={{ position: "absolute", left: 80, top: 80, display: "flex", fontSize: 36 }}>
-          <span>{lead}</span>
-          <span style={{ color: colors.accent }}>{accent}</span>
-          <span>{tail}</span>
-        </div>
+        <OgWordmark style={{ position: "absolute", left: 80, top: 80, fontSize: 36 }} />
         <div
           style={{
             position: "absolute",
@@ -62,19 +54,8 @@ export default async function OpengraphImage() {
           <span>{intro.heading.lead}</span>
           <span style={{ color: colors.accent }}>{intro.heading.accent}</span>
         </div>
-        <div style={{ position: "absolute", left: 80, top: 540, display: "flex", fontSize: 28, color: colors.muted }}>
-          {address}
-        </div>
-        <div
-          style={{
-            position: "absolute",
-            left: 80,
-            top: rixBox.floor,
-            width: rixBox.right - 80,
-            height: 2,
-            background: colors.line,
-          }}
-        />
+        <OgAddress text={siteAddress(rixPath)} left={80} top={540} />
+        <OgFloorLine left={80} right={rixBox.right} top={rixBox.floor} />
         <div
           style={{
             position: "absolute",
@@ -87,9 +68,6 @@ export default async function OpengraphImage() {
         </div>
       </div>
     ),
-    {
-      ...size,
-      fonts: [{ name: "Acosta", data: acosta, weight: 400, style: "normal" }],
-    },
+    { ...size, fonts: await ogFonts(["display"]) },
   );
 }

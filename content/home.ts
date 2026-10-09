@@ -6,7 +6,13 @@
 export const meta = {
   title: "Muhammad Waqas | AI Agents and Automations",
   description:
-    "AI agents for your business: they book appointments, answer customer messages and follow up on new enquiries, around the clock. Book a call.",
+    "I build AI agents that do the routine work for service businesses, online stores and Discord servers. Websites and web apps too. Book a call.",
+  // The home sharing image (ui-spec §0.7). ogLine: the role line under the name, at most 2 lines.
+  // ogBubble: Rix offers the lead offer (bookings) to the reader, one line, no tick. An offer,
+  // never a finished job: the sharing image isn't a demo panel (constitution §7.5).
+  ogLine: "I build AI agents that do the routine work in your business.",
+  ogBubble: "Need bookings handled?",
+  ogAlt: "MARWIX wordmark and Muhammad Waqas, who builds AI agents for business. Violet mascot Rix asks if you need bookings handled.",
 } as const;
 
 export const hero = {

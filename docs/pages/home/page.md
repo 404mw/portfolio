@@ -43,7 +43,7 @@ kept as they were, so Marquee (3) renders before About (2a).
 
 ## Current State (site-wide)
 
-All nine sections are built statically; section detail lives in `sections/`. Lint, `tsc` and the
+Deploy: `main` at `aa403cb` is live in production as of 2026-10-09. All nine sections are built statically; section detail lives in `sections/`. Lint, `tsc` and the
 production build are green (lead check, 2026-10-09, after round 2; the orphan `AgentPointerPanel.tsx` is gone).
 That check (headless Chromium, 360, 768, 1024, 1440, 3840) found no sideways scroll and no page
 errors; the earlier 2026-10-08 check (reduced motion, 360, 768, 1440, 3840) found no overflowing
@@ -80,7 +80,7 @@ no console errors, and no reveal is left stuck hidden; the Proofs takeover's ope
 mid-open/Next/double-Esc/direct-load+Back all end in the right state at 360 and 1440. The Agents
 and Process motion pass was lead-checked 2026-10-04 (lint, tsc and build green; 360, 768, 1024,
 1440 and 3840 in full and reduced motion: no sideways scroll, no console errors, nothing left dimmed
-after a swap). Next: deploy prep (a pre-push audit).
+after a swap).
 
 Site-wide, in `app/globals.css`: the scrollbar is an accent thumb on a transparent track, and text
 selection plus image dragging are off (inputs, textarea and contenteditable stay selectable), and
@@ -100,13 +100,29 @@ IBM Plex Sans Bold (`displayPunct`, local static 700 file); Acosta's automatic f
 1.8x smaller than under Bricolage, tracking normal, leading 1.0 to 1.15 (footer mark 0.9,
 `--text-footer-mark` 17.5vw, `--text-hero` `clamp(2.4375rem, 1.25rem + 5.278vw, 7rem)` so MUHAMMAD
 clears the portrait); the About poster card title steps `text-body` / `md:text-summary` /
-`lg:text-card`; both sharing images use Acosta. Lead-checked 2026-10-07 on the dev server (Edge via
+`lg:text-card`; both sharing images use Acosta for the wordmark and the name (home also uses Plex Sans 400, see the sharing-image paragraph below). Lead-checked 2026-10-07 on the dev server (Edge via
 Playwright): lint and build pass; `/` and `/rix` at 360, 768, 1440 and 3840 under reduced motion
 have no sideways scroll, no console errors and no display text wider than its box (section headings
 on two lines, row and card titles on one); step and row titles for the Discord, software-builder,
 online-store and service-business sets fit at 360, 1024 and 1440; full motion at 360 and 1440: the
 Exile Bot takeover opens and closes in the right end state and the footer reveal completes. Not
 checked: Safari, Firefox, real devices, the Design Vault takeover, the takeover's Next slide.
+
+Home sharing image and description (2026-10-09, built, build and lint green, not deployed; the lead
+checked the rendered PNG from the build output, not in a browser): `app/opengraph-image.tsx` is
+rebuilt to `ui-spec.md` §0.7. It draws the wordmark (`components/og/OgWordmark.tsx`, shared with
+`/rix`, whose image looks unchanged), the name in two violet Acosta 72px lines (`hero.firstName`,
+`hero.lastName`), the role line (`meta.ogLine`), the floor line, Rix (`RixOgFigure`, unchanged, 340x220
+at x 620) with an offer bubble over his head (`components/og/OgSpeechBubble.tsx`, text
+`meta.ogBubble` "Need bookings handled?", no tick), and the address `marwix.dev`
+(`components/og/OgAddress.tsx`). The floor line is `components/og/OgFloorLine.tsx`; both it and
+the address are shared with `/rix`. The role line, bubble and address
+use IBM Plex Sans 400 from `assets/fonts/ibm-plex-sans-latin-400.woff` (Fontsource 5.1.1; OFL
+already in `assets/fonts/`). `alt` is `meta.ogAlt` (describes the offer). `content/home.ts`
+`meta.description` is rewritten (every audience, 141 characters); `meta.ogLine`, `meta.ogBubble` and
+`meta.ogAlt` are new. `lib/ogFonts.ts` reads the OG font files and returns the ImageResponse
+fonts; `lib/site.ts` `siteAddress(path)` returns the address string. The `/rix` image renders
+byte-identical to before (PNGs compared).
 
 Footer Rix (2026-10-07, built, static and motion, lead-checked): Rix stands on the footer's top
 hairline as the only entry to `/rix`, and calls the visitor with typed lines; browser checks beyond
@@ -204,7 +220,7 @@ Built and lead-checked 2026-10-06: under full motion a plain click or Enter on a
 ducks its bot below the banner floor, then opens the takeover; bots stay down while any takeover is
 open and rise back after. Lint and build pass; checked in Edge at 1440. See `sections/07-proofs.md`.
 
-SEO pass (2026-10-07, built, not deployed): every page gets a canonical link through
+SEO pass (2026-10-07, built, live since 2026-10-09): every page gets a canonical link through
 `pageMetadata` (`alternates.canonical` is the page's own path; `app/page.tsx` passes `path: "/"`);
 `app/sitemap.ts` stamps each published route with the build date; `/` renders one JSON-LD graph
 (`StructuredData`: a WebSite node and a Person node, strings from `content/shared.ts` and
@@ -213,9 +229,13 @@ purpose); and Agents and Process each server-render all four card sets in a `hid
 (`AgentsAllOffers`: title and line; `ProcessAllFlows`: caption and steps), built from `about.replies`
 through `pickSet` (`lib/cardSets.ts`), so crawlers and AI models can read offers that otherwise
 appear only after a pick, without showing or being read twice. Home `meta.title` is "Muhammad Waqas | AI
-Agents and Automations" (`content/home.ts`). Checked only in the built HTML: the canonical on `/` and `/rix`,
-the JSON-LD parses, the four sets' text is present, and the hidden wrappers are `display: none` by
-Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live site.
+Agents and Automations" (`content/home.ts`). Passed code-auditor and deployed; checked in the built HTML (the four sets' text is present, the
+hidden wrappers are `display: none` by Tailwind's `[hidden]` rule) and live with curl on 2026-10-09:
+`www.marwix.dev` returns 308 to `https://marwix.dev/`; `robots.txt` allows all and points to the
+sitemap, which lists `/` and `/rix` with lastmod; canonicals are `https://marwix.dev` on `/` and
+`https://marwix.dev/rix` on `/rix`; title, description, og:title, og:url and og:image are present
+and the og image returns 200 `image/png`; the live JSON-LD parses as one graph (WebSite + Person).
+Not checked in a browser.
 
 ## Key Files (site-wide)
 
@@ -235,6 +255,12 @@ Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live si
   `--font-mono`), `app/opengraph-image.tsx`, `app/rix/opengraph-image.tsx`, `assets/fonts/acosta.otf`
   (and `assets/fonts/ibm-plex-sans-latin-700.woff2`) — the site's fonts (2026-10-07 decision; Acosta,
   IBM Plex Sans, IBM Plex Mono, Plex Sans Bold for display punctuation)
+- `components/og/OgWordmark.tsx`, `components/og/OgSpeechBubble.tsx` (the offer bubble, no tick),
+  `components/og/OgFloorLine.tsx`, `components/og/OgAddress.tsx` (floor line and address shared by
+  both images), `lib/ogFonts.ts` (reads the OG font files, returns the ImageResponse fonts),
+  `lib/site.ts` `siteAddress(path)` (the address string), `assets/fonts/ibm-plex-sans-latin-400.woff`
+  (the static Plex Sans 400 the OG builder reads, since it can't read WOFF2) — the sharing images'
+  parts; `components/rix/RixOgFigure.tsx` draws Rix in both images
 - `lib/styles.ts` — shared style helpers: the takeover's cream-side tokens (`pillInk`,
   `focusRingOnCream`, `metaLabelOnCream`) and the split/sticky-title helpers (`splitColumns`,
   `splitGrid` adds `lg:items-start`, `stickyTitle` `lg:sticky lg:top-30 lg:self-start`) and
@@ -279,10 +305,13 @@ Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live si
 
 ## Decisions (site-wide)
 
-- 2026-10-09 — User's call: Agents' `sync` demo (online-store "Orders to stock", discord "Custom commands") drops the looping packets; each event drives its own dot from its `from` tool to its `to` tool, then its box pops in. Built (build and lint green; screen check pending). See `sections/04-agents.md`.
+- 2026-10-09 — User's call after the pre-push audit: Rix's bubble on the home sharing image is an offer, not a done message, and has no tick (`meta.ogBubble` "Need bookings handled?"; `meta.ogAlt` describes the offer). Why: constitution §7.5 exempts sample/done content only inside the Agents demo panels and Process flows; a ticked "Customer booked in" beside the name read as delivered work. Supersedes the done-message part of the earlier 2026-10-09 sharing-image decision.
+- 2026-10-09 — User's call: home `meta.description` is rewritten because it was outdated and incomplete (it named only service-business jobs); it now names every audience: service businesses, online stores and Discord servers, plus websites and web apps (software builders left out for length), first person, ending on Book a call. `meta.title` is unchanged. Copywriter wrote it in `content/home.ts`.
+- 2026-10-09 — User's call: the home sharing image (`app/opengraph-image.tsx`) is redesigned from the wordmark alone to the wordmark, the name (violet, from `hero.firstName`/`lastName`), a role line (`meta.ogLine`), the address, and Rix on a floor line with a speech bubble saying a job is done (`meta.ogBubble`); alt from `meta.ogAlt`. Only the home image changes; /rix's stays. The user delegated the detailed calls to the lead ("be creative, decide for me"): name in `accent`, Rix mid-right and smaller so he survives a square crop, IBM Plex Sans 400 for the role line, bubble and address (a new static font file, since the OG builder can't read WOFF2), and the bubble itself (bubble superseded by the decision above: an offer, no tick). Spec: `ui-spec.md` §0.7 (decisions 44–49).
+- 2026-10-09 — User's call: Agents' `sync` demo (online-store "Orders to stock", discord "Custom commands") drops the looping packets; each event drives its own dot from its `from` tool to its `to` tool, then its box pops in. Built (build and lint green; screen check pending). The replay's end is being changed so the packets fade back in at their connector midpoints as the pill pops (not built yet). See `sections/04-agents.md`.
 - 2026-10-09 — User's call: Agents' online-store "Orders to stock" offer is reworked within the facts (benefit: nothing typed by hand; each demo event lands in a different tool); supersedes the audit wording for that card. See `sections/04-agents.md`.
 - 2026-10-09 — User's call: the default set's Agents "Order questions" demo now shows a refund passed to the owner, not a happy-path answer; the online-store card keeps its tracking-link demo. See `sections/04-agents.md`.
-- 2026-10-09 — User's call: Agents demo hand-off receipts and replies (default "Order questions", online-store "Returns") name the person they go to, a fictional sample owner with role ("Passed to Sam, the owner"), not "you"; "you" stays where the page speaks to the visitor (Process `handoffLabel`, Process and Agents leads, card lines). See `sections/04-agents.md`.
+- 2026-10-09 — User's call: Agents demo hand-off receipts and replies (default "Order questions", online-store "Returns") name the person they go to, a fictional sample owner with role ("Passed to Sam, the owner"), not "you", and the online-store Sales report stamp reads "sent to Sam · Mon 09:00" (Discord's stays "sent to owner"); "you" stays where the page speaks to the visitor (Process `handoffLabel`, Process and Agents leads, card lines). See `sections/04-agents.md`.
 - 2026-10-09 — User's call: the word "rules" is replaced by "standards" everywhere on the home page except the Discord demo's "#rules" channel (Process step, lead, loop and fix labels in every flow; the software-builder card incl. the Review gate role; the Exile Bot proof line). Copywriter writing; the facts file is unchanged ("standards" paraphrases its "rules"). Supersedes the "your rules" wording in the 2026-10-08 Process decision. See `sections/04-agents.md`, `05-process.md`, `07-proofs.md`.
 - 2026-10-09 — User's calls: the facts line "Sensitive actions, like refunds and complaints, are passed to a person instead of being handled by an agent" stands as worded; the new round 1 Marquee and About lines stay (nothing restored); home `meta.title` stays "Muhammad Waqas | AI Agents and Automations" and need not echo the description; the software-builder "inside your team" line stays (see `sections/04-agents.md`, `05-process.md`).
 - 2026-10-09 — Lead's call (user delegated): audit copy fixes where the facts or voice rule 17 didn't back the wording: Process default step 3 ("passed to you, not handled by an agent"), Web label ("Websites and web apps"), Exile takeover and proof line ("from plan to launch"; "Agents that each do one part"). "To you or your staff" stays. See `sections/04-agents.md`, `05-process.md`, `06-web.md`, `07-proofs.md`.
@@ -423,11 +452,14 @@ Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live si
 
 - **To do (user):** create a free Umami Cloud account, add the website marwix.dev and send the
   lead its website ID; it's set as `NEXT_PUBLIC_UMAMI_WEBSITE_ID` in Vercel and needs a redeploy.
-- **To do (user):** in Vercel, set `www.marwix.dev` to redirect to `marwix.dev` (it currently
-  serves the page too).
 - **To do (user):** add the site to Google Search Console (Domain property; the user adds the TXT
   record in Cloudflare themselves, constitution §10) and Bing Webmaster Tools, then submit the
-  sitemap, after the SEO pass is deployed.
+  sitemap (`https://marwix.dev/sitemap.xml`).
+- **To do (lead, after Search Console):** run Google's Rich Results Test on the live JSON-LD,
+  LinkedIn Post Inspector on the sharing preview, and PageSpeed Insights on phone.
+- **To check (lead):** the redesigned home sharing image is built but not deployed; after the deploy, refresh LinkedIn's cache with Post Inspector, and check the image in a square-cropped preview (WhatsApp).
+- **To do:** `docs/01-design-system.md` Type section says IBM Plex loads from Google Fonts; it doesn't mention the local static `assets/fonts/ibm-plex-sans-latin-400.woff` the home sharing image uses (audit LOW, 2026-10-09).
+- **To build:** `docs/pages/rix/ui-spec.md` §0.5 is stale (says Geist Mono 800 and 72px; code uses Acosta at 64px); ui-designer updates it.
 - **Choice:** constitution §13's ship date (2026-09-30) has passed; the user decides the new one.
 - **Choice:** the reference design file `temp/claude-design/Portfolio Redesign v3.dc.html` is
   missing on disk (constitution §5 names it); the user restores it or says to drop it.

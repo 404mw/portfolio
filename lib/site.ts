@@ -11,3 +11,8 @@ export const siteName = `${lead}${accent}${tail}`;
 export function absoluteUrl(path: string): string {
   return new URL(path, siteUrl).toString();
 }
+
+/** The site's address as a sharing image shows it, without the scheme: "marwix.dev", "marwix.dev/rix". */
+export function siteAddress(path = ""): string {
+  return `${new URL(siteUrl).host}${path === "/" ? "" : path}`;
+}

@@ -1,6 +1,6 @@
 # Home: UI spec
 
-**Last Updated:** 2026-10-06
+**Last Updated:** 2026-10-09
 **Sources:** `docs/pages/home/page.md` (decisions 1–44, the source of truth), constitution §2–§9,
 `docs/01-design-system.md`, `app/globals.css`, v3 reference (layout and behaviour only),
 `docs/03-facts.md`, `docs/04-voice.md`.
@@ -80,6 +80,16 @@ run the job goes back along the dotted fix line (the user's request), which ligh
 (`FIX_LINE_HOP` 1.1s, `lib/processRelayFixLine.ts`); a fix run below `lg` is +5.5s. From `lg`
 nothing changes. No markup, copy or token change. Six calls are open for the user (Choices,
 below; `ui-spec/05-process.md` §5.8 62–65, 67–68). Summary: §10.
+
+**2026-10-09 (the user's choices on the sharing image; built 2026-10-09, not deployed):** the home
+sharing image is redrawn to pair with `/rix`'s: the wordmark, the name, a role line and
+`marwix.dev` down the left, Rix on a floor line mid-right (§0.7). `/rix`'s image is unchanged. The
+user delegated the layout calls; the lead settled them the same day and added Rix's speech bubble
+(Choices 45–49). **Later the same day (the user's call after the pre-push audit):** the bubble is
+an offer to the reader, not a done message, and has no tick, because constitution §7.5 exempts
+sample done content only inside the Agents demo panels and Process flows (49). Existing tokens
+only; three new copy keys (`meta.ogLine`, `meta.ogBubble`, `meta.ogAlt`); `meta.description` is
+rewritten to name every audience.
 
 ## Sections
 
@@ -300,6 +310,90 @@ Contrast: `muted` on `bg` about 6.9:1; `text` on `bg` above 16:1; `on-accent` on
   enough; it never moves focus and never changes `open`.
 - **Images:** none (the emblem is the inline `AboutPropGlyph`).
 
+### 0.7 Sharing image (`app/opengraph-image.tsx`; new 2026-10-09, built 2026-10-09, not deployed)
+
+The site-wide preview, redrawn to pair with `/rix`'s (`docs/pages/rix/ui-spec.md` §0.5): the same
+frame, floor line and Rix, but it leads with the name, and Rix makes the reader an offer in a
+speech bubble. `/rix`'s image is unchanged. It stays the default preview for every route without its own.
+
+- **Format:** 1200×630 PNG, `ImageResponse` from `next/og`; `size` and `contentType` as now.
+  Colours are `lib/tokens.ts` names only (the image can't read CSS, so no Tailwind classes).
+  `alt` is `meta.ogAlt`, replacing `siteName`. Background `colors.bg`; 80px clear on every side.
+- **Faces:** the wordmark and the name are Acosta 400 (`assets/fonts/acosta.otf`, as now). The role
+  line, the bubble and the address are body text: **IBM Plex Sans 400** (choice 45), from
+  `assets/fonts/ibm-plex-sans-latin-400.woff`, read from disk like Acosta, as a second font
+  (Satori reads WOFF but not WOFF2, so the site's `ibm-plex-sans-latin-700.woff2` can't stand in;
+  `ibm-plex-sans-OFL.txt` covers it). Acosta has no punctuation, so none of the three would
+  render in it. **2026-10-09:** both files are read by `lib/ogFonts.ts` (the font loading, moved
+  out of the image file).
+
+| Part | Top-left (x, y) and box | Type | Colour (`tokens.colors`) | Source |
+|---|---|---|---|---|
+| Wordmark | 80, 80; ≈ 194×36 | Acosta 36px, line height 1 | `text`, W in `accent` | `footer.wordmark`, drawn by `components/og/OgWordmark.tsx` (shared with `/rix`) |
+| Name, line 1 | 80, 168; ≈ 580×72 measured (x 80–660) | Acosta 72px, uppercase (as the hero), line height 1 | `accent` (as the hero name) | `hero.firstName` |
+| Name, line 2 | 80, 240; ends at ≈ x 455 measured (≈ 375 wide) | same | `accent` | `hero.lastName` |
+| Bubble | right edge at x 844, top 268; sized to its text, at most 288 wide (x 556–844), ≈ 52 tall | Plex Sans 400, 18px, line height 1.3, one line | fill `accent`; text `onAccent` | `meta.ogBubble`, drawn by `components/og/OgSpeechBubble.tsx` |
+| Role line | 80, 360; 540 wide, at most 2 lines (≈ 78 tall) | Plex Sans 400, 30px, line height 1.3 | `text` | `meta.ogLine` |
+| Floor line | x 80–1120 at y 500, 2px | none | `line` | none; drawn by `components/og/OgFloorLine.tsx` (shared) |
+| Rix | 620, 280; box 340×220 (1 unit = 2px), feet on the floor | `RixOgFigure` | its own (`accent`, eyes `bg`) | none |
+| Address | 80, 522; 28 tall | Plex Sans 400, 28px, line height 1 | `muted` | the address helper in `lib/site.ts` (the host of `siteUrl`, `marwix.dev`), drawn by `components/og/OgAddress.tsx` (shared) |
+
+- **Widths (measured on the render, 2026-10-09):** Acosta's capitals run wider than the 0.9em
+  estimate: MUHAMMAD spans x 80–660 and WAQAS ends at about x 455. Line 1 sits above the bubble
+  and line 2 ends at least 100 left of it; the role line stays inside x 80–620.
+- **The bubble (choice 49):** an offer to the reader, never a done message: the sharing image is
+  not a demo panel or a flow, so constitution §7.5's sample exemption doesn't reach it. It is
+  drawn as the agent's chat bubble from the Agents demos (`ChatDemo`: `rounded-xl rounded-br-sm
+  bg-accent px-4.5 py-3.5 text-on-accent`): radius 12 with the bottom-right corner 4, padding 14
+  top and bottom, 18 left and right, `accent` fill, the text alone (no tick, no icon). Its width
+  is its text's plus the padding, at most 288, growing left from the fixed right edge; with no
+  tick it is narrower than the done bubble was. It sits over Rix's head: its bottom edge (y 320)
+  is 12px above the head's left peak (x 736, y 332) and 16 above the right one (x 828, y 336),
+  and its right edge is 28 left of the heart (x 872), so its small bottom-right corner points
+  down at him. Clear of the name's first line by 28, of the second by at least 100 and of the
+  role line by 40, all inside the square zone. Moved from a right edge at x 744 after the lead's
+  screen check (2026-10-09): there it read as a label beside the name, not Rix speaking.
+  **Satori:** `OgSpeechBubble` (renamed from `OgDoneBubble`, 2026-10-09) is one absolutely
+  placed `div` (`display: flex`, `alignItems: center`, background colour, per-corner radii)
+  holding the text in a `span` with `whiteSpace: nowrap`. No icon, tail shape, shadow, filter or
+  `tw`. It's a picture: nothing to hover, focus or tap.
+- **Rix:** `RixOgFigure` as is (same idle host pose, heart part 1), at 2px a unit, the size he
+  stands on `/rix` from `lg`. His drawn figure spans x 672–900, y 288–500; the role line's 540
+  width keeps 52px clear of his left arm. Only that file's header comment changes, to name both
+  images.
+- **Not confused with `/rix`:** home leads with the name, violet capitals at 72px over two lines,
+  plus a role line, and Rix makes an offer; he is two thirds of `/rix`'s size and stands
+  mid-right, with floor to spare on his right; the address has no path. `/rix` leads with "Play
+  with Rix" in mixed case, Rix large at the right edge, silent.
+- **Crops:** 1.91:1 (Facebook, LinkedIn, WhatsApp's large card) shows it all; X's 2:1 takes 15px
+  off the top and bottom, inside the margin. A **square centre crop** (x 285–915; small WhatsApp,
+  iMessage and Telegram thumbnails) keeps Rix on his floor and his bubble whole, and most of the
+  name ("AMMAD", then "AS"); the wordmark, the role line's start and the address are cut.
+  Accepted: at thumbnail size the text is unreadable and the platform prints the title beside it,
+  so Rix and his speech bubble are what identify the link. That is why Rix stands at x 620, not 1120.
+- **Contrast:** `accent` on `bg` about 8.6:1, `onAccent` on `accent` about 9:1, `text` above
+  16:1, `muted` about 6.9:1. The bubble shows no state, so nothing rests on colour alone.
+- **Motion:** none (a static PNG). **Images:** none beyond Rix's inline SVG.
+- **Files:** `app/opengraph-image.tsx` (rewritten), `components/og/OgWordmark.tsx` (new, also
+  used by `app/rix/opengraph-image.tsx`, same output), `components/og/OgSpeechBubble.tsx` (new;
+  renamed from `OgDoneBubble.tsx`, 2026-10-09), `components/og/OgFloorLine.tsx` and
+  `components/og/OgAddress.tsx` (new shared parts, one each), `lib/ogFonts.ts` (new: the font
+  loading, moved out of the image file), `lib/site.ts` (gains the address helper),
+  `content/home.ts → meta` (three new keys, `description` rewritten),
+  `assets/fonts/ibm-plex-sans-latin-400.woff` (new), `components/rix/RixOgFigure.tsx` (comment
+  only). `components/icons/CheckIcon.tsx` is unchanged: its `checkPath` export, added for the
+  tick, is reverted. The page doc follows (constitution §1).
+
+| Key (`content/home.ts → meta`) | Meaning | Limit |
+|---|---|---|
+| `meta.title` | Unchanged: the name and what the user offers | 60 characters |
+| `meta.description` (rewritten) | Search and sharing line: names every audience (service businesses, online stores, Discord servers) plus websites and web apps, from the facts only, ending on the ask | 155 characters |
+| `meta.ogLine` (new) | The image's role line under the name: what the user does, in one plain idea (the description carries the audiences) | Sizing: 2 lines in 540px at 30px, about 70 characters |
+| `meta.ogBubble` (new) | Rix's offer to the reader: one offer the facts list, phrased so it can't read as delivered work or a finished job; a question to the reader works. Not a demo sample (constitution §7.5 exempts only the Agents demo panels and Process flows). No names, numbers or prices | Sizing: one line in the bubble, at most 288 wide with its padding, about 24 characters |
+| `meta.ogAlt` (new) | What the image shows: the MARWIX wordmark, the user's name, the role line's idea, and Rix, the violet MW mascot, standing on a line with a speech bubble making that offer (never a finished job) | 125 characters |
+
+The name has no new slot: it is `hero.firstName` and `hero.lastName` (choice 46).
+
 ---
 
 ## 10. Motion hooks, summary
@@ -455,7 +549,10 @@ the panel), no typing step, no pulse; bubbles and chips only fade.
   and `accent` (with a `/0` gradient stop) and the `rounded-l-2xl` radius. No new token.
   **2026-10-05, later still:** the takeover's What I learned part uses `ink`, `ink/15`,
   `cream-muted`, `font-display`, `font-body`, `font-mono`, `text-step`, `text-summary`,
-  `text-body-lg` and `text-meta`. No new token.)
+  `text-body-lg` and `text-meta`. No new token. **2026-10-09:** the sharing image (§0.7) uses
+  `lib/tokens.ts` `bg`, `text`, `muted`, `line`, `accent` and `onAccent` (the bubble's text),
+  the chat bubble's radii (12, with one 4 corner), and the design system's display
+  (Acosta) and body (IBM Plex Sans) families. No new token.)
 
 ## Choices
 
@@ -603,6 +700,43 @@ and 768):**
     straight rise from ledge 4 to ledge 3, kept only as the fallback with no fix line. From `lg`
     the arch hop is unchanged. Two calls from its build are open for the user (below; §5.8
     67–68). (§5.3a, §5.9, §5.8 66)
+
+**Decided by the user, 2026-10-09 (the sharing image, §0.7; built 2026-10-09, not deployed):**
+
+44. **The home sharing image pairs with `/rix`'s.** It shows the MARWIX wordmark (W in the
+    accent), the user's name, a short line about what they do, `marwix.dev`, and Rix standing on
+    a floor line at the side. Only the home image changes; `/rix`'s stays as it is. The home
+    `meta.description` is rewritten to name every audience; the title is unchanged.
+
+**Decided by the lead, 2026-10-09 (the sharing image, §0.7; the user delegated: "be creative,
+decide for me"):**
+
+45. **The role line's, the bubble's and the address's face:** IBM Plex Sans 400, from a new
+    `assets/fonts/ibm-plex-sans-latin-400.woff` (the body face, as lead lines are on the page;
+    takes punctuation and the dot in `marwix.dev`). Rejected: Acosta only (no new file, but no
+    punctuation, about 40 characters over two lines, no glyph for the address's dot).
+46. **The name's source:** `hero.firstName` and `hero.lastName` (the page's own name, already two
+    lines, as the `<h1>`). Rejected: `footer.copyrightName` (one string, the copyright line's
+    slot). No new slot either way.
+47. **Rix's place:** mid-right at x 620–960 and smaller than on `/rix`, so his whole figure (and
+    his bubble, 49) survives a square thumbnail. Rejected: the right edge like `/rix`, which cuts
+    him in half in a square crop.
+48. **The name's colour:** `accent`, as the hero name, which sets it apart from `/rix`'s `text`
+    heading. Rejected: `text`.
+49. **The lead's addition: Rix makes an offer.** A small speech bubble over his head, left of the
+    heart, drawn as the Agents demos' agent chat bubble (`accent` fill, `onAccent` text, one
+    small corner toward him), carrying one short offer to the reader from the facts
+    (`meta.ogBubble`), phrased so it can't read as delivered work. It ties the image to what the
+    user sells and survives the square crop. To make room in the square zone, the name drops
+    from 80 to 72px; Rix's box is unchanged. **2026-10-09, after the lead's screen check:** its
+    right edge moved from x 744 to x 844; at 744 it read as a label beside the name, not Rix
+    speaking. **2026-10-09, the user's call after the pre-push audit:** the bubble was first a
+    done message with the done pill's tick (a sample job finished for a business). It is now an
+    offer with no tick, because constitution §7.5 exempts sample and done content only inside
+    the Agents demo panels and the Process flows; the sharing image is neither, so a done
+    message there would claim delivered work. Shape, colours, radii and position (right edge
+    x 844, top 268) are unchanged; the bubble is sized to its text, at most 288 wide, so it is
+    narrower. The component is `components/og/OgSpeechBubble.tsx` (was `OgDoneBubble.tsx`).
 
 **Settled or superseded (decisions A and B, 2026-10-03):**
 
