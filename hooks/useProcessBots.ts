@@ -9,13 +9,13 @@
 // - lib/processRelayPlan.ts: the relay's clock, which stop the job visits when (five or six stops),
 //   and the runs' cycle (`RUN_CYCLE`: a send to a person at step 3, a straight run, a fix run from
 //   step 5 back to step 4) in a flow that draws the hand-off and the fix loop.
-// - lib/processRelay.ts: the relay job run along the ground line (from `lg`; the shared story in
+// - lib/processRelay.ts: the relay job run along the ground line (from `wide`; the shared story in
 //   lib/processRelayRun.ts, the hand-off out of step 1's hand in lib/processRelayHand.ts, the job's
 //   changes and exit in lib/processRelayJob.ts, the fix hop in lib/processRelayFix.ts, the send up
 //   the hand-off stem in lib/processRelayHandoff.ts, the lesson
 //   that rides the return in lib/processRelayLesson.ts, its trail and lit lines in
 //   lib/processRelayTrail.ts).
-// - lib/processRelayColumn.ts: the same run down the bot column (below `lg`, ui-spec §5.9), hopping
+// - lib/processRelayColumn.ts: the same run down the bot column (below `wide`, ui-spec §5.9), hopping
 //   ledge to ledge with each ledge and the dotted fix line lighting (lib/processRelayLedge.ts), the
 //   send dropping onto the hand-off marker (lib/processRelayHandoff.ts).
 // - lib/processBotCrew.ts: the one registry every bot animation and scheduler runs in.
@@ -27,10 +27,10 @@
 // and skipped if the list is already scrolled past (once per page load, across matchMedia re-runs).
 // On unmount, a new flow (`set`) or any mode change everything is killed and every bot, the job and
 // its parts, the lesson and its parts, the ghosts, the lit overlays (ground, return, fix and
-// hand-off; below `lg` each ledge's and the fix line's), chevron
+// hand-off; below `wide` each ledge's and the fix line's), chevron
 // icons and arrowhead go back to the server markup exactly: hidden again, with the emblem held in
 // step 1's hand (it is a `data-bot` part, so `resetBot` shows it; the last bot's lesson hold is a
-// bot act, so `resetBot` puts its eyes back too). Crossing `lg` is a mode change: the run in the
+// bot act, so `resetBot` puts its eyes back too). Crossing `wide` is a mode change: the run in the
 // old geometry is reverted and the new one starts on the usual first-run delay. A flow with no
 // loops has no return, no fix and no hand-off parts: the relay still runs, as a one-way pass.
 // Catch priority: the relay publishes each bot's next catches, so timed acts and naps keep clear of them.
@@ -146,7 +146,7 @@ type FullOptions = {
   readonly list: HTMLElement;
   readonly bots: readonly Bot[];
   readonly entered: Flag;
-  /** The relay's geometry: along the ground line from `lg`, down the bot column below it. */
+  /** The relay's geometry: along the ground line from `wide`, down the bot column below it. */
   readonly wide: boolean;
   /** A fine pointer: eyes and lean follow it, and hovering reacts. */
   readonly fine: boolean;
@@ -315,7 +315,7 @@ function fullMotion({ root, list, bots, entered, wide, fine }: FullOptions): () 
   const roles = bots.map((bot) => bot.role);
   const fixAt = relay?.fix || column?.fixes ? fixStop(roles) : null;
   const sendAt = relay?.handoff || column?.handoff ? sendStop(roles) : null;
-  // The hop back's length is the geometry's: below `lg` the longer way along the dotted fix line.
+  // The hop back's length is the geometry's: below `wide` the longer way along the dotted fix line.
   const back = column ? columnBack(column).duration : undefined;
   const planFor = (run: number): readonly Visit[] => {
     const kind = runKind(run, sendAt, fixAt);
@@ -340,7 +340,7 @@ function fullMotion({ root, list, bots, entered, wide, fine }: FullOptions): () 
     return due === undefined ? Infinity : due - now;
   };
 
-  // The relay, once all the bots have landed: along the ground line from `lg`, down the bot column
+  // The relay, once all the bots have landed: along the ground line from `wide`, down the bot column
   // below it. Runs differ in length, so the next one starts `RELAY_REST` after this one ends.
   let relayTimer: gsap.core.Tween | null = null;
   let relayPlaying: gsap.core.Timeline | null = null;
@@ -426,7 +426,7 @@ function fullMotion({ root, list, bots, entered, wide, fine }: FullOptions): () 
  * are shown at rest and life starts: no second drop-in.
  */
 export function useProcessBots(section: RefObject<HTMLElement | null>, set: string) {
-  // Once per page load: survives matchMedia re-runs (resizing across `lg`, switching motion).
+  // Once per page load: survives matchMedia re-runs (resizing across `wide`, switching motion).
   const entered = useRef(false);
 
   useGSAP(

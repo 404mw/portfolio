@@ -1,7 +1,8 @@
 // Process' classes that depend on the flow's step count (ui-spec §5.1), written out as literal
-// strings so Tailwind sees each one. Below `lg` the steps are rows; from `lg` they stand across on
-// the ground line. Six across fit 1024 with a 16px gap up to `xl` (144px columns for the 136px
-// bots), then the usual 32px.
+// strings so Tailwind sees each one. Below `wide` (1440) the steps are rows; from `wide` they stand
+// across on the ground line. Six across at 1440 with the usual 32px gap give about 195px columns
+// for the 136px bots, and the widest step title (about 200px) still clears the next by about 25px;
+// at 1280 it didn't, so every flow stays stacked below 1440. Both counts share one gap.
 import type { process } from "@/content/home";
 
 /** The step counts the flows use. */
@@ -20,15 +21,15 @@ export type FlowLayout = {
 
 export const flowLayouts: Record<FlowCount, FlowLayout> = {
   5: {
-    grid: "lg:grid-cols-5 lg:gap-x-8",
-    chevron: "lg:-right-6",
-    returnBox: "lg:col-start-2 lg:col-span-3 lg:ml-15.5 lg:-mr-24",
-    fixBox: "lg:-right-24",
+    grid: "wide:grid-cols-5 wide:gap-x-8",
+    chevron: "wide:-right-6",
+    returnBox: "wide:col-start-2 wide:col-span-3 wide:ml-15.5 wide:-mr-24",
+    fixBox: "wide:-right-24",
   },
   6: {
-    grid: "lg:grid-cols-6 lg:gap-x-4 xl:gap-x-8",
-    chevron: "lg:-right-4 xl:-right-6",
-    returnBox: "lg:col-start-2 lg:col-span-4 lg:ml-15.5 lg:-mr-20 xl:-mr-24",
-    fixBox: "lg:-right-20 xl:-right-24",
+    grid: "wide:grid-cols-6 wide:gap-x-8",
+    chevron: "wide:-right-6",
+    returnBox: "wide:col-start-2 wide:col-span-4 wide:ml-15.5 wide:-mr-24",
+    fixBox: "wide:-right-24",
   },
 };

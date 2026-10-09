@@ -1,6 +1,6 @@
 // The relay job (ui-spec §5.7): what the bots pass along, hidden at rest (the relay's motion shows
 // it). In `default` it's the built cream sheet, drawn finished with one mark per bot, 16px wide
-// below `lg` and 24px from `lg`; in a card's flow it's that card's emblem (`data-emblem`), its base
+// below `wide` and 24px from `wide`; in a card's flow it's that card's emblem (`data-emblem`), its base
 // parts `data-job="base"`, its marks `data-job="mark"`, and the base outline again as the glow.
 // Its anchor is the bottom centre (negative margins), so motion owns `transform` alone.
 // Decorative: `aria-hidden`, never focusable.
@@ -16,7 +16,7 @@ function JobSheet() {
       focusable="false"
       data-anim="process-relay"
       viewBox="0 -5 24 29"
-      className="absolute left-0 top-0 -ml-2 -mt-4.75 h-4.75 w-4 overflow-visible opacity-0 lg:-ml-3 lg:-mt-7.25 lg:h-7.25 lg:w-6"
+      className="absolute left-0 top-0 -ml-2 -mt-4.75 h-4.75 w-4 overflow-visible opacity-0 wide:-ml-3 wide:-mt-7.25 wide:h-7.25 wide:w-6"
     >
       <path data-job="base" d={jobBase} className="fill-cream" />
       {jobParts.rules.map((d) => (
@@ -49,7 +49,7 @@ export function ProcessJob({ emblem }: ProcessJobProps) {
       data-anim="process-relay"
       data-emblem={emblem.name}
       viewBox="104 21 28 31"
-      className="absolute left-0 top-0 -ml-2.25 -mt-5 h-5 w-4.5 overflow-visible opacity-0 lg:-ml-3.5 lg:-mt-7.75 lg:h-7.75 lg:w-7"
+      className="absolute left-0 top-0 -ml-2.25 -mt-5 h-5 w-4.5 overflow-visible opacity-0 wide:-ml-3.5 wide:-mt-7.75 wide:h-7.75 wide:w-7"
     >
       {emblem.parts.map((part) => (
         <path

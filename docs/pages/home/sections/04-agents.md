@@ -1,8 +1,10 @@
 # Agents
 
-**Last Updated:** 2026-10-08
+**Last Updated:** 2026-10-09
 
-> **Status:** In build. Offers and panels follow the About pick (five sets: default and four
+> **Status:** In build. Round 2 (the "Done" receipt line, static and motion) is built and
+> lead-checked (lint, `tsc`, build; no sideways scroll or page errors at 360, 768, 1024, 1440, 3840;
+> 2026-10-09). Offers and panels follow the About pick (five sets: default and four
 > cards; the website set and `pointer` panel were removed 2026-10-07); lint, `tsc` and the
 > production build are green (lead check, 2026-10-08). The section now opens like Web, with the
 > label, a two-part heading and a lead in the sticky column; round 1 copy is in. The SEO pass's hidden all-offers list is built, checked
@@ -48,8 +50,15 @@ accent; row 7's checks card uses `border-line`. `OrchestraLink.tsx` draws each L
 (percentages of the cell, no breakpoints; the links on rows 6 and 7 are dashed accent). The done
 pill is centred below. The drawing is `aria-hidden`, with an `sr-only` list of the steps. In the
 static markup it shows finished (the token is `hidden`); the builder's check roles are Review,
-Rules and Tests. The `orch-*` hooks and `orch-token` are what `lib/orchestraRun.ts`
+Standards and Tests. The `orch-*` hooks and `orch-token` are what `lib/orchestraRun.ts`
 animates.
+
+Every chat or list demo ends with a "Done" receipt line (`DemoActionLine.tsx`, hook
+`data-anim="demo-action"`; spec `../ui-spec/04-agents-action.md` §4.10), e.g. "Booked Sat 10:00 ·
+your calendar", "Booked each one in · your calendar". Motion: the receipt pops with an empty box,
+then ticks after a 0.45-0.9s hold (`lib/agentDemoReceipt.ts`; the tick is shared via
+`lib/agentDemoPop.ts`). Lists show it only after their last row; chats with a receipt finish by
+4.5s. Under reduced motion it fades in already ticked.
 
 The demo status pill reads "working for you" (`agents.demoStatus`) and the slugs are plain ("your
 bookings", "your messages"...). The Discord "Member questions" demo is a chat with an @mention
@@ -194,7 +203,11 @@ lit after fast sweeps.
 - `lib/agentDemoSequences.ts` — each demo kind's replay sequence, built from its finished static
   state and `data-demo-order`; reduced motion fades parts in by order instead
 - `lib/agentDemoPop.ts` — what every replay shares: `DemoPlayback`, the pop, `LEAD_IN`,
-  `newSequence`
+  `newSequence`, and the receipt's tick
+- `components/home/agents/DemoActionLine.tsx` — the "Done" receipt line ending each chat or list demo
+  (`data-anim="demo-action"`)
+- `lib/agentDemoReceipt.ts` — the receipt's motion: empty box, 0.45-0.9s hold, tick; the 4.5s chat
+  ceiling
 - `lib/agentBarHover.ts` — `bindBarHover` and `BAR_HOVER`: the Report bars' hover (accent fill,
   `scaleY` stretch from the floor, capped at the chart's top); `reset` and `unbind`
 - `lib/demoBudget.ts` — `spendBudget(budget, steps, random)`: shares a demo's longest time between
@@ -211,6 +224,7 @@ lit after fast sweeps.
 
 ## Decisions
 
+- 2026-10-09 — User's call: "rules" becomes "standards" on the software-builder card, including the Review gate role "Rules" → "Standards" and its lines (landed in `content/home.ts`); the Discord demo's "#rules" channel keeps its name. See `../page.md`.
 - 2026-09-24 — Agents section label numbered like v3 ("01", from copywriter); the offers are
   rows with a number and a big title; the active row shows its one-line description.
 - 2026-09-24 — Agents interaction: rows are an accessible tab list, first active, click or tap
@@ -246,7 +260,8 @@ lit after fast sweeps.
   and website. Replaces v3's four fixed offers.
 - 2026-10-08 — User's call (`../page.md`): the default set (no pick or Just exploring) is four everyday-business offers: Bookings, Customer messages, Order questions, New enquiries (kinds leads, chat, chat, leads). The orchestra stays only in the software-builder set. Supersedes the 2026-10-03 default set.
 - 2026-10-08 — User's call: Agents gets a SectionHeading ("Booked, replied, / followed up.") as its h2 and a lead line (the bridge, defining "AI agent" by comparison with ChatGPT) in the sticky column, in an intro wrapper the entrance raises as one block; the label becomes a p. Online-store "Connected tools" is now "Orders to stock". - 2026-10-08 — User's call: Agents' heading is `heading-sm`, not `heading`, so the sticky column fits.
-- 2026-10-08 — User's calls (spec `../ui-spec/04-agents-action.md` §4.10, choices 39–48, all first options): every chat and people-list demo ends with an action line, a "Done" receipt of what got done and where it went: accent outline with a tick box, full width, its own entry in the chat list, one per demo, on the five lists too; copy check only for report, sync, checklist and orchestra; empty box then tick motion; 4.5s chat ceiling; chat meta dropped where a receipt follows; sr word `agents.demoAction` "Done". Six chats (default 2 and 3, service-business 2 and 3, online-store 1, discord 1) and five lists (default 1 and 4, service-business 1 and 4, online-store 4). Discord "Custom commands" pill "all tools in sync" becomes "all up to date". Web-coder is building it.
+- 2026-10-08 — User's calls (spec `../ui-spec/04-agents-action.md` §4.10, choices 39–48, all first options): every chat and people-list demo ends with an action line, a "Done" receipt of what got done and where it went: accent outline with a tick box, full width, its own entry in the chat list, one per demo, on the five lists too; copy check only for report, sync, checklist and orchestra; empty box then tick motion; 4.5s chat ceiling; chat meta dropped where a receipt follows; sr word `agents.demoAction` "Done". Six chats (default 2 and 3, service-business 2 and 3, online-store 1, discord 1) and five lists (default 1 and 4, service-business 1 and 4, online-store 4). Discord "Custom commands" pill "all tools in sync" becomes "all up to date". Built: the static line, plus the motion (empty box, then tick after a 0.45-0.9s hold; lists show it after the last row; chats finish by 4.5s; ticked fade-in under reduced motion).
+- 2026-10-09 — User's call: the software-builder row 1 line "I set up the agent workflow I use inside your team." stays; builders' words belong in that card.
 - 2026-10-03 — Demo kinds: the four built (chat, leads, report, sync) are reused with new sample
   content; a new `checklist` kind (four lines whose boxes turn to ticks) serves the software-builder
   "build" and "rescue" rows; `ChatDemo` takes an ordered message list so the reminder demo opens
@@ -305,15 +320,13 @@ lit after fast sweeps.
 ## Open Questions
 
 - **Choice:** the developer card's row titles: copywriter's alternatives exist; the user picks.
-- **To build:** motion pass for the action line (spec `../ui-spec/04-agents-action.md` §4.10 motion): gsap-animator sequences the empty box then tick, the 4.5s chat ceiling and the dropped chat meta (web-coder is building the static line).
-- **Review:** the software-builder Agents row 1 line "I set up the agent workflow I use inside your team." assumes a team (voice rule 17) but is the facts' wording; the user's call.
-- **Review:** the reminder chat's "reminder sent" meta was dropped where a receipt follows; it could come back.
+- **Review:** the reminder chat's "reminder sent" note was dropped when the receipt was added; the user decides whether it comes back.
 - **Review:** "Twitch" as the sample app in the Discord "Custom commands" demo.
 - **Note:** `AgentsStack` ships only as A's no-JS fallback; its markup is also in the page payload
   for JS visitors (audit NIT, accepted for now).
-- **Review:** with the heading and lead the pinned column is 806px (with its 120px top) at
-  1024x768, 38px over the screen, so the last tab row sits below the fold while pinned; it fits at
-  1440 and 3840. The user judges: keep, or shorten the column at that size.
+- **Review:** the sticky column at 1024x768 was 38px taller than the screen (806px with its 120px
+  top), so the last tab row sat below the fold while pinned; re-measured 2026-10-09 after the
+  `heading-sm` change and still 38px taller than the screen. It fit at 1440 and 3840. The user judges: keep, or shorten the column.
 - **Choice:** Discord moderation row 2: "not in English" or "broke English-only" (copywriter's
   alternatives).
 - **Choice:** Discord welcome step: "Sent to #rules" or "Sent to #onboarding".

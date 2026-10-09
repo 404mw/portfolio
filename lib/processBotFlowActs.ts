@@ -59,8 +59,8 @@ export function intakeAct(bot: Bot, length: Length): gsap.core.Timeline {
 /**
  * The flag's angles about its grip (degrees, + = tipped forward, to the right): lowered, the
  * overshoot at the top of the raise, then the waves, `wave` seconds each. Lowered, the pennant's
- * far corner reaches x 154: 11px past the bot's box from `lg` (inside even the 16px gap of six
- * across at 1024) and 7px on a phone (inside the 18px gap before the text).
+ * far corner reaches x 154: 11px past the bot's box from `wide` (inside even the 32px gap of six
+ * across at 1440) and 7px on a phone (inside the 18px gap before the text).
  */
 const FLAG = { lowered: 30, over: -6, waves: [9, -7, 6, 0], wave: 0.18, short: [10, -8, 0], shortWave: 0.16 } as const;
 

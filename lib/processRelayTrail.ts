@@ -1,6 +1,6 @@
 // The relay's trail and lit lines (ui-spec §5.7 layer 10, "Hops" and "The return"): the three
 // ghosts that repeat each of the job's moves (its hops, the fix hop, its exit slide) a little
-// behind it, the ground-lit segment under it (from `lg`; below it the ledges light instead,
+// behind it, the ground-lit segment under it (from `wide`; below it the ledges light instead,
 // lib/processRelayLedge.ts), the chevron and arrowhead flash, and the return-lit overlay that turns
 // the dashed path solid violet behind the lesson (no ghosts on the return).
 // Transforms, opacity and (for the return) `clip-path` only; no filters. The flash colours are

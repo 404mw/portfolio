@@ -1,8 +1,8 @@
-// A flow's steps (ui-spec §5.2): the ground line the bots stand on (from `lg`), then the relay's
+// A flow's steps (ui-spec §5.2): the ground line the bots stand on (from `wide`), then the relay's
 // lit segment clipped to the line's box (hidden at rest; before the list, so each chevron's mask
 // still covers it), then the ordered list. The list is `relative` with no z-index, so it doesn't
-// start a stacking context. Rows below `lg`, each bot on its own ledge (ProcessStep, §5.9); five or
-// six across from `lg`. Step 1's bot holds the flow's emblem; in a flow with loops step 3 ends
+// start a stacking context. Rows below `wide`, each bot on its own ledge (ProcessStep, §5.9); five or
+// six across from `wide`. Step 1's bot holds the flow's emblem; in a flow with loops step 3 ends
 // with the hand-off to a person (ProcessHandoff) and step 4 with the fix loop back from step 5
 // (ProcessFixReturn).
 import { ProcessEmblem } from "@/components/home/process/ProcessEmblem";
@@ -39,11 +39,11 @@ export function ProcessList({ steps, emblem, layout, stepLabel, fixLabel, handof
       <div
         aria-hidden="true"
         data-anim="process-ground"
-        className="absolute inset-x-0 top-27 hidden h-0.5 bg-line lg:block"
+        className="absolute inset-x-0 top-27 hidden h-0.5 bg-line wide:block"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-27 hidden h-0.5 overflow-hidden lg:block"
+        className="pointer-events-none absolute inset-x-0 top-27 hidden h-0.5 overflow-hidden wide:block"
       >
         <span
           data-anim="process-ground-lit"

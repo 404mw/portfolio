@@ -1,4 +1,4 @@
-// The fix run's way back below `lg` (ui-spec §5.3a, §5.9): the job goes back from step 5 to step 4
+// The fix run's way back below `wide` (ui-spec §5.3a, §5.9): the job goes back from step 5 to step 4
 // along the dotted fix line (`process-fix-line`), not up the bot column. From ledge 5 it leaves left
 // and lifts to the line's bottom end at bot 5's hand, follows the bottom turn, climbs the line,
 // follows the top turn and the arrowhead into bot 4's hand, then drops onto ledge 4 and slides to

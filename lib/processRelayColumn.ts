@@ -1,4 +1,4 @@
-// The crew relay below `lg` (ui-spec §5.9, §5.3a, §5.3b): the ground-line run turned 90° clockwise,
+// The crew relay below `wide` (ui-spec §5.9, §5.3a, §5.3b): the ground-line run turned 90° clockwise,
 // on the same clock (the plan's visits, dwells, job beats and cues). Every bot stands on its own
 // ledge (`process-ledge`); there is no rail between them. The job leaves step 1's hand
 // (lib/processRelayHand.ts), drops onto ledge 1 and hops down the bot column from ledge to ledge,
@@ -71,7 +71,7 @@ import { ghostFollow } from "@/lib/processRelayTrail";
 
 const ORIGIN: Point = { x: 0, y: 0 };
 
-/** The return's elements below `lg`: only in a flow with loops. */
+/** The return's elements below `wide`: only in a flow with loops. */
 type ColumnReturn = {
   /** The rule card that rides back up the column after the last bot. */
   readonly lesson: LessonParts;
@@ -104,7 +104,7 @@ export type ColumnParts = {
   readonly handoff: HTMLElement | null;
 };
 
-/** Every waypoint below `lg`, in the relay layer's coordinates. */
+/** Every waypoint below `wide`, in the relay layer's coordinates. */
 export type ColumnWaypoints = {
   /**
    * Each bot's stop: stop 1's is the hand at rest, the others the job's bottom centre on the bot's
@@ -162,7 +162,7 @@ export function columnParts(root: HTMLElement, stops: readonly RelayStop[]): Col
   };
 }
 
-/** The hop back's timing below `lg`: along the fix line, or the straight rise without one. */
+/** The hop back's timing below `wide`: along the fix line, or the straight rise without one. */
 export function columnBack(parts: ColumnParts): Timing {
   return parts.fixPath ? FIX_LINE_HOP : { duration: FIX_HOP.duration, ease: FIX_HOP.ease };
 }
@@ -292,7 +292,7 @@ function rideUp(
   tl.call(cues.receive, [takes], at);
 }
 
-/** One relay run below `lg`. `waypoints` returns the latest measurement. */
+/** One relay run below `wide`. `waypoints` returns the latest measurement. */
 export function columnRun(
   parts: ColumnParts,
   waypoints: () => ColumnWaypoints,

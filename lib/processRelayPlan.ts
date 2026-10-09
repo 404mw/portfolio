@@ -1,7 +1,7 @@
 // The crew relay's clock (ui-spec §5.7, §5.3a, §5.11e): which stop the job visits when, at every
 // width. A run visits the flow's stops in step order, five or six of them, each for its role's
 // `RELAY_DWELL`, a `RELAY_HOP` apart. On a fix run the check (step 5) finds something: it keeps the
-// job only `RELAY_FIND.dwell`, the job hops back to the work step (step 4; `FIX_HOP` from `lg`,
+// job only `RELAY_FIND.dwell`, the job hops back to the work step (step 4; `FIX_HOP` from `wide`,
 // `FIX_LINE_HOP` below it, the geometry's own), which does its act again, and forward to the check,
 // which passes it; then the run goes on. On a send run the flag bot (step 3) sends the job to a
 // person: it keeps it only `RELAY_SEND.dwell` and the run's visits end there (the geometry draws
@@ -68,7 +68,7 @@ export function runKind(run: number, send: number | null, fix: number | null): R
 
 /**
  * A run's visits for `roles` in step order. `fix` is the check's index on a fix run (from
- * `fixStop`), or null. `back` is the hop back's length: `FIX_HOP`'s from `lg`, the fix line's
+ * `fixStop`), or null. `back` is the hop back's length: `FIX_HOP`'s from `wide`, the fix line's
  * (`FIX_LINE_HOP`) below it. `send` is the flag's index on a send run (from `sendStop`), or null:
  * the visits end there, and `fix` is ignored. With neither it is a straight run.
  */

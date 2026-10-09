@@ -1,6 +1,6 @@
 // One process step (ui-spec §5.2): its bot (holding the job on step 1), the ledge it stands on
-// (below `lg`, ProcessLedge, §5.9), the chevron to the next step (from `lg`, not on the last
-// step), then the step label, title and line. A row below `lg`, a column from `lg`. The `<li>` is
+// (below `wide`, ProcessLedge, §5.9), the chevron to the next step (from `wide`, not on the last
+// step), then the step label, title and line. A row below `wide`, a column from `wide`. The `<li>` is
 // `relative` at every width (no z-index) so the ledge, the chevron, step 3's hand-off and step 4's
 // fix loop are placed against it. Nothing here is interactive.
 import type { ReactNode } from "react";
@@ -40,7 +40,7 @@ export function ProcessStep({
   return (
     <li
       data-step={index}
-      className="relative grid grid-cols-[5.5rem_minmax(0,1fr)] items-start gap-x-4.5 border-t border-line py-6 lg:flex lg:min-w-0 lg:flex-col lg:border-t-0 lg:py-0"
+      className="relative grid grid-cols-[5.5rem_minmax(0,1fr)] items-start gap-x-4.5 border-t border-line py-6 wide:flex wide:min-w-0 wide:flex-col wide:border-t-0 wide:py-0"
     >
       <ProcessBot role={role} pose={pose}>
         {children}
@@ -50,19 +50,19 @@ export function ProcessStep({
         <span
           aria-hidden="true"
           data-anim="process-chevron"
-          className={`absolute top-27 hidden h-0.5 w-4 items-center justify-center bg-bg lg:flex ${chevron}`}
+          className={`absolute top-27 hidden h-0.5 w-4 items-center justify-center bg-bg wide:flex ${chevron}`}
         >
           <ChevronRightIcon className="size-6 shrink-0 text-accent" />
         </span>
       )}
-      <div data-anim="reveal" className="flex flex-col gap-2 lg:gap-2.5 lg:pt-7.5">
+      <div data-anim="reveal" className="flex flex-col gap-2 wide:gap-2.5 wide:pt-7.5">
         <p className={`${metaLabel} uppercase tracking-[0.06em]`}>{label}</p>
         <h3
           className={`font-display text-step leading-[1.15] text-balance wrap-break-word text-text`}
         >
           {title}
         </h3>
-        <p className="text-body-lg leading-normal text-muted lg:max-w-65">{line}</p>
+        <p className="text-body-lg leading-normal text-muted wide:max-w-65">{line}</p>
       </div>
       {after}
     </li>

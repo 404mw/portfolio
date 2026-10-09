@@ -1,12 +1,12 @@
 // The hand-off's exit (ui-spec §5.11e): on a send run the flag bot (step 3) sends the job to a
-// person, and the job leaves the row there; no exit slide, no lesson, no return light. From `lg`
+// person, and the job leaves the row there; no exit slide, no lesson, no return light. From `wide`
 // it climbs: it rises straight up from its stop in front of the pennant, eases onto the dashed
 // stem's line (`process-handoff`), climbs it and passes behind the label's `bg` mask at the
 // arrowhead (the relay layer's `z-1` is under the label's `z-10`), fading over its last moments,
 // while the stem's lit overlay (`process-handoff-lit`) lights bottom to top behind it by
-// `clip-path`, holds, and fades. Below `lg` it drops: straight down the empty bot column from ledge
+// `clip-path`, holds, and fades. Below `wide` it drops: straight down the empty bot column from ledge
 // 3 onto the marker (`process-handoff-mark`), then slides a little right towards the label as it
-// pops and fades; there is no lit overlay below `lg`. The ghosts trail both moves. Only the job, its
+// pops and fades; there is no lit overlay below `wide`. The ghosts trail both moves. Only the job, its
 // ghosts and the lit overlay are written: the stem, the marker, their row and step 3's `<li>` are
 // read for their place, never written (a transform or an opacity there would trap the label's
 // `z-10`).
@@ -16,10 +16,10 @@ import { FIX_LIT_FADE, HANDOFF_CLIMB, HANDOFF_DROP, JOB_DONE, JOB_FADE } from "@
 import type { JobSize, Point, PointAt } from "@/lib/processRelayJob";
 import { ghostFollow, type Mover } from "@/lib/processRelayTrail";
 
-/** From `lg`: the stem's box (read only) and its lit overlay. */
+/** From `wide`: the stem's box (read only) and its lit overlay. */
 export type StemParts = { readonly stem: HTMLElement; readonly lit: HTMLElement };
 
-/** The stem from `lg`, in the relay layer's coordinates. */
+/** The stem from `wide`, in the relay layer's coordinates. */
 export type StemWaypoints = {
   /** The stem's centre line. */
   readonly x: number;
@@ -37,7 +37,7 @@ export function findStem(root: HTMLElement): StemParts | null {
   return stem && lit ? { stem, lit } : null;
 }
 
-/** Below `lg`: the hand-off marker inside `root` (read only), or null in a flow with no hand-off. */
+/** Below `wide`: the hand-off marker inside `root` (read only), or null in a flow with no hand-off. */
 export function findMark(root: HTMLElement): HTMLElement | null {
   return animTargets(root, "process-handoff-mark")[0] ?? null;
 }
@@ -132,7 +132,7 @@ export function climbStem(
 }
 
 /**
- * From `t`, as the flag reaches the top of its raise (below `lg`): the job falls straight down from
+ * From `t`, as the flag reaches the top of its raise (below `wide`): the job falls straight down from
  * `from` until its centre is on the marker's, trailed by the ghosts, then slides `HANDOFF_DROP.slide`
  * px right towards the label as it pops once (`JOB_DONE`, about its bottom centre), and fades.
  * Returns the run time at which it's gone.

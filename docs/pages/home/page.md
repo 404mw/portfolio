@@ -1,8 +1,10 @@
 # Home
 
-**Last Updated:** 2026-10-08
+**Last Updated:** 2026-10-09
 
-> **Status:** In build. Round 2 (2026-10-08: Agents' action line, Process recast around control) is in build by web-coder; its motion pass follows. Copy round 1 (2026-10-08, plain words for everyday business owners) is in
+> **Status:** In build. Round 2 (Agents' "Done" receipt line and Process recast around control, with
+> their motion) is built (2026-10-08) and lead-checked (2026-10-09: lint, `tsc` and build pass; no
+> sideways scroll or page errors at 360, 768, 1024, 1440, 3840). Copy round 1 (2026-10-08, plain words for everyday business owners) is in
 > Hero, Marquee, About, Agents, Web and Contact; Agents now opens with a heading and lead; lint,
 > `tsc` and build green and lead-checked (360, 768, 1440, 3840, reduced motion). All nine sections are built; the per-card redesign of About, Agents and
 > Process is built (2026-10-03): the About pick sets Agents' offers and Process' flow. The motion
@@ -32,8 +34,8 @@ kept as they were, so Marquee (3) renders before About (2a).
 | 2 | Hero | Who is this? | `docs/03-facts.md` → Who | Built, motion done; round 1 copy in (side line, tag) | `sections/02-hero.md` |
 | 3 | Marquee | (transition, no claim) | none | Built, motion done; seven job items (2026-10-08) | `sections/03-marquee.md` |
 | 2a | About | Can he help someone like me? | `docs/03-facts.md` → Who (more needed) | Built, per-card pick (five cards); new heading and plain intro lines (2026-10-08); the Rix playground is built at /rix | `sections/02a-about.md` |
-| 4 | Agents | What can their agents handle for my business? | `docs/03-facts.md` → What the user builds | Built per card; heading and lead in the sticky column, phone stepper, entrance, auto-advance, demo replays and swap fade run; orchestra in the developer set only; round 1 copy in | `sections/04-agents.md` |
-| 5 | Process | How do they work? | `docs/03-facts.md` → How the user works | Built per card; bot life, crew relay and swap fade run | `sections/05-process.md` |
+| 4 | Agents | What can their agents handle for my business? | `docs/03-facts.md` → What the user builds | Built per card; heading and lead in the sticky column, phone stepper, entrance, auto-advance, demo replays and swap fade run; orchestra in the developer set only; round 1 copy in; "Done" receipt line on every chat and list demo (round 2) | `sections/04-agents.md` |
+| 5 | Process | Can I trust it with my customers? | `docs/03-facts.md` → How the user works | Built per card; recast around control (round 2): hand-off at step 3, send / straight / fix relay; bot life and swap fade run | `sections/05-process.md` |
 | 6 | Web | Can they build my website end-to-end? | `docs/03-facts.md` → What the user can build | Built, motion done | `sections/06-web.md` |
 | 7 | Projects (formerly Proofs) | Have they built something real that people use? | `docs/03-facts.md` → Work that is live | Built, motion done | `sections/07-proofs.md` |
 | 8 | Contact | How do I start? | `docs/03-facts.md` → Contact | Built, motion done | `sections/08-contact.md` |
@@ -42,9 +44,13 @@ kept as they were, so Marquee (3) renders before About (2a).
 ## Current State (site-wide)
 
 All nine sections are built statically; section detail lives in `sections/`. Lint, `tsc` and the
-production build are green (lead check, 2026-10-08; the orphan `AgentPointerPanel.tsx` is gone).
-That check (headless Chromium, reduced motion, 360, 768, 1440, 3840) found no sideways scroll, no
-page errors and no overflowing leaf text in hero, about and agents. There is no separate lead screen
+production build are green (lead check, 2026-10-09, after round 2; the orphan `AgentPointerPanel.tsx` is gone).
+That check (headless Chromium, 360, 768, 1024, 1440, 3840) found no sideways scroll and no page
+errors; the earlier 2026-10-08 check (reduced motion, 360, 768, 1440, 3840) found no overflowing
+leaf text in hero, about and agents. Round 2 (built 2026-10-08): every Agents chat or list demo ends
+with a "Done" receipt (empty box, then tick) and Process is recast around control (label "You stay
+in charge", heading "Hard calls / come to you.", a hand-off to a person at step 3, a relay that
+cycles send, straight and fix); browser checks still pending are listed in `sections/05-process.md`. There is no separate lead screen
 check of the five-card About board's layout (rows of 2, 2, 1 on phones; 3, 2 from `md`). Last
 full production-build check (lead, 2026-10-03): 360, 768, 1024, 1440 and 3840 had no sideways
 scroll, no tap target under 44px and no console errors. Every title column pins from
@@ -273,7 +279,10 @@ Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live si
 
 ## Decisions (site-wide)
 
-- 2026-10-08 — User's calls: the shared voice is written first for everyday business owners who know AI only as a chat box (ChatGPT); developer and Discord content stays inside their own cards. "AI agent" stays, defined once in Agents by comparison with ChatGPT, then the copy talks in jobs; tone is calm proof (their job done, they stay in charge), no grand claims. Round 1: words plus Agents' heading and bridge line; round 2: demos show the action taken (a "Done" receipt) and Process is recast around control, one question "Can I trust it with my customers?" (decided and in build). `docs/04-voice.md` gained the chat-box reader line and rules 15-17 (show the job done; define "AI agent" once; builders' words only in the software-builder card); `docs/03-facts.md` gained "What an AI agent is", around-the-clock lines for service business and online store, and the new default set line. See `sections/02-hero.md`, `02a-about.md`, `03-marquee.md`, `04-agents.md`, `05-process.md`, `06-web.md`, `08-contact.md`.
+- 2026-10-09 — User's call: the word "rules" is replaced by "standards" everywhere on the home page except the Discord demo's "#rules" channel (Process step, lead, loop and fix labels in every flow; the software-builder card incl. the Review gate role; the Exile Bot proof line). Copywriter writing; the facts file is unchanged ("standards" paraphrases its "rules"). Supersedes the "your rules" wording in the 2026-10-08 Process decision. See `sections/04-agents.md`, `05-process.md`, `07-proofs.md`.
+- 2026-10-09 — User's calls: the facts line "Sensitive actions, like refunds and complaints, are passed to a person instead of being handled by an agent" stands as worded; the new round 1 Marquee and About lines stay (nothing restored); home `meta.title` stays "Muhammad Waqas | AI Agents and Automations" and need not echo the description; the software-builder "inside your team" line stays (see `sections/04-agents.md`, `05-process.md`).
+
+- 2026-10-08 — User's calls: the shared voice is written first for everyday business owners who know AI only as a chat box (ChatGPT); developer and Discord content stays inside their own cards. "AI agent" stays, defined once in Agents by comparison with ChatGPT, then the copy talks in jobs; tone is calm proof (their job done, they stay in charge), no grand claims. Round 1: words plus Agents' heading and bridge line; round 2: demos show the action taken (a "Done" receipt) and Process is recast around control, one question "Can I trust it with my customers?" (built; heading changed to "Hard calls / come to you." on 2026-10-09). `docs/04-voice.md` gained the chat-box reader line and rules 15-17 (show the job done; define "AI agent" once; builders' words only in the software-builder card); `docs/03-facts.md` gained "What an AI agent is", around-the-clock lines for service business and online store, and the new default set line. See `sections/02-hero.md`, `02a-about.md`, `03-marquee.md`, `04-agents.md`, `05-process.md`, `06-web.md`, `08-contact.md`.
 - 2026-10-07 — User's call: the entry to `/rix` moves from a footer-row link to a second Rix standing on the footer's top line; see `sections/09-footer.md`.
 - 2026-10-07 — User's call: the fonts change for the whole site: display text (name, headings, big display text, the MARWIX wordmark, the sharing images) is Acosta (single weight, local `assets/fonts/acosta.otf`, Befonts, commercial use allowed), body is IBM Plex Sans, labels and meta are IBM Plex Mono; replaces Bricolage Grotesque, Geist and Geist Mono. Why: the user chose Acosta from five candidates; IBM Plex beat Space Grotesk because its capital I reads as a lowercase l ("AI" looks like "Al"). Acosta is about twice as wide as condensed Bricolage, so size tokens, tracking and leading were retuned the same day (see `docs/01-design-system.md`).
 - 2026-10-07 — User's call: display punctuation renders in IBM Plex Sans Bold (a local static 700 file, `displayPunct`) because Acosta has letters and digits only.
@@ -418,8 +427,8 @@ Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live si
 - **Choice:** the reference design file `temp/claude-design/Portfolio Redesign v3.dc.html` is
   missing on disk (constitution §5 names it); the user restores it or says to drop it.
 - **Roll-up:** section-specific open questions remain in `sections/02-hero.md` (5),
-  `sections/02a-about.md` (10), `sections/03-marquee.md` (1), `sections/04-agents.md` (18),
-  `sections/05-process.md` (25), `sections/07-proofs.md` (34), `sections/08-contact.md` (1) and `sections/09-footer.md` (3). The
+  `sections/02a-about.md` (10), `sections/03-marquee.md` (1), `sections/04-agents.md` (16),
+  `sections/05-process.md` (24), `sections/07-proofs.md` (34), `sections/08-contact.md` (1) and `sections/09-footer.md` (3). The
   pre-deploy check reads this roll-up and every section file; the page ships with none open
   anywhere.
 - **To build:** `lib/takeoverTitleMorph.ts` still carries logic for Bricolage's `opsz`/`wdth` axes
@@ -438,3 +447,7 @@ Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live si
   takeover and the takeover's Next slide, which the 2026-10-07 check did not cover.
 - **Fact:** the About copy (`content/home.ts` → `about`) is still SAMPLE (see
   `sections/02a-about.md`).
+- **Review (rolled up):** Agents: sticky column at 1024x768 re-measured 2026-10-09, still 38px over;
+  the reminder chat's "reminder sent" note was dropped. Process (flow side by side from `wide`, 1440,
+  since 2026-10-09): layout lead-checked 2026-10-09; browser check pending (animation at 1440 and 3840, two accepted
+  overlaps), and "To you or your staff" may be too long at 1440.

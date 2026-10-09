@@ -17,6 +17,9 @@
 
   --container-site: 1536px;
 
+  /* Extra breakpoint (`wide:`, between `xl` and `2xl`): the home Process flow goes across here. */
+  --breakpoint-wide: 90rem;
+
   /* Page gutter (`px-gutter`) and section rhythm (`py-section`). */
   --spacing-gutter: clamp(20px, 4vw, 56px);
   --spacing-section: clamp(80px, 12vw, 160px);

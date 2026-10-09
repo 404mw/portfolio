@@ -249,7 +249,7 @@ export function jobHold(tl: gsap.core.Timeline, job: SVGSVGElement, at: PointAt,
 /**
  * From `t`, when the last bot lets go: the finished job slides to `to` (the line's end) over
  * `seconds` with the hops' ease, pops once as done about its bottom centre (the origin `jobStart`
- * set), then fades out where it stands. Below `lg` `seconds` is 0: it pops and fades on the last
+ * set), then fades out where it stands. Below `wide` `seconds` is 0: it pops and fades on the last
  * ledge. Returns the run time at which it's gone.
  */
 export function jobExit(tl: gsap.core.Timeline, job: SVGSVGElement, to: PointAt, seconds: number, t: number): number {

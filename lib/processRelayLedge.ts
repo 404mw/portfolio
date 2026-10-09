@@ -1,4 +1,4 @@
-// The ledges below `lg` (ui-spec §5.9 "The ledges", §5.3a): the job's hop from ledge to ledge and
+// The ledges below `wide` (ui-spec §5.9 "The ledges", §5.3a): the job's hop from ledge to ledge and
 // each ledge's light. Every hop lifts the job a little above the higher ledge and drops it onto the
 // other, as a thrown arc (`LEDGE_HOP`); on the hand-off it first drops out of the hand onto ledge 1.
 // Each ledge's lit overlay (`process-ledge-lit`, the ground-lit gradient cut to the ledge) fades in

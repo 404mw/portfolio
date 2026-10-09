@@ -430,10 +430,10 @@ export const agents = {
         demo: {
           lead: "Lead",
           team: { label: "Build team", roles: ["UI", "Backend", "Data"] },
-          checks: { label: "Review gate", roles: ["Review", "Rules", "Tests"] },
+          checks: { label: "Review gate", roles: ["Review", "Standards", "Tests"] },
           ring: {
             out: "assigns",
-            rules: "reads rules",
+            rules: "reads standards",
             work: "codes, reports",
             check: "lead routes it",
             fix: "fix and rerun",
@@ -441,10 +441,10 @@ export const agents = {
           },
           steps: [
             "The lead splits the work and assigns each part to a specialist.",
-            "Each specialist reads the written rules before building.",
+            "Each specialist reads the written standards before building.",
             "The specialist builds its part and reports back to the lead.",
-            "The lead sends the work to separate review, rules and test checks.",
-            "Findings and broken rules go back to be fixed, then rechecked.",
+            "The lead sends the work to separate review, standards and test checks.",
+            "Findings and anything below standard go back to be fixed, then rechecked.",
             "When every check is green, the work goes back to the lead.",
           ],
           done: "all checks green",
@@ -501,7 +501,7 @@ export const agents = {
 // Facts → How the user works. One flow per About card (ui-spec/05-process.md §5.5, §5.10): the
 // agent doing that visitor's job on the card's lead offer. Flows are illustrations (constitution
 // §7.5). flows.default is in the shared voice; each card's flow is in its own tone.
-// Round 2 (2026-10-08): control first. Job arrives, your rules, the sort (sensitive or unusual
+// Round 2 (2026-10-08): control first. Job arrives, your standards, the sort (sensitive or unusual
 // goes to a person: handoffLabel), done, checked (fixLabel: back to step 4), then the flow's own
 // last step. The loop returns to step 2. No agent names, tools or counts; no step says the
 // reader approves every reply (not in the facts).
@@ -511,48 +511,48 @@ export const process = {
   number: "02",
   label: "You stay in charge",
   heading: { lead: "Hard calls", accent: "come to you." },
-  lead: "Routine jobs follow your rules and are checked before they go out. Refunds, complaints and anything unusual are passed to you instead.",
+  lead: "Routine jobs are done to your standards and checked before they go out. Refunds, complaints and anything unusual are passed to you instead.",
   stepLabel: "Step",
   flows: {
     default: {
       caption: "Example: one job",
       steps: [
         { title: "Job arrives", line: "A job comes in: a booking, a question, a request." },
-        { title: "Your rules", line: "Every job follows rules written for your business." },
+        { title: "Your standards", line: "Every job follows standards written for your business." },
         { title: "Hard calls", line: "Anything sensitive or unusual is passed to you before any work starts." },
-        { title: "Done", line: "Routine jobs get done, following those rules." },
+        { title: "Done", line: "Routine jobs get done to those standards." },
         { title: "Checked", line: "A separate agent checks the work before it goes out." },
       ],
       handoffLabel: "To you",
-      loopLabel: "Each job improves your rules.",
-      fixLabel: "Breaks a rule? Done again.",
+      loopLabel: "Each job improves your standards.",
+      fixLabel: "Below your standard? Done again.",
     },
     "service-business": {
       caption: "Example: a booking",
       steps: [
         { title: "Request arrives", line: "A customer asks for an appointment." },
-        { title: "Your rules", line: "The booking follows your hours, services and rules." },
+        { title: "Your standards", line: "The booking fits your hours, services and standards." },
         { title: "Hard calls", line: "Unusual bookings and complaints are passed to you or your staff." },
         { title: "Booked", line: "The customer gets booked into a free slot." },
         { title: "Checked", line: "A separate agent checks the booking before it goes out." },
         { title: "Reminder", line: "The customer gets a reminder, and can reschedule." },
       ],
       handoffLabel: "To you or your staff",
-      loopLabel: "Each job improves your rules.",
-      fixLabel: "Breaks your rules? Redone.",
+      loopLabel: "Each job improves your standards.",
+      fixLabel: "Below your standard? Redone.",
     },
     "online-store": {
       caption: "Example: an order question",
       steps: [
         { title: "Question arrives", line: "A customer asks where their order is." },
-        { title: "Your rules", line: "The reply follows your delivery and returns rules." },
+        { title: "Your standards", line: "The reply follows your delivery and returns policy." },
         { title: "Hard calls", line: "Refunds, complaints and anything unusual are passed to you." },
         { title: "Answered", line: "The order is looked up and the reply written." },
         { title: "Checked", line: "A separate agent checks the reply before it goes out." },
       ],
       handoffLabel: "To you",
-      loopLabel: "Each order improves your rules.",
-      fixLabel: "Breaks a rule? Rewritten.",
+      loopLabel: "Each order improves your standards.",
+      fixLabel: "Below your standard? Rewritten.",
     },
     discord: {
       caption: "Example: a member's @mention",
@@ -568,15 +568,15 @@ export const process = {
       caption: "Example: shipping a feature",
       steps: [
         { title: "Feature asked", line: "You describe the feature you want shipped." },
-        { title: "Your rules", line: "The work starts from your written rules." },
+        { title: "Your standards", line: "The work starts from your written standards." },
         { title: "Flagged", line: "Anything sensitive or unusual goes to a person, not an agent." },
-        { title: "Built", line: "Agents build the feature inside those rules." },
+        { title: "Built", line: "Agents build the feature to those standards." },
         { title: "Reviewed", line: "A separate agent reviews the work before it ships." },
         { title: "Shipped", line: "The feature ships to production." },
       ],
       handoffLabel: "To a person",
-      loopLabel: "Next build, better rules.",
-      fixLabel: "Breaks a rule? Rebuild.",
+      loopLabel: "Next build, better standards.",
+      fixLabel: "Below standard? Rebuild.",
     },
   },
 } as const;
@@ -655,7 +655,7 @@ export const proofs = {
         items: [
           {
             title: "I build the system before the app",
-            line: "Specialist agents, written rules, automatic checks and a review loop built Exile Bot and ran it live, with real users.",
+            line: "Specialist agents, written standards, automatic checks and a review loop built Exile Bot and ran it live, with real users.",
           },
           {
             title: "I keep only the data an app needs",

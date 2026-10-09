@@ -1,6 +1,6 @@
 # Design system
 
-**Last Updated:** 2026-10-07
+**Last Updated:** 2026-10-09
 
 The look of `marwix.dev`. Layout and behaviour follow the reference design
 (`temp/claude-design/Portfolio Redesign v3.dc.html`); **colours and type come only from this
@@ -84,6 +84,8 @@ so it is smaller than `heading` on desktop.
   (`py-section`), a `line` hairline between sections.
 - **Max width:** `--container-site` (1536px), shared by the nav and every section. Nothing may
   scroll sideways at any width.
+- **Breakpoints:** Tailwind's defaults plus `--breakpoint-wide` (90rem, 1440px; `wide:`), first
+  used by the home Process flow, which goes side by side from 1440.
 - **Buttons:** pills (radius 999px). Primary: `accent` background, `on-accent` text, 600 weight.
   Secondary: `line` border, `text` colour. Tap targets at least 44px.
 - **Panels and cards:** large radii (20–24px for panels and cards, 12–14px inside them).
@@ -123,3 +125,6 @@ Section-by-section layout lives in `docs/pages/home/ui-spec.md`.
   `heading-xl`, `takeover`, `hero`, `footer-mark`); display letter spacing is now normal, display
   weight classes and the `wdth` width settings are gone, and leading is looser (1.0–1.15).
   `summary` and the body-size tokens are unchanged. No token was added or removed.
+- 2026-10-09 — Added `--breakpoint-wide: 90rem` (user's yes): the home Process flow goes side by
+  side from 1440, because the six-step flows' "Your standards" step title doesn't fit a step
+  column below that.

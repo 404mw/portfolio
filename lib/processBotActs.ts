@@ -402,7 +402,7 @@ function wake(bot: Bot, crew: Crew) {
  * The hover/tap reaction: a jump with popped eyes, then the short act. Only an idle or napping bot
  * reacts (a nap is interrupted, not "active"); it's ignored while the bot drops in, while it's
  * `acting` (a timed act, a relay catch and its watch of the job, the `receive`
- * squash, the last bot's lesson hold below `lg`) or `reacting`, and within `REACT_COOLDOWN` of the last one's start. An ignored hover or
+ * squash, the last bot's lesson hold below `wide`) or `reacting`, and within `REACT_COOLDOWN` of the last one's start. An ignored hover or
  * tap is dropped, not queued, and doesn't count toward the cooldown. The next timed act comes the
  * usual gap after it ends.
  */
@@ -471,7 +471,7 @@ export function catchRelay(
 }
 
 /**
- * Below `lg`, as the job leaves the last bot: the lesson pops in at its left hand for `seconds`. An
+ * Below `wide`, as the job leaves the last bot: the lesson pops in at its left hand for `seconds`. An
  * idle bot, or one still watching the job it just let go (its look back to rest is all that's left:
  * every catch act ends inside its role's dwell), looks down-left at the lesson and holds it,
  * `acting` so a tap is ignored, then looks back to rest.

@@ -162,7 +162,7 @@ export const JOB_BEATS = {
   host: { nod: 0.4 },
 } as const;
 
-// Crew relay: along the ground line from `lg`, down the bot column below it (§5.9), on one clock
+// Crew relay: along the ground line from `wide`, down the bot column below it (§5.9), on one clock
 // (lib/processRelayPlan.ts).
 /**
  * The relay's switch. Off, `useProcessBots` builds no relay parts, so no run ever starts and the
@@ -268,13 +268,13 @@ export const JOB_AT: PerRole = {
 export const JOB_HAND = { sheet: 50, emblem: 52 } as const;
 /**
  * The hand-off: the travelling job takes the held emblem's place at the emblem's size, then grows
- * to its own over `duration` as it leaves; from `lg` it also drops onto the ground line over the
+ * to its own over `duration` as it leaves; from `wide` it also drops onto the ground line over the
  * same time (the fall's ease), early in the hop, so it is on the line before it reaches the next
- * bot: even at six across on 1024, where that bot's clipboard starts 45px from the hand.
+ * bot: even at six across on 1440, where that bot's clipboard starts about 112px from the hand.
  */
 export const JOB_HAND_OFF: Timing = { duration: 0.22, ease: "power2.in" };
 /**
- * Below `lg` (§5.9), every hop from ledge to ledge: the job lifts `lift` px above the higher of its
+ * Below `wide` (§5.9), every hop from ledge to ledge: the job lifts `lift` px above the higher of its
  * two ledges and drops onto the other, as a thrown arc. The hop's time is split between the rise
  * and the fall by the square roots of their heights (a short lift and a long drop down the column),
  * each half on its quadratic ease (`power1`);
@@ -283,7 +283,7 @@ export const JOB_HAND_OFF: Timing = { duration: 0.22, ease: "power2.in" };
  */
 export const LEDGE_HOP = { lift: 6, up: "power1.out", down: "power1.in" } as const;
 /**
- * Below `lg`: a ledge's lit overlay (`process-ledge-lit`) fades in over `on` as the job lands on it,
+ * Below `wide`: a ledge's lit overlay (`process-ledge-lit`) fades in over `on` as the job lands on it,
  * holds while that bot works the job, and fades over `off` as the job hops off. On the hand-off
  * ledge 1 only flashes (`on`, then `off`) as the job touches it; on the last ledge it fades with
  * the job (`JOB_FADE`).
@@ -329,10 +329,10 @@ export const JOB_SHAKE = {
   drop: { duration: 0.15, ease: "power2.in" },
 } as const;
 /**
- * The hop back, from `lg`: one arc up into the fix arch and down to the work step's stop. `x` runs
+ * The hop back, from `wide`: one arc up into the fix arch and down to the work step's stop. `x` runs
  * the whole hop on `ease`; `y` rises on `up` for the first half and falls on `down` for the second.
  * At the top the job hangs inside the arch, its top `clear` px under the arch's top edge, so it
- * never reaches the label above. From `lg` only: below it the job goes back along the dotted fix
+ * never reaches the label above. From `wide` only: below it the job goes back along the dotted fix
  * line (`FIX_LINE_HOP`).
  */
 export const FIX_HOP = {
@@ -343,7 +343,7 @@ export const FIX_HOP = {
   clear: 4,
 } as const;
 /**
- * The way back below `lg` (lib/processRelayFixLine.ts): from ledge 5 left and up to the dotted fix
+ * The way back below `wide` (lib/processRelayFixLine.ts): from ledge 5 left and up to the dotted fix
  * line's bottom end, round its turns, up it and through the arrowhead into bot 4's hand, then down
  * onto ledge 4. One eased progress over the whole route (about 330–360px), so it starts slowly off
  * ledge 5, is quickest on the climb and settles onto ledge 4; on `power1.inOut`, gentler than the
@@ -352,7 +352,7 @@ export const FIX_HOP = {
  * hops' speed.
  */
 export const FIX_LINE_HOP: Timing = { duration: 1.1, ease: "power1.inOut" };
-/** The fix arch's lit overlay (below `lg`: the fix line's) fades once the job heads forward again. */
+/** The fix arch's lit overlay (below `wide`: the fix line's) fades once the job heads forward again. */
 export const FIX_LIT_FADE = 0.6;
 
 // The hand-off (ui-spec §5.11e): on a send run the flag bot sends the job to a person.
@@ -362,7 +362,7 @@ export const FIX_LIT_FADE = 0.6;
  */
 export const RELAY_SEND = { dwell: JOB_BEATS.flag.raise } as const;
 /**
- * From `lg`, the climb: the job rises from its stop up the hand-off stem (`process-handoff`) and
+ * From `wide`, the climb: the job rises from its stop up the hand-off stem (`process-handoff`) and
  * passes behind the label's `bg` mask at the arrowhead, `y` over the whole climb on `ease`; `x`
  * eases onto the stem's line between `drift` (shares of the climb), so it first rises straight up
  * in front of the pennant. It fades over its last `fade` seconds, and ends with its centre `under`
@@ -379,7 +379,7 @@ export const HANDOFF_CLIMB = {
   hold: 0.6,
 } as const;
 /**
- * Below `lg`, the drop: the job falls straight down the bot column from ledge 3 onto the hand-off
+ * Below `wide`, the drop: the job falls straight down the bot column from ledge 3 onto the hand-off
  * marker (`process-handoff-mark`), its centre on the marker's, then slides `slide` px right
  * towards the label as it pops (`JOB_DONE`) and fades (`JOB_FADE`).
  */
@@ -396,7 +396,7 @@ export const JOB_EXIT = { speed: 480, min: 0.35, ease: "power2.inOut" } as const
  * Where the exit slide stops: at least this far (px) inside the ground line's right end, so the
  * 24px sheet (half is 12) stays on the line even at the done pop's peak (12 × `JOB_DONE.scale` ≈
  * 13.4). A wider job (an emblem's 28px box) stops half its own width × `JOB_DONE.scale` inside.
- * From `lg` only: below it the job has no slide, it pops and fades on the last ledge.
+ * From `wide` only: below it the job has no slide, it pops and fades on the last ledge.
  */
 export const JOB_EXIT_INSET = 14;
 /** At the line's end, one "done" pop about the bottom centre: up to `scale`, then `back.out` to 1. */
@@ -413,7 +413,7 @@ export const JOB_FADE: Timing = { duration: 0.3, ease: "power1.in" };
 /**
  * At the last bot, as the job leaves: the lesson splits off the job's centre, popping in from
  * `from` about its own centre (`ease`) as it fades in over `fade`, and peeling `peel` px up off the
- * job (`peelEase`) over the same `duration`; it waits `hold` before it leaves. Below `lg` the same
+ * job (`peelEase`) over the same `duration`; it waits `hold` before it leaves. Below `wide` the same
  * pop, without the peel or `hold`, puts it at the last bot's left hand.
  */
 export const LESSON_SPLIT = {
@@ -427,7 +427,7 @@ export const LESSON_SPLIT = {
 } as const;
 /**
  * Leaving the last bot: a small lift as it fades out. That step's text lies between the bot and
- * the path's start, so the lesson crosses it hidden instead of flying over the words. Below `lg`
+ * the path's start, so the lesson crosses it hidden instead of flying over the words. Below `wide`
  * the same lift, without the fade, takes it off the last bot's hand.
  */
 export const LESSON_LEAVE = { lift: 4, duration: 0.2, ease: "power2.in" } as const;
@@ -436,13 +436,13 @@ export const LESSON_ENTER = { from: 8, duration: 0.3, ease: "power2.out" } as co
 /** At the arrowhead: a small scale up about its centre as it fades out. */
 export const LESSON_OUT = { scale: 1.3, duration: 0.25, ease: "power2.out" } as const;
 /**
- * Below `lg` (§5.9): the rules bot's clipboard centre (step 2), in bot viewBox units. Its `x` is
+ * Below `wide` (§5.9): the rules bot's clipboard centre (step 2), in bot viewBox units. Its `x` is
  * the lesson's lane up the column's left edge; the point itself is where the ride ends and the
  * lesson pops out.
  */
 export const COLUMN_LESSON_AT = { x: -15, y: 50 } as const;
 /**
- * Below `lg`: just off the last bot's bare left hand (its arm ends at x −4, y 50–56; the last bot
+ * Below `wide`: just off the last bot's bare left hand (its arm ends at x −4, y 50–56; the last bot
  * holds a flag or an arrow in its right hand and nothing in its left), in bot viewBox units, mapped
  * through the live `arm-left` group, so it rides the arm's breath, drift and sway. The lesson pops
  * in here (`LESSON_SPLIT`'s pop, without the peel). Its `x` is the clipboard's, so the ride starts
@@ -450,7 +450,7 @@ export const COLUMN_LESSON_AT = { x: -15, y: 50 } as const;
  */
 export const COLUMN_LESSON_FROM = { x: -15, y: 53 } as const;
 /**
- * Below `lg`: once the lesson has popped in at its hand, the last bot holds it `hold` s, looking at
+ * Below `wide`: once the lesson has popped in at its hand, the last bot holds it `hold` s, looking at
  * it (look −`LOOK_MAX`, down-left, over `look` from the pop's start); as it lifts off
  * (`LESSON_LEAVE`'s lift, without the fade) its eyes go back to rest over `back`.
  */
@@ -459,7 +459,7 @@ export const COLUMN_LESSON_HOLD = {
   look: { duration: 0.3, ease: LOOK_EASE },
   back: { duration: 0.4, ease: "power2.inOut" },
 } as const;
-/** Below `lg`: if the live hand sits off the lane, the lesson eases into it over the ride's start. */
+/** Below `wide`: if the live hand sits off the lane, the lesson eases into it over the ride's start. */
 export const COLUMN_LESSON_GLIDE: Timing = { duration: 0.3, ease: "power2.out" };
 
 // The trail and lit lines.
@@ -469,7 +469,7 @@ export const GHOST_SCALE = [0.85, 0.7, 0.55] as const;
 export const GHOST_OPACITY = [0.45, 0.28, 0.14] as const;
 export const GHOST_IN = 0.1;
 export const GHOST_OUT = 0.15;
-/** The ground-lit segment (px, its `w-32`), its fade in at a hop's start and out on arrival (from `lg`). */
+/** The ground-lit segment (px, its `w-32`), its fade in at a hop's start and out on arrival (from `wide`). */
 export const LIT_LENGTH = 128;
 export const LIT_IN = 0.1;
 export const LIT_FADE = 0.5;

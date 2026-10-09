@@ -1,7 +1,7 @@
 // One relay run's story, shared by both geometries (ui-spec §5.7, §5.3a): the plan's visits in
 // order (lib/processRelayPlan.ts). At each, the bot's cue and the job's change on its beats
 // (lib/processRelayJob.ts); between them, a hop, which the geometry draws: along the ground line
-// from `lg` (lib/processRelay.ts), down the bot column below it (lib/processRelayColumn.ts). The
+// from `wide` (lib/processRelay.ts), down the bot column below it (lib/processRelayColumn.ts). The
 // first hop is the hand-off out of intake's hand; on a fix run one hop goes back to the work step
 // and the next one forward again; on a send run the visits end at the flag (step 3). What happens
 // after the last stop (the exit and the return, or the send's way out) is the geometry's own.
@@ -21,7 +21,7 @@ export type RelayCues = {
   /** The lesson reaches the arrowhead (or the clipboard): this bot takes the loop back. */
   readonly receive: (index: number) => void;
   /**
-   * Below `lg`: the lesson pops in at this bot's left hand and stays `seconds`; the bot looks at
+   * Below `wide`: the lesson pops in at this bot's left hand and stays `seconds`; the bot looks at
    * it, then back to rest as it lifts off.
    */
   readonly holdLesson: (index: number, seconds: number) => void;

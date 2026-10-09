@@ -1,11 +1,11 @@
-// The relay lesson's moves (ui-spec §5.7 layer 10, "The return"; §5.9 below `lg`): the small rule
-// card that rides the return back to step 2, "your rules", in a flow that has the return. From `lg`
+// The relay lesson's moves (ui-spec §5.7 layer 10, "The return"; §5.9 below `wide`): the small rule
+// card that rides the return back to step 2, "your rules", in a flow that has the return. From `wide`
 // it splits off the finished job at the last bot: it pops in off the job's centre and peels up,
 // fades out as it leaves (that step's text lies between the bot and the path, so it never flies
 // across the words), drops onto the dashed path at the return's start (R0), and at the end scales
-// up as it fades. Below `lg` it pops in at the last bot's left hand instead, lifts off it and rides
+// up as it fades. Below `wide` it pops in at the last bot's left hand instead, lifts off it and rides
 // up the column's left edge. The rides themselves (the legs, the light, the cues) are timed in
-// lib/processRelay.ts (from `lg`) and lib/processRelayColumn.ts (below). The card is anchored at its
+// lib/processRelay.ts (from `wide`) and lib/processRelayColumn.ts (below). The card is anchored at its
 // centre (negative margins), so every point here is where its centre goes. Only the relay timeline
 // writes it; transforms and opacity only.
 import type { gsap } from "@/lib/gsap";
@@ -49,7 +49,7 @@ export function lessonAppear(tl: gsap.core.Timeline, lesson: SVGSVGElement, at: 
 }
 
 /**
- * From `t` (from `lg`): the lesson splits off the job at `at` (the sheet's centre), popping in as
+ * From `t` (from `wide`): the lesson splits off the job at `at` (the sheet's centre), popping in as
  * it peels up off the sheet. Returns the run time at which it leaves.
  */
 export function lessonSplit(tl: gsap.core.Timeline, lesson: SVGSVGElement, at: PointAt, t: number): number {
@@ -66,7 +66,7 @@ export function lessonLeave(tl: gsap.core.Timeline, lesson: SVGSVGElement, t: nu
   return t + duration;
 }
 
-/** From `t` (below `lg`): the same small lift, still shown, off the last bot's hand. Returns when it's up. */
+/** From `t` (below `wide`): the same small lift, still shown, off the last bot's hand. Returns when it's up. */
 export function lessonLift(tl: gsap.core.Timeline, lesson: SVGSVGElement, t: number): number {
   const { lift, duration, ease } = LESSON_LEAVE;
   tl.to(lesson, { y: `-=${lift}`, duration, ease }, t);
@@ -74,7 +74,7 @@ export function lessonLift(tl: gsap.core.Timeline, lesson: SVGSVGElement, t: num
 }
 
 /**
- * At `t` (from `lg`): onto the return path at `at` (R0), dropping in from `LESSON_ENTER.from` px
+ * At `t` (from `wide`): onto the return path at `at` (R0), dropping in from `LESSON_ENTER.from` px
  * above as it fades in. Returns when it's there.
  */
 export function lessonEnter(tl: gsap.core.Timeline, lesson: SVGSVGElement, at: PointAt, t: number): number {

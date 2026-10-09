@@ -1,4 +1,4 @@
-// The crew relay from `lg` (ui-spec §5.7 "the relay's rebuild", §5.3, §5.3a, §5.3b), on the flow's
+// The crew relay from `wide` (ui-spec §5.7 "the relay's rebuild", §5.3, §5.3a, §5.3b), on the flow's
 // five or six stops. The job (the flow's emblem, or the default sheet) leaves step 1's hand
 // (lib/processRelayHand.ts), drops onto the ground line and is passed along it from bot to bot, in
 // front of them: each bot catches it at its stop and changes it on a beat of its act
@@ -16,7 +16,7 @@
 // passing behind the loop label, with no ghosts; at the arrowhead, on step 2's end, it pops out as
 // the arrowhead flashes and the rules bot takes it. A flow with no loops (`data-loops="off"`) has
 // no return path and no fix arch in its markup: their absence means "skip those parts", so its run
-// is a one-way pass that ends with the job's fade. Below `lg` the same run turns down the bot
+// is a one-way pass that ends with the job's fade. Below `wide` the same run turns down the bot
 // column (lib/processRelayColumn.ts, ui-spec §5.9).
 //
 // Waypoints are measured from the DOM relative to the relay layer (its box is the body wrapper's;
@@ -77,11 +77,11 @@ import {
 } from "@/lib/processRelayTrail";
 
 /**
- * Tailwind's `lg`: the ground line, chevrons, return path and fix arch show from here, and the
- * relay runs along them; below it the relay runs down the bot column instead
- * (lib/processRelayColumn.ts).
+ * The `wide` breakpoint (`--breakpoint-wide`, 90rem, 1440px): the ground line, chevrons, return
+ * path and fix arch show from here, and the relay runs along them; below it the relay runs down
+ * the bot column instead (lib/processRelayColumn.ts).
  */
-export const relayQuery = "(min-width: 64rem)";
+export const relayQuery = "(min-width: 90rem)";
 
 /** The return path's corner radius (16px) and its 45° point's inset, 16 × (1 − cos 45°). */
 const CORNER = 16;
@@ -360,7 +360,7 @@ function rideReturn(
   tl.call(cues.receive, [takes], at);
 }
 
-/** One relay run with the job (from `lg`). `waypoints` returns the latest measurement. */
+/** One relay run with the job (from `wide`). `waypoints` returns the latest measurement. */
 export function relayRun(
   parts: RelayParts,
   waypoints: () => RelayWaypoints,

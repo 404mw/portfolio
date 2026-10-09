@@ -37,8 +37,8 @@ function renderShape(shape: BotShape, index: number, pose: BotPose) {
   }
 }
 
-/** Process' size: 88 × 57 below `lg`, 136 × 88 from `lg`. */
-const processSize = "h-14.25 w-22 lg:mt-5 lg:h-22 lg:w-34";
+/** Process' size: 88 × 57 below `wide`, 136 × 88 from `wide`. */
+const processSize = "h-14.25 w-22 wide:mt-5 wide:h-22 wide:w-34";
 
 type ProcessBotProps = {
   readonly role: BotRole;

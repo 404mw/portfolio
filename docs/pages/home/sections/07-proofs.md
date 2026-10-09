@@ -1,6 +1,6 @@
 # Proofs
 
-**Last Updated:** 2026-10-08
+**Last Updated:** 2026-10-09
 
 **The one question:** Have they built something real that people use?
 
@@ -480,6 +480,7 @@ land on the card h3 within 0.03px and on the banner exactly. Not checked: real d
 
 ## Decisions
 
+- 2026-10-09 — User's call: Exile Bot's proof line says "standards" instead of "rules" ("written standards", landed); see `../page.md`.
 - 2026-10-08 — User chose the condensing sticky band (spec `ui-spec/07-proofs-sticky-band.md`): the
   takeover's ink band and title stick under the top bar and shrink to a slim strip as you scroll, so
   every close morphs back into the card; strip hangs from the bar, slim title at the card title's
