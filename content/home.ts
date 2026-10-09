@@ -209,8 +209,8 @@ export const agents = {
           asker: "Customer",
           messages: [
             { from: "them", text: "Hi, my order arrived damaged. Can I get a refund?" },
-            { from: "agent", text: "Sorry about that. Refunds are decided by the owner, so I've passed your request on with your order details." },
-            { from: "action", text: "Passed to you", where: "your inbox" },
+            { from: "agent", text: "Sorry about that. Refunds are decided by Sam, the owner, so I've passed your request on with your order details." },
+            { from: "action", text: "Passed to Sam, the owner", where: "Sam's inbox" },
             { from: "them", text: "Okay, thank you." },
           ],
         },
@@ -316,7 +316,7 @@ export const agents = {
           week: "week 38",
           bars: [42, 58, 50, 72, 64, 86, 78, 95],
           chartAlt: "Bar chart of eight weeks, rising, with this week highest.",
-          sent: "sent to you · Mon 09:00",
+          sent: "sent to Sam · Mon 09:00",
         },
       },
       {
@@ -345,7 +345,7 @@ export const agents = {
           ],
           statusNew: "new",
           statusDone: "passed on",
-          action: { text: "Passed to you to decide", where: "your inbox" },
+          action: { text: "Passed to Sam, the owner, to decide", where: "Sam's inbox" },
         },
       },
     ],
