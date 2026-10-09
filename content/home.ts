@@ -4,16 +4,16 @@
 // takeover only. Agents demo content is sample illustration (constitution §7 item 5).
 
 export const meta = {
-  title: "MARWIX: AI Automation Engineer",
+  title: "Muhammad Waqas | AI Agents and Automations",
   description:
-    "I build AI agents that take repetitive work off your team, and the websites around them. Book a call.",
+    "AI agents for your business: they book appointments, answer customer messages and follow up on new enquiries, around the clock. Book a call.",
 } as const;
 
 export const hero = {
   firstName: "Muhammad",
   lastName: "Waqas",
-  sideLine: "I build AI agents that take repetitive work off your team, and the websites around them.",
-  tag: "AI agents · End-to-end web",
+  sideLine: "I build AI agents that answer your customers and book them in, where they already message you. I build websites too.",
+  tag: "AI agents · Websites",
   seeProofs: "See projects",
   portraitAlt: "Muhammad Waqas, head and shoulders, in black and white, with glasses, a beard and a dark collared shirt, looking to one side.",
 } as const;
@@ -25,10 +25,10 @@ export const hero = {
 // Card keys are fixed (ui-spec §0.5): the radio value, the ?for= value and the set keys.
 export const about = {
   label: "About me",
-  heading: { lead: "Software that", accent: "runs on its own." },
+  heading: { lead: "Your routine work,", accent: "done for you." },
   lines: [
-    "I'm an AI Automation Engineer. I automate the work a business repeats.",
-    "If you build software, I help you ship it.",
+    "I set up AI agents that do the work your business repeats, like bookings and customer messages. My job title: AI Automation Engineer.",
+    "If you build software, I help you finish it and put it live.",
   ],
   prompt: "What do you do? Pick the closest one.",
   // Rix, the mascot (About on home and the playground on /rix). Playful, no claims.
@@ -46,7 +46,7 @@ export const about = {
     idleLines: [
       "Go on, pick one.",
       "Which one are you?",
-      "Not sure counts too.",
+      "Exploring counts too.",
       "Pick the closest one.",
       "One of these is you.",
       "Pick one. I'll wait.",
@@ -65,8 +65,7 @@ export const about = {
       "online-store": ["Orders coming in?", "Run a shop? Pick it."],
       discord: ["Discord? Got a server?", "Server owner? That's you."],
       "software-builder": ["Shipping something?", "Building an app? Go on."],
-      website: ["Need a site? That's it.", "No website yet? Pick it."],
-      "not-sure": ["Not sure? That's fine.", "Still deciding? Pick it."],
+      "not-sure": ["Just exploring? That's fine.", "Looking around? Pick it."],
     },
     // hoverAnyLines: any card hovered before a pick, between that card's own lines.
     hoverAnyLines: ["That one?", "Go on, it's yours.", "Is that you?", "Ooh, good one."],
@@ -86,7 +85,7 @@ export const about = {
     // The pet (ui-spec/00-rix.md R6B, R12.1). Shown in turn, never announced.
     petLines: ["Aw, that's nice.", "Okay, don't stop."],
   },
-  // Shown under a picked card's ack (cards 0–4 only), hidden without JavaScript (ui-spec §2a.R3).
+  // Shown under a picked card's ack (cards 0–3 only), hidden without JavaScript (ui-spec §2a.R3).
   ackSet: "The examples below are now set for you.",
   replies: [
     {
@@ -118,14 +117,8 @@ export const about = {
         "Hi Marwix, I'm building an app and I'd like to talk about shipping it with your workflow.",
     },
     {
-      key: "website",
-      label: "I need a website",
-      ack: "Need a website? MARWIX can build it, with agents that answer your visitors.",
-      whatsappText: "Hi Marwix, I need a website and I'd like to talk about building it.",
-    },
-    {
       key: "not-sure",
-      label: "Not sure yet",
+      label: "Just exploring",
       ack: "Fair enough. Scroll on for a mix of what MARWIX builds.",
       whatsappText: "Hi Marwix, I'd like to talk about automating my business",
     },
@@ -143,13 +136,13 @@ export const shownFor = {
 
 export const marquee = {
   items: [
-    "Specialized agents",
-    "Enforced Rules",
+    "Bookings",
     "Customer messages",
-    "Lead follow-up",
-    "Recurring reports",
-    "Connected tools",
-    "Web apps",
+    "Appointment reminders",
+    "New enquiries",
+    "Order questions",
+    "Sales reports",
+    "Websites",
   ],
 } as const;
 
@@ -161,8 +154,14 @@ export const marquee = {
 export const agents = {
   number: "01",
   label: "What my agents handle",
-  demoStatus: "agent running",
+  // The sticky column's big two-part heading (Process-style) and the bridge line under it.
+  // The bridge line is the page's one definition of "AI agent" (facts → What an AI agent is).
+  heading: { lead: "Booked, replied,", accent: "followed up." },
+  lead: "ChatGPT answers you. An AI agent works for you: it replies to your customers and books them in, and passes anything unusual to you.",
+  demoStatus: "working for you",
   demoAgent: "Agent",
+  // Screen-reader only: read before each action line (ui-spec 04-agents-action §4.10.3).
+  demoAction: "Done",
   // Below `lg`, the phone stepper above the panel (ui-spec §4.2a). Screen-reader and button names
   // only; `{n}` and `{total}` are filled in code. `position` also starts the press announcement.
   stepper: {
@@ -170,18 +169,13 @@ export const agents = {
     next: "Next offer",
     position: "Offer {n} of {total}",
   },
-  // The website card's last row: not an agent demo, it points to section 03 (web.steps titles).
-  pointer: {
-    status: "website build",
-    heading: "Websites, built end to end.",
-    cta: "See the website steps",
-  },
   cards: {
+    // Shared voice, four everyday-business offers (facts, 2026-10-08). Kinds: leads, chat, chat, leads.
     default: [
       {
         title: "Bookings",
-        line: "I set up agents that take bookings and keep your schedule.",
-        slug: "booking-agent",
+        line: "Customers book themselves in at any hour, and your schedule stays up to date.",
+        slug: "your bookings",
         demo: {
           rows: [
             { initials: "MH", name: "Maya H.", source: "website form" },
@@ -190,129 +184,41 @@ export const agents = {
           ],
           statusNew: "new",
           statusDone: "booked",
+          action: { text: "Booked each one in", where: "your calendar" },
+        },
+      },
+      {
+        title: "Customer messages",
+        line: "Routine customer messages get a reply, even outside opening hours.",
+        slug: "your messages",
+        demo: {
+          asker: "Customer",
+          messages: [
+            { from: "them", text: "Hi, are you open on Saturday?" },
+            { from: "agent", text: "Yes, 9 to 5 on Saturdays. Want me to book you in?" },
+            { from: "them", text: "Yes please, thank you!" },
+            { from: "action", text: "Booked Sat 10:00", where: "your calendar" },
+          ],
         },
       },
       {
         title: "Order questions",
-        line: "I set up agents that answer order and delivery questions.",
-        slug: "support-agent",
+        line: "Order and delivery questions get answered, day and night.",
+        slug: "order questions",
         demo: {
           asker: "Customer",
           messages: [
             { from: "them", text: "Hi, has my order shipped yet?" },
-            {
-              from: "agent",
-              text: "Yes, it left this morning. Here's your tracking link.",
-              meta: "agent reply · 2s",
-            },
+            { from: "agent", text: "Yes, it left this morning. Here's your tracking link." },
+            { from: "action", text: "Tracking link sent", where: "your orders" },
             { from: "them", text: "Perfect, thanks!" },
           ],
         },
       },
       {
-        title: "Member questions",
-        line: "I set up agents that answer Discord members' questions when they're mentioned.",
-        slug: "member-agent",
-        demo: {
-          asker: "Member",
-          messages: [
-            { from: "them", text: "@bot how do I join the weekend event?" },
-            {
-              from: "agent",
-              text: "Sign-ups are in #events, same as last time. Here's the link.",
-              meta: "agent reply · 2s",
-            },
-            { from: "them", text: "Found it, thanks." },
-          ],
-        },
-      },
-      {
-        title: "Agent workflow",
-        line: "I set up my agent workflow inside your team, for building software.",
-        slug: "workflow-agent",
-        // Kind `orchestra` (ui-spec §4.4): swimlanes for the lead, the team and the checkers, with the fix.
-        demo: {
-          lead: "Lead",
-          team: { label: "The team", roles: ["Plan", "Design", "Build"] },
-          checks: { label: "The checkers", roles: ["Review", "Rules", "Try-out"] },
-          ring: {
-            out: "hands out",
-            rules: "reads rules",
-            work: "works, reports",
-            check: "lead sends it",
-            fix: "fix, recheck",
-            pass: "all clear",
-          },
-          steps: [
-            "The lead agent hands each part of the work to a specialist.",
-            "Each specialist reads the written rules before starting.",
-            "The specialist does the work and reports back to the lead.",
-            "The lead sends the finished work to separate checkers.",
-            "Problems and broken rules go back to be fixed and checked again.",
-            "When every check passes, the work goes back to the lead.",
-          ],
-          done: "all checks passed",
-        },
-      },
-    ],
-    "service-business": [
-      {
-        title: "Bookings",
-        line: "I set up agents that book customers in and manage your schedule.",
-        slug: "booking-agent",
-        demo: {
-          rows: [
-            { initials: "MH", name: "Maya H.", source: "website form" },
-            { initials: "OT", name: "Omar T.", source: "WhatsApp message" },
-            { initials: "LP", name: "Lena P.", source: "phone message" },
-          ],
-          statusNew: "new",
-          statusDone: "booked",
-        },
-      },
-      {
-        title: "Customer messages",
-        line: "I set up agents that answer your routine customer messages.",
-        slug: "support-agent",
-        demo: {
-          asker: "Customer",
-          messages: [
-            { from: "them", text: "Hi, are you open on Saturday?" },
-            {
-              from: "agent",
-              text: "Yes, 9 to 5 on Saturdays. Want me to book you in?",
-              meta: "agent reply · 2s",
-            },
-            { from: "them", text: "Yes please, thank you!" },
-          ],
-        },
-      },
-      {
-        title: "Reminders",
-        line: "I set up agents that remind customers and handle a reschedule.",
-        slug: "reminder-agent",
-        demo: {
-          asker: "Customer",
-          messages: [
-            {
-              from: "agent",
-              text: "Hi Nadia, a reminder: your appointment is tomorrow at 10:00.",
-              meta: "reminder sent",
-            },
-            { from: "them", text: "Can we move it to Thursday?" },
-            {
-              from: "agent",
-              text: "Done. You're booked for Thursday at 10:00.",
-              meta: "rescheduled",
-            },
-            { from: "them", text: "Thanks!" },
-          ],
-        },
-      },
-      {
         title: "New enquiries",
-        line: "I set up agents that follow up on your new enquiries.",
-        slug: "lead-agent",
+        line: "Every new enquiry gets a follow-up while you get on with your day.",
+        slug: "your enquiries",
         demo: {
           rows: [
             { initials: "SK", name: "Sara K.", source: "website form" },
@@ -321,43 +227,102 @@ export const agents = {
           ],
           statusNew: "new",
           statusDone: "followed up",
+          action: { text: "Followed up on each one", where: "your messages" },
+        },
+      },
+    ],
+    "service-business": [
+      {
+        title: "Bookings",
+        line: "Customers book themselves in, and your schedule stays up to date.",
+        slug: "your bookings",
+        demo: {
+          rows: [
+            { initials: "MH", name: "Maya H.", source: "website form" },
+            { initials: "OT", name: "Omar T.", source: "WhatsApp message" },
+            { initials: "LP", name: "Lena P.", source: "phone message" },
+          ],
+          statusNew: "new",
+          statusDone: "booked",
+          action: { text: "Booked each one in", where: "your calendar" },
+        },
+      },
+      {
+        title: "Customer messages",
+        line: "Questions like 'Are you open Saturday?' get answered, even after you close.",
+        slug: "your messages",
+        demo: {
+          asker: "Customer",
+          messages: [
+            { from: "them", text: "Hi, are you open on Saturday?" },
+            { from: "agent", text: "Yes, 9 to 5 on Saturdays. Want me to book you in?" },
+            { from: "them", text: "Yes please, thank you!" },
+            { from: "action", text: "Booked Sat 10:00", where: "your calendar" },
+          ],
+        },
+      },
+      {
+        title: "Reminders",
+        line: "Customers get a reminder before their appointment and can reschedule.",
+        slug: "your reminders",
+        demo: {
+          asker: "Customer",
+          messages: [
+            { from: "agent", text: "Hi Nadia, a reminder: your appointment is tomorrow at 10:00." },
+            { from: "them", text: "Can we move it to Thursday?" },
+            { from: "agent", text: "Done. You're booked for Thursday at 10:00." },
+            { from: "action", text: "Moved to Thu 10:00", where: "your calendar" },
+            { from: "them", text: "Thanks!" },
+          ],
+        },
+      },
+      {
+        title: "New enquiries",
+        line: "New enquiries get followed up while you're with a customer.",
+        slug: "your enquiries",
+        demo: {
+          rows: [
+            { initials: "SK", name: "Sara K.", source: "website form" },
+            { initials: "DR", name: "Daniel R.", source: "instagram DM" },
+            { initials: "AM", name: "Aisha M.", source: "call-back request" },
+          ],
+          statusNew: "new",
+          statusDone: "followed up",
+          action: { text: "Followed up on each one", where: "your messages" },
         },
       },
     ],
     "online-store": [
       {
         title: "Order questions",
-        line: "I set up agents that answer your customers' order and delivery questions.",
-        slug: "support-agent",
+        line: "Customers asking where their order is get an answer, day or night.",
+        slug: "order questions",
         demo: {
           asker: "Customer",
           messages: [
             { from: "them", text: "Hi, has my order shipped yet?" },
-            {
-              from: "agent",
-              text: "Yes, it left this morning. Here's your tracking link.",
-              meta: "agent reply · 2s",
-            },
+            { from: "agent", text: "Yes, it left this morning. Here's your tracking link." },
+            { from: "action", text: "Tracking link sent", where: "your orders" },
             { from: "them", text: "Perfect, thanks!" },
           ],
         },
       },
       {
         title: "Sales reports",
-        line: "I set up sales reports that get built and sent on schedule.",
-        slug: "report-agent",
+        line: "Your sales report is built and sent to you on schedule.",
+        slug: "sales report",
         demo: {
           title: "Weekly sales",
           week: "week 38",
           bars: [42, 58, 50, 72, 64, 86, 78, 95],
           chartAlt: "Bar chart of eight weeks, rising, with this week highest.",
-          sent: "sent to team · Mon 09:00",
+          sent: "sent to you · Mon 09:00",
         },
       },
       {
-        title: "Connected tools",
-        line: "I connect your store's tools so their data moves between them.",
-        slug: "sync-agent",
+        title: "Orders to stock",
+        line: "A new order updates your stock and your sheet, and the customer hears when it ships.",
+        slug: "orders to stock",
         demo: {
           tools: ["Store", "Stock", "Sheets"],
           events: [
@@ -365,13 +330,13 @@ export const agents = {
             { kind: "order paid", result: "Row in Sheets" },
             { kind: "item shipped", result: "Customer told" },
           ],
-          done: "all tools in sync",
+          done: "all up to date",
         },
       },
       {
         title: "Returns",
-        line: "My agents take return and refund requests and pass them to you.",
-        slug: "returns-agent",
+        line: "Return and refund requests are taken in and passed to you to decide.",
+        slug: "returns",
         demo: {
           rows: [
             { initials: "JM", name: "Jonas M.", source: "return request" },
@@ -380,6 +345,7 @@ export const agents = {
           ],
           statusNew: "new",
           statusDone: "passed on",
+          action: { text: "Passed to you to decide", where: "your inbox" },
         },
       },
     ],
@@ -392,12 +358,9 @@ export const agents = {
           asker: "Member",
           messages: [
             { from: "them", text: "@bot when's the next game night?" },
-            {
-              from: "agent",
-              text: "Friday, 8pm in #events. Same squad as last time?",
-              meta: "bot reply · 2s",
-            },
+            { from: "agent", text: "Friday, 8pm in #events. Same squad as last time?" },
             { from: "them", text: "Yep, count me in!" },
+            { from: "action", text: "Added to game night", where: "your sign-up sheet" },
           ],
         },
       },
@@ -454,7 +417,7 @@ export const agents = {
             { kind: "/stock used", result: "Read from Sheets" },
             { kind: "Stream goes live", result: "Posted in #live" },
           ],
-          done: "all tools in sync",
+          done: "all up to date",
         },
       },
     ],
@@ -532,121 +495,64 @@ export const agents = {
         },
       },
     ],
-    website: [
-      {
-        title: "Visitor questions",
-        line: "I set up agents that answer visitors' routine questions on your site.",
-        slug: "site-agent",
-        demo: {
-          asker: "Visitor",
-          messages: [
-            { from: "them", text: "Hi, where are you based?" },
-            {
-              from: "agent",
-              text: "We're on Mill Street, open 9 to 6. Here's the map.",
-              meta: "agent reply · 2s",
-            },
-            { from: "them", text: "Thanks, see you Friday." },
-          ],
-        },
-      },
-      {
-        title: "Form follow-up",
-        line: "I set up agents that follow up on your contact-form enquiries.",
-        slug: "lead-agent",
-        demo: {
-          rows: [
-            { initials: "NB", name: "Noor B.", source: "contact form" },
-            { initials: "TW", name: "Tom W.", source: "quote request" },
-            { initials: "IR", name: "Ines R.", source: "contact form" },
-          ],
-          statusNew: "new",
-          statusDone: "followed up",
-        },
-      },
-      {
-        title: "Site bookings",
-        line: "I set up agents that take bookings right on your site.",
-        slug: "booking-agent",
-        demo: {
-          rows: [
-            { initials: "CD", name: "Clara D.", source: "booking page" },
-            { initials: "YA", name: "Yusuf A.", source: "services page" },
-            { initials: "HK", name: "Hana K.", source: "home page" },
-          ],
-          statusNew: "new",
-          statusDone: "confirmed",
-        },
-      },
-      {
-        title: "Site reports",
-        line: "I set up site reports that get built and sent on schedule.",
-        slug: "report-agent",
-        demo: {
-          title: "Weekly visits",
-          week: "week 38",
-          bars: [42, 58, 50, 72, 64, 86, 78, 95],
-          chartAlt: "Bar chart of eight weeks of visits, rising, this week highest.",
-          sent: "sent to you · Mon 09:00",
-        },
-      },
-      {
-        // Kind `pointer`: no slug and no demo. Its panel is agents.pointer plus web.steps titles.
-        title: "Custom websites",
-        line: "I build your website end to end, from plan to launch.",
-      },
-    ],
   },
 } as const;
 
 // Facts → How the user works. One flow per About card (ui-spec/05-process.md §5.5, §5.10): the
 // agent doing that visitor's job on the card's lead offer. Flows are illustrations (constitution
 // §7.5). flows.default is in the shared voice; each card's flow is in its own tone.
-// The loop returns to step 2. No agent names, tools or counts.
-// flows.discord (user's call, 2026-10-04) is the bot's own behaviour: no check, no loop, so it
-// carries no loopLabel and no fixLabel.
+// Round 2 (2026-10-08): control first. Job arrives, your rules, the sort (sensitive or unusual
+// goes to a person: handoffLabel), done, checked (fixLabel: back to step 4), then the flow's own
+// last step. The loop returns to step 2. No agent names, tools or counts; no step says the
+// reader approves every reply (not in the facts).
+// flows.discord (user's call, 2026-10-04) is the bot's own behaviour: no check, no loop, no
+// hand-off, so it carries no loopLabel, fixLabel or handoffLabel.
 export const process = {
   number: "02",
-  label: "How I work",
-  heading: { lead: "AI agents run", accent: "every job." },
+  label: "You stay in charge",
+  heading: { lead: "Hard calls", accent: "come to you." },
+  lead: "Routine jobs follow your rules and are checked before they go out. Refunds, complaints and anything unusual are passed to you instead.",
   stepLabel: "Step",
   flows: {
     default: {
       caption: "Example: one job",
       steps: [
         { title: "Job arrives", line: "A job comes in: a booking, a question, a request." },
-        { title: "Your rules", line: "The agent works from rules written for your business." },
-        { title: "Done", line: "The agent does the job, following those rules." },
-        { title: "Second check", line: "A separate agent checks the work against your rules." },
-        { title: "Flagged", line: "Anything unusual is passed to a person." },
+        { title: "Your rules", line: "Every job follows rules written for your business." },
+        { title: "Hard calls", line: "Anything sensitive or unusual is passed to you before any work starts." },
+        { title: "Done", line: "Routine jobs get done, following those rules." },
+        { title: "Checked", line: "A separate agent checks the work before it goes out." },
       ],
-      loopLabel: "Next job, better rules.",
-      fixLabel: "Rule broken? Back to fix.",
+      handoffLabel: "To you",
+      loopLabel: "Each job improves your rules.",
+      fixLabel: "Breaks a rule? Done again.",
     },
     "service-business": {
       caption: "Example: a booking",
       steps: [
         { title: "Request arrives", line: "A customer asks for an appointment." },
-        { title: "Your rules", line: "The agent follows your hours, services and booking rules." },
-        { title: "Booked", line: "The agent finds a free slot and books it." },
-        { title: "Second check", line: "A separate agent checks the booking against your rules." },
+        { title: "Your rules", line: "The booking follows your hours, services and rules." },
+        { title: "Hard calls", line: "Unusual bookings and complaints are passed to you or your staff." },
+        { title: "Booked", line: "The customer gets booked into a free slot." },
+        { title: "Checked", line: "A separate agent checks the booking before it goes out." },
         { title: "Reminder", line: "The customer gets a reminder, and can reschedule." },
-        { title: "Flagged", line: "Anything unusual is passed to you or your staff." },
       ],
-      loopLabel: "Next job, better rules.",
+      handoffLabel: "To you or your staff",
+      loopLabel: "Each job improves your rules.",
       fixLabel: "Breaks your rules? Redone.",
     },
     "online-store": {
       caption: "Example: an order question",
       steps: [
         { title: "Question arrives", line: "A customer asks where their order is." },
-        { title: "Your rules", line: "The agent follows your delivery and returns rules." },
-        { title: "Answered", line: "The agent looks up the order and replies." },
-        { title: "Second check", line: "A separate agent checks the reply against your rules." },
-        { title: "Flagged", line: "Refunds and complaints are passed to you." },
+        { title: "Your rules", line: "The reply follows your delivery and returns rules." },
+        { title: "Hard calls", line: "Refunds, complaints and anything unusual are passed to you." },
+        { title: "Answered", line: "The order is looked up and the reply written." },
+        { title: "Checked", line: "A separate agent checks the reply before it goes out." },
       ],
-      loopLabel: "Next order, better rules.",
-      fixLabel: "Rule broken? Reply redone.",
+      handoffLabel: "To you",
+      loopLabel: "Each order improves your rules.",
+      fixLabel: "Breaks a rule? Rewritten.",
     },
     discord: {
       caption: "Example: a member's @mention",
@@ -662,26 +568,15 @@ export const process = {
       caption: "Example: shipping a feature",
       steps: [
         { title: "Feature asked", line: "You describe the feature you want shipped." },
-        { title: "Your rules", line: "The work starts from your team's written rules." },
+        { title: "Your rules", line: "The work starts from your written rules." },
+        { title: "Flagged", line: "Anything sensitive or unusual goes to a person, not an agent." },
         { title: "Built", line: "Agents build the feature inside those rules." },
-        { title: "Second check", line: "A separate agent reviews the work against your rules." },
-        { title: "Flagged", line: "Anything unusual goes to a person, not an agent." },
+        { title: "Reviewed", line: "A separate agent reviews the work before it ships." },
         { title: "Shipped", line: "The feature ships to production." },
       ],
+      handoffLabel: "To a person",
       loopLabel: "Next build, better rules.",
       fixLabel: "Breaks a rule? Rebuild.",
-    },
-    website: {
-      caption: "Example: a visitor's enquiry",
-      steps: [
-        { title: "Visitor asks", line: "A visitor sends a question through your site." },
-        { title: "Your rules", line: "The agent follows the rules written for your site." },
-        { title: "Answered", line: "The agent replies with what the visitor needs." },
-        { title: "Second check", line: "A separate agent checks the reply against your rules." },
-        { title: "Flagged", line: "Anything unusual is passed to you." },
-      ],
-      loopLabel: "Next visit, better rules.",
-      fixLabel: "Breaks site rules? Redone.",
     },
   },
 } as const;
@@ -691,7 +586,7 @@ export const web = {
   number: "03",
   label: "Websites, end to end",
   heading: { lead: "Your website,", accent: "start to finish." },
-  lead: "One person, from plan to launch: your website or web app, with your automations wired in from the start.",
+  lead: "One person, from plan to launch: your website or web app, ready to take bookings and answer visitors from the start.",
   steps: [
     { title: "Strategy", line: "First, I plan what your site needs to do." },
     { title: "Design", line: "Layouts and visuals you review before anything is built." },
@@ -805,7 +700,6 @@ export const proofs = {
           "I can build custom commands for your server, so members get answers without leaving the channel.",
         "software-builder":
           "I keep Exile Bot running in production on my own, and I can do that for your app after it ships.",
-        website: "I built Exile Bot's website alone, and I can build yours end to end, from plan to launch.",
       },
       shotAlts: [
         "The Exile Bot website's home page, showing a calculation result card beside its headline.",
@@ -834,16 +728,15 @@ export const proofs = {
         headline: "One place for the screens, palettes and fonts worth keeping.",
         body: "Design Vault holds UI screens and components, colour palettes and fonts in one library, on the designer's own computer. It's free and open source under the MIT licence, so anyone can use it or build on it.",
       },
-      // No card line but the builder's: the other four fall back to default.
+      // No card line but the builder's: the other three fall back to default.
       meansForYou: {
         default: "I built Design Vault because I needed it, and I can build the custom tool you need.",
         "software-builder":
           "Design Vault is open source, so you can read my code before I build your app or feature.",
       },
       shotAlts: [
-        "[FILL: Design Vault takeover screenshot 1 alt text]",
-        "[FILL: Design Vault takeover screenshot 2 alt text]",
-        "[FILL: Design Vault takeover screenshot 3 alt text]",
+        "Design Vault's Palettes view, showing a grid of saved colour palettes, each card with its swatches and the colours' names.",
+        "Design Vault's Fonts view, showing a grid of saved fonts, each card a preview of the typeface over its name.",
       ],
       visitLabel: "Visit Design Vault",
     },
@@ -913,7 +806,7 @@ export const contact = {
     heading: "Build your brief",
     needs: {
       legend: "01 / What do you need?",
-      options: ["AI agents", "Automations", "Website", "Web app", "Not sure yet"],
+      options: ["Answering customers", "Bookings and reminders", "Website", "Web app", "Not sure yet"],
     },
     timeline: {
       legend: "02 / Timeline",

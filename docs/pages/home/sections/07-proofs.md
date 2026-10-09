@@ -1,11 +1,13 @@
 # Proofs
 
-**Last Updated:** 2026-10-06
+**Last Updated:** 2026-10-08
 
 **The one question:** Have they built something real that people use?
 
 See `../page.md` for the site-wide index. Spec: `../ui-spec/07-proofs.md`; the spam diagram:
-`../ui-spec/07-proofs-spam.md`.
+`../ui-spec/07-proofs-spam.md`; the takeover title band: `../ui-spec/07-proofs-band.md` (§A
+placement and §C fallbacks superseded by `../ui-spec/07-proofs-sticky-band.md`, the condensing
+sticky band).
 
 ## Current State
 
@@ -87,7 +89,7 @@ the heading's siblings (info grid, shots, visit link, Next link) rise 40px and f
 it (`barClearProgressOnOpen`, never before 0.35s), then fades in over 0.3s; if the title never
 passes under it, the bar rises with the rest. While morphing, the content carries inline
 `overflow-x: clip` so the scaled heading's empty box can't cause sideways scroll. Every open tween
-is tracked per dialog (`openTweens`) and killed whole in `reset`, since a partial `killTweensOf` on
+is tracked per dialog (`titleTweens`) and killed whole in `reset`, since a partial `killTweensOf` on
 a delayed multi-target tween doesn't stop it in GSAP 3.15. Reduced motion and direct loads are
 unchanged.
 
@@ -95,11 +97,15 @@ Closing a takeover (Close, Esc, Back) while its heading is on screen now runs th
 (2026-09-28): the heading shrinks back into its card title over 0.6s on `power4.inOut`, the same
 ease and time as the clip closing. The top bar and the rest of the content fade out over 0.2s
 first. A 0.15s fade-out runs at the end if the heading and the card title wrap to different line
-counts. If the dialog is scrolled so the heading is off screen, it closes with the plain clip, no
-morph. A close mid-open carries on from where the open had got to, and a reopen mid-close is
-clean. Both ends of the morph match the card title's typography: the heading starts (open) and
+counts. (Superseded 2026-10-08: the scrolled-off-heading close and the band landing on the banner
+are gone; the condensing sticky band keeps the heading on screen, so scrolled closes morph too, see
+"Built 2026-10-08" below.) `plainOut` (`hooks/useTakeoverMotion.ts`, the plain clip: content fades
+over the first 0.2s, whole dialog dissolves over the last 0.15s) now runs only when the card title
+is not on screen or missing, the fit check fails, or a plain open was cut off mid-rise. A close
+mid-open carries on from where the open had got to, and a reopen mid-close is clean. Both ends of the morph match the card title's typography: the heading starts (open) and
 ends (close) at the card title's optical size (the font's `opsz` axis) and letter spacing, keeping
-`wdth 80`. Both are driven from the morph's scale, so they reach the heading's own values at rest.
+`wdth 80` (Bricolage logic; Acosta has no axes since 2026-10-07, so this does nothing now, see
+`../page.md` Open Questions). Both are driven from the morph's scale, so they reach the heading's own values at rest.
 They are skipped if they would change the heading's line count at rest size. The text boxes line
 up within 1px on every edge at 360, 768 and 1440 for all three cards (before: up to 39px off on
 MARWIX-SKILLS at 1440). Cause: with `font-optical-sizing: auto`, the large heading renders narrower
@@ -218,14 +224,20 @@ per-project headline, body beside it from `lg`, `data-part` on the section); (7)
 the ink "means for you" panel: eyebrow, the closing line (`TakeoverMeansLine`, the one part that
 follows the About pick, falling back to `default`) and a Book a call button, then the Next link.
 The shape of every project is `ProofProject` in `lib/proofProject.ts` (a project that drifts fails
-the type check). Every project has three shots in one layout (`TakeoverShots`: one 2:1, then two
-4:3 details side by side from `sm`); `shots` and `shotAlts` are three-tuples (`ProofShots`), and each
-shot carries the edge its frame keeps (`ProofShot` = name + `position`, `top | center | left`;
-`lib/proofs.ts`). Exile Bot's positions are center / top / left (home, dashboard, spam-raid);
-the others keep the slot defaults top / center / center. `SiteImage` gained a `left` position key
-for this. Exile Bot's three shots load from `public/images/exile/` (`home.webp`, `dashboard.webp`,
-`spam-raid.webp`) and all three alts are written; Design Vault's and MARWIX-SKILLS' are `null`
-placeholders. The spam diagram (`SpamDiagram`, `SpamStage`, `SpamStep`, `SpamStepFigure`,
+the type check). A project has two or three shots and `TakeoverShots` picks the layout from the
+count (`ProofShots` is a two- or three-tuple): three is one 2:1, then two 4:3 details side by side
+from `sm` (Exile Bot, MARWIX-SKILLS); two is two 2:1 frames stacked at every width (Design Vault).
+Each shot carries the edge its frame keeps (`ProofShot` = name + `position`, `top | center | left`;
+`lib/proofs.ts`). Shots, positions and alts are paired by index (`zipShots`); a project's shot names
+must match its `shotAlts` length in `content/home.ts` (checked by `satisfies`, a mismatch fails the
+type check, and `zipShots` throws at build if one slips past). Exile Bot's positions are center /
+top / left (home, dashboard, spam-raid); the slot defaults are top / top for two and top / center /
+center for three. `SiteImage` gained a `left` position key for this. Exile Bot's three shots load
+from `public/images/exile/` (`home.webp`, `dashboard.webp`, `spam-raid.webp`) and all three alts are
+written. Design Vault's two light-theme shots load from `public/images/design-vault/`
+(`palettes.webp`, `fonts.webp`; 1907×947 and 1906×948 per the lead, not re-measured here) with
+both alts written (Palettes view, Fonts view). Only MARWIX-SKILLS' three shots are `null`
+placeholders (hidden). The spam diagram (`SpamDiagram`, `SpamStage`, `SpamStep`, `SpamStepFigure`,
 `SpamStepLink`, `SpamStepDown`, `SpamReturn`; keys and the step-to-image map in `lib/spamDiagram.ts`;
 spec `../ui-spec/07-proofs-spam.md`) is three numbered steps with a dashed "Temporary" return line,
 drawn as an ink stage (2026-10-06). From `md` it is one ink band (`SpamStage`, hidden on phones)
@@ -267,9 +279,80 @@ at 768 one band with 144px figures; at 1440 and 3840 one band with 248px figures
 above it; no sideways scroll at any width; the diagram is about 599 / 382 / 434 / 434px tall; the
 proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
 
+Built 2026-10-07: every takeover has a permanent decorative ink band behind its title
+(`TakeoverBand.tsx`, spec `../ui-spec/07-proofs-band.md`). It is the shared `InkStageGround` (floor
+glow, `rounded-3xl`, `aria-hidden`, `data-anim="takeover-band"`), placed before the `<h2>` inside
+`TakeoverHead` (built 2026-10-08, see below), which sits in a `flex flex-col` column; the band is the
+title plus the title's margins (the title is `text-text`, its margins are the band's padding). Part 1 keeps its hairline. It shows at rest on direct loads, after
+Next, without JS and under reduced motion. `InkStageGround` gained an optional `anim` prop
+(`data-anim`); the card banner's ground carries `proof-banner`.
+
+Motion (2026-10-07, `hooks/useTakeoverMotion.ts`, `lib/takeoverBand.ts`, `lib/takeoverTitleTone.ts`):
+opening from a card, the card's ink banner morphs into the title band (0.75s, `power4.inOut`, one
+tweened `{x, y, width, height, radius}` written as translate, width, height and border-radius, no
+scale; radius 12 → 24; opaque; `zIndex 1` in flight) and back on close (0.6s, from where it stands,
+opaque through the last-0.15s dissolve). The title's colour follows where it sits: `text` over the
+band, ink over cream, and a `background-clip: text` gradient split while a band edge crosses it (a
+function of position, not time), including during Next, where nothing is written on the band (it
+rises with its content). Band and title morph together or fall back together (plain open, plain
+clip). `bodyPartsOf` skips the band. The sticky bar's hold on open is the later of the title's
+glyph-clear and the band's top-edge-clear progress. `reset` clears everything new. Reduced motion
+and direct loads run none of it.
+
+Lead-checked 2026-10-07: lint and `tsc --noEmit` pass (the production build was run green by
+gsap-animator, not re-run by the lead). On the dev server in headless Edge, sampled every frame, full
+motion at 360 and 1440: open from the Exile Bot card, Esc close, close mid-open, and Next to Design
+Vault then Esc. The band is never outside the dialog's clip (max 0.0px), no sideways scroll on the
+page or in the dialog at any frame, no console errors, and after every flow the band, title, bar,
+content and dialog carry no leftover inline style (the band keeps only its server-rendered
+background). The band starts on the card banner's rect (as lifted 8px by the hover) and rests at
+320 × 85 (360) and 1328 × 202 (1440), matching the spec; the title is one line at both and rests in
+`text`; on open the title goes ink → split → `text`, and back on close. Reduced motion at 360, 768
+and 3840: nothing moves, no inline style is written, the band rests at 320 × 85, 707 × 132 and
+1536 × 220. Screens looked at: rest at 360 and 1440, mid-open and mid-close at 1440, mid-open at 360.
+Not checked: Safari, Firefox, a real phone, the split frame's descender on "Design Vault", a
+two-line title, 768/1024/3840 in full motion.
+
+Built 2026-10-07 in `hooks/useTakeoverMotion.ts`: `freezeScroll(dialog)` runs first in the full-motion
+`closing`, before every read. It sets inline `overflow-y: hidden`, plus `scrollbar-gutter: stable`
+only when a classic scrollbar shows (so nothing re-wraps), writes `scrollTop` back, and adds
+`wheel`/`touchmove` (preventDefault, non-passive) and `scroll` (puts `scrollTop` back) listeners. The
+scroll listener is needed because Chromium lands one more step of a smooth scroll after the close
+starts. `reset(dialog, holdScroll)` clears all of it and is still the one cleanup point. Verified by
+gsap-animator in headless Chromium at 1440 and 360 with classic scrollbars, sampling every frame. Esc
+during a smooth scroll: scrollTop held, heading and band land on the card title and banner at dx/dy
+0. Normal close: unchanged. Wheel, PageDown, Space and arrows don't move the dialog during a close.
+Reopen mid-close and a reduced-motion switch mid-close leave no inline style or listener. No console
+errors. The lead re-ran lint and `tsc --noEmit`: both pass.
+
+Lead's check 2026-10-07 on the two-shot Design Vault takeover: `npm run build` and `npm run lint`
+pass. On the dev server (headless Chromium) at 360, 768, 1440 and 3840 the two frames measure
+320×160 / 707×353 / 1328×664 / 1536×768, both images load, no sideways scroll, no page errors. The
+light shots' edges read on cream at 360 and 1440 (cool white and lavender against warm cream). Not
+checked: Safari, Firefox, a real phone.
+
+Built 2026-10-08: the condensing sticky band (spec `../ui-spec/07-proofs-sticky-band.md`).
+`TakeoverHead` (`data-anim="takeover-head"`) wraps the band and the h2; the column is `flex flex-col`.
+The head is sticky only when the dialog has `data-condense` (top `--takeover-stick` = bar − 12). A
+no-scrub ScrollTrigger per dialog (`lib/takeoverCondenseTrigger.ts`, math in
+`lib/takeoverCondense.ts`) shrinks the band's height H → 12 + H·s and radius 24 → 12, with the title
+scaled to the card title size (`text-card`), as a pure function of scrollTop over a distance = H
+starting when the head sticks; the dialog carries inline `scroll-padding-top: B+V+16`. Open: the
+condense is held until the open ends, then applies once; a direct load starts at once. Next: the old
+strip is frozen and slides away slim, cleared at slide end. Close from full, mid or slim: scroll is
+frozen, the pose is read at the frozen scrollTop, the head stays sticky, and the card morph plus
+band flight run back to the card (from slim the title is a pure slide; typography is blended over the
+flight via `condensedTypeAt`). `plainOut` runs only for: card title not on screen or missing, failed
+fit check, plain open cut off mid-rise. Removed: the scrolled-off-heading close, the narrow
+band-window close, `bandLanding`, `plainOut`'s landing branch. Reduced motion: not sticky, no
+condense. Verified in headless Chromium on a production build at 360/768/1440/3840: measured sizes
+match the spec table (1440: slim strip 65 visible, slim title 35px; 360: 51.5 visible, 25px); closes
+land on the card h3 within 0.03px and on the banner exactly. Not checked: real devices, Safari.
+
 ## Key Files
 
-- `components/home/proofs/` — ProofsSection (label/heading/hint above the cards, no split, not
+- `components/home/proofs/` — TakeoverBand (the title band, new; row 1 of the column's grid),
+  ProofsSection (label/heading/hint above the cards, no split, not
   pinned; cards two across from `md`, three from `lg` only when three or more are shown), ProofCard
   (identical across shown projects, no `overflow-hidden` so the bot can break out), ProofBanner (the ink-stage banner and the bot's break-out clip layer),
   ProofBot (the card bot's SVG: viewBox, lean, rig, eyes, glints), ProofBotDefs (the gradients, rim,
@@ -286,8 +369,8 @@ proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
   SpamDiagram, SpamStage (the shared band from `md`), SpamStep, SpamStepFigure (Eva, 148 / 144 /
   192 / 248px), SpamStepLink (the band's arrow), SpamStepDown (the phone's down chevron) and
   SpamReturn (part 6's diagram), InkStageGround (the ink ground shared with ProofBanner),
-  TakeoverMeans and TakeoverMeansLine (part 7), TakeoverShots (part 3, one big-plus-two-details
-  layout, per-shot crop position),
+  TakeoverMeans and TakeoverMeansLine (part 7), TakeoverShots (part 3; layout from the shot count: two stacked 2:1
+  frames, or one big plus two details; per-shot crop position),
   ProjectVisitLink, ProofsMotion (client, mounts the reveal, `useProofCards` and
   `useProofBots`, renders nothing); `ProofCard`'s h3 carries `data-anim="proof-card-title"`, the
   card-open morph's source
@@ -295,9 +378,12 @@ proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
 - `lib/spamDiagram.ts` — the diagram's step keys (`watch`, `spot`, `stop`), each step's Eva image
   name (`spamStepImage`) and `spamStepPointsOn`
 - `lib/images.ts` — the image-name-to-file map: Exile Bot's three shots (`exileShot1–3`) and Eva
-  images (`exileEvaWatch/Spot/Stop`) are filled; Design Vault's and MARWIX-SKILLS' shots are `null`
+  images (`exileEvaWatch/Spot/Stop`) and Design Vault's two shots (`designVaultShot1–2`) are filled;
+  only MARWIX-SKILLS' three shots (hidden) are `null`
 - `components/SiteImage.tsx` — the shared image component; `position` takes `top`, `center`,
   `bottom` and `left` (new)
+- `public/images/design-vault/` — `palettes.webp`, `fonts.webp` (Design Vault's two shots, light
+  theme; from `temp/project-images/design-vault/DV_palettes.png`, `DV_fonts.png`)
 - `public/images/exile/` — `home.webp`, `dashboard.webp`, `spam-raid.webp` (the shots) and
   `eva-watch.png`, `eva-spot.png`, `eva-stop.png` (the tiles)
 - `components/home/proofs/SpamStepTile.tsx`, `components/icons/EyeIcon.tsx`, `AlertIcon.tsx`,
@@ -305,6 +391,19 @@ proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
   lets only the user delete files)
 - `docs/pages/home/ui-spec/07-proofs-spam.md` — the spam diagram's spec (ink stage); supersedes
   `07-proofs.md` §7.3.2 and §7.6.1
+- `docs/pages/home/ui-spec/07-proofs-band.md` — the takeover title band's spec (built 2026-10-07;
+  §A placement and §C fallbacks superseded 2026-10-08)
+- `docs/pages/home/ui-spec/07-proofs-sticky-band.md` — the condensing sticky band's spec (built
+  2026-10-08)
+- `components/home/proofs/TakeoverHead.tsx` — wraps the band and h2 (`data-anim="takeover-head"`);
+  sticky only under `data-condense`
+- `lib/takeoverCondense.ts` — the condense math: band height, radius and title scale as a pure
+  function of scrollTop; `condensedTypeAt` for the close flight
+- `lib/takeoverCondenseTrigger.ts` — the per-dialog no-scrub ScrollTrigger that applies it
+- `lib/takeoverBand.ts` — the band morph's numbers (fit check per edge, band box and radius tween
+  values, top-edge-clear progress)
+- `lib/takeoverTitleTone.ts` — the title's colour as a function of its position against the band
+  (`text`, ink, or the `background-clip: text` split)
 - `docs/pages/home/ui-spec/07-proofs-bot.md` — the spec's card-bot block (§7.2.1–§7.2.3), moved out
   of `07-proofs.md`; the §7.x numbers are unchanged
 - `lib/proofBotBody.ts` — the card bot's viewBox, static pose (10° lean, look 7), arms, glints and
@@ -321,7 +420,7 @@ proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
   `color-mix()` of existing tokens only, in one table
 - `lib/proofs.ts` — the project order/keys (`proofKeys`, all three), the temporary hide flag
   (`hiddenProofs`) and the shown list it derives (`shownProofKeys`), each shown project's dialog id,
-  image names and crop positions (`ProofShots` is a three-tuple, `proofImages`), two-digit number and total, next-project wraparound, the grid's column count
+  image names and crop positions (`ProofShots` is a two- or three-tuple, `proofImages`, `proofShotsWithAlts`), two-digit number and total, next-project wraparound, the grid's column count
   (`proofGridColumns`: two from `md`, three from `lg` only when three or more are shown), card bot
   prop (`proofProp`), the card bot's per-card SVG ids (`proofBotIds`) and `proofCardSelector()` (the
   card that opens a given takeover, used for focus return and the clip's source rect) — every one of
@@ -359,7 +458,10 @@ proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
   while one is open; used by the proof bots' idle branch
 - `hooks/useTakeoverMotion.ts` — the takeover's open/Next-slide/close clip and content motion,
   handed to `useHashTakeover` as `transitions`; also owns the close morph (`cardMorphBack`,
-  `morphOut`), the typography match on both ends and the close's end fade
+  `morphOut`), the typography match on both ends and the close's end fade, the plain-clip close's
+  content fade and dissolve (`plainOut`, now only the no-card / failed-fit / cut-off-open cases),
+  the band flight's measuring helper (`bandOverBanner`), the condense hold, slim Next and close
+  poses, and freezes the dialog's scroll for the close (`freezeScroll`)
 - `lib/takeoverTitleMorph.ts` — the Next slide, the card-open and the card-close morphs, as plain
   numbers: `titleMorph` reads the source title's offset/scale onto the new heading and whether the
   two wrap to different line counts (crossfade instead of swap), and, for the card morphs, a
@@ -378,6 +480,50 @@ proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
 
 ## Decisions
 
+- 2026-10-08 — User chose the condensing sticky band (spec `ui-spec/07-proofs-sticky-band.md`): the
+  takeover's ink band and title stick under the top bar and shrink to a slim strip as you scroll, so
+  every close morphs back into the card; strip hangs from the bar, slim title at the card title's
+  size on phones, not sticky under reduced motion (the spec's recommended options). Built
+  2026-10-08. Supersedes the scrolled-off and narrow-window plain closes and the band landing on
+  the banner.
+- 2026-10-07 — (superseded 2026-10-08) User's choice: on the plain-clip close (heading scrolled off screen), the card's black
+  banner shows during the shrink and dissolve. The takeover's ink band is set on the card banner's
+  rect and radius and fades in over the content's 0.2s fade; the bar, heading and siblings fade out
+  instead of the whole content. The cream shrinks with the banner in place and dissolves onto the
+  real one. Refines the plain-close fade-and-dissolve decision below.
+- 2026-10-07 — (superseded 2026-10-08 for the scrolled-off and narrow-window cases; the other plain
+  closes stand) User's choice (after reporting that a close from a scrolled takeover showed the
+  full-screen content inside the shrinking card shape, then snapped): a close that clips back to the
+  card without the title morph (heading scrolled off screen, the narrow band-window fallback, a close
+  mid plain open, no card title) fades the takeover content out over the first 0.2s and dissolves the
+  whole dialog over the last 0.15s, so the clip shrinks as plain cream and the card dissolves in.
+  Supersedes "no morph, just the clip" for those closes. The no-card fade, the morph close and reduced
+  motion are unchanged.
+- 2026-10-07 — Bug fix (user report: closing a project mid-scroll looked wrong): the takeover close
+  freezes the dialog's scroll where it stands for the whole close, so a close fired mid-scroll lands
+  the heading and band exactly on the card; the dialog scrolls normally again once the close ends.
+  Full motion only (reduced motion closes instantly).
+- 2026-10-07 — Deviations from `../ui-spec/07-proofs-band.md` (recorded so audits don't flag them):
+  the band fit check is per edge with a screen-cut allowance (an edge passes if inside the clip at
+  both ends, or the clip sits on the screen edge at both ends); (the narrow close window's plain
+  clip is superseded 2026-10-08, removed); the band has its own tween on the clip's ease and duration rather than
+  reading the clip's progress; `GLYPH_OVERHANG` (0.15) is repeated in `lib/takeoverTitleTone.ts`
+  because `lib/takeoverTitleMorph.ts` keeps it private.
+- 2026-10-07 — The spec's two open choices were taken as recommended by the lead: the title's colour
+  splits exactly at the band's edge; one gutter (`pt-gutter`) above the band.
+- 2026-10-07 — The card's ink banner is part of the takeover transition (the user): on open it gets
+  thinner and travels to sit behind the takeover's title, and close plays it in reverse; replaces
+  the banner being covered by the dialog's cream from the first frame and popping back at the end
+  of the close.
+- 2026-10-07 — Every takeover has a permanent ink band behind its title, the title in a light colour
+  on ink; it shows at rest on direct loads, after Next, without JS and under reduced motion (nothing
+  moves there).
+- 2026-10-07 — The band is the takeover's content column width with rounded corners, with the card
+  banner's hatch and violet glow, built from the shared `InkStageGround` (never forked).
+- 2026-10-07 — On Next, the new project's band is part of its content and slides up with it (no
+  morph of its own); the existing Next title morph is kept, the title's colour changing as it lands.
+- 2026-10-07 — The takeovers' website closing line is removed with the About card "I need a
+  website" (user's call, see `02a-about.md`); the closing lines follow four cards plus the default.
 - 2026-10-06 — Clicking a proof card first ducks its bot below the banner floor (0.25s), then opens
   the takeover; each open takeover's bot stays down by any route (hash link or load, Next), and all
   rise back with the reveal's soft bounce once no takeover is open. Replaces the break-out
@@ -437,10 +583,17 @@ proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
 - 2026-10-06 — The dashboard screenshot is used as the user supplied it, not pre-cropped; the user
   accepted that it shows the community's name, server ID, member count and credit balance ("a server
   id does no harm").
-- 2026-10-06 — Exile Bot's takeover shows three screenshots in the three-shot layout (one wide 2:1,
-  two 4:3 details), like Design Vault (the user): the Exile Bot website home page, the owner
-  dashboard's home view, and the spam and raid protection settings page. The two-shot layout is
-  removed.
+- 2026-10-07 — A takeover's shot count is per project, two or three (the user). Design Vault shows
+  two light-theme shots, Palettes then Fonts, stacked full width at 2:1 (`temp/project-images/design-vault/DV_palettes.png`,
+  `DV_fonts.png` → `public/images/design-vault/palettes.webp`, `fonts.webp`); `designVaultShot3` is
+  removed. Light screenshots are allowed (a shot's pixels are image content, not the site's theme).
+  Spec `../ui-spec/07-proofs.md` §7.3.1 part 3, §7.6, §7.8 34–37.
+- 2026-10-07 — `TakeoverShots` picks its layout from the shot count (two stacked 2:1, or three),
+  and shots, positions and alts are paired by index in `lib/proofs.ts`, so a length mismatch fails
+  the type check or the build.
+- 2026-10-06 — Exile Bot's takeover keeps the three-shot layout (one wide 2:1, two 4:3 details): the
+  Exile Bot website home page, the owner dashboard's home view, and the spam and raid protection
+  settings page.
 - 2026-10-05 — The spam diagram is sample "D" (`temp/spam-diagram-samples.html`): three numbered
   steps (Watches, Spots, Shuts it down) and a dashed return line marked "Temporary". The figure is
   one swappable component (`SpamStepFigure`). It carries no sample names or messages.
@@ -449,8 +602,8 @@ proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
   palettes and fonts only (never photos of real-life things, so the site never says so).
 - 2026-10-05 — Copy is written to the six-part shape: Exile Bot's story is "the calculations were
   brought into the chat players already use"; spam protection appears in its showcase part and,
-  from 2026-10-06, as a screenshot in the shots part, never in a closing line; Exile Bot has a closing line for all five cards, Design Vault for the default
-  and software-builder only (the other four fall back); MARWIX-SKILLS' new slots are `[FILL]`
+  from 2026-10-06, as a screenshot in the shots part, never in a closing line; Exile Bot has a closing line for all four cards plus the default, Design Vault for the default
+  and software-builder only (the other three cards fall back); MARWIX-SKILLS' new slots are `[FILL]`
   markers (it stays hidden). Spec: `../ui-spec/07-proofs.md` §7.3–7.8.
 - 2026-10-05 — Deviations from the six-part build (recorded so audits don't flag them): canonical
   `aspect-2/1` / `aspect-4/3` classes; the `ProofProject` type lives in `lib/proofProject.ts`, not
@@ -515,10 +668,9 @@ proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
   while open and returns to the card on close. Static: it opens and closes instantly. Motion
   (later): v3's clip-path expand from the card and collapse back, content rising in, and
   next-project transition.
-- 2026-09-24 — Proofs: every project gets the same image set, a card shot plus three takeover
-  shots (one big, two details), MARWIX-SKILLS included. Projects keep the same structure with
-  optional parts (2026-10-05), kept in sync. This replaces the earlier "skipped for MARWIX-SKILLS" in the
-  takeover template.
+- 2026-09-24 — Proofs: MARWIX-SKILLS gets takeover shots like the others (not skipped). Projects
+  keep the same structure with optional parts (2026-10-05); the shot count is per project
+  (2026-10-07, see above).
 - 2026-09-24 — Proofs built: three identical `ProofCard`s and one native `<dialog>` takeover per
   project, driven by the hash (`:target` without JS, `showModal` with JS). Every open takeover
   has a page entry beneath it (a direct load rewrites its entry to #projects and pushes the
@@ -615,8 +767,8 @@ proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
 - **Fact:** the user is adding MARWIX-SKILLS details (BUILT / IN USE) to `docs/03-facts.md`; its
   rows show `[FILL]` until then and can't ship. MARWIX-SKILLS is hidden for now (see Decisions), so
   this doesn't block launch.
-- **To build (waiting on the user):** Design Vault's three screenshots and alt text (its shots are
-  still `null` placeholders; this holds the next push); MARWIX-SKILLS' takeover shots too (hidden).
+- **To build (waiting on the user):** MARWIX-SKILLS' takeover shots (hidden). Design Vault's two
+  shots and alts are built in (the alts name no names, values or licences read off the shots).
 - **To build (waiting on the user):** a sharper retake of the Exile home page shot (the supplied
   file is 1908×728, about 80px under the 4K slot's width after the crop).
 - **To build:** delete the unused `components/home/proofs/SpamStepTile.tsx` and
@@ -629,6 +781,10 @@ proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
   paragraph; the ui-designer points them to `07-proofs-spam.md`.
 - **Choice:** the ui-designer's open items in ui-spec §7.8 23–33 (Eva crop, step number place, shot
   anchors, source resolution) are built with the spec's first option and await the user's review.
+- **Choice:** the lead's screen check found the edges hold without a hairline; recommended: no
+  hairline. Awaits the user's yes (ui-spec §7.8 38).
+- **Choice:** ui-spec §7.8 39: Design Vault's Fonts alt leaves out licences (not in
+  `docs/03-facts.md`); the user can add a licence fact if wanted.
 - **Choice:** "no generated art on the site" is not written in the constitution or any doc; does
   the user want it added as a rule (the user's own constitution edit) with the Exile exception?
 - **Choice (later):** replace the color-mix shades in `lib/proofBotShades.ts` with named tokens.
@@ -648,6 +804,11 @@ proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
 - **To build:** check the Next slide-up and both title morphs (Next and card-open) on a real
   Safari/iPhone before launch — only tested in headless Chromium so far; stacked-modal
   (`showModal()` under an open dialog) behaviour on Safari and Firefox is unverified.
+- **To build:** check the band morph on real Safari/iPhone with the other takeover morphs, including
+  the `background-clip: text` split, the "Design Vault" descender during the split, and the band's
+  grid-area box in Safari.
+- **Choice:** the two spec choices taken as recommended (colour split at the edge; `pt-gutter` above
+  the band) await the user's review.
 - **To build:** the motion pass for the new takeover parts (hooks are in the spec §7.7), parts 5 and
   6 included, then re-test `useTakeoverMotion` (Next from the bottom of the taller takeover).
 - **Choice:** the tag "Discord platform" is the copywriter's pick; alternatives "Discord tools"
@@ -661,3 +822,22 @@ proof card banner after the `InkStageGround` extraction looks unchanged at 1440.
 - **Fact:** Design Vault: lessons for its What I learned part (skipped for now).
 - **Note:** Design Vault's card line lists "screens, colour palettes and fonts" without components,
   while the new takeover text includes components.
+- **To build:** real-device check of the condensing band and the close mid-scroll: touch momentum,
+  trackpad, Edge smooth wheel, Safari. At most one frame of Chromium's last smooth-scroll step may
+  still show. Safari before 18.2 ignores `scrollbar-gutter`, so with classic scrollbars the content
+  could widen by the scrollbar's width during the close.
+- **Choice:** the slim ink strip over the spam stage and the closing panel is ink over ink, so its
+  edge may read weak; the fix would be a `line` hairline.
+- **Choice:** slim title contrast in the band's glow, unchecked by eye on a real screen.
+- **Choice:** "Design Vault" wraps to two lines at 360 (strip 76.5px, 22.7% of 640); consider a
+  one-line title.
+- **Note:** GSAP keeps a permanent per-scroller wheel/scroll cache on the dialog (stable count, no
+  public removal).
+- **Note:** the condense kill writes ScrollTrigger's internal `rec` field to keep scroll on a
+  reduced-motion switch; fragile on a GSAP upgrade.
+- **Note:** pre-existing: a wheel during the opening clip scrolls the page under it after close.
+- **Note:** close mid-open lands the heading and band ~5px off vertically (seen at 1440 and 360, with
+  or without scrolling); not traced to whether it predates this fix.
+- **To build:** at 360 with classic 15px scrollbars, the Exile Bot takeover is 9px wider than the
+  dialog at rest (scrollWidth 354 vs clientWidth 345, from `li.spam-step` and its figures), so it can
+  scroll sideways slightly; overlay scrollbars are fine.

@@ -1,6 +1,6 @@
 # Web
 
-**Last Updated:** 2026-09-26
+**Last Updated:** 2026-10-08
 
 **The one question:** Can they build my website end-to-end?
 
@@ -9,7 +9,9 @@ See `../page.md` for the site-wide index. Spec: `../ui-spec/06-web.md`.
 ## Current State
 
 Web built: two columns from `lg` (left sticky at 120px from the top, CSS only, no JS), four
-static step rows; stacks below `lg`. Web pins and travels visibly, using the shared
+static step rows; stacks below `lg`. Its lead (`web.lead`, round 1 copy, 2026-10-08) reads "One
+person, from plan to launch: your website or web app, ready to take bookings and answer visitors
+from the start." Web pins and travels visibly, using the shared
 `splitColumns`/`stickyTitle` helpers in `lib/styles.ts` (see `../page.md`).
 
 The GSAP motion pass is built: `WebMotion` mounts the generic reveal on the left column and
@@ -49,6 +51,8 @@ motion: fades only, no rise, no indent. Everything shows as built with no JS.
   matchMedia branch's `context.add`, not useGSAP's `contextSafe`; `contextSafe` could crash with a
   stack overflow when the page loaded already scrolled to Web (e.g. `/#web`), since its context
   ended up containing itself.
+
+- 2026-10-08 — User's call (`../page.md`): the lead now ends "ready to take bookings and answer visitors from the start."
 
 ## Open Questions
 

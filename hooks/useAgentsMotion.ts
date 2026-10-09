@@ -1,10 +1,10 @@
 // The Agents tab list's motion (ui-spec §4.7, Motion; §10 generic reveal), on the tabs layout
 // inside `root`. `AgentsTabs` owns the selection; this hook animates around it and advances it.
 //
-// - Entrance, once, when the section scrolls in: the label and the tab rows rise from below,
-//   staggered, and the panel fades up. Reduced motion: opacity fades only.
+// - Entrance, once, when the section scrolls in: the intro (label, heading, lead) and the tab
+//   rows rise from below, staggered, and the panel fades up. Reduced motion: opacity fades only.
 // - Replay: the first time the section is in view, and whenever a panel shows after that, its
-//   panel replays from the start (lib/agentDemoSequences.ts; the pointer panel too) and its row's
+//   panel replays from the start (lib/agentDemoSequences.ts) and its row's
 //   progress line and stepper bar fade in.
 // - Auto-advance, full motion only: the selected row's line and, below `lg`, the stepper's bar
 //   for that offer (§4.2a) grow scaleX 0 → 1 over 6s on one tween, so they pause and resume as
@@ -63,8 +63,8 @@ type AgentsMotionOptions = {
   readonly selected: number;
   /** Selects a row without moving focus (`useRovingTabs`). */
   readonly select: (index: number) => void;
-  /** The section label's id (the tab list's name). */
-  readonly labelId: string;
+  /** The id of the section's intro block (label, heading, lead), the first to rise. */
+  readonly introId: string;
   /** The set the tab list shows; a change re-runs the hook on the new markup. */
   readonly set: string;
   /** The shown set's panel kind per row. */
@@ -73,7 +73,7 @@ type AgentsMotionOptions = {
 
 export function useAgentsMotion(
   root: RefObject<HTMLElement | null>,
-  { selected, select, labelId, set, kinds }: AgentsMotionOptions,
+  { selected, select, introId, set, kinds }: AgentsMotionOptions,
 ) {
   // The latest selection, `select` and kinds, for GSAP callbacks that outlive a render.
   const latest = useRef({ selected, select, kinds });
@@ -89,7 +89,7 @@ export function useAgentsMotion(
     () => {
       const el = root.current;
       if (!el) return;
-      const label = document.getElementById(labelId);
+      const intro = document.getElementById(introId);
       const rows = animTargets(el, "agents-row");
       const [tablist] = animTargets(el, "agents-tablist");
       const [panelBox] = animTargets(el, "agents-panels");
@@ -102,7 +102,7 @@ export function useAgentsMotion(
       ];
       const dots = animTargets(el, "demo-status-dot");
       if (!tablist || !panelBox) return;
-      const rising = label ? [label, ...rows] : rows;
+      const rising = intro ? [intro, ...rows] : rows;
 
       const mm = gsap.matchMedia();
 

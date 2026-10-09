@@ -1,12 +1,13 @@
 // The Agents panels' replay (ui-spec §4.7, Motion): builds one panel's sequence from its
 // finished, static state (§4.4), in its `data-demo-order` order. Full motion: parts pop in
 // (y 8px, scale .96 → none); Chat shows its typing dots before every agent line, then hides them
-// for the line; Leads swaps each "new" pill for "followed up"; the Checklist pops its lines with
-// empty boxes, then turns each box to its tick; Report grows its bars from the bottom; Sync sends
-// packets along its connectors on a loop; the Orchestra runs its token down the swimlanes
-// (lib/orchestraRun.ts); the pointer panel's three parts pop in order. Reduced motion: the
-// finished state, its parts fading in by order with no pop, rise or scale, no typing dots, no
-// swaps, no packets and no token moving. Every sequence ends well inside the 6s auto-advance slot.
+// for the line; Leads swaps each "new" pill for "followed up"; a Chat's or a list's receipt (the
+// action line, §4.10) pops with its box empty and ticks it off after a drawn hold
+// (lib/agentDemoReceipt.ts); the Checklist pops its lines with empty boxes, then turns each box
+// to its tick; Report grows its bars from the bottom; Sync sends packets along its connectors on
+// a loop; the Orchestra runs its token down the swimlanes (lib/orchestraRun.ts). Reduced motion:
+// the finished state, its parts fading in by order with no pop, rise or scale, no typing dots, no
+// swaps, no packets, no token moving and every receipt already ticked. Every sequence ends well inside the 6s auto-advance slot.
 //
 // Pacing, full motion only (2026-10-05): the moments an agent is working are not evenly spaced.
 // Each one (a chat gap or the typing dots, a lead handled, a line ticked off, a bar's turn, a sync
@@ -14,7 +15,7 @@
 // (lib/demoBudget.ts): its `longest` time less the fixed parts around the steps. Every time is
 // drawn here, as the sequence is built, so a replay is paced afresh each time its panel shows and
 // a paused one resumes exactly where it stopped. The parts' first pop-in keeps its tight, even
-// stagger, and the pointer panel (three pops, no agent at work) is not drawn at all.
+// stagger.
 //
 // All starting states are set here, in JS: without JS, or before a replay, the panel shows its
 // finished state. Reverting what this returns puts the panel back to that state.
@@ -22,9 +23,13 @@ import {
   LEAD_IN,
   POP_FROM,
   POP_SECONDS,
+  TICK_EASE,
+  TICK_FROM,
+  TICK_SECONDS,
   newSequence,
   type DemoPlayback,
 } from "@/lib/agentDemoPop";
+import { RECEIPT_HOLD, findReceipt, playReceipt } from "@/lib/agentDemoReceipt";
 import type { AgentPanelKind } from "@/lib/agents";
 import { spendBudget } from "@/lib/demoBudget";
 import { gsap } from "@/lib/gsap";
@@ -38,18 +43,36 @@ export type { DemoPlayback };
  * Chat: the seconds from a message to the next part (the visitor writing, or the agent starting
  * to type) and how long the typing dots show (the agent thinking; never shorter than a pop, so
  * the dots have landed before they fade), each drawn from its range; then the dots' fade, and
- * the longest the whole exchange may take. Two messages take 1.55s to 3.25s, three with one
- * agent line 1.85s to 4.35s, four with two agent lines 2.8s to 5s.
+ * the longest the whole exchange may take: 5s, or 4.5s with a receipt (choice 46), so the receipt
+ * is on screen at least 1.5s before the 6s advance. Two messages take 1.55s to 3.25s, three with
+ * one agent line 1.85s to 4.35s, four with two agent lines 2.8s to 5s. A receipt adds its hold
+ * and its tick (and the gap after it, when it isn't last): three messages with one agent line and
+ * a receipt take 2.45s (receipt last) or 2.6s (receipt inside) to 4.5s, four with two agent lines
+ * and a receipt 3.55s to 4.5s.
  */
-const CHAT = { gap: [0.3, 1.1], typing: [0.5, 1.4], typingOut: 0.15, longest: 5 } as const;
+const CHAT = {
+  gap: [0.3, 1.1],
+  typing: [0.5, 1.4],
+  typingOut: 0.15,
+  longest: 5,
+  longestWithReceipt: 4.5,
+} as const;
 /** Chat: the last message has nothing after it to wait for. */
 const NO_WAIT: Range = [0, 0];
 /**
  * Leads: seconds between rows, when the agent starts on the first person, how long it takes
- * over each one before that row's pill swaps (drawn from the range), and the longest the whole
- * list may take. Three rows take 1.73s to 3.2s.
+ * over each one before that row's pill swaps (drawn from the range), the wait from the last swap
+ * to the receipt (drawn), and the longest the whole list may take: 3.2s, or 4.4s with a receipt.
+ * Three rows take 1.73s to 3.2s; with a receipt, 2.23s to 4.4s.
  */
-const LEADS = { rowStagger: 0.15, workAt: 0.8, handle: [0.16, 0.8], longest: 3.2 } as const;
+const LEADS = {
+  rowStagger: 0.15,
+  workAt: 0.8,
+  handle: [0.16, 0.8],
+  toReceipt: [0.2, 0.5],
+  longest: 3.2,
+  longestWithReceipt: 4.4,
+} as const;
 /**
  * Checklist: seconds between lines, when the work starts, how long each line takes before its
  * box turns to its tick (drawn from the range), one tick's pop, from the last tick starting to
@@ -59,14 +82,9 @@ const CHECKLIST = {
   rowStagger: 0.12,
   workAt: 0.65,
   work: [0.15, 0.7],
-  tick: 0.3,
   pillAfter: 0.25,
   longest: 3.4,
 } as const;
-/** Checklist: where a tick pops in from, in its box's place. */
-const TICK_FROM = { opacity: 0, scale: 0.5 } as const;
-/** Pointer: seconds between its three parts. */
-const POINTER = { stagger: 0.12 } as const;
 /**
  * Report: seconds each bar grows, the wait before each next bar starts (drawn from the range;
  * always left to right), how long before the last bar's end the pill pops, and the longest the
@@ -98,9 +116,10 @@ function orderedParts(panel: ParentNode): HTMLElement[] {
 
 /**
  * Chat: each message pops in turn; before every agent line its typing dots take the line's place,
- * then give it back (a chat that opens with the agent starts with the dots). The wait after each
- * message and each hold of the dots is drawn from the exchange's budget. The chat keeps its
- * finished height while the dots stand in, so the panel never jumps.
+ * then give it back (a chat that opens with the agent starts with the dots). The receipt pops in
+ * its place with its box empty and ticks it off after its hold. The wait after each message, each
+ * hold of the dots and the receipt's hold are drawn from the exchange's budget. The chat keeps
+ * its finished height while the dots stand in, so the panel never jumps.
  */
 function chat(panel: HTMLElement, parts: HTMLElement[]): DemoPlayback {
   const typings = new Set(animTargets(panel, "demo-typing"));
@@ -112,20 +131,29 @@ function chat(panel: HTMLElement, parts: HTMLElement[]): DemoPlayback {
     sequence.set(chatBox, { minHeight: `${chatBox.getBoundingClientRect().height}px` }, 0);
   }
 
-  // One wait per part: the dots' hold, or the gap after a message. What is fixed around them:
-  // the lead-in, each dots' fade and the last message's pop.
-  const fixed = LEAD_IN + typings.size * CHAT.typingOut + POP_SECONDS;
-  const waits = spendBudget(
-    CHAT.longest - fixed,
-    parts.map((part, index) => {
-      if (typings.has(part)) return CHAT.typing;
-      return index < parts.length - 1 ? CHAT.gap : NO_WAIT;
-    }),
-  );
+  // One wait per part: the dots' hold, or the gap after a message (after the receipt's tick, for
+  // the receipt), plus the receipt's hold just before its own gap. What is fixed around them: the
+  // lead-in, each dots' fade and the last part's pop (or its tick, when the receipt is last).
+  const receipt = findReceipt(parts);
+  const fixed =
+    LEAD_IN +
+    typings.size * CHAT.typingOut +
+    (receipt !== undefined && parts.at(-1) === receipt ? TICK_SECONDS : POP_SECONDS);
+  const steps = parts.flatMap((part, index): Range[] => {
+    const after = index < parts.length - 1 ? CHAT.gap : NO_WAIT;
+    if (typings.has(part)) return [CHAT.typing];
+    return part === receipt ? [RECEIPT_HOLD, after] : [after];
+  });
+  const waits = spendBudget((receipt ? CHAT.longestWithReceipt : CHAT.longest) - fixed, steps);
 
   let at: number = LEAD_IN;
+  let step = 0;
   parts.forEach((part, index) => {
-    const wait = waits[index] ?? 0;
+    const wait = waits[step++] ?? 0;
+    if (part === receipt) {
+      at = playReceipt(sequence, part, at, wait) + (waits[step++] ?? 0);
+      return;
+    }
     if (!typings.has(part)) {
       sequence.from(part, POP_FROM, at);
       at += wait;
@@ -149,7 +177,9 @@ function chat(panel: HTMLElement, parts: HTMLElement[]): DemoPlayback {
 
 /**
  * Leads: the rows pop in reading "new", then each swaps to "followed up" in turn, one after the
- * other, each after its own drawn time: one person takes the agent longer than another.
+ * other, each after its own drawn time: one person takes the agent longer than another. A list
+ * with a receipt keeps it hidden until a drawn wait after the last swap, then plays it (its pop,
+ * its hold with the empty box, its tick).
  */
 function leads(panel: HTMLElement, parts: HTMLElement[]): DemoPlayback {
   const sequence = newSequence();
@@ -161,10 +191,17 @@ function leads(panel: HTMLElement, parts: HTMLElement[]): DemoPlayback {
     const pill = parts.find((part) => part !== row && row.contains(part));
     return before && pill ? [{ before, pill }] : [];
   });
-  const handled = spendBudget(
-    LEADS.longest - LEADS.workAt - POP_SECONDS,
-    swaps.map(() => LEADS.handle),
-  );
+  // With a receipt the list ends on its tick, after the wait to it and its hold; without, on the
+  // last pill's pop.
+  const receipt = findReceipt(parts);
+  const handles = swaps.map((): Range => LEADS.handle);
+  const handled = receipt
+    ? spendBudget(LEADS.longestWithReceipt - LEADS.workAt - TICK_SECONDS, [
+        ...handles,
+        LEADS.toReceipt,
+        RECEIPT_HOLD,
+      ])
+    : spendBudget(LEADS.longest - LEADS.workAt - POP_SECONDS, handles);
 
   let at: number = LEADS.workAt;
   swaps.forEach(({ before, pill }, index) => {
@@ -178,6 +215,11 @@ function leads(panel: HTMLElement, parts: HTMLElement[]): DemoPlayback {
       .from(pill, POP_FROM, at);
   });
 
+  if (receipt) {
+    const toReceipt = handled[swaps.length] ?? 0;
+    const hold = handled[swaps.length + 1] ?? 0;
+    playReceipt(sequence, receipt, at + toReceipt, hold);
+  }
   return { sequence, loops: [] };
 }
 
@@ -211,16 +253,10 @@ function checklist(_panel: HTMLElement, parts: HTMLElement[]): DemoPlayback {
       .set(tick, { display: "none" }, 0)
       .set(box, { display: "none" }, last)
       .set(tick, { display: tickDisplay }, last)
-      .from(tick, { ...TICK_FROM, duration: CHECKLIST.tick, ease: "back.out(2)" }, last);
+      .from(tick, { ...TICK_FROM, duration: TICK_SECONDS, ease: TICK_EASE }, last);
   });
 
   sequence.from(pill, POP_FROM, last + CHECKLIST.pillAfter);
-  return { sequence, loops: [] };
-}
-
-/** Pointer: its heading, its steps and its link pop in order. Nothing else about the link changes. */
-function pointer(_panel: HTMLElement, parts: HTMLElement[]): DemoPlayback {
-  const sequence = newSequence().from(parts, { ...POP_FROM, stagger: POINTER.stagger }, LEAD_IN);
   return { sequence, loops: [] };
 }
 
@@ -310,7 +346,7 @@ function sync(panel: HTMLElement, parts: HTMLElement[]): DemoPlayback {
 const fullMotion: Record<
   AgentPanelKind,
   (panel: HTMLElement, parts: HTMLElement[]) => DemoPlayback
-> = { chat, leads, report, sync, checklist, orchestra, pointer };
+> = { chat, leads, report, sync, checklist, orchestra };
 
 /**
  * Reduced motion: the finished state, its parts fading in by order, evenly spaced (nothing is

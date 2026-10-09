@@ -109,6 +109,16 @@ const moves: Readonly<Record<BeatName, (rix: Rix, tl: gsap.core.Timeline) => voi
   },
 };
 
+/**
+ * Beat `name`'s moves as a timeline of their own, for a caller that places them in an act it plays
+ * itself (the footer Rix's calls, lib/footerRixActs.ts).
+ */
+export function beatMove(rix: Rix, name: BeatName): gsap.core.Timeline {
+  const tl = timeline();
+  moves[name](rix, tl);
+  return tl;
+}
+
 /** Plays beat `name` where he stands. */
 export function beat(rix: Rix, name: BeatName) {
   const tl = timeline();

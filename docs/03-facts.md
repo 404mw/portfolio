@@ -17,6 +17,12 @@ Any agent may edit this file, but only with the user's explicit permission for t
 - **What the user does, in one idea:** builds software that runs on its own, can automate the
   repetitive work in a business, and helps people who build software ship it.
 
+## What an AI agent is
+
+- An AI agent is like ChatGPT that works for your business: it doesn't just answer you, it answers
+  your customers and does the job (books, replies, updates) where they already message you (the
+  user, 2026-10-08).
+
 ## Work that is live: proof, can be stated as done
 
 **Exile Bot**
@@ -80,6 +86,8 @@ What building Exile Bot taught the user (the user, 2026-10-05; shown in its take
 - When a check finds a problem or a broken rule, the work goes back to the agent that did it and is
   checked again, until it passes.
 - Anything unusual in a job is passed to a person instead of being handled by an agent.
+- Sensitive actions, like refunds and complaints, are passed to a person instead of being handled
+  by an agent (the user, 2026-10-08).
 - The workflow covers an app's first build and its upkeep after launch: managing it and scaling it.
 - The workflow lowers the cost of building software and makes delivery faster. Stated without any
   figure.
@@ -116,12 +124,14 @@ shows them (user's list, 2026-10-03); each card's first offer is its lead offer.
 - Answering routine customer messages.
 - Appointment reminders, including a reschedule.
 - Following up on new enquiries.
+- These agents keep working around the clock, outside opening hours (the user, 2026-10-08).
 
 **For an online store**
 - Answering order and delivery questions.
 - Sales reports, built and sent on schedule.
 - Connecting the store's tools so their data moves between them.
 - Taking returns and refund requests and passing them to a person.
+- These agents keep working around the clock, outside opening hours (the user, 2026-10-08).
 
 **For a Discord server**
 - Answering the questions members ask again and again.
@@ -140,14 +150,16 @@ shows them (user's list, 2026-10-03); each card's first offer is its lead offer.
 - Making an app that was built fast with AI safe to serve the public.
 - Keeping an app running after launch: fixes, updates and scaling.
 
-**For someone who needs a website**
+**On a website** (not shown on a card)
 - Answering visitors' routine questions on the site.
 - Following up on contact-form enquiries.
 - Bookings on the site.
 - Site reports, sent on schedule.
 - Custom websites: see "What the user can build" below.
 
-With no card picked, the home page shows each of the first four cards' lead offer.
+With no card picked, the home page shows four everyday-business offers: bookings, answering routine
+customer messages, answering order and delivery questions, and following up on new enquiries (the
+user, 2026-10-08). Discord and software-builder offers show only under their own cards.
 
 ## What the user can build: an offer
 

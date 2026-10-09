@@ -11,7 +11,7 @@ import { SpamStepFigure } from "@/components/home/proofs/SpamStepFigure";
 import { SpamStepLink } from "@/components/home/proofs/SpamStepLink";
 import { listNumber } from "@/lib/listNumber";
 import { spamStepPointsOn, type SpamStepKey } from "@/lib/spamDiagram";
-import { condensed, metaLabel } from "@/lib/styles";
+import { metaLabel } from "@/lib/styles";
 
 type SpamStepProps = {
   readonly step: SpamStepKey;
@@ -43,7 +43,7 @@ export function SpamStep({ step, index, title, line }: SpamStepProps) {
             {listNumber(index)}
           </span>
           <h4
-            className={`min-w-0 font-display text-summary leading-[1.05] font-semibold tracking-[-0.02em] text-text md:text-ink ${condensed}`}
+            className={`min-w-0 font-display text-summary leading-[1.15] text-text md:text-ink`}
           >
             {title}
           </h4>

@@ -43,11 +43,14 @@ export const feet = (bot: Bot) => [bot.parts.footLeft, bot.parts.footRight];
 
 // Shared moves.
 
+/** The eye pop's two halves (s): wide, then back. */
+const POP = { up: 0.1, back: 0.3 } as const;
+
 /** The eyes pop wide and ease back. */
 export function eyePop(bot: Bot): gsap.core.Timeline {
   return timeline()
-    .to(bot.parts.eye, { scale: POP_SCALE, duration: 0.1, ease: "power2.out" }, 0)
-    .to(bot.parts.eye, { scale: 1, duration: 0.3, ease: "power2.inOut" }, 0.1);
+    .to(bot.parts.eye, { scale: POP_SCALE, duration: POP.up, ease: "power2.out" }, 0)
+    .to(bot.parts.eye, { scale: 1, duration: POP.back, ease: "power2.inOut" }, POP.up);
 }
 
 /** A bounce with the feet planted: anticipate, lift stretched, down, squash, settle. */
@@ -74,6 +77,9 @@ export function hop(bot: Bot): gsap.core.Timeline {
     .to(feet(bot), { y: HOP.feet, ...HOP.feetUp }, fall - HOP.feetUp.duration)
     .to(feet(bot), { y: 0, ...HOP.feetDown }, fall);
 }
+
+/** The perk's length, to the end of its eye pop (0.4s); the settle rings on after it. */
+export const perkLength = POP.up + POP.back;
 
 /** The perk's move (`PERK`): the eyes pop and he stands tall, then `SETTLE`. */
 export function perkUp(bot: Bot): gsap.core.Timeline {

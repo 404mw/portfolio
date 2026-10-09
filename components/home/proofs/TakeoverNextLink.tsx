@@ -5,7 +5,7 @@
 // (lib/takeoverLinks.ts); without JS it's a plain hash link.
 import { ArrowRightIcon } from "@/components/icons/ArrowRightIcon";
 import { proofs } from "@/content/home";
-import { condensed, focusRingOnCream, metaLabelOnCream } from "@/lib/styles";
+import { focusRingOnCream, metaLabelOnCream } from "@/lib/styles";
 import { replaceTakeoverHash } from "@/lib/takeoverLinks";
 
 type TakeoverNextLinkProps = {
@@ -26,7 +26,7 @@ export function TakeoverNextLink({ href, title }: TakeoverNextLinkProps) {
       </span>
       <span
         data-anim="takeover-next-title"
-        className={`font-display text-heading leading-[0.95] font-semibold tracking-[-0.04em] group-hover:text-cream-muted ${condensed}`}
+        className={`font-display text-heading leading-[1.05] group-hover:text-cream-muted`}
       >
         {title}
       </span>

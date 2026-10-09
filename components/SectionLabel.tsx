@@ -1,6 +1,6 @@
 // A section label: number (optional; About is unnumbered), a 24px hairline, then the label, in
 // the mono label style.
-// `as="h2"` where the label is the section's heading (Agents); `p` elsewhere.
+// A `p` by default; `as="h2"` only where a label is a section's heading (none today).
 import { monoLabel } from "@/lib/styles";
 
 type SectionLabelProps = {

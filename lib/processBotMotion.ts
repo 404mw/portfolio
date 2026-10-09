@@ -137,8 +137,9 @@ export const PAGE_FLIP: Timing = { duration: 0.35, ease: "power2.in" };
 /**
  * Every beat, and the job's pop and `SETTLE` after it, lands inside the role's `RELAY_DWELL`, so
  * the job has settled before it hops on: rules' stamp settles at 1.75, team's second strike at
- * 1.69, check's tick at 1.9, update's pop at 1.95 (of 2s); flag's at 1.15 (of 1.8), remind's at
- * 0.95 (of 1.6), ship's at 1.15 and host's at 1.05 (of 1.2).
+ * 1.69, check's tick at 1.9, update's pop at 1.95 (of 2s); flag's at 1.05 (of 1.3), remind's at
+ * 0.95 (of 1.6), ship's at 1.15 and host's at 1.05 (of 1.2). On a send the flag keeps the job
+ * only to the top of its raise (`RELAY_SEND`), where the job lifts off for the hand-off.
  */
 export const JOB_BEATS = {
   /** The held job goes out at arm's length; then it is handed on (the job leaves the hand: intake's dwell). */
@@ -151,8 +152,8 @@ export const JOB_BEATS = {
   check: [LENS_FLICKER[1], LENS_FLICKER[2], LENS_FLICKER[3]],
   /** The page flips; the mark is re-written. The job pops as the page lands (`PAGE_FLIP` after `flip`). */
   update: { flip: 0.95, rewrite: 1.35 },
-  /** The flag reaches the top of its raise. */
-  flag: { raise: 0.5 },
+  /** The flag reaches the top of its raise (a send); the nod's dip (a routine pass). */
+  flag: { raise: 0.5, nod: 0.4 },
   /** The bell's first swing peaks. */
   remind: { ring: 0.3 },
   /** The arrow's thrust up and out. */
@@ -176,8 +177,14 @@ export const RELAY_ON: boolean = true;
  * its rest, not by a fixed start-to-start time.
  */
 export const RELAY_REST = 2;
-/** The fix hop plays on every this-many-th run (runs 2, 4, 6…), in a flow that has the fix loop. */
-export const FIX_EVERY = 2;
+/**
+ * The runs' cycle (ui-spec §5.11e, choice 74), from the first run after setup or a swap: the job
+ * goes to a person (`send`), a routine job goes through (`straight`), the check finds something
+ * (`fix`), and again. A flow with no send stop skips `send`, one with no fix stop skips `fix`, so
+ * every run of a flow with no loops (Discord) is straight.
+ */
+export const RUN_CYCLE = ["send", "straight", "fix"] as const;
+export type RunKind = (typeof RUN_CYCLE)[number];
 /** After the last bot lands. */
 export const RELAY_FIRST = 1.5;
 export const RELAY_HOP: Timing = { duration: 0.7, ease: "power2.inOut" };
@@ -192,7 +199,7 @@ export const RELAY_DWELL: PerRole = {
   team: 2.0,
   check: 2.0,
   update: 2.0,
-  flag: 1.8,
+  flag: 1.3,
   remind: 1.6,
   ship: 1.2,
   host: 1.2,
@@ -336,10 +343,10 @@ export const FIX_HOP = {
   clear: 4,
 } as const;
 /**
- * The way back below `lg` (lib/processRelayFixLine.ts): from ledge 4 left and up to the dotted fix
- * line's bottom end, round its turns, up it and through the arrowhead into bot 3's hand, then down
- * onto ledge 3. One eased progress over the whole route (about 330–360px), so it starts slowly off
- * ledge 4, is quickest on the climb and settles onto ledge 3; on `power1.inOut`, gentler than the
+ * The way back below `lg` (lib/processRelayFixLine.ts): from ledge 5 left and up to the dotted fix
+ * line's bottom end, round its turns, up it and through the arrowhead into bot 4's hand, then down
+ * onto ledge 4. One eased progress over the whole route (about 330–360px), so it starts slowly off
+ * ledge 5, is quickest on the climb and settles onto ledge 4; on `power1.inOut`, gentler than the
  * hops' `power2`, so the climb up the line gets about 0.4s of the 1.1 and the two short legs
  * beside the bots about 0.35s each. Longer than `FIX_HOP` for the longer route: about the ledge
  * hops' speed.
@@ -347,6 +354,36 @@ export const FIX_HOP = {
 export const FIX_LINE_HOP: Timing = { duration: 1.1, ease: "power1.inOut" };
 /** The fix arch's lit overlay (below `lg`: the fix line's) fades once the job heads forward again. */
 export const FIX_LIT_FADE = 0.6;
+
+// The hand-off (ui-spec §5.11e): on a send run the flag bot sends the job to a person.
+/**
+ * The flag's stop on a send: it keeps the job to the top of its raise (`JOB_BEATS.flag.raise`),
+ * then the job lifts off and the run's visits end there.
+ */
+export const RELAY_SEND = { dwell: JOB_BEATS.flag.raise } as const;
+/**
+ * From `lg`, the climb: the job rises from its stop up the hand-off stem (`process-handoff`) and
+ * passes behind the label's `bg` mask at the arrowhead, `y` over the whole climb on `ease`; `x`
+ * eases onto the stem's line between `drift` (shares of the climb), so it first rises straight up
+ * in front of the pennant. It fades over its last `fade` seconds, and ends with its centre `under`
+ * px above the stem's top (inside the label's mask). The lit overlay (`process-handoff-lit`) lights
+ * bottom to top behind it, holds `hold` once the job is gone, then fades over `FIX_LIT_FADE`.
+ */
+export const HANDOFF_CLIMB = {
+  duration: 0.9,
+  ease: "power2.inOut",
+  drift: [0.15, 0.55],
+  driftEase: "power1.inOut",
+  fade: 0.3,
+  under: 14,
+  hold: 0.6,
+} as const;
+/**
+ * Below `lg`, the drop: the job falls straight down the bot column from ledge 3 onto the hand-off
+ * marker (`process-handoff-mark`), its centre on the marker's, then slides `slide` px right
+ * towards the label as it pops (`JOB_DONE`) and fades (`JOB_FADE`).
+ */
+export const HANDOFF_DROP = { duration: 0.45, ease: "power1.in", slide: 16 } as const;
 /** While the job waits after its change: one small lift and back (px, each way). */
 export const JOB_BOB = { lift: 1.5, duration: 0.4, ease: "sine.inOut" } as const;
 /**

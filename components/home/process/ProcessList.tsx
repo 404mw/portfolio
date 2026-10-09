@@ -2,14 +2,16 @@
 // lit segment clipped to the line's box (hidden at rest; before the list, so each chevron's mask
 // still covers it), then the ordered list. The list is `relative` with no z-index, so it doesn't
 // start a stacking context. Rows below `lg`, each bot on its own ledge (ProcessStep, §5.9); five or
-// six across from `lg`. Step 1's bot holds the flow's emblem; step 3 ends with the fix loop back
-// from step 4 (ProcessFixReturn), in a flow that has one.
+// six across from `lg`. Step 1's bot holds the flow's emblem; in a flow with loops step 3 ends
+// with the hand-off to a person (ProcessHandoff) and step 4 with the fix loop back from step 5
+// (ProcessFixReturn).
 import { ProcessEmblem } from "@/components/home/process/ProcessEmblem";
 import { ProcessFixReturn } from "@/components/home/process/ProcessFixReturn";
+import { ProcessHandoff } from "@/components/home/process/ProcessHandoff";
 import { ProcessStep } from "@/components/home/process/ProcessStep";
 import { listNumber } from "@/lib/listNumber";
 import type { FlowEmblem } from "@/lib/processEmblems";
-import { FIX_STEP, type FlowStep } from "@/lib/processFlows";
+import { FIX_STEP, HANDOFF_STEP, type FlowStep } from "@/lib/processFlows";
 import type { FlowLayout } from "@/lib/processLayout";
 
 type ProcessListProps = {
@@ -20,9 +22,18 @@ type ProcessListProps = {
   readonly stepLabel: string;
   /** The fix loop's label, at step `FIX_STEP`. A flow with no loops has none (ui-spec §5.3b). */
   readonly fixLabel?: string;
+  /** The hand-off's label, at step `HANDOFF_STEP`. A flow with no loops has none (ui-spec §5.11). */
+  readonly handoffLabel?: string;
 };
 
-export function ProcessList({ steps, emblem, layout, stepLabel, fixLabel }: ProcessListProps) {
+export function ProcessList({ steps, emblem, layout, stepLabel, fixLabel, handoffLabel }: ProcessListProps) {
+  const after = (index: number) => {
+    if (fixLabel !== undefined && index === FIX_STEP) {
+      return <ProcessFixReturn fixBox={layout.fixBox} label={fixLabel} />;
+    }
+    if (handoffLabel !== undefined && index === HANDOFF_STEP) return <ProcessHandoff label={handoffLabel} />;
+    return undefined;
+  };
   return (
     <div data-anim="process-list" className="relative">
       <div
@@ -50,11 +61,7 @@ export function ProcessList({ steps, emblem, layout, stepLabel, fixLabel }: Proc
             label={`${stepLabel} ${listNumber(index)}`}
             title={step.title}
             line={step.line}
-            after={
-              fixLabel !== undefined && index === FIX_STEP ? (
-                <ProcessFixReturn fixBox={layout.fixBox} label={fixLabel} />
-              ) : undefined
-            }
+            after={after(index)}
           >
             {index === 0 && <ProcessEmblem emblem={emblem} />}
           </ProcessStep>

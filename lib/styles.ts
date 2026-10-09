@@ -14,6 +14,11 @@ export const splitGrid = `${splitColumns} lg:items-start`;
  * from being stretched to the row height, which would stop it pinning. */
 export const stickyTitle = "lg:sticky lg:top-30 lg:self-start";
 
+/** The slant shared by the hero's bottom edge and the marquee strip under it: sets
+ * `--slant-drop`, how far a 3° line falls across the viewport's width (tan 3° × 100vw). Geometry,
+ * not a design token. Both parts carry this class and read the variable, so they always agree. */
+export const slantDrop = "[--slant-drop:5.2408vw]";
+
 /** Focus ring on dark: 2px `text` outline, 2px offset. */
 export const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text";
@@ -26,14 +31,8 @@ export const focusRingOnCream =
 export const focusRingCard =
   "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-text";
 
-/** The display face condensed to width 80. */
-export const condensed = "[font-variation-settings:'wdth'_80]";
-
-/** Big-row titles (agent rows, web step rows): condensed display, `text-row`, tight. */
-export const rowTitle = `font-display text-row leading-none font-semibold tracking-[-0.035em] ${condensed}`;
-
-/** The display face condensed to width 75: the footer wordmark only. */
-export const condensedMark = "[font-variation-settings:'wdth'_75]";
+/** Big-row titles (agent rows, web step rows): display face, `text-row`, tight. */
+export const rowTitle = "font-display text-row leading-[1.05]";
 
 /** Section labels and the hero tag: uppercase mono, 13px, muted. */
 export const monoLabel = "font-mono text-nav uppercase tracking-[0.06em] text-muted";

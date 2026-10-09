@@ -219,7 +219,8 @@ export function jobBeat(tl: gsap.core.Timeline, parts: JobParts, visit: Visit): 
     case "update":
       return flash(JOB_BEATS.update.flip + JOB_FOLD.duration);
     case "flag":
-      return flash(JOB_BEATS.flag.raise);
+      // A send: the job lifts off on the raise (the geometry's hand-off move), so no change here.
+      return visit.kind === "send" ? arrival : flash(JOB_BEATS.flag.nod);
     case "remind":
       return flash(JOB_BEATS.remind.ring);
     case "ship":

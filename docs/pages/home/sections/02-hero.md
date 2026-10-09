@@ -1,12 +1,17 @@
 # Hero
 
-**Last Updated:** 2026-09-28 (removed the deleted `usePointerDrift.ts`/`useHeroPulses.ts` Key Files entries)
+**Last Updated:** 2026-10-08 (round 1 copy: side line and tag; 2026-10-07: Acosta swap)
 
 **The one question:** Who is this?
 
 See `../page.md` for the site-wide index. Spec: `../ui-spec/02-hero.md`.
 
 ## Current State
+
+Copy (round 1, 2026-10-08): the side line reads "I build AI agents that answer your customers and
+book them in, where they already message you. I build websites too." and the tag "AI agents ·
+Websites" (`hero.sideLine`, `hero.tag`). Lead check 2026-10-08 (360, 768, 1440, 3840, reduced
+motion): no sideways scroll, no page errors, no overflowing leaf text in the hero.
 
 The Hero has been rebuilt to ui-spec §2 (2026-09-25): the portrait sits between the two name lines
 in one stacking context, masks replace the fade overlay, and a seeded agent network drawn once on
@@ -47,20 +52,39 @@ square of side S = 1.1·min(column height, 66vw) pinned at the site column's bot
 column's right edge, so S — and the offset — grow with the section height; only the M's lower left
 tucks behind the right shoulder, from 1024 to 4K. `HeroBackdrop` paints back to front: the network,
 then the light pool (glowing over the lines), then the vignette and grain; the pool scales with S
-so it stays centred on the head: `top` 100% − 0.77S, `left` CR + 0.25em − 1.331S (CR = the column's
-right edge). The image's `sizes` hint tracks the rendered
+so it stays centred on the head: `top` 100% − 0.77S, `left` CR + 0.45em − 1.331S (CR = the column's
+right edge). Since the Acosta swap (2026-10-07) the name is set in Acosta at `--text-hero`
+`clamp(2.4375rem, 1.25rem + 5.278vw, 7rem)` (no weight, `leading-none`), and the em-based geometry
+in `HeroPortrait.tsx` and `HeroBackdrop.tsx` is the old values ×1.8 (0.25em is now 0.45em, the
+portrait's overlap `-0.81em`, its phone centre `2.457em`, and the pool's phone offsets), except the
+pool's `0.87em` name-height term. On phones and tablets the portrait is taller than before (about
+100px at 360), because the name block above it is shorter. The image's `sizes` hint tracks the rendered
 width, including viewport height, scaled ×1.1. The portrait's inner box has only the bottom mask
 (`mask-b-from-75%`); left and right are not faded. The lead screen-checked this with the real photo
 (2464×2448, near-square) at 360×640, 768×1024, 1024×768, 1024×1366, 1440×900, 1920×1080, 1920×1200
 and 3840×1200; at the 10%-bigger size, the user accepted that on desktop (1366, 1440, 1920, 3840)
 the top of the hair now runs behind the nav links or touches the top edge.
 
+The bottom edge is slanted 3° (built 2026-10-07). `HeroSection` is `box-content`, so `h-svh
+max-h-300 min-h-160` size the content box and `pb-(--slant-drop)` adds D = 5.2408vw under it;
+`clip-path: polygon(0 0, 100% 0, 100% calc(100% - D), 0 100%)` cuts the bottom-right triangle. In
+`HeroBackdrop` the light pool sits in an inner box ending D above the backdrop's bottom, so it
+stays on the head; network, vignette and grain fill the added area. Known knock-ons, left as they
+are: the scroll parallax travel grows by D × rate (it reads `offsetHeight`); the nav turns solid D
+later; with a classic 15px scrollbar the marquee's edge is ~0.4px off the cut at each end (vw
+includes the scrollbar). Lead-checked 2026-10-07 at 360, 768, 1440 and 3840 (dev server, headless
+Edge): no sideways scroll, no console errors, content in place. Reduced motion and Safari/iPhone
+not checked.
+
 ## Key Files
 
-- `components/home/hero/HeroSection.tsx` — the hero section, `#top`
+- `components/home/hero/HeroSection.tsx` — the hero section, `#top` (and its slanted bottom edge)
+- `lib/styles.ts` — `slantDrop` (`[--slant-drop:5.2408vw]`), the one class that sets the slant's
+  drop D for the hero, its backdrop and the marquee
 - `components/home/hero/HeroStage.tsx` — the name + portrait stage; imports `HeroName` and
   `HeroPortrait` itself
 - `components/home/hero/HeroBackdrop.tsx` — the light pool, agent network and vignette/grain
+  (continues into the slant's added area)
 - `components/home/hero/HeroNetwork.tsx` — the client canvas agent network; also runs the node
   drift and travelling pulses over the static draw
 - `components/home/hero/HeroGrain.tsx` — the SVG grain overlay
@@ -101,6 +125,13 @@ the top of the hair now runs behind the nav links or touches the top edge.
 
 ## Decisions
 
+- 2026-10-07 — User's call (mockup option "A1"): the hero's bottom edge is slanted 3°, low on the
+  left and high on the right; the hero grows at the bottom left by D = tan(3°) × viewport width
+  (≈ 5.2408vw: ~19px at 360, ~75px at 1440, ~201px at 3840) while its right side and its whole
+  content box (side line, name, portrait, actions) keep today's height and position; the backdrop
+  (network, vignette, grain) continues into the added area; same angle at every width. The Marquee
+  sits under the cut (`sections/03-marquee.md`). D comes from one `slantDrop` class in
+  `lib/styles.ts`, a plain CSS custom property (not a design token), so hero and marquee agree.
 - 2026-09-24 — Hero buttons: primary violet Book a call (Cal.com, new tab, counted) and an outline
   "See proofs" jumping to Proofs. (v3's "Get in touch" is dropped.)
 - 2026-09-24 — Hero phone stack: side line at the top (left-aligned), name keeping the v3 offset
@@ -108,9 +139,7 @@ the top of the hair now runs behind the nav links or touches the top edge.
   stacked. It all fits one screen. (The photo-behind-the-lower-half part is superseded by the
   2026-09-25 hero redesign decision below: below `lg` the name sits above the photo.)
 - 2026-09-24 — Hero height is full screen, capped at 1200px.
-- 2026-09-24 — The hero side line is v3's: "I build AI agents that take repetitive work off your
-  team, and the websites around them."
-- 2026-09-24 — The hero side line (16 words) runs over the 12-word limit by the user's choice.
+- 2026-10-08 — User's call: `hero.sideLine` is "I build AI agents that answer your customers and book them in, where they already message you. I build websites too." and the tag is "AI agents · Websites", written for business owners who know AI as a chat box (`../page.md`). Supersedes the user's 2026-09-24 pick of v3's line; `meta.description` no longer has to match the side line.
 - 2026-09-24 — Hero built as a static server component (`components/home/hero/*`) per ui-spec §2,
   carrying every `data-anim` hook for the GSAP pass; MUHAMMAD measured at 314.7px within 320 at
   360px, so the 72px token stands.
@@ -203,6 +232,7 @@ the top of the hair now runs behind the nav links or touches the top edge.
 
 ## Open Questions
 
+- **Review:** `meta.title` in `content/home.ts` reads "Muhammad Waqas | AI Agents and Automations" (the user's edit; the docs now follow the file, replacing "Muhammad Waqas, AI Automation Engineer | MARWIX"); the user confirms it or restores the old title.
 - **Review:** the h1 isn't a network keep-out, so faint nodes can sit behind the name letters — a
   visual call for the user to make.
 - **Review:** between `md` and `lg` a bright agent node can land on the photo below the frame

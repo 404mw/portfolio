@@ -434,13 +434,15 @@ export function receive(bot: Bot, crew: Crew) {
  * the usual gap after that, a napping one wakes, a busy one (still acting or reacting) glances
  * `toward` (+1 up-right, where the job always sits; −1 down-left) and back. The relay's job changes on its own clock either way.
  * `kind` is `find` on a fix run's first check (only the check plays it differently: it finds
- * something); `dwell` is how long the job stays, when that isn't the role's `RELAY_DWELL`.
+ * something) and `send` at the flag on a send run (only the flag plays it: its full raise, where a
+ * routine catch is a look and a nod); `dwell` is how long the job stays, when that isn't the
+ * role's `RELAY_DWELL`.
  */
 export function catchRelay(
   bot: Bot,
   crew: Crew,
   toward: 1 | -1,
-  kind: "catch" | "find" = "catch",
+  kind: "catch" | "find" | "send" = "catch",
   dwell: number = RELAY_DWELL[bot.role],
 ) {
   switch (bot.state) {
@@ -450,7 +452,8 @@ export function catchRelay(
       wake(bot, crew);
       return;
     case "idle": {
-      const length: Length = bot.role === "check" ? kind : "catch";
+      // Only the check is ever sent a find, and only the flag a send.
+      const length: Length = kind;
       const act = watchJob(bot, acts[bot.role](bot, length), dwell);
       play(bot, crew, act, "acting");
       nextActAfter(bot, crew, act);

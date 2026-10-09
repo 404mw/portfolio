@@ -10,9 +10,10 @@ import type { Bot } from "@/lib/processBotRig";
  * How much of its act a bot plays. `full`: the timed act. `short`: after the hover/tap jump.
  * `catch`: the full act as played on a relay catch (team strikes exactly `RELAY_STRIKES`), ending
  * with the eyes on the job (`RELAY_WATCH`) rather than back at rest. `find`: the check's catch on a
- * fix run, when it finds something and sends the job back; every other role plays its `catch`.
+ * fix run, when it finds something and sends the job back. `send`: the flag's catch on a send run,
+ * when it sends the job to a person. Every other role plays its `catch`.
  */
-export type Length = "full" | "catch" | "find" | "short";
+export type Length = "full" | "catch" | "find" | "send" | "short";
 
 /** An act's timeline: tweens that share a property use `overwrite: "auto"`. */
 export const actTimeline = () => gsap.timeline({ defaults: { overwrite: "auto" } });

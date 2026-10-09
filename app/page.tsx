@@ -7,6 +7,7 @@ import { ProcessSection } from "@/components/home/process/ProcessSection";
 import { ProjectTakeovers } from "@/components/home/proofs/ProjectTakeovers";
 import { ProofsSection } from "@/components/home/proofs/ProofsSection";
 import { WebSection } from "@/components/home/web/WebSection";
+import { StructuredData } from "@/components/StructuredData";
 import { meta } from "@/content/home";
 import { pageMetadata } from "@/lib/pageMetadata";
 
@@ -15,9 +16,10 @@ export const metadata = pageMetadata({ ...meta, path: "/" });
 export default function Home() {
   return (
     <>
+      <StructuredData />
       <HeroSection />
-      <AboutPosterSection />
       <MarqueeStrip />
+      <AboutPosterSection />
       <AgentsSection />
       <ProcessSection />
       <WebSection />

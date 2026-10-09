@@ -3,7 +3,7 @@ import { Analytics } from "@/components/Analytics";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SkipLink } from "@/components/SkipLink";
-import { bricolage, geist, geistMono } from "@/lib/fonts";
+import { acosta, displayPunct, plexMono, plexSans } from "@/lib/fonts";
 import { sectionIds } from "@/lib/routes";
 import { siteName, siteUrl } from "@/lib/site";
 import "./globals.css";
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${bricolage.variable} ${geist.variable} ${geistMono.variable}`}
+      className={`${acosta.variable} ${displayPunct.variable} ${plexSans.variable} ${plexMono.variable}`}
     >
       <body className="bg-bg text-text font-body antialiased">
         <SkipLink />

@@ -1,6 +1,6 @@
 # Contact
 
-**Last Updated:** 2026-09-26
+**Last Updated:** 2026-10-08
 
 **The one question:** How do I start?
 
@@ -11,6 +11,9 @@ See `../page.md` for the site-wide index. Spec: `../ui-spec/08-contact.md`.
 Contact pins its left column at 120px from the top from `lg` (CSS `sticky`, no JS), using the
 shared `splitColumns`/`stickyTitle` helpers in `lib/styles.ts` (see `../page.md`). Contact pins
 but barely moves because its left column is about as tall as the right one.
+
+The brief's need chips (`contact.brief.needs.options`, round 1 copy, 2026-10-08) are Answering
+customers, Bookings and reminders, Website, Web app and Not sure yet.
 
 Contact built: side links from one `ContactRow` (Book a call row counted), a client brief builder
 whose radios and textarea are uncontrolled and read back on mount; without JS, the controls Send
@@ -49,8 +52,9 @@ Reduced motion: no rotation, fades only, the first phrase stays.
 - 2026-09-24 — Contact side links: three rows, Book a call (Cal.com, new tab, counted; no
   "30-minute" label), the email address (mailto), WhatsApp click-to-chat (facts link). Other
   socials stay in the footer.
-- 2026-09-24 — Contact brief builder: (01) "what do you need" multi-select chips: AI agents /
-  Automations / Website / Web app / Not sure yet, with AI agents preselected; (02) timeline,
+- 2026-09-24 — Contact brief builder: (01) "what do you need" multi-select chips: Answering customers /
+  Bookings and reminders / Website / Web app / Not sure yet, with Answering customers preselected
+  (2026-10-08, the user's call, `../page.md`; was AI agents / Automations); (02) timeline,
   single-select: ASAP / This month / Exploring, with This month preselected; (03) a textarea,
   "what do you repeat every week". A summary line of the choices under the button. Chips and
   segments are real buttons with aria-pressed/radio semantics, keyboard reachable, tap targets at

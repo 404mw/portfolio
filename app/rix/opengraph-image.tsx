@@ -1,7 +1,7 @@
 // The /rix sharing preview (1200×630, docs/pages/rix/ui-spec.md §0.5): the wordmark, the page's
 // title and its address down the left; Rix standing on a floor line on the right. Colours come
-// from lib/tokens.ts, the token mirror for OG images; the font is the static Geist Mono 800 face in
-// assets/fonts (OFL), read from disk when the image is built.
+// from lib/tokens.ts, the token mirror for OG images; the font is Acosta, the display face
+// (assets/fonts/acosta.otf, one weight: regular 400), read from disk when the image is built.
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
@@ -16,7 +16,7 @@ export const alt = meta.ogAlt;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const fontPath = join(process.cwd(), "assets", "fonts", "GeistMono-ExtraBold.ttf");
+const fontPath = join(process.cwd(), "assets", "fonts", "acosta.otf");
 
 /** Rix's box: 510 × 330 (1 unit = 3px), right edge at x 1120, feet on the floor at y 500. */
 const rixBox = { width: 510, height: 330, right: 1120, floor: 500 };
@@ -25,7 +25,7 @@ export default async function OpengraphImage() {
   const { colors } = tokens;
   const { lead, accent, tail } = footer.wordmark;
   const address = `${new URL(siteUrl).host}${rixPath}`;
-  const geistMono = await readFile(fontPath);
+  const acosta = await readFile(fontPath);
 
   return new ImageResponse(
     (
@@ -37,8 +37,8 @@ export default async function OpengraphImage() {
           display: "flex",
           background: colors.bg,
           color: colors.text,
-          fontFamily: "Geist Mono",
-          fontWeight: 800,
+          fontFamily: "Acosta",
+          fontWeight: 400,
         }}
       >
         <div style={{ position: "absolute", left: 80, top: 80, display: "flex", fontSize: 36 }}>
@@ -54,8 +54,8 @@ export default async function OpengraphImage() {
             width: 480,
             display: "flex",
             flexWrap: "wrap",
-            columnGap: 43,
-            fontSize: 72,
+            columnGap: 38,
+            fontSize: 64,
             lineHeight: 1,
           }}
         >
@@ -89,7 +89,7 @@ export default async function OpengraphImage() {
     ),
     {
       ...size,
-      fonts: [{ name: "Geist Mono", data: geistMono, weight: 800, style: "normal" }],
+      fonts: [{ name: "Acosta", data: acosta, weight: 400, style: "normal" }],
     },
   );
 }

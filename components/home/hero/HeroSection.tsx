@@ -5,19 +5,25 @@
 // the portrait frame is placed against the full-height site column. `#top` is also what the
 // Nav observes to turn solid once the hero has passed. `HeroMotion` (client) renders nothing; it
 // adds the GSAP motion to this section's `data-anim` hooks.
+// The bottom edge is slanted 3°, low on the left: the content box keeps its height,
+// clamp(40rem, 100svh, 75rem) (`box-content`, so the three height classes size the content, not
+// the padding), and a bottom padding of `--slant-drop` (lib/styles.ts) is added under it. The
+// clip-path then cuts the bottom-right triangle away, so the right side ends where the content
+// box does and the left side is taller by the drop. The backdrop fills the added strip; the
+// marquee strip (section 3) sits in the cut.
 import { HeroActions } from "@/components/home/hero/HeroActions";
 import { HeroBackdrop } from "@/components/home/hero/HeroBackdrop";
 import { HeroMotion } from "@/components/home/hero/HeroMotion";
 import { HeroSideLine } from "@/components/home/hero/HeroSideLine";
 import { HeroStage } from "@/components/home/hero/HeroStage";
 import { sectionIds } from "@/lib/routes";
-import { container } from "@/lib/styles";
+import { container, slantDrop } from "@/lib/styles";
 
 export function HeroSection() {
   return (
     <section
       id={sectionIds.top}
-      className="relative isolate h-svh max-h-300 min-h-160 overflow-hidden"
+      className={`${slantDrop} relative isolate box-content h-svh max-h-300 min-h-160 overflow-hidden pb-(--slant-drop) [clip-path:polygon(0_0,100%_0,100%_calc(100%-var(--slant-drop)),0_100%)]`}
     >
       <HeroBackdrop />
       <div className="relative h-full px-gutter">

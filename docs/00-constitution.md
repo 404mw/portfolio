@@ -1,6 +1,6 @@
 # Constitution
 
-**Last Updated:** 2026-10-05
+**Last Updated:** 2026-10-07
 
 The non-negotiable rules for `marwix.dev`. Every implementation decision is checked against them.
 They exist to stop scope creep, unsupported claims and rework.
@@ -33,12 +33,12 @@ mascot act out its emotions, moves and plays. It makes no claims and has its own
 ## 3. The reader and the main action
 
 The reader is **someone who might hire the user**, usually sent the link directly. They are one
-of five audiences, the About cards: a service business (a clinic, a salon, a tutor), an online
-store, a Discord server owner, a software builder (a developer, a vibe coder, a software company)
-or someone who needs a website. Only the software builder is technical. **"Book a call" is the
-main action** and stays visible in the nav.
+of four audiences, the About cards: a service business (a clinic, a salon, a tutor), an online
+store, a Discord server owner or a software builder (a developer, a vibe coder, a software
+company). Only the software builder is technical. **"Book a call" is the main action** and stays
+visible in the nav.
 
-- **The shared page is written so all five can follow it.** A reader who has picked no card, or
+- **The shared page is written so all four can follow it.** A reader who has picked no card, or
   "Not sure yet", sees only shared content.
 - **A picked card's own content is written for that audience, in its tone:** its acknowledgement,
   its offers and demos in Agents, its flow in Process, its WhatsApp message and the closing line

@@ -15,7 +15,7 @@ export function ReportDemo({ demo }: ReportDemoProps) {
   return (
     <div className="flex h-full flex-col justify-end gap-5">
       <p className="flex items-baseline justify-between gap-4">
-        <span className="font-display text-summary font-semibold tracking-[-0.02em] text-text">
+        <span className="font-display text-summary leading-[1.15] text-text">
           {title}
         </span>
         <span className={metaLabel}>{week}</span>

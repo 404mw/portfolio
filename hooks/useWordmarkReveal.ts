@@ -11,8 +11,8 @@
 //
 // The starting state is set here, in JS, inside the matchMedia branch, so without JS (or before
 // this runs) the full word shows, still. Every tween is created at setup, so the branch reverts
-// them all; inline styles are cleared once each has played. The footer clips its content
-// (`overflow-hidden`) and nothing changes size, so nothing scrolls sideways at any point.
+// them all; inline styles are cleared once each has played. The footer's inner wrapper clips its
+// content (`overflow-hidden`) and nothing changes size, so nothing scrolls sideways at any point.
 import { gsap, useGSAP } from "@/lib/gsap";
 import { animTargets, duration, ease, motionQuery } from "@/lib/motion";
 

@@ -1,7 +1,7 @@
-// The fix run's way back below `lg` (ui-spec §5.3a, §5.9): the job goes back from step 4 to step 3
-// along the dotted fix line (`process-fix-line`), not up the bot column. From ledge 4 it leaves left
-// and lifts to the line's bottom end at bot 4's hand, follows the bottom turn, climbs the line,
-// follows the top turn and the arrowhead into bot 3's hand, then drops onto ledge 3 and slides to
+// The fix run's way back below `lg` (ui-spec §5.3a, §5.9): the job goes back from step 5 to step 4
+// along the dotted fix line (`process-fix-line`), not up the bot column. From ledge 5 it leaves left
+// and lifts to the line's bottom end at bot 5's hand, follows the bottom turn, climbs the line,
+// follows the top turn and the arrowhead into bot 4's hand, then drops onto ledge 4 and slides to
 // its stop. Its visual centre runs on the line's stroke; the turns are quarter circles of a few
 // points each. Behind it the line's lit overlay (`process-fix-line-lit`) lights from the bottom end
 // up to the job, by `clip-path`, so the bright part follows it; once the job is past the arrowhead
@@ -53,7 +53,7 @@ function turn(cx: number, cy: number, r: number, a: number, b: number): Point[] 
 }
 
 /**
- * The route from ledge 4's stop (`from`) to ledge 3's (`to`), both job anchors, along `box`'s
+ * The route from ledge 5's stop (`from`) to ledge 4's (`to`), both job anchors, along `box`'s
  * centre line. `centre` is the job's visual centre above its anchor. Pure arithmetic: no reads.
  */
 export function fixRoute(box: FixLineBox, from: Point, to: Point, centre: number): FixRoute {

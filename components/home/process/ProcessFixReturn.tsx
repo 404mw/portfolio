@@ -1,14 +1,14 @@
-// The fix loop (ui-spec §5.3a): inside a job, when the second check (step 4) finds a problem or a
-// broken rule, the work goes back to step 3 and is checked again until it passes. The last child
-// of step 3's `<li>`. Below `lg`: a marker row at the end of the step holding the label, which
-// wraps, 14px right of a dotted `accent` bracket down the bot column's left edge, from bot 3's
-// hand to bot 4's, placed against step 3's `relative` `<li>` and reaching into step 4's row; its
-// arrowhead points onto bot 3, then its lit overlay (hidden at rest). From `lg`: a dashed arch over
-// the gap between bots 3 and 4, its legs on their centres (the right edge from `fixBox`), the
-// arrowhead down onto bot 3, and the label centred above it on a `bg` mask at `z-10`, so a relay
-// job passing later goes behind it. Then the motion pass's lit overlay (hidden at rest). One label
-// element at every width; the rest is decoration. Never animate `transform` or `opacity` on
-// `process-fix`, `process-fix-line`, `process-fix-row` or step 3's `<li>`: motion writes the lit
+// The fix loop (ui-spec §5.3a): inside a job, when the second check (step 5) finds a problem or a
+// broken rule, the work goes back to step 4 and is checked again until it passes. The last child
+// of step 4's `<li>` (`FIX_STEP`). Below `lg`: a marker row at the end of the step holding the
+// label, which wraps, 14px right of a dotted `accent` bracket down the bot column's left edge, from
+// bot 4's hand to bot 5's, placed against step 4's `relative` `<li>` and reaching into step 5's
+// row; its arrowhead points onto bot 4, then its lit overlay (hidden at rest). From `lg`: a dashed
+// arch over the gap between bots 4 and 5, its legs on their centres (the right edge from `fixBox`),
+// the arrowhead down onto bot 4, and the label centred above it on a `bg` mask at `z-10`, so a
+// relay job passing later goes behind it. Then the motion pass's lit overlay (hidden at rest). One
+// label element at every width; the rest is decoration. Never animate `transform` or `opacity` on
+// `process-fix`, `process-fix-line`, `process-fix-row` or step 4's `<li>`: motion writes the lit
 // overlays only, and a stacking context would trap the label's `z-10`.
 import { ChevronRightIcon } from "@/components/icons/ChevronRightIcon";
 import { ChevronUpIcon } from "@/components/icons/ChevronUpIcon";

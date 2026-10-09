@@ -1,11 +1,14 @@
 # About
 
-**Last Updated:** 2026-10-06 (Rix rev 4 built, pick lock look)
+**Last Updated:** 2026-10-08 (new heading and intro lines; 2026-10-07: fifth card relabelled "Just exploring", frame lost its top hairline, "I need a website" card removed)
 
-> **Status:** In build. Option B (poster board) is live on / with the six per-card replies, the
-> two-part ack, four new emblems and the session-remembered pick (built static, 2026-10-03); the
-> Rix playground is built at /rix (`docs/pages/rix/page.md`). Copy is still SAMPLE and the user's
-> calls are open (see Open Questions).
+> **Status:** In build. Option B (poster board) is live on / with the five per-card replies, the
+> two-part ack, four emblems and the session-remembered pick (built static, 2026-10-03; the website
+> card removed 2026-10-07); the Rix playground is built at /rix (`docs/pages/rix/page.md`). Copy is
+> still SAMPLE and the user's calls are open (see Open Questions). Lint, `tsc` and the production
+> build are green (lead check, 2026-10-08; the orphan `AgentPointerPanel.tsx` is gone). The
+> 2026-10-08 check (360, 768, 1440, 3840) found no sideways scroll and no overflowing leaf text in
+> About; no separate check yet of the five-card board's layout.
 
 **The one question:** Can he help someone like me?
 
@@ -18,12 +21,21 @@ tag are in `../ui-spec.md` §0.5–0.6; Rix is `../ui-spec/00-rix.md`.
 About on `/` is option B, "Poster board" (`app/page.tsx` renders `AboutPosterSection` between Hero
 and Marquee, unnumbered). Sample
 copy (`content/home.ts` → `about`, marked SAMPLE): local preview only, no deploy, no commit. The
-six cards are `about.replies`, keyed service-business, online-store, discord, software-builder,
-website and not-sure (labels: Service business, Online store, Discord, Developer or team, I need a
-website, Not sure yet); each has a `label`, `ack` and `whatsappText`, and `about.ackSet` is the
-shared second ack line. `about.lines` is the intro's "who I am" pair.
+five cards are `about.replies`, keyed service-business, online-store, discord, software-builder
+and not-sure (labels: Service business, Online store, Discord, Developer or team, Just exploring);
+each has a `label`, `ack` and `whatsappText`, and `about.ackSet` is the shared second ack line.
+The heading is "Your routine work," / "done for you." (`about.heading`). `about.lines` is the
+intro's "who I am" pair, in plain words: "I set up AI agents that do the work your business
+repeats, like bookings and customer messages. My job title: AI Automation Engineer." and "If you
+build software, I help you finish it and put it live."
 `AboutPosterSection` stacks `AboutIntro` (split), the prompt, the shelf with Rix, the poster-card
 board and the picked reply's ack, inside `AboutFrame` with home's ids (`lib/aboutScope.ts`).
+`AboutFrame` has no top hairline (`border-t border-line` dropped, `py-section` kept), so no line
+sits between the marquee and About or between About and Agents. Lead screen check 2026-10-07 at 360,
+768, 1440 and 3840: no line under the strip, no sideways scroll, no console errors. Lint, `tsc` and
+the build pass (2026-10-08). A `?for=website` link or a remembered `website` pick
+matches no card: nothing is checked and the default view shows (read from code by web-coder, not run
+in a browser).
 `RixMotion` (renders nothing) adds the scroll reveal and Rix's play. `RixRunOptions` carries the
 scope (section id and radio name) separately from Rix's option and host. Rix now has two hosts only:
 home's About (option B, `homeRixOption = "b"` in `hooks/useAboutRix.ts`, against home's ids) and the
@@ -34,16 +46,17 @@ The pick is locked only while Rix throws a tantrum (see Rix rev 4 below); at eve
 section never locks or gates on the choice, and it works fully without a choice and without
 JavaScript.
 
-Replies are six native radios grouped by `name="about-for"`, the poster cards; the picked reply's
+Replies are five native radios grouped by `name="about-for"`, the poster cards; the picked reply's
 ack shows via CSS `:has`, so picking works with no JavaScript. `AboutAck` renders one paragraph per
-reply, and for the five cards that have their own set in Agents and Process it adds the shared
+reply, and for the four cards that have their own set in Agents and Process it adds the shared
 `about.ackSet` line, hidden without JavaScript (`noscript:hidden`). `TypingBubble` is still used by
 Agents' `ChatDemo`.
 
 Emblems: each card has one (`aboutReplyProp` in `lib/aboutReplies.ts`): calendar (service
-business), parcel (online store), bubble (Discord), code (developer or team), window (website);
-Not sure yet has none. The parcel, bubble, code and window geometry is in `lib/rixProps.ts`
-(`RixPropName`); shield, send, report and envelope remain defined but held by no card.
+business), parcel (online store), bubble (Discord), code (developer or team); Just exploring has none.
+The parcel, bubble and code geometry is in `lib/rixProps.ts` (`RixPropName`; the `window` emblem is
+gone); shield, send, report and envelope remain defined (and have cases in `lib/rixPick.ts`) but
+are held by no card.
 
 Lead check 2026-10-02: `/` at 360, 768, 1440 and 3840 has 6 radios named `about-for` and Rix
 present; scrollWidth equals the viewport; no tap target under 44px; the patrol moves; a pick checks
@@ -51,7 +64,7 @@ the radio and the status line updates; no console errors or warnings; lint green
 360, 768, 1440 and 3840 after the options A/C and chat cleanup: unchanged, no errors.
 
 The pick is the checked radio (read by `useAboutPick`). `lib/aboutPick.ts` `pickSet` maps it to a
-set (`default` for no pick, an unknown key or Not sure yet, else the card's key), which
+set (`default` for no pick, an unknown key or Just exploring (`not-sure`), else the card's key), which
 `hooks/useShownSet.ts` hands to Agents and Process; `setAboutPick` sets the pick from outside About
 (the "Shown for" tag, `?for=`, the memory) by checking the radio and dispatching an untrusted,
 bubbling `change`: no focus move, no scroll, the URL is never rewritten. A pick also sets the
@@ -69,7 +82,7 @@ silent; a visitor's own pick announces the ack, plus `ackSet` when the card has 
 `AboutStatus`'s `aria-live="polite"` region.
 
 The "Shown for" tag (`components/home/pick/ShownForTag.tsx`, in Agents and Process) is a native
-`<details>` whose summary shows the picked card's emblem and label (or "Everyone"); its list is six
+`<details>` whose summary shows the picked card's emblem and label (or "Everyone"); its list is five
 radios in the flow (`ShownForOption`). A choice calls `setAboutPick` inside `lib/holdInView.ts`, so
 the tag stays where it was while heights above it change. A pointer choice closes the list and
 focuses the summary; an arrow-key choice selects live and keeps it open. `hooks/useCloseOnLeave.ts`
@@ -151,8 +164,8 @@ announces `throwAway`, keeps focus, no sideways scroll at 360/1440.
 
 ## Key Files
 
-- `components/home/about/` — AboutIntro, AboutPrompt, AboutAck (the two-part ack), AboutFrame,
-  AboutStatus, AboutForParam (memory and `?for=`), AboutPropGlyph
+- `components/home/about/` — AboutIntro, AboutPrompt, AboutAck (the two-part ack), AboutFrame
+  (`components/home/about/AboutFrame.tsx`, no top line), AboutStatus, AboutForParam (memory and `?for=`), AboutPropGlyph
 - `app/page.tsx` — renders `AboutPosterSection` (option B) for About on `/`
 - `components/home/process/ProcessBot.tsx` — the host mascot: the 2D Process bot with the new
   `host` role (`lib/processBots.ts`)
@@ -164,7 +177,7 @@ announces `throwAway`, keeps focus, no sideways scroll at 360/1440.
 - `lib/aboutPick.ts` — `pickSet` (pick to set) and `setAboutPick` (set the pick from outside About)
 - `lib/aboutMemory.ts` — the visit's session memory (pick and last `?for=` value)
 - `lib/holdInView.ts` — keeps an element in place on screen across a swap
-- `lib/rixProps.ts` — the emblems' geometry, including the four new ones
+- `lib/rixProps.ts` — the emblems' geometry, including the three in use (parcel, bubble, code)
 - `components/home/pick/` — `ShownForTag`, `ShownForOption`: the "Shown for" tag used by Agents and
   Process
 - `hooks/useShownSet.ts` — the set Agents and Process draw (the pick through `pickSet`)
@@ -175,7 +188,7 @@ announces `throwAway`, keeps focus, no sideways scroll at 360/1440.
 - `hooks/useAboutFor.ts` — applies `?for=<group>` (once per value per visit) or the remembered pick
   after mount, untrusted so it never announces or scrolls
 - `hooks/useAboutAnnouncement.ts` — the status text, set only on a visitor's own (trusted) pick
-- `content/home.ts` → `about` — the sample copy (heading, mascot name, prompt, six replies each
+- `content/home.ts` → `about` — the sample copy (heading, mascot name, prompt, five replies each
   with a label/ack/WhatsApp message), marked SAMPLE pending real facts; `about.rix` — the poke-ladder
   lines (`annoyedLines`, `angryLines`, `sulkLine`, `forgiveLine`, `throwAway`) and, with rev 4,
   `idleLines`, `afterPickLines`, `hoverLines`, `hoverAnyLines`, `switchLines`, `lockLine`, `unlockLine`
@@ -211,6 +224,19 @@ announces `throwAway`, keeps focus, no sideways scroll at 360/1440.
 
 ## Decisions
 
+- 2026-10-08 — User's call (`../page.md`): the heading is "Your routine work, / done for you." and `about.lines` are rewritten in plain words for business owners; developer wording stays in the developer card.
+- 2026-10-07 — User's call: the fifth card's label is "Just exploring" (was "Not sure yet") so every card answers "What do you do? Pick the closest one."; the lead chose the exact wording (alternatives: "Exploring options", "Looking around"); key `not-sure`, its ack and WhatsApp message unchanged; Rix's hover lines and the idle line ("Exploring counts too.") follow it; Contact's brief option "Not sure yet" is a different control and keeps its label.
+- 2026-10-07 — User's call: About's frame drops its top hairline (`border-t border-line` removed from `AboutFrame.tsx`) because the tilted (−3°) marquee now sits directly above it and a horizontal line under the diagonal strip looked cluttered; same rule as Agents under the marquee, `py-section` unchanged.
+- 2026-10-07 — User's call: the "I need a website" card (`website`) is removed. The prompt asks
+  "What do you do? Pick the closest one." and viewers choose what they do; "I need a website" isn't
+  a profession, and the lead and copywriter found no label that makes it an answer, so removal won
+  over a relabel. About has five cards: Service business, Online store, Discord, Developer or team,
+  Not sure yet (four audiences plus "Not sure yet"). The card's ack, WhatsApp message, Rix hover
+  lines, emblem use, Agents set (and the `pointer` panel), Process flow and takeover closing line go
+  with it; `?for=website` no longer matches and falls back to the default view. A reader who needs
+  a website picks their real occupation (or nothing) and is served by Web, shown to everyone.
+  Constitution §3, `docs/03-facts.md` and `docs/04-voice.md` are amended to match. Supersedes the
+  2026-10-03 card, emblem and audience lines marked below.
 - 2026-10-05 — Rix on home's About is livelier (`ui-spec/00-rix.md` rev 4, the user's): for his
   first 6 minutes of live time he does something every 2–4s (beats from existing moves, plays and
   strolls), then every 10–15s; the pointer near the cards no longer pauses him. Replaces the
@@ -254,12 +280,13 @@ announces `throwAway`, keeps focus, no sideways scroll at 360/1440.
 - 2026-10-01 — The mascot is the 2D Process bot (`lib/processBots.ts`) with a new bare `host` role
   and a wave.
 - 2026-10-01 — Sample copy is written by copywriter into `content/home.ts → about`, marked SAMPLE:
-  heading "Software that / runs on its own.", mascot "Rix from MARWIX", six replies, each with
+  mascot "Rix from MARWIX", six replies, each with
   its own WhatsApp default message (the last keeps the existing default).
 - 2026-10-01 — Rix speaks for the user in the third person by the brand: the acks say "MARWIX
   can…" (the user's own edit, replacing "Muhammad can…"); the "who I am" lines stay in the user's
   first person; the WhatsApp messages are in the visitor's voice.
-- 2026-10-03 — The reader is one of five audiences, the About cards (constitution §3 as amended;
+- 2026-10-03 — (**superseded 2026-10-07**: four audiences, the website card is removed) The reader
+  is one of five audiences, the About cards (constitution §3 as amended;
   `docs/04-voice.md` "The reader" matches it); only the developer is technical.
 - 2026-10-01 — Built as a static, unnumbered section between Hero and Marquee: native radios shown
   with CSS `:has` (works without JS), with a pick (or `?for=`, applied after load) setting the
@@ -327,7 +354,8 @@ announces `throwAway`, keeps focus, no sideways scroll at 360/1440.
   home renders `AboutPosterSection` with home's ids, and Rix there runs B's features (`RixMotion`/
   `useAboutRix` split the scope option from the Rix host, which is "b" on home); the old chat
   `AboutSection` is no longer rendered on `/`.
-- 2026-10-03 — The six poster cards, in order (key, radio `value` and `?for=` value): Service
+- 2026-10-03 — (**superseded 2026-10-07 for the fifth card**: "I need a website" is removed, five
+  cards remain) The six poster cards, in order (key, radio `value` and `?for=` value): Service
   business (`service-business`); Online store (`online-store`); Discord (`discord`); Developer or
   team (`software-builder`); I need a website (`website`); Not sure yet (`not-sure`). Replaces the
   six sample groups (Online community, Agency or freelancer, Startup team, Creator, Just looking),
@@ -341,6 +369,7 @@ announces `throwAway`, keeps focus, no sideways scroll at 360/1440.
   without JavaScript.
 - 2026-10-03 — Four new emblems, in the bots' style: parcel (online store), speech bubble
   (Discord), code brackets (developer or team), browser window (website). Not sure yet has none.
+  (**Browser window superseded 2026-10-07**: no card uses it; three emblems remain in use.)
 - 2026-10-03 — The pick is remembered for the visit (session storage; gone when the tab closes). A
   `?for=` link wins the first time that value is seen in a visit; after that the visitor's own pick
   is remembered. Replaces "a pick isn't remembered across reloads" (2026-10-01) and the built "`?for=`
@@ -364,16 +393,18 @@ announces `throwAway`, keeps focus, no sideways scroll at 360/1440.
 
 ## Open Questions
 
-- **Choice:** the intro's "who I am" lines: copywriter wrote option 1 (`about.lines`) and two
-  alternatives exist; the user picks (they must speak to builders as well as business owners).
-- **Choice:** the "I need a website" label is 4 words against the spec's 3-word label limit; kept
-  pending the user's call.
-- **Choice:** the four new emblems (parcel, speech bubble, code brackets, browser window) are
-  built and need the user's look on screen.
-- **To build:** motion left for the motion pass: the four new emblems' own flourishes (`lib/rixPick.ts`
+- **Choice:** the user confirms the exact form of the 'Just exploring' label.
+- **Choice:** constitution §3 still quotes the old label ('or "Not sure yet"'); the user amends it or tells the lead to.
+- **To build:** code comments still name the card 'Not sure yet' (`lib/aboutReplies.ts`, `lib/aboutPick.ts`, `lib/shownSet.ts`, `lib/rixHoverLines.ts`, `hooks/useShownSet.ts`); comment-only cleanup for web-coder.
+- **Review:** both `about.lines` may have been the user's own words; the user confirms the rewrite or restores theirs.
+- **Choice:** the three new emblems in use (parcel, speech bubble, code brackets) are built and
+  need the user's look on screen.
+- **To build:** motion left for the motion pass: the three emblems' own flourishes (`lib/rixPick.ts`
   has no case for them) and the swap and tag fades.
 - **Choice:** the user has not confirmed two copy changes: `throwAway` ("Rix threw your pick
   away.") and `pokeLines[4]` ("Fun. Now look down.").
 - **To build:** the lead's browser check of Rix rev 4 and the pick lock on `/` (pending).
 - **Fact:** the About copy (`content/home.ts` → `about`) is still SAMPLE until the user approves
   the real text.
+- **To build:** the lead's screen check of the five-card board at 360, 768, 1440 and 3840, and
+  whether the last row needs a layout change (the user's call).

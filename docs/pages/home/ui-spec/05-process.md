@@ -5,7 +5,18 @@ The built bot motion (§5.7's constants and layers): [`05-process-motion.md`](05
 The four-step relay (legacy; superseded by the 2026-10-04 rebuild, 5.7): [`05-process-relay-legacy.md`](05-process-relay-legacy.md).
 The phone track (legacy; superseded 2026-10-05, later, by the ledges, 5.9): [`05-process-track-legacy.md`](05-process-track-legacy.md).
 
-**Last Updated:** 2026-10-05. Every choice in 5.8 is decided except the ones marked open.
+**Last Updated:** 2026-10-08. Every choice in 5.8 is decided except the ones marked open.
+**2026-10-08 (round 2 of the plain-words overhaul; the user's decisions; static and motion
+specced, not built yet):** the one question becomes **"Can I trust it with my customers?"** (was
+"How do they work?"). **Control comes first:** in every flow with loops the step that passes the
+job to a person moves from the end to step 3, before the work: job arrives → your rules → anything
+sensitive or unusual goes to you → the routine job is done → it is checked before it goes out
+(→ back to fix) → the flow's last step, if it has one. The fix loop moves one step right (step 5
+back to step 4, `FIX_STEP = 3`); the return is unchanged. New: **the hand-off to you**
+(`ProcessHandoff`, 5.11), a dashed stem up the flag's pole to a label above the row (a marker row
+below `lg`), with one new slot, `handoffLabel`; and an intro line under the heading,
+`process.lead`. The relay gains a third kind of run, the job going to you (5.11e). Discord is
+unchanged. No new token, role, pose, prop or icon. Choices 69–80 (5.8).
 **2026-10-04 (the user's decision):** the Discord flow has no validation and no loops: no "Second
 check" step, no fix loop, no bottom return. Its five steps are Mentioned, Your tone, Remembers,
 Connected, Always on (5.3b, 5.10). The other five flows keep their check and both loops. Not built yet.
@@ -43,7 +54,12 @@ line, which lights behind it (5.3a, 5.9 The fix rise, choice 66). A fix run belo
 (was +5.2s). From `lg` nothing changes. No markup, copy or token change. Two calls are open for
 the user (5.8, 67–68).
 
-## 5. Process (the one question: how do they work?)
+## 5. Process (the one question: can I trust it with my customers?)
+
+**2026-10-08:** the question was "How do they work?" until round 2. The reader is an owner who
+knows AI only as ChatGPT and fears a job with no person in it; the section answers in this order:
+your rules run it, anything sensitive or unusual comes to you, the rest is done and checked before
+it goes out (5.11).
 
 Source: Claude Design canvas "Process mascots" (`Main.dc.html` desktop 1440, `Phone.dc.html` 390,
 `Bot.dc.html` vector bot, `Sprites.dc.html` sheet), 2026-09-26; vector bots with separate feet in
@@ -64,18 +80,24 @@ off (5.7).
 - **Two loops, one question.** Both answer "how do they work?": the fix loop is inside a job (a
   check sends work back until it passes), the return is between jobs (the lesson goes into the
   rules). They sit on opposite sides of the row, top and bottom, so neither reads as the other.
+  **2026-10-08:** under the new question both loops are the "checked" half of the answer, and the
+  hand-off to you (5.11) is the "a person decides" half. The hand-off sits on the top side with the
+  fix loop, to its left, over step 3; it leaves the row and never comes back, so it reads as a way
+  out, not a loop.
 
 ### 5.1 Layout (stacked at every width; no pinned title)
 
 - Section frame (§0.1), `id="process"`. Inner: `{container} flex flex-col gap-14 border-t border-line py-section md:gap-20 lg:gap-24`.
 - Header: `<div data-anim="reveal" class="flex max-w-250 flex-col gap-5 lg:gap-7">`: `SectionLabel`
   (`process.number`, `process.label`, `as="p"`), `SectionHeading size="heading"`. Shared voice;
-  the same for every flow.
+  the same for every flow. **New 2026-10-08:** then the intro line
+  `<p class="max-w-xl text-lead leading-normal text-muted">` = `process.lead` (5.11b).
 - **`ProcessFlow`** (new, client): `<div data-anim="process-flow" data-set={set} data-count={n} data-loops={"on" | "off"} class="flex flex-col gap-8 lg:gap-24">`.
   **Changed (decision B):** `lg:gap-12` → `lg:gap-24` (48 → 96px), so the fix label above the
   arch (76px above the list) keeps 20px clear of the caption. **2026-10-04:** a flow with no
   loops keeps `lg:gap-12` and carries `data-loops="off"` (5.3b). It reads `useAboutPick()` →
-  `pickSet` → `useShownSet` (§0.5) and draws `process.flows[set]`.
+  `pickSet` → `useShownSet` (§0.5) and draws `process.flows[set]`. **2026-10-08:** the hand-off
+  label sits at the same height as the fix label, so `lg:gap-24` covers it too; no gap change.
   1. **Meta:** `<div class="flex flex-col gap-3">` → `ShownForTag` (radio name
      `process-shown-for`), then the caption `<p data-anim="process-caption" class="{metaLabel}">`
      = `flows[set].caption` (decided, choice 32).
@@ -83,6 +105,8 @@ off (5.7).
      → `ProcessList`, then `ProcessReturn` (flows with loops only, 5.3b), then `ProcessRelay`.
      `isolate` keeps the relay layer's `z-1` inside the body, below the loop labels' `lg:z-10`.
      The fix loop lives inside step 3's `<li>` (5.3a), so the body's children are unchanged.
+     **2026-10-08:** the fix loop lives in step 4's `<li>` and the hand-off in step 3's (5.11);
+     the body's children are still unchanged.
 - **Below `lg`: rows**, five or six. **From `lg`: all steps across on a ground line.** The classes
   that depend on the count are literal strings in `lib/processLayout.ts`:
 
@@ -91,12 +115,16 @@ off (5.7).
 | 5 | `lg:grid-cols-5 lg:gap-x-8` | `lg:-right-6` | `lg:col-start-2 lg:col-span-3 lg:ml-15.5 lg:-mr-24` | `lg:-right-24` |
 | 6 | `lg:grid-cols-6 lg:gap-x-4 xl:gap-x-8` | `lg:-right-4 xl:-right-6` | `lg:col-start-2 lg:col-span-4 lg:ml-15.5 lg:-mr-20 xl:-mr-24` | `lg:-right-20 xl:-right-24` |
 
+- **2026-10-08:** `lib/processLayout.ts` is unchanged. `fixBox` is placed against the fix step's
+  own column, so it works the same one column to the right; the return box still runs step 2 to
+  the last step. The hand-off needs no count-dependent class (its stem sits 110px into step 3's
+  column at every count, 5.11c).
 - **The tight spot, six across at 1024 (decided, choice 28).** Content is 942px. With the usual
   32px gap a column is 130px, narrower than the 136px bot. With a 16px gap from `lg` to `xl` it is
   144px: the bot fits with 8px to spare, and neighbouring bots stay 24px apart. From `xl` (1280)
   the gap is 32px again and a column is 170px. Five across at 1024 is 163px with the 32px gap.
 - **Without JavaScript:** the server markup is the `default` flow; the tag is hidden. Both loops
-  are static markup, so they show without JavaScript.
+  are static markup, so they show without JavaScript. **2026-10-08:** so does the hand-off.
 
 ### 5.2 List and step (`ProcessList`, `ProcessStep`)
 
@@ -108,7 +136,10 @@ off (5.7).
   by the ledges, which live in each step, 5.9). The `<ol>` keeps `relative` (no `z-index`, so no
   stacking context; it was added for the track and is harmless now).
   It passes `ProcessFixReturn` (5.3a) to the step at `FIX_STEP` (index 2) only, and only when
-  it has a `fixLabel` (5.3b).
+  it has a `fixLabel` (5.3b). **2026-10-08:** `FIX_STEP` is index 3 (step 4), and a new optional
+  prop `handoffLabel` passes `ProcessHandoff` (5.11c) to the step at `HANDOFF_STEP` (index 2,
+  step 3) only, and only when it is there. Both go through `ProcessStep`'s `after`; they are never
+  on the same step.
 - `<li data-step={i}>`: `grid grid-cols-[5.5rem_minmax(0,1fr)] items-start gap-x-4.5 border-t border-line py-6 relative lg:flex lg:min-w-0 lg:flex-col lg:border-t-0 lg:py-0`
   (phone column 88px; the text column starts at x 106). **2026-10-05, later:** `lg:relative`
   becomes `relative`, so the ledge and the phone fix line are placed against the row below `lg`
@@ -126,6 +157,7 @@ off (5.7).
      line `<p class="text-body-lg leading-normal text-muted lg:max-w-65">`.
   4. **New, step 3 only:** `ProcessStep`'s new optional prop `after` (a `ReactNode`, rendered as
      the `<li>`'s last child) carries `ProcessFixReturn`. `children` stays the bot's hand.
+     **2026-10-08:** `after` carries `ProcessHandoff` on step 3 and `ProcessFixReturn` on step 4.
 - **Feet on the ground line (from `lg`):** the bot's feet (the body's lowest points, viewBox y 92) are
   the viewBox's **bottom edge** (−18 + 110 = 92), so the box bottom is the feet. `lg:mt-5` (20px) puts
   the 88px box's bottom at 108, the ground line's top (`top-27`); the 2px line sits right under the
@@ -151,8 +183,16 @@ off (5.7).
 - Dash rhythm is the browser's CSS `dashed` (about 6/6 at 2px).
 - **Unchanged by decision B.** Its slot keeps its meaning (5.5). **2026-10-04:** not rendered at
   all for a flow with no loops (5.3b); the component itself is unchanged.
+- **Unchanged by round 2 (2026-10-08).** In five-step flows the last bot is now `check` (step 5),
+  so the lesson leaves the check; in six-step flows it leaves `remind` or `ship`, as before.
 
 ### 5.3a The fix loop (`ProcessFixReturn`, new 2026-10-03, decision B)
+
+**2026-10-08 (round 2):** the fix loop is now **step 5 back to step 4** (`FIX_STEP = 3`; `team`
+is step 4 and `check` step 5 in every flow with loops). Everything below is placed against the fix
+step's own `<li>` and the next row, so every class, size and route is unchanged; read "step 3" as
+"the work step (now 4)" and "step 4" as "the check step (now 5)". New x positions from `lg`: 5.11d.
+Below `lg` the dotted line runs from bot 5's hand up to bot 4's.
 
 The agent loop inside a job: when the second check finds a problem or a broken rule, the work goes
 back to the agent that did it and is checked again until it passes (facts → How the user works).
@@ -188,7 +228,9 @@ with it (one flow child is left); `bg-bg` goes with the track it masked; `pl-4` 
   20px to the caption, and the tag pushes everything down in the flow when open, so nothing
   overlaps at any width. The label is centred over the middle of the row, at least 260px from
   either edge of the list at 1024 (five steps; about 340px with six), so `whitespace-nowrap`
-  never reaches the container's side.
+  never reaches the container's side. **2026-10-08:** one column further right, it is about 130px
+  from the list's right edge at 1024 (five steps; about 190px with six), and the hand-off label
+  sits to its left at the same height (5.11d gives the gap between them).
   Below: the arrowhead's tip is about 4px above the list; step 3's bot (`team`) has its hat ridge
   26px below the list top at rest and 6px below at the top of a hover jump (14px up), so even a
   jump stays clear. Step 4's leg ends over the `check` bot's head (body top 22px down; its lens is
@@ -238,7 +280,8 @@ with it (one flow child is left); `bg-bg` goes with the track it masked; `pl-4` 
   `process-fix-row` for its presence (a flow with a fix loop), so the hook stays.
 - **Motion (built 2026-10-04, `lib/processRelayFix.ts`, `lib/processRelayPlan.ts`):** on every
   second run (`FIX_EVERY = 2`: runs 2, 4, 6…) of a flow with loops, the check finds something.
-  Bot 4's scan stops short and it plays its "found it" eye pop (1.3s into a 1.7s stop); the job
+  **2026-10-08:** `FIX_EVERY` is replaced by the run cycle (5.11e): the fix run is every third
+  run. Bot 4's scan stops short and it plays its "found it" eye pop (1.3s into a 1.7s stop); the job
   shakes its "no" (the default sheet drops what step 3 built); then the job arcs back over the
   arch to step 3 in 0.8s, peaking 4px under the arch's top edge, while `process-fix-lit` lights
   right to left behind it by `clip-path`. Step 3 redoes its act (2s), the job hops forward again
@@ -262,6 +305,9 @@ with it (one flow child is left); `bg-bg` goes with the track it masked; `pl-4` 
   check step needs no new drawing: its bot already stands in `act` with the lens, and the arch's
   leg lands on it. Recommended copy change (copywriter's call): step 4's `line` names the rules,
   e.g. "checks the work against your rules before it goes out", within its 10 words.
+  **2026-10-08:** the label's meaning is unchanged, but its words move to the reader's: what
+  happens to their customer's job ("not right, so it is done again"), not the build pipeline's
+  ("Rule broken? Back to fix."). Copywriter's call (5.5).
 
 ### 5.3b A flow with no loops (Discord; the user's decision, 2026-10-04)
 
@@ -269,18 +315,27 @@ A Discord bot isn't a job run through checks: it stays in the server and answers
 mentions it. So its flow has no "Second check" step and neither loop. The question is unchanged:
 how does it work?
 
+**2026-10-08:** Discord's flow is unchanged by round 2 (choice 72): no check, no loops and no
+hand-off; under `data-loops="off"` the four `process-handoff*` hooks are absent too. Its "Your
+tone" step is its control step. The shared heading must still hold for it (choice 75).
+
 - **Data-driven; no component names `discord`.**
   - Content: `process.flows.discord` has **no `loopLabel` and no `fixLabel`** (the keys are
-    removed, never left empty). The other five flows keep both.
+    removed, never left empty). The other five flows keep both. **2026-10-08:** and no
+    `handoffLabel`; the other four flows have all three.
   - `lib/processFlows.ts`: **new** `hasLoops: { readonly [S in AboutSet]: boolean }` (`discord:
     false`, the rest `true`), tied to the content's type as `flowRoles` is: `true` needs both
     labels in `process.flows[S]`, `false` needs neither, so a label deleted by mistake still fails
     `tsc`. **New** `flowLoops(set)`: `{ loopLabel, fixLabel }`, or `null` where `hasLoops[set]` is
     `false`. `flowRoles.discord` changes (5.10). `FIX_STEP` and `rolePose` are unchanged.
+    **2026-10-08:** `FlowLoops` gains `handoffLabel`, so `true` needs all three labels and
+    `false` none, and `flowLoops(set)` returns all three; `FIX_STEP` becomes 3 and `HANDOFF_STEP`
+    (2) is new (5.10).
   - `ProcessFlow`: `loops = flowLoops(set)`. With loops: `lg:gap-24`, `data-loops="on"`,
     `ProcessReturn` rendered, `fixLabel={loops.fixLabel}`. Without: `lg:gap-12`,
     `data-loops="off"`, no `ProcessReturn`, no `fixLabel`. `ProcessList`'s `fixLabel` is optional
-    and step `FIX_STEP` gets its `after` only when it is there.
+    and step `FIX_STEP` gets its `after` only when it is there. **2026-10-08:** with loops it
+    also passes `handoffLabel={loops.handoffLabel}`; without, none.
   - Unchanged: `ProcessStep`, `ProcessReturn`, `ProcessFixReturn`, `ProcessRelay`, `ProcessBot`,
     `ProcessEmblem` and `lib/processLayout.ts` (`flowLayouts[5]`; its `returnBox` and `fixBox`
     simply go unused).
@@ -309,9 +364,10 @@ how does it work?
 | Row / column height | ≈ 160 a row, 5 rows ≈ 800 (no marker in step 3) | ≈ 140 a row, ≈ 700 | ≈ 340 | ≈ 300 | ≈ 290 |
 | Fix loop: arch, arrowhead, label, marker row, dotted line | none | none | none | none | none |
 | Return: path, arrowhead, label, phone row and its hairline | none | none | none | none | none |
+| Hand-off (2026-10-08): stem, arrowhead, label, phone marker row | none | none | none | none | none |
 | Ledges (5.9; was the phone track) | 5, each 2 × 70 under its bot | same | none | none | none |
 | Under the last step | 24 (`py-6`), then the section's padding | same | 0: the list's bottom is the flow's bottom | same | same |
-| Flow height against a five-step looped flow | ≈ 90 shorter | ≈ 90 shorter | 144 shorter (48 gap, 40 body gap, 56 path) | same | same |
+| Flow height against a five-step looped flow | ≈ 90 shorter (≈ 130 since the hand-off row, 2026-10-08) | ≈ 90 shorter (≈ 130) | 144 shorter (48 gap, 40 body gap, 56 path) | same | same |
 | Widest bot part | `update`'s wrench jaw, 1.5px past its 88 box, into the 18px gap | same | 2.3px past its 136 box, into the 32px gap; step 5 (`host`) has nothing past its arm | same | same |
 
 - **Motion, the bots:** no wiring of its own. `update` and `host` already pass `isRole` and have
@@ -323,7 +379,9 @@ how does it work?
   `[data-loops="off"]` the six fix and return hooks don't exist, and the motion code takes their
   absence as "skip", never as an error (`relayParts` and `columnParts` return the run's parts
   with the return and the fix left out, so the run still starts). `process-lesson` stays in the
-  hidden relay layer, unused. Trigger: the relay's clock.
+  hidden relay layer, unused. Trigger: the relay's clock. **2026-10-08:** every Discord run is a
+  straight run: the run cycle skips the hand-off run where there is no `flag` at step 3 and the
+  fix run where there is no fix loop (5.11e).
 
 ### 5.4 Sizes
 
@@ -353,6 +411,14 @@ how does it work?
 
 This table is the five flows with loops; Discord's differences are the table in 5.3b.
 
+**2026-10-08, round 2:** the fix loop's x positions move one column right and step 3 gains the
+hand-off marker row below `lg`: both are in 5.11d, which overrides the fix rows above. Two rows
+above are stale since the 2026-10-07 font retune (Acosta): the heading (`text-heading`) is 30 /
+43 / 51 / 64 / 72px at 360 / 768 / 1024 / 1440 / 3840, and the step title (`text-step`) is a
+fixed 24px. The 9-character word rule below was set for the old face; the lead's 2026-10-07 check
+found the current titles fitting at 360, 1024 and 1440. A new title's longest word is judged the
+same way, on screen at six across 1024 (144px column): a sizing note, not a limit.
+
 136px holds at 4K on purpose: the container caps at 1536 and the step type stops at 32px, so a
 bigger bot would outgrow its title. No step title word may pass 9 characters, so it fits the 144px
 column at 32px; `wrap-break-word` is the guard if one does. Nothing scrolls sideways: the new
@@ -366,7 +432,26 @@ fix run the job rides the line 7–8px into it for a moment, 5.9).
 `<set>` is `default`, `service-business`, `online-store`, `discord`, `software-builder` or
 `website`. `default` is in the shared voice; each card's flow is in its tone. Flows are
 illustrations (constitution §7.5); how the user works, as a flow shows it, must still be in
-`docs/03-facts.md` → How the user works.
+`docs/03-facts.md` → How the user works. **2026-10-07:** `website` is removed (five flows).
+
+**2026-10-08, round 2 (copywriter writes every line; the step meanings in the new order are in
+5.10).** Changed or new slots:
+
+| Key | Meaning (round 2) |
+|---|---|
+| `process.label` | Unchanged key. The section label; copywriter may align it with the new question (it is not a nav link) |
+| `process.heading.lead` / `.accent` | **Rewritten.** Answers "can I trust it with my customers?" in the reader's words: they stay in charge (their rules run the work; the sensitive or unusual comes to them). The reader, not "AI agents", is the subject (voice rules 15–16). Shared voice; must hold for every flow, Discord included (choice 75). Two lines at every width in `text-heading` (a sizing note) |
+| `process.lead` (**new**) | One plain line under the heading, the skim answer: routine jobs are done from their rules and checked before they go out; anything sensitive or unusual (such as refunds and complaints) is passed to them instead. Shared voice. About 3–4 lines at 360, 1–2 from `lg` at `max-w-xl` (a sizing note) |
+| `process.flows.<set>.steps[i]` (4 flows with loops) | **Reordered and rewritten** to 5.10's order and meanings. Default, service-business and online-store in plain words ("show the job done, not the chat", rule 15); software-builder in the peer tone |
+| `process.flows.<set>.handoffLabel` (**new**; absent on `discord`) | The end of the way out above step 3: who the job goes to, in the card's tone (you; you or your staff; a person). Short: the step's own line says what is sent. One line at 360; from `lg` about 24 characters keeps it clear of the fix label at six across 1024 (5.11d; sizing notes) |
+| `process.flows.<set>.fixLabel` | Key and meaning unchanged (inside a job: the work is done again and checked again until it passes); now between steps 4 and 5. Words move from the build pipeline's to the reader's (5.3a) |
+| `process.flows.<set>.loopLabel` | Key and meaning unchanged |
+
+Needs a fact before it ships: "sensitive actions (refunds, complaints) go to a person" is the
+user's 2026-10-08 decision; copywriter adds it to `docs/03-facts.md` → How the user works with the
+user's permission. Refunds are already backed for the online store ("Taking returns and refund
+requests and passing them to a person"); complaints are not, until that line is in. Nothing in a
+flow may say the owner sees or approves every reply: that is not in the facts (choice 78).
 
 | Key | Meaning | Limit |
 |---|---|---|
@@ -379,12 +464,15 @@ illustrations (constitution §7.5); how the user works, as a flow shows it, must
 | `process.flows.<set>.loopLabel` (**absent on `discord`**) | Between jobs: what the job taught goes back into the rules, so the next job starts from better rules. **Meaning unchanged by decision B;** the current lines ("Next job, better rules.") already read as between jobs, so no rewrite is needed | 5 words / 26 characters |
 | `process.flows.<set>.fixLabel` (new, decision B; **absent on `discord`**) | Inside a job: a problem or a broken rule sends the work back to the agent that did it, checked again until it passes. Names the rule break (the user asked for it shown), in the card's tone (e.g. "Rule broken? Back to fix."). No counts | 5 words / 26 characters |
 
+The "Limit" column is a sizing note from when the layout was drawn, not a rule (`docs/04-voice.md`
+→ Length, 2026-10-05).
+
 The old `process.steps[0–3]` and `process.loopLabel` are replaced by `process.flows`. The relay
 adds no text and no slots; neither did the phone track (2026-10-05), and neither do the ledges or
 the phone fix line (2026-10-05, later: `fixLabel` keeps its key and meaning; one line at 360 is a
 sizing note, not a limit). `loopLabel` and `fixLabel`
 are required on the five flows with loops and must be absent on `discord`; `hasLoops` (5.3b)
-makes either mistake fail `tsc`.
+makes either mistake fail `tsc`. **2026-10-08:** so is `handoffLabel`.
 
 **Discord's slots (2026-10-04), in the Discord tone** (`docs/04-voice.md`). The limits above
 hold. Each line needs its fact in `docs/03-facts.md` → For a Discord server (lines being added
@@ -400,6 +488,9 @@ hold. Each line needs its fact in `docs/03-facts.md` → For a Discord server (l
 | `process.flows.discord.steps[4]` | Always on | It stays in the server around the clock |
 
 ### 5.6 The bot (`ProcessBot`, data in `lib/processBots.ts`)
+
+**2026-10-08:** unchanged by round 2. No new role, pose, part, prop or pivot: the hand-off step
+is the existing `flag` role in its `act` pose.
 
 The body is the logo itself: the MW outline on a 100 grid, cut into three "/" strips with gap 8
 (bands x + y = 36–76, 84–116, 124–164). Vector: **no `crispEdges`, no cells, no run-merging.**
@@ -546,7 +637,9 @@ to x ≈ 137, inside the viewBox (140). **In its act (built 2026-10-04)** the fl
 before the raise, and the pennant's far corner reaches x 154: 11px past the box from `lg` (inside
 even the 16px gap of six across at 1024) and 7px on a phone (inside the 18px gap), transient. The
 bell's swing (x 99–137) and the arrow's thrust (tip at x 131, y 14) stay inside the box. No
-sideways scroll at 360.
+sideways scroll at 360. **2026-10-08:** the flag bot now stands at step 3, under the hand-off stem
+(5.11c): the pole's top is 38px under the list's top at rest, the stem's bottom end 16px under it,
+so 22px apart at rest and about 8px at the top of a hover jump (14px up).
 
 ### 5.7 Components, images, motion
 
@@ -574,12 +667,22 @@ sideways scroll at 360.
   row's `bg-bg`, `flex items-center gap-3`, gains `pl-4` and the phone fix line with its lit
   overlay. Icons: `ChevronRightIcon` (also the phone fix arrowhead); `CornerUpLeftIcon` now in
   `ProcessReturn` only.
+  **2026-10-08 (round 2, 5.11), one new file and three changes:** **new** `ProcessHandoff.tsx`
+  (server, props `label`: the stem, its arrowhead, label and lit overlay, and the phone marker);
+  `ProcessList.tsx` takes an optional `handoffLabel` and renders `ProcessHandoff` into step
+  `HANDOFF_STEP`'s `after`; `ProcessFlow.tsx` passes `loops.handoffLabel`; `ProcessSection.tsx`
+  renders `process.lead` in the header. Icons reused: `ChevronUpIcon` (the stem's arrowhead, as
+  the return's) and `ArrowRightIcon` (the phone marker). Unchanged: `ProcessStep`,
+  `ProcessFixReturn`, `ProcessReturn`, `ProcessRelay`, `ProcessBot`, `ProcessEmblem`,
+  `ProcessLedge`, `ProcessAllFlows` (it reads the reordered steps as they are).
 - **Logic:** `lib/processBots.ts` (four new roles; `stepBots` goes), **new** `lib/processFlows.ts`
   (each set's roles, poses and emblem, 5.10; each list's type tied to `process.flows[set].steps`;
   **new** `FIX_STEP = 2`; **2026-10-04:** `hasLoops`, `flowLoops(set)` and the new
   `flowRoles.discord`), `lib/processLayout.ts` (the 5.1 class strings; `FlowLayout` **gains**
   `fixBox`), **new** `lib/processEmblems.ts` (the default job sheet's parts, and the set → emblem
   lookup over `lib/rixProps.ts`), `hooks/useAboutPick.ts`, `hooks/useShownSet.ts` (§0.5).
+  **2026-10-08:** `lib/processFlows.ts`: four `flowRoles` re-mapped, `FIX_STEP = 3`, **new**
+  `HANDOFF_STEP = 2`, `FlowLoops` gains `handoffLabel` (5.10). The relay's changes: 5.11e.
 - **The relay layer stays in the markup, hidden** (`ProcessRelay`, `opacity-0`, decorative), so the
   motion pass adds no elements. For `default` the job is the built sheet (`ProcessJob`, all
   `data-job` parts) and the ghosts its outline. For a card the job draws that card's emblem:
@@ -591,7 +694,8 @@ sideways scroll at 360.
   emblem held at step 1, both loops drawn with their labels (neither on Discord, 5.3b), nothing
   lit on the ground line, the return path or the fix arch. ~~**2026-10-05:** below `lg` the track
   is drawn, unlit.~~ **2026-10-05, later:** below `lg` every bot stands on its ledge, unlit, and
-  the dotted fix line is drawn, unlit (5.3a, 5.9).
+  the dotted fix line is drawn, unlit (5.3a, 5.9). **2026-10-08:** the hand-off is drawn with its
+  label, unlit (not on Discord).
 
 **Motion, as built (the motion pass, 2026-10-04; the 2026-10-03 round built nothing new and left
 the relay off).** `ProcessMotion` calls `useScrollReveal` and `useProcessBots`; `ProcessFlow`
@@ -639,6 +743,7 @@ the relay is on. The wiring, with what the motion pass changed:
 | The ledges' and the phone fix line's lights (`process-ledge-lit`, `process-fix-line-lit`) | **Built 2026-10-05** (the ledge pass, `lib/processRelayLedge.ts`; the fix line route, `lib/processRelayFixLine.ts`) | Below `lg`, full motion only: the job hops ledge to ledge, each ledge lights while its bot works the job, and on a fix run the job goes back along the dotted fix line, which lights behind it (5.9 Motion, as built) |
 | Swap fade (§0.5) | **Built 2026-10-04** | Wrappers: `process-caption` and the keyed body (the flow's last child). `process-flow` itself and the tag are not written |
 | The new roles' own acts; the emblem's hand-off from step 1 | **Built 2026-10-04** | `lib/processBotFlowActs.ts`, `lib/processRelayHand.ts`; detail below |
+| **The hand-off run, the flag's two catches and `process-handoff-lit` (new 2026-10-08)** | **To build** (5.11e) | The run cycle replaces `FIX_EVERY`; the job goes up the stem (from `lg`) or down to the marker (below `lg`) and the run ends there. Never on Discord |
 
 - **Hooks in the markup** (all stay): `reveal`, `process-list`, `process-ground`,
   `process-ground-lit`, `process-chevron`, `process-return`, `process-return-row`,
@@ -653,7 +758,9 @@ the relay is on. The wiring, with what the motion pass changed:
   `process-track-lit`~~ (removed 2026-10-05, later). **2026-10-05, later:** `process-ledge` and
   `process-ledge-lit` (below `lg`, one pair in every step of every flow, Discord included);
   `process-fix-line` and `process-fix-line-lit` (below `lg`, inside `process-fix-row`, flows with
-  loops only, so absent under `data-loops="off"` with the other fix hooks).
+  loops only, so absent under `data-loops="off"` with the other fix hooks). **2026-10-08:**
+  `process-handoff-row`, `process-handoff`, `process-handoff-lit` (from `lg`) and
+  `process-handoff-mark` (below `lg`), in step 3 of flows with loops only (5.11c).
 - **The relay, as built (2026-10-04; rebuilt from the four-step relay).** Files in `lib/`:
   `processRelayPlan.ts` (the clock: which stop when), `processRelayRun.ts` (one run's story, for
   both widths), `processRelay.ts` (from `lg`, along the ground line), `processRelayColumn.ts`
@@ -709,6 +816,8 @@ the relay is on. The wiring, with what the motion pass changed:
     choice 65). The track's three known limits (the job
     against the flag pole and the wrench on the track's lane, the hand-off's tolerance, the lit
     segment's bright end) went with the track (choices 50–52 closed).
+  - **2026-10-08:** the clock, the fix hop and the return change as 5.11e says; everything else
+    in this list holds.
 - **New acts, as built** (`lib/processBotFlowActs.ts`; each in three lengths: timed, short after
   a hover or tap, and the relay catch): `intake` looks at the job, nods, holds it out (0.5s) and
   hands it on (1.3s) on a catch, or brings it back on a timed act; with the job out on the relay
@@ -716,6 +825,7 @@ the relay is on. The wiring, with what the motion pass changed:
   rotates about 108 53) and waves it. `remind` swings the bell about 118 20 (the first swing
   peaks at 0.3s), with a nod. `ship` pulls the arrow back, then sends it up and to the right
   (0.5s; `tool` `x`/`y`). `host` nods; on a catch it looks at the job first (dip at 0.4s).
+  **2026-10-08:** the flag's relay catch splits in two (5.11e): a routine pass and a send.
 - **Swap, as built (§0.5):** `process-caption` and the keyed body fade out over 0.15s, the flow
   changes, and they fade in over 0.25s; opacity only, the same under reduced motion.
 
@@ -743,7 +853,7 @@ the relay is on. The wiring, with what the motion pass changed:
     its own label slot carrying the rule break. Specced as an arch above the bots from `lg` and a
     marker row in step 3 below `lg` (5.3a); the bottom return and its slot's meaning stay.
     (Not on Discord, 38.) **2026-10-05, later:** below `lg` the marker row's icon is replaced by
-    a dotted line (54).
+    a dotted line (54). **2026-10-08:** step 5 → step 4 (69).
 
 **Decided by the user, 2026-10-04** (also listed in `../ui-spec.md`):
 
@@ -884,6 +994,64 @@ rise):**
 42. **Naps on an "always on" flow:** `rules` (step 2) and `update` (step 3) nap as built, or naps are skipped under `data-loops="off"` (new wiring).
 43. **Below `lg` the list's end:** no closing hairline under step 5, or `border-b border-line` on the last row.
 
+**Decided by the user, 2026-10-08 (round 2):**
+
+69. **Control comes first — decided.** The one question is "Can I trust it with my customers?";
+    in every flow with loops the flag step moves to step 3, before the work, and the check after
+    it (5.10). The user chose this over recasting the words only, accepting the bot-order and
+    relay rework. The fix loop becomes step 5 → step 4; the return is unchanged.
+70. **"Sensitive actions go to a human" — decided** (refunds, complaints and anything unusual are
+    passed to a person). Copywriter adds the fact with the user's permission; no line naming
+    complaints ships before it is in (5.5).
+
+**Open for the user, round 2 (2026-10-08; the spec is built on the recommended option of each):**
+
+71. **Software-builder's flow.** (a) Reorders like the others (feature asked, your rules, to a
+    person, built, reviewed, shipped), in its own peer words: one `FIX_STEP`, one `HANDOFF_STEP`,
+    one layout and one relay for all four flows with loops. (b) Keeps its build order (built,
+    reviewed, flagged, shipped): the fix and hand-off steps become per-flow data, the hand-off stem
+    sits right of the arch instead of left, and the relay plans two shapes. **Recommended: (a).**
+    A builder trusts a flow where a person decides the unusual before agents build it as much as
+    an owner does, and (b) doubles the cases to build and check for one card.
+72. **Discord's flow.** (a) Unchanged: no check, no loops, no hand-off (the 2026-10-04 decision);
+    "Your tone" is its control step. (b) A hand-off step added, which needs its own Discord fact
+    and reverses choice 38. **Recommended: (a).**
+73. **What "to you" looks like.** (a) A dashed `accent` stem rising from the flag's pole to a label
+    above the row ("to you"), a marker row below `lg`; no person is drawn; the job runs up the
+    stem into the label. (b) No static mark: on a flagged run the job just leaves upward and
+    fades. (c) A drawn person at the stem's end: a new drawing, and it reverses "no person is
+    drawn" (2026-10-03). **Recommended: (a):** the triage reads on the static page, without
+    JavaScript and under reduced motion, and needs no new drawing.
+74. **The run cycle.** (a) Hand-off run first, then a routine run, then a fix run, repeating, so
+    the first thing the relay shows is a job going to you. (b) A routine run first, then the
+    hand-off, then the fix. **Recommended: (a):** control is the answer, and most readers see one
+    run. The flag bot nodding the routine job through on run 2 still shows the sort.
+75. **The heading must hold on Discord, which shows no hand-off.** (a) The heading states the
+    control in general terms (their rules run the work, the unusual comes to them): a fact about
+    how the user works, true for every card even where Discord's sample flow doesn't draw it.
+    (b) The heading speaks only of "your rules" ("your tone" on Discord), which every flow draws:
+    weaker against the fear of no person at all. **Recommended: (a).**
+76. **An intro line under the heading.** (a) In: `process.lead`, as Agents now has, so the
+    3–5 second skim gets the answer before the long flow. (b) None: the heading alone.
+    **Recommended: (a).**
+77. **No lesson on a hand-off run.** (a) The run ends at "to you": no exit slide and no lesson
+    back to the rules; a person handled it. (b) The lesson still rides back to step 2 from the
+    flag. **Recommended: (a):** a short, clear run, and no suggestion that the agents handled it.
+78. **Approval of every reply.** "You see everything" or "you approve each reply before it goes"
+    is not in the facts, so no step shows it. If the user wants such a step, it needs a new fact
+    first. **Recommended: no such step;** the hand-off and the check carry the answer.
+
+**Decided in this spec, 2026-10-08 (the lead may review; 5.11):**
+
+79. **The hand-off label from `lg` ends at the stem** (right-aligned, extending left over steps
+    2–3). (Not chosen: centred on the stem; at six across 1024 a centred label over about 14
+    characters would run into the fix label.)
+80. **Below `lg` the hand-off is a marker row under step 3's text,** an `ArrowRightIcon` under
+    ledge 3's right end pointing at the label in the text column, so the job drops straight down
+    the empty bot column and the lesson's lane (x ≈ 2–13) stays clear. (Not chosen: the icon at
+    the row's left edge like the return row's, on the lesson's lane; or `ArrowUpRightIcon`, the
+    site's outside-link sign.)
+
 **Earlier choices that still hold** (the relay ones are in the legacy file; the rest are in git
 at `37dee00`): the bot stays 136px at 4K (2); the return path is a CSS dashed border box (4);
 step numbers are two-digit (5); the wrench jaw shows in full with `overflow-visible` (8); the
@@ -893,6 +1061,12 @@ strike and the update `mark` hook (9–11, 13, 14); no cursor change on bots (15
 becomes 2 words / 16 characters.
 
 ### 5.9 Phone relay
+
+**2026-10-08:** with the fix loop at step 5 → 4 the dotted line runs from bot 5's hand up to bot
+4's, and in five-step flows the last bot is the check, so the lesson pops in at bot 5's left hand,
+right where the dotted line's bottom turn ends: for its 0.35s pop and 0.6s hold it sits over the
+unlit line's end (open choice 65's case, now at rest for about a second). The hand-off run's drop
+is 5.11e.
 
 **Rebuilt 2026-10-04 for five or six steps** (`lib/processRelayColumn.ts`), on the same clock as
 the ground-line run (5.7). The job leaves step 1's hand and goes down the bot column,
@@ -1023,24 +1197,54 @@ and 768).** It uses the markup above and in 5.3a as it stands; nothing was added
 
 ### 5.10 Flows and roles (`lib/processFlows.ts`, `lib/processEmblems.ts`)
 
-Step order and meaning are the user's (2026-10-03; Discord's 2026-10-04); the wording is the
-copywriter's.
+**Revised 2026-10-08 (round 2, choice 69): control comes first.** Step order and meaning are the
+user's (2026-10-03, reordered 2026-10-08; Discord's 2026-10-04, unchanged); the wording is the
+copywriter's. The 2026-10-03 order (intake, rules, team, check, then flag, remind or ship) is in
+git before this date.
 
 | Set (sample job) | Steps | 1 | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|---|---|
-| `default` (a job) | 5 | a job arrives: `intake` | your rules: `rules` | done: `team` | second check: `check` | flagged: `flag` | |
-| `service-business` (a booking) | 6 | request arrives: `intake` | your rules: `rules` | booked: `team` | second check: `check` | reminder: `remind` | flagged: `flag` |
-| `online-store` (an order question) | 5 | question arrives: `intake` | your rules: `rules` | answered: `team` | second check: `check` | flagged: `flag` | |
-| `discord` (a mention; no loops, 2026-10-04) | 5 | mentioned: `intake` | your tone: `rules` | remembers: `update` | connected: `ship` | always on: `host` | |
-| `software-builder` (shipping a feature) | 6 | feature asked: `intake` | your rules: `rules` | built: `team` | second check: `check` | flagged: `flag` | shipped: `ship` |
-| `website` (a visitor's enquiry) | 5 | visitor asks: `intake` | your rules: `rules` | answered: `team` | second check: `check` | flagged: `flag` | |
+| `default` (a job) | 5 | a job arrives: `intake` | your rules: `rules` | to you: `flag` | done: `team` | checked: `check` | |
+| `service-business` (a booking) | 6 | request arrives: `intake` | your rules: `rules` | to you or your staff: `flag` | booked: `team` | checked: `check` | reminder: `remind` |
+| `online-store` (an order question) | 5 | question arrives: `intake` | your rules: `rules` | refunds and complaints to you: `flag` | answered: `team` | checked: `check` | |
+| `discord` (a mention; no loops, 2026-10-04; unchanged) | 5 | mentioned: `intake` | your tone: `rules` | remembers: `update` | connected: `ship` | always on: `host` | |
+| `software-builder` (shipping a feature; choice 71) | 6 | feature asked: `intake` | your rules: `rules` | to a person: `flag` | built: `team` | reviewed: `check` | shipped: `ship` |
+| ~~`website`~~ | removed 2026-10-07 | | | | | | |
+
+**`flowRoles` (round 2):**
+- `default`: `intake, rules, flag, team, check`
+- `service-business`: `intake, rules, flag, team, check, remind`
+- `online-store`: `intake, rules, flag, team, check`
+- `software-builder`: `intake, rules, flag, team, check, ship`
+- `discord`: unchanged, `intake, rules, update, ship, host`
+
+`FIX_STEP` 2 → **3** (`team`, with `check` next, in all four); **new** `HANDOFF_STEP = 2` (`flag`
+in all four). `rolePose` is unchanged (`check` and `flag` in `act`). Every bot, pose, prop and
+pivot is reused; **no new role.** The step counts are unchanged (5, 6, 5, 5, 6), so
+`lib/processLayout.ts` and the type ties hold as they are.
+
+**What each step is for, in the new order (for copywriter; the four flows with loops):**
+
+| Step | Bot | Purpose | Per card |
+|---|---|---|---|
+| 1 | `intake` holding the job | The customer's job comes in | Booking request; order question; feature asked (peer) |
+| 2 | `rules` | It is handled from rules written for this business | Hours, services and booking rules; delivery and returns rules; the builder's written rules |
+| 3 | `flag` raising its flag | The sort, before any work: anything sensitive or unusual is passed to a person instead; routine jobs go on | Unusual bookings to you or your staff; refunds and complaints to you (the new fact, 5.5); anything unusual to a person, not an agent (peer) |
+| 4 | `team` | The routine job is done, following those rules | Booked; answered; built |
+| 5 | `check` | A separate agent checks it before it goes out (facts) | The booking; the reply; the review before it ships |
+| 6 | `remind` / `ship` | The flow's own last step, after the check | The customer gets a reminder and can reschedule; the feature ships to production |
 
 - **Poses:** `check` and `flag` in `act`; the rest in `idle`.
 - **The return** runs from the last step back to step 2 in every flow but Discord.
-- **The fix loop** runs from step 4 back to step 3 in every flow but Discord (`FIX_STEP = 2`): in
-  those five, step 3 is always the `team` step and step 4 always `check`, so one constant serves
-  them all. Which flows have loops is `hasLoops` (5.3b).
+- **The fix loop** runs from step 5 back to step 4 in every flow but Discord (`FIX_STEP = 3`,
+  2026-10-08; it was step 4 → 3 with `FIX_STEP = 2`): in those four, step 4 is always the `team`
+  step and step 5 always `check`, so one constant serves them all. Which flows have loops is
+  `hasLoops` (5.3b).
+- **The hand-off** leaves the row from step 3 in every flow but Discord (`HANDOFF_STEP = 2`,
+  5.11). It goes to a person and does not come back.
 - **"Flagged"** means anything unusual goes to a person. The bot raises a flag; no person is drawn.
+  **2026-10-08:** it also covers sensitive actions (refunds, complaints; choice 70), and the
+  person is named in words by `handoffLabel`, still with no person drawn (choice 73).
 - **"Second check"** is backed by the facts: "A separate agent checks the work before it goes
   out" (`docs/03-facts.md` → How the user works). It needs no special wording. The fix loop is
   backed by "When a check finds a problem or a broken rule, the work goes back to the agent that
@@ -1070,10 +1274,127 @@ copywriter's.
   The job sheet is the built relay job (`lib/processJob.ts`) moved into the prop slot by (106, 26),
   written out as its own paths so the markup holds no transform. Fills through `botFills`.
 
+### 5.11 The hand-off to you (round 2, new 2026-10-08; not built)
+
+#### 5.11a What it answers
+
+The fear the section answers is "no person at all". Step 3's flag bot sorts the job before any
+work, and the hand-off draws the way out of the row: anything sensitive or unusual leaves here
+for a person; routine jobs go on to be done and checked. One question per section holds: the
+hand-off and the check are the two halves of "can I trust it?", in reading order.
+
+#### 5.11b Header: the intro line
+
+- `ProcessSection`'s header gains, after `SectionHeading`:
+  `<p class="max-w-xl text-lead leading-normal text-muted">` = `process.lead`. It sits inside the
+  header's `data-anim="reveal"` block, so it reveals with the heading; no hook of its own.
+- `text-lead` (17px) as Agents', Web's and Contact's leads; `max-w-xl` (576px) because this header
+  is full width, stacked, not a split column. Contrast `muted` on `bg` ≈ 7:1.
+- **Motion (later):** none beyond the header's existing reveal. Reduced motion: the reveal's fade.
+
+#### 5.11c Markup (`ProcessHandoff`, `components/home/process/ProcessHandoff.tsx`, server, prop `label`)
+
+The last child of step 3's `<li>` (via `ProcessStep`'s `after`), flows with loops only.
+
+```
+div data-anim="process-handoff-row" class="col-span-2 mt-5 grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-x-4.5 lg:contents"
+├ span aria-hidden="true" data-anim="process-handoff-mark" class="justify-self-end lg:hidden"
+│ └ ArrowRightIcon className="size-5 text-accent"                      (phone: under ledge 3's right end, x 68–88)
+└ div data-anim="process-handoff" class="contents lg:absolute lg:-top-12 lg:left-27.5 lg:block lg:h-16 lg:w-0.5 lg:border-l-2 lg:border-dashed lg:border-accent"
+  ├ ChevronUpIcon className="absolute -left-3.25 -top-2.5 hidden size-6 text-accent lg:block"   (arrowhead up, away from the bot: the return's arrowhead classes)
+  ├ p class="{monoLabel} lg:absolute lg:-right-3 lg:bottom-full lg:z-10 lg:mb-2 lg:whitespace-nowrap lg:text-right"
+  │   → span class="lg:bg-bg lg:px-3"                                  ← flows[set].handoffLabel
+  └ span aria-hidden="true" data-anim="process-handoff-lit" class="pointer-events-none absolute -left-0.5 inset-y-0 hidden w-0.5 bg-accent opacity-0 lg:block"
+```
+
+- **From `lg`: a dashed stem up the flag's pole.** 2px dashed `accent`, 64px tall, from 48px above
+  the list's top to 16px below it, at x 110–112 of step 3's column: on the pole's line (viewBox
+  x 108 = 110.4px), so the flag's pole carries on upward as the way out. Its bottom end is 22px
+  above the pole's top at rest (5.6 Overflow). The arrowhead points up at the top end; the label
+  sits 8px above it, its text ending at the stem (choice 79), at the fix label's height (76px
+  above the list), on a `bg` mask at `z-10`. It never meets a step's text (under the bots), the
+  fix arch (one column right) or the caption (`lg:gap-24`, 20px clear).
+- **Below `lg`: a marker row under step 3's text** (choice 80), the row's own two columns: the
+  arrow right-aligned in the bot column, under ledge 3's right end, pointing at the label at
+  x 106. `mt-5` (20) under the text, ≈ 20 tall, so step 3 grows by about 40, as the fix step does.
+  It is clear of the lesson's lane (x ≈ 2–13) and of the ledge (73px above it at 360).
+- **The label:** real text, one element at every width, never `aria-hidden`; a screen reader
+  meets it inside step 3, after its line. Muted mono on `bg` ≈ 7:1. One line at 360 for a short
+  label; it wraps below `lg` if long (nothing is `nowrap` there).
+- **States:** nothing interactive; no hover, focus-visible or active state. No tap target.
+- **Never write** `process-handoff`, `process-handoff-row`, `process-handoff-mark` or step 3's
+  `<li>` from motion (a `transform` or `opacity` would trap the label's `z-10`); the lit overlay
+  is the only writable part.
+
+#### 5.11d Sizes (round 2; overrides the fix rows in 5.4)
+
+| Element | Phone 360 | Tablet 768 | Small desktop 1024 | Desktop 1440 | 4K 3840 |
+|---|---|---|---|---|---|
+| Heading (`text-heading`, 2 lines) | 30px | 43px | 51px | 64px | 72px |
+| Lead (`text-lead`, `max-w-xl`) | 17px / 1.5, 20 under the heading, full 320 width | 17px, max 576 | same, 28 under the heading | same | same |
+| Hand-off stem (2px dashed `accent`, 64 tall, −48 → +16 on the list's top) | none | none | 5: x 501 · 6: x 431 | 5: 655 · 6: 564 | 5: 738 · 6: 634 |
+| Hand-off arrowhead | none | none | `ChevronUpIcon` 24 box on the stem's top end | same | same |
+| Hand-off label (13px mono) | from x 106, 20 under step 3's text; one line for a short label | same | one line, text ending at the stem, bottom 56 above the list | same | same |
+| Phone marker (`ArrowRightIcon` `size-5`) | x 68–88 of the row, centred on the label's line | same | none | none | none |
+| Step 3 row | ≈ 200 (+40); 5 rows ≈ 890, 6 ≈ 1050 | ≈ 180; 5 rows ≈ 790, 6 ≈ 930 | column unchanged, ≈ 340 | ≈ 300 | ≈ 290 |
+| Fix arch (now over steps 4–5) | dotted line from bot 5's hand to bot 4's, as 5.3a | same | 5: x 647 → 844 · 6: x 542 → 704 | 5: 878 → 1152 · 6: 742 → 971 | 5: 1003 → 1319 · 6: 846 → 1109 |
+| Hand-off text → fix label (a 26-character fix label, ≈ 225) | — | — | 5: ≥ 130 · 6: ≥ 78 | 5: ≥ 245 · 6: ≥ 180 | 5: ≥ 310 · 6: ≥ 230 |
+| Return path | unchanged (5.4) | same | same | same | same |
+
+The tightest spot is six across at 1024: about 78px between the end of the hand-off text and the
+start of a 26-character fix label. The hand-off label grows to the left, over steps 2–3, where
+nothing else is drawn, so any length stays inside the list. No sideways scroll at any width: the
+stem and its label are inside step 3's column or to its left, and the phone marker is inside the
+88px bot column.
+
+#### 5.11e Motion (later; for gsap-animator, on the existing relay)
+
+- **The plan** (`lib/processRelayPlan.ts`). A new visit kind, **`send`**: the flag bot keeps the
+  job `RELAY_SEND.dwell` (≈ 0.5s, the top of its flag raise), and the run's visits end there.
+  A new `sendStop(roles)`: `HANDOFF_STEP` where `roles[HANDOFF_STEP] === "flag"`, else null
+  (Discord: null). `fixStop` is unchanged and finds the check at 4 through the new `FIX_STEP`.
+  `relayPlan` takes the send stop as one more optional argument; a run is a send run or a fix run,
+  never both. `lessonTaker` is unchanged (step 2).
+- **The run cycle replaces `FIX_EVERY`:** `RUN_CYCLE = send, straight, fix`, repeating from the
+  first run after setup or a swap (choice 74). A flow with no send stop skips `send`, a flow with
+  no fix stop skips `fix`, so every Discord run is straight. Trigger: the relay's clock, unchanged
+  (`RELAY_FIRST`, `RELAY_REST`).
+- **The flag's two catches** (`lib/processBotFlowActs.ts`, built moves only). On a routine
+  `catch`: it looks down at the job and nods it on (the moves `host`'s catch uses), its flag
+  staying up; `RELAY_DWELL.flag` 1.8 → about 1.3. On `send`: its built act (dip to 30°, raise to
+  the top at 0.5s, wave), the job lifting on the raise.
+- **From `lg`, the send exit** (new, one file, e.g. `lib/processRelayHandoff.ts`): from its stop
+  on the ground line (`JOB_AT` 126) the job rises straight up in front of the pennant, eases onto
+  the stem's line, climbs it and passes behind the label's `bg` mask at the arrowhead, fading over
+  its last 0.3s. About 0.9s, `power2.inOut`; the animator tunes it. `process-handoff-lit` lights
+  bottom to top behind the job by `clip-path` (as `process-fix-lit`), holds about 0.6s, then fades
+  over `FIX_LIT_FADE`. The ghosts trail the climb. The ground-lit and the chevron pulses stop at
+  step 3; no exit slide, no lesson, no return light (choice 77). The stem is read from
+  `process-handoff`'s box when the course is measured, never written.
+- **Below `lg`, the send drop** (same file or its own): the job leaves ledge 3's right end and
+  falls straight down the empty bot column (x ≤ 90, so it never crosses the text) onto
+  `process-handoff-mark` (≈ 70px at 360, about 0.45s `power1.in`), then slides about 16px right
+  towards the label as it pops (`JOB_DONE`) and fades (`JOB_FADE`). Ledge 3's light fades as it
+  drops. No lit overlay below `lg`. The mark is read, never written.
+- **The fix run:** unchanged in shape; it now plays from bot 5 to bot 4 (the arch over 4–5 from
+  `lg`, the dotted line from bot 5 to 4 below it). No new geometry: every route is measured from
+  `process-fix` and `process-fix-line` as built.
+- **Run lengths (to re-measure):** a send run about 6.5–7s; a straight run about 0.5s shorter than
+  now (the flag's shorter routine catch); a fix run as now plus that change.
+- **Known limits to accept or fix:** below `lg`, in five-step flows the lesson's 0.35s pop and
+  0.6s hold sit over the dotted fix line's bottom end at bot 5's hand (5.9, as choice 65). From
+  `lg`, the job crosses in front of the flag's pennant for about 0.2s on the climb (as choice 67).
+- **Reduced motion:** no relay, so nothing moves or lights; the stem, arrowhead, marker and label
+  are static, and the label shows without a reveal (it is outside the text column, like the fix
+  label).
+- **Must stay true:** tokens only (`accent`, `bg`); motion writes the job, the ghosts and
+  `process-handoff-lit` only. No sideways scroll. No scroll hijacking.
+
 **Tokens (all existing):** `bg`, `band`, `line`, `text`, `muted`, `accent`, `on-accent`, `cream`,
 `cream-muted`, `ink`; `font-display`, `font-body`, `font-mono`; `text-meta`, `text-nav`,
 `text-body`, `text-body-lg`, `text-step`, `text-heading`; `px-gutter`, `py-section`,
 `--container-site`; radii `rounded-full`, `rounded-b-2xl`, `rounded-t-2xl`, `rounded-l-2xl`. No new
 token (2026-10-04: the Discord flow adds none; 2026-10-05: the phone track used `line` and `accent`
 only; 2026-10-05, later: the ledges and the phone fix line use `line` and `accent` only, and
-`rounded-l-2xl` joins the radii).
+`rounded-l-2xl` joins the radii). **2026-10-08:** round 2 adds `text-lead` to the list (the intro
+line, an existing token) and uses `accent`, `muted` and `bg` for the hand-off; no new token.

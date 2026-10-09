@@ -72,7 +72,7 @@ export function AgentsStepper({ set, panels, selected, step, panelsId }: AgentsS
           <span className="sr-only">{position(selected)}</span>
           <span
             data-anim="agents-stepper-title"
-            className="font-display text-summary font-semibold leading-[1.15] tracking-[-0.02em] text-balance text-text"
+            className="font-display text-summary leading-[1.15] text-balance text-text"
           >
             {panel?.title}
           </span>

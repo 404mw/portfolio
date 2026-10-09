@@ -4,7 +4,7 @@
 // the headline); the optional wide slot (shots, the diagram) spans both.
 import type { ReactNode } from "react";
 import type { TakeoverPartKey } from "@/lib/proofs";
-import { condensed, metaLabelOnCream } from "@/lib/styles";
+import { metaLabelOnCream } from "@/lib/styles";
 
 type TakeoverPartProps = {
   readonly part: Exclude<TakeoverPartKey, "intro" | "means">;
@@ -27,7 +27,7 @@ export function TakeoverPart({ part, headlineId, label, headline, children, wide
         <p className={`${metaLabelOnCream} font-medium tracking-[0.06em] uppercase`}>{label}</p>
         <h3
           id={headlineId}
-          className={`max-w-xl font-display text-step leading-[1.05] font-semibold tracking-[-0.02em] text-balance text-ink ${condensed}`}
+          className={`max-w-xl font-display text-step leading-[1.15] text-balance text-ink`}
         >
           {headline}
         </h3>

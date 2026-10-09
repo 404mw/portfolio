@@ -30,22 +30,22 @@
   --text-body-lg: 16px;
   --text-lead: 17px;
   --text-summary: clamp(1.25rem, 1.106rem + 0.64vw, 1.625rem);
-  --text-step: 32px;
-  --text-card: clamp(1.875rem, 1.589rem + 1.27vw, 2.75rem);
-  --text-row: clamp(2.125rem, 1.596rem + 2.35vw, 3.625rem);
-  --text-marquee: 40px;
-  --text-heading-sm: clamp(2.5rem, 1.773rem + 3.23vw, 5rem);
-  --text-heading: clamp(2.75rem, 1.661rem + 4.84vw, 6.5rem);
-  --text-heading-xl: clamp(3.25rem, 1.997rem + 5.57vw, 7.75rem);
-  --text-takeover: clamp(3.5rem, 1.592rem + 8.48vw, 10.5rem);
-  --text-hero: clamp(4.5rem, 2rem + 11.11vw, 13.75rem);
-  --text-footer-mark: 25vw;
+  --text-step: 24px;
+  --text-card: clamp(1.5625rem, 1.354rem + 0.926vw, 2.25rem);
+  --text-row: clamp(1.375rem, 1.172rem + 0.904vw, 2.75rem);
+  --text-marquee: 28px;
+  --text-heading-sm: clamp(1.5625rem, 1.224rem + 1.506vw, 3.5rem);
+  --text-heading: clamp(1.875rem, 1.167rem + 3.148vw, 4.5rem);
+  --text-heading-xl: clamp(1.875rem, 1.536rem + 1.506vw, 4rem);
+  --text-takeover: clamp(2.125rem, 1.083rem + 4.63vw, 6.25rem);
+  --text-hero: clamp(2.4375rem, 1.25rem + 5.278vw, 7rem);
+  --text-footer-mark: 17.5vw;
 }
 
 @theme inline {
-  --font-display: var(--font-bricolage), sans-serif;
-  --font-body: var(--font-geist), sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+  --font-display: var(--font-acosta), var(--font-display-punct), sans-serif;
+  --font-body: var(--font-plex-sans), sans-serif;
+  --font-mono: var(--font-plex-mono), monospace;
 }
 
 @layer base {

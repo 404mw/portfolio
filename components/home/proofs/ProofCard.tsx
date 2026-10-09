@@ -7,7 +7,7 @@ import { ProofLine } from "@/components/home/proofs/ProofLine";
 import { ArrowUpRightIcon } from "@/components/icons/ArrowUpRightIcon";
 import { proofs } from "@/content/home";
 import { proofCardIds, proofProp, type ProofKey } from "@/lib/proofs";
-import { condensed, focusRingCard, metaLabelOnCream } from "@/lib/styles";
+import { focusRingCard, metaLabelOnCream } from "@/lib/styles";
 
 type ProofCardProps = {
   readonly href: `#${string}`;
@@ -44,7 +44,7 @@ export function ProofCard({ href, project, number, tag, title, cardLine, proofLi
         <h3
           id={ids.title}
           data-anim="proof-card-title"
-          className={`font-display text-card leading-none font-semibold tracking-[-0.03em] decoration-1 underline-offset-4 group-hover:underline ${condensed}`}
+          className={`font-display text-card leading-none decoration-1 underline-offset-4 group-hover:underline`}
         >
           {title}
         </h3>

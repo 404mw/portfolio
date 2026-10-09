@@ -8,7 +8,6 @@ import { useRef } from "react";
 import { useShownSet } from "@/hooks/useShownSet";
 import { useSwapFade } from "@/hooks/useSwapFade";
 import type { ProofMeans } from "@/lib/proofProject";
-import { condensed } from "@/lib/styles";
 
 type TakeoverMeansLineProps = {
   readonly id: string;
@@ -28,7 +27,7 @@ export function TakeoverMeansLine({ id, lines }: TakeoverMeansLineProps) {
       id={id}
       data-anim="takeover-means-line"
       data-set={set}
-      className={`max-w-3xl font-display text-card leading-[1.05] font-semibold tracking-[-0.025em] text-balance text-text ${condensed}`}
+      className={`max-w-3xl font-display text-card leading-[1.15] text-balance text-text`}
     >
       {lines[set] ?? lines.default}
     </h3>

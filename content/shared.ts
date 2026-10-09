@@ -1,4 +1,4 @@
-// Shared copy: the nav and the footer on the one page.
+// Shared copy: the nav and the footer on the one page, and the structured data (JSON-LD).
 // Source: docs/03-facts.md (Who, Brand, Contact). Voice: docs/04-voice.md.
 // Slots: docs/pages/home/ui-spec.md §1.4 and §9.3.
 
@@ -33,8 +33,28 @@ export const footer = {
     discord: "Discord",
     whatsapp: "WhatsApp",
   },
-  // The footer link to /rix, the Rix playground (docs/pages/rix/ui-spec.md §0.1).
+  // The label of the Rix link standing on the footer's top line (docs/pages/home/ui-spec/09-footer.md §9.4):
+  // Rix and this label are one link to /rix, the Rix playground. No longer a link in the footer row.
   rixLink: "Play with Rix",
+  // Rix's own typed lines above his head on the footer line (ui-spec/09-footer.md §9.4). Shown in turn,
+  // never announced, absent without JavaScript. He calls the visitor over to play: no claims, no ask for a pick.
+  // The first is the one he says when the footer first comes into view.
+  rixLines: [
+    "Psst. Come play with me.",
+    "Press a button. I'll do a trick.",
+    "I juggle. I drop things too.",
+    "I have moods. Come and meet them.",
+    "End of the page. Time to play.",
+  ],
+} as const;
+
+// The page's structured data (JSON-LD): read by search engines and AI models, never shown on
+// screen. Third person on purpose, since it is data about a person, not page voice.
+// Source: docs/03-facts.md → Who.
+export const structured = {
+  role: "AI Automation Engineer",
+  description:
+    "Muhammad Waqas is an AI Automation Engineer who works under the brand MARWIX. He builds software that runs on its own, can automate the repetitive work in a business, and helps people who build software ship it.",
 } as const;
 
 // Addresses, not copy. Copied verbatim from docs/03-facts.md → Contact.

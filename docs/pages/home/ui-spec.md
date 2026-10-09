@@ -100,6 +100,8 @@ below; `ui-spec/05-process.md` §5.8 62–65, 67–68). Summary: §10.
 | 7 | Proofs (the takeover in parts, with a headline per part, 2026-10-05; the optional What I learned part, later the same day; the Exile view's three shots, 18+ / 3.9K+ and Eva step tiles at 96 / 128px on existing tokens, 2026-10-06, §7.3.2, §7.6, §7.8 20–33) | [`ui-spec/07-proofs.md`](ui-spec/07-proofs.md) | [`sections/07-proofs.md`](sections/07-proofs.md) |
 | 7 | Proofs, the spam diagram as an ink stage with Eva (supersedes §7.3.2 and §7.6.1, 2026-10-06) | [`ui-spec/07-proofs-spam.md`](ui-spec/07-proofs-spam.md) | [`sections/07-proofs.md`](sections/07-proofs.md) |
 | 7 | Proofs, the card bot (§7.2.1–§7.2.3, moved 2026-10-06, text unchanged) | [`ui-spec/07-proofs-bot.md`](ui-spec/07-proofs-bot.md) | [`sections/07-proofs.md`](sections/07-proofs.md) |
+| 7 | Proofs, the takeover's title band and the banner's part in open, close and Next (2026-10-07) | [`ui-spec/07-proofs-band.md`](ui-spec/07-proofs-band.md) | [`sections/07-proofs.md`](sections/07-proofs.md) |
+| 7 | Proofs, the sticky band that condenses as the takeover scrolls (2026-10-07; amends 07-proofs-band.md §A placement and §C fallbacks) | [`ui-spec/07-proofs-sticky-band.md`](ui-spec/07-proofs-sticky-band.md) | [`sections/07-proofs.md`](sections/07-proofs.md) |
 | 8 | Contact | [`ui-spec/08-contact.md`](ui-spec/08-contact.md) | [`sections/08-contact.md`](sections/08-contact.md) |
 | 9 | Footer | [`ui-spec/09-footer.md`](ui-spec/09-footer.md) | [`sections/09-footer.md`](sections/09-footer.md) |
 

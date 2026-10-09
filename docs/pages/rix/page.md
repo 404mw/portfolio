@@ -1,8 +1,9 @@
 # Rix
 
-**Last Updated:** 2026-10-03
+**Last Updated:** 2026-10-07
 
-> **Status:** In build
+> **Status:** In build. Fonts changed to Acosta/IBM Plex (2026-10-07); `/rix` lead-checked at 360,
+> 768, 1440 and 3840 under reduced motion after that: no sideways scroll, no console errors.
 
 **The one question:** None. `/rix` is the one extra route that `docs/00-constitution.md` §2 allows
 (amended 2026-10-02): the Rix playground, where a visitor presses buttons to make the mascot act out
@@ -23,9 +24,12 @@ section's file only. Rix himself (the gap-eyes MW mascot) is defined in
 ## Current State (site-wide)
 
 Built: `app/rix/page.tsx` renders Intro, Playground and Way back, with metadata from `content/rix.ts`
-through `lib/pageMetadata.ts` and a sharing image (`app/rix/opengraph-image.tsx`, `RixOgFigure`).
-`lib/publishedRoutes.ts` lists `/` and `/rix`, so `/rix` is in the sitemap. The footer's
-"Play with Rix" link sits between the socials and © (`components/FooterLinks.tsx`). The `/dev` route and its
+through `lib/pageMetadata.ts` and a sharing image (`app/rix/opengraph-image.tsx`, `RixOgFigure`);
+the image's heading is set in Acosta 400 at 64px so it sets on two lines.
+`lib/publishedRoutes.ts` lists `/` and `/rix`, so `/rix` is in the sitemap. The entry is
+Rix standing on the footer's top hairline with a "Play with Rix" label, one link to `/rix`
+(`components/FooterRix.tsx`, `FooterRixLink.tsx`; hidden on `/rix`; see
+`docs/pages/home/sections/09-footer.md`). The `/dev` route and its
 files are deleted. Lint is green and tsc has no errors outside `.next/`; `npm run build` is pending
 (see Open Questions). A screen check at 360/768/1440/3840 passed before the motion pass; the
 re-check after it is pending.
@@ -44,11 +48,13 @@ re-check after it is pending.
 
 ## Decisions (site-wide)
 
+- 2026-10-07 — Site fonts change to Acosta (display), IBM Plex Sans (body) and IBM Plex Mono (labels), including this page's sharing image; see `docs/pages/home/page.md`.
 - 2026-10-03: /rix motion: sections reveal on data-anim="reveal" (fade only under reduced motion); walk buttons use a ramped, stride-locked walk (WALK_FAR: cadence eased over 3 steps at each end, speed-matched at each plant with a 12% per-step push, lean into the start, speed-scaled bob); the quip sits above with an upward glance; patrol pause looks on the bare floor are pointer / out / a shelf end; a tossed prop lands on the floor line (TOSS.floorY) so no paint leaves the stage.
 - 2026-10-02 — `/rix` exists as the one extra route (constitution §2): a public Rix playground that
   makes no claims.
-- 2026-10-02 — Entry is a footer link only: not in the nav, not on the About shelf (see
+- 2026-10-02 — Entry is from the footer only: not in the nav, not on the About shelf (see
   `docs/pages/home/sections/09-footer.md`).
+- 2026-10-07 — The entry is now Rix standing on the footer's top line with a "Play with Rix" label (home ui-spec §9.4), hidden on `/rix` itself; supersedes the 2026-10-02 "footer link in the row" wording.
 - 2026-10-02 — Content is a short title and one line, a big Rix on a stage, the button groups
   (Tricks, Symbols), a patrol toggle, and a way back; the site nav and footer stay.
 - 2026-10-02 — Home nav links become `/#agents` etc. so they work from `/rix`; the footer's
@@ -57,9 +63,11 @@ re-check after it is pending.
 
 ## Open Questions (site-wide)
 
-- **Choice:** the footer link's placement (between the socials and ©) needs the user's confirmation.
-- **To build:** screen re-check of `/rix` (and `/`) after the motion pass (listed in
-  `sections/02-playground.md`). `npm run build` currently fails only on a stale
+- **To build:** screen re-check of `/rix` after the motion pass (listed in
+  `sections/02-playground.md`); the font swap's check is done (see Status). Safari, Firefox and
+  real devices are unchecked.
+- **To build:** `docs/pages/rix/ui-spec.md` line 106 still names the Geist Mono 800 file for the
+  sharing image, and `ui-spec/01-intro.md` quotes `condensed`; ui-designer updates them. `npm run build` currently fails only on a stale
   `.next/dev/types/validator.ts` that references the deleted `app/dev`; it clears once the dev
   server regenerates it or `.next/dev` is removed.
 - **Roll-up:** section-specific open questions remain in `sections/02-playground.md` (1). The

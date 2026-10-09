@@ -4,9 +4,11 @@
 // (lib/processRelayHand.ts), drops onto ledge 1 and hops down the bot column from ledge to ledge,
 // landing at each later bot's right foot (its role's `JOB_AT` on the feet line, the ledge's top),
 // trailed by the ghosts (no chevrons). Each ledge's light fades in as the job lands and out as it
-// hops off (lib/processRelayLedge.ts). On a fix run it goes back from ledge 4 to ledge 3 along the
-// dotted fix line, up from bot 4's hand and through the arrowhead into bot 3's, the line lighting
-// behind it (lib/processRelayFixLine.ts), and hops down again as that light fades.
+// hops off (lib/processRelayLedge.ts). On a fix run it goes back from ledge 5 to ledge 4 along the
+// dotted fix line, up from bot 5's hand and through the arrowhead into bot 4's, the line lighting
+// behind it (lib/processRelayFixLine.ts), and hops down again as that light fades. On a send run
+// the flag bot (step 3) sends it to a person: it drops from ledge 3 straight down the bot column
+// onto the hand-off marker, pops and fades there (lib/processRelayHandoff.ts), and the run ends.
 // After the last bot's change it pops once as done and fades on the last ledge, its light with it.
 //
 // In a flow with the return, at that moment the lesson pops in at the last bot's bare left hand
@@ -44,6 +46,7 @@ import type { RelayStop } from "@/lib/processRelay";
 import { fixLitFade } from "@/lib/processRelayFix";
 import { fixLineLight, fixLineMove, fixRoute, type FixLineBox, type FixRoute } from "@/lib/processRelayFixLine";
 import { findProp, handArrive, handOff, measureHand, type Hand } from "@/lib/processRelayHand";
+import { dropToMark, findMark, measureMark } from "@/lib/processRelayHandoff";
 import { findJob, jobElements, jobExit, measureJob, type JobParts, type JobSize, type Point } from "@/lib/processRelayJob";
 import {
   findLedgeLights,
@@ -88,15 +91,17 @@ export type ColumnParts = {
   readonly ledges: readonly (HTMLElement | null)[];
   /** The return, or null in a flow with no loops: then there is no lesson and no ride back. */
   readonly back: ColumnReturn | null;
-  /** The flow draws the fix loop (its marker row is in step 3): a run may be a fix run. */
+  /** The flow draws the fix loop (its marker row is in step 4): a run may be a fix run. */
   readonly fixes: boolean;
   /**
    * The dotted fix line (`process-fix-line`), read for its box only: the way back runs along it.
-   * Null: the job rises straight from ledge 4 to ledge 3 instead.
+   * Null: the job rises straight from ledge 5 to ledge 4 instead.
    */
   readonly fixPath: HTMLElement | null;
   /** The dotted fix line's lit overlay (`process-fix-line-lit`), or null: then the way back lights nothing. */
   readonly fixLine: HTMLElement | null;
+  /** The hand-off marker (`process-handoff-mark`, read only), or null: then no run is a send run. */
+  readonly handoff: HTMLElement | null;
 };
 
 /** Every waypoint below `lg`, in the relay layer's coordinates. */
@@ -112,6 +117,8 @@ export type ColumnWaypoints = {
   readonly job: JobSize;
   /** The dotted fix line's border box, or null with no line. */
   readonly fix: FixLineBox | null;
+  /** The hand-off marker's centre, or null with none. */
+  readonly handoff: Point | null;
   readonly back: {
     /** Just off the last bot's left hand (`COLUMN_LESSON_FROM`), where the lesson appears. */
     readonly hand: Point;
@@ -151,6 +158,7 @@ export function columnParts(root: HTMLElement, stops: readonly RelayStop[]): Col
     fixes: animTargets(root, "process-fix-row").length > 0,
     fixPath: fixPath ?? null,
     fixLine: fixLine ?? null,
+    handoff: findMark(root),
   };
 }
 
@@ -228,6 +236,7 @@ export function measureColumn(parts: ColumnParts): ColumnWaypoints {
     hand,
     job,
     fix,
+    handoff: parts.handoff ? measureMark(parts.handoff, layer) : null,
     back: parts.back ? { hand: leftHandAt(parts, layer), clipboard } : null,
   };
 }
@@ -359,6 +368,16 @@ export function columnRun(
   };
   const last = runVisits(tl, job, visits, cues, course);
   if (!last) return tl;
+
+  // A send: the flag bot sends the job to a person, down onto the marker; its ledge's light fades
+  // as it drops, and the run ends there.
+  const mark = now.handoff;
+  if (last.kind === "send" && mark) {
+    const markAt = () => waypoints().handoff ?? mark;
+    dropToMark(tl, job.job, ghosts, stop(last.stop), markAt, () => waypoints().job, last.leave);
+    ledgeOff(tl, ledges[last.stop], last.leave);
+    return tl;
+  }
 
   // The last bot is done. With no rail below it the job stays on its ledge: it pops as done and
   // fades there, its ledge's light fading with it...

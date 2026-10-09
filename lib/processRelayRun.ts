@@ -3,8 +3,8 @@
 // (lib/processRelayJob.ts); between them, a hop, which the geometry draws: along the ground line
 // from `lg` (lib/processRelay.ts), down the bot column below it (lib/processRelayColumn.ts). The
 // first hop is the hand-off out of intake's hand; on a fix run one hop goes back to the work step
-// and the next one forward again. What happens after the last stop (the exit, the return) is the
-// geometry's own.
+// and the next one forward again; on a send run the visits end at the flag (step 3). What happens
+// after the last stop (the exit and the return, or the send's way out) is the geometry's own.
 import type { gsap } from "@/lib/gsap";
 import { jobBeat, jobHold, type JobParts, type PointAt } from "@/lib/processRelayJob";
 import type { Visit } from "@/lib/processRelayPlan";
@@ -14,8 +14,8 @@ export type RelayCues = {
   /** The job heads this bot's way (the rules bot's, when the lesson leaves for the return). */
   readonly head: (index: number) => void;
   /**
-   * The job reaches this bot: its catch (`find`: the check finds something on a fix run). It stays
-   * `dwell` seconds.
+   * The job reaches this bot: its catch (`find`: the check finds something on a fix run; `send`:
+   * the flag sends it to a person on a send run). It stays `dwell` seconds.
    */
   readonly arrive: (index: number, kind: Visit["kind"], dwell: number) => void;
   /** The lesson reaches the arrowhead (or the clipboard): this bot takes the loop back. */

@@ -8,10 +8,14 @@
 // life; its buttons play the moves, and poking or petting him runs the real ladder and pet. Its
 // quip sits above him (no R5.3 side); with no cards its patrol pauses look at the pointer, out at
 // the visitor or down the floor to a shelf end, and a tossed prop lands on the floor line.
+//
+// The footer's Rix (`footer`, ui-spec/09-footer.md §9.4) is a light one with a run of its own
+// (lib/footerRix.ts), never lib/rixFull.ts: no walk, props, glyphs, ladder, pet or plays. He is a
+// host here only so the shared moves and the typed talk can ask where his quip sits: above him.
 import type { AboutOption } from "@/lib/aboutScope";
 
-/** A Rix instance: home's About Rix, or the /rix playground's. */
-export type RixHost = AboutOption | "playground";
+/** A Rix instance: home's About Rix, the /rix playground's, or the one on the footer's line. */
+export type RixHost = AboutOption | "playground" | "footer";
 
 export type RixFeatures = {
   /** The idle clock and its chatter, hover mode, the nap timer, tag and walks to hovered or focused targets. */
@@ -31,4 +35,5 @@ export type RixFeatures = {
 export const rixFeatures: Readonly<Record<RixHost, RixFeatures>> = {
   b: { schedulers: true, patrol: "auto", quip: "side", stage: "cards" },
   playground: { schedulers: false, patrol: "toggle", quip: "above", stage: "floor" },
+  footer: { schedulers: false, patrol: "toggle", quip: "above", stage: "floor" },
 };

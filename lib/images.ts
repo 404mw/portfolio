@@ -5,7 +5,7 @@ type ImageEntry = { readonly dark: string | null };
 
 export const images = {
   portrait: { dark: "/images/portrait.png" },
-  // Proofs (ui-spec §7.6): each project's takeover shots, three each: a big shot and two details.
+  // Proofs (ui-spec §7.6): each project's takeover shots, two or three each.
   exileShot1: { dark: "/images/exile/home.webp" },
   exileShot2: { dark: "/images/exile/dashboard.webp" },
   exileShot3: { dark: "/images/exile/spam-raid.webp" },
@@ -13,9 +13,9 @@ export const images = {
   exileEvaWatch: { dark: "/images/exile/eva-watch.png" },
   exileEvaSpot: { dark: "/images/exile/eva-spot.png" },
   exileEvaStop: { dark: "/images/exile/eva-stop.png" },
-  designVaultShot1: { dark: null },
-  designVaultShot2: { dark: null },
-  designVaultShot3: { dark: null },
+  // Design Vault's two shots (ui-spec §7.6): light-theme screenshots; `dark` names the site's theme.
+  designVaultShot1: { dark: "/images/design-vault/palettes.webp" },
+  designVaultShot2: { dark: "/images/design-vault/fonts.webp" },
   marwixSkillsShot1: { dark: null },
   marwixSkillsShot2: { dark: null },
   marwixSkillsShot3: { dark: null },

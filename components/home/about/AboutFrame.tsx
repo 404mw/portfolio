@@ -15,7 +15,7 @@ type AboutFrameProps = {
 export function AboutFrame({ scope, children }: AboutFrameProps) {
   return (
     <section id={scope.sectionId} className="scroll-mt-20 px-gutter">
-      <div className={`group/about ${container} border-t border-line py-section`}>
+      <div className={`group/about ${container} py-section`}>
         {children}
         <AboutStatus name={scope.name} />
       </div>

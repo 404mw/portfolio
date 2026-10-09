@@ -1,7 +1,7 @@
 // One titled line in a takeover part (ui-spec §7.3.1): a title over its line. Part 4 (what it took)
 // passes no number; part 5 (what I learned) passes its ordinal, shown beside the title and hidden
 // from screen readers because the list gives the order.
-import { condensed, metaLabelOnCream } from "@/lib/styles";
+import { metaLabelOnCream } from "@/lib/styles";
 
 type TakeoverItemProps = {
   readonly title: string;
@@ -9,7 +9,7 @@ type TakeoverItemProps = {
   readonly number?: string;
 };
 
-const titleClass = `font-display text-summary leading-[1.1] font-semibold tracking-[-0.02em] text-ink ${condensed}`;
+const titleClass = `font-display text-summary leading-[1.15] text-ink`;
 
 export function TakeoverItem({ title, line, number }: TakeoverItemProps) {
   return (

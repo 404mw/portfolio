@@ -1,7 +1,8 @@
 // The shared "ink stage" ground (ui-spec/07-proofs-spam.md): ink with a violet glow over a faint "/"
-// hatch. Used by the proof card banner and the spam diagram, so it is never forked. `glow` picks the
-// glow's anchor ("floor" is the card's, "end" sits near the right end); `className` carries the
-// position, radius and visibility. Decorative, so hidden from assistive tech.
+// hatch. Used by the proof card banner, the takeover's title band and the spam diagram, so it is
+// never forked. `glow` picks the glow's anchor ("floor" is the card's, "end" sits near the right
+// end); `className` carries the position, radius and visibility; `anim` is an optional `data-anim`
+// hook for the motion pass. Decorative, so hidden from assistive tech.
 import { proofBotShades } from "@/lib/proofBotShades";
 
 const { glow: floorGlow, glowEnd, hatch } = proofBotShades.banner;
@@ -14,12 +15,14 @@ const glows = {
 type InkStageGroundProps = {
   readonly glow: keyof typeof glows;
   readonly className: string;
+  readonly anim?: string;
 };
 
-export function InkStageGround({ glow, className }: InkStageGroundProps) {
+export function InkStageGround({ glow, className, anim }: InkStageGroundProps) {
   return (
     <div
       aria-hidden="true"
+      data-anim={anim}
       className={`absolute overflow-hidden bg-ink ${className}`}
       style={{ backgroundImage: `${glows[glow]}, ${hatch}` }}
     />

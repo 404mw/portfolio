@@ -2,7 +2,7 @@
 // hops back to the work step in one arc that rises into the dashed fix arch and comes down at the
 // work step's stop, and the arch's lit overlay (`process-fix-lit`) turns solid violet right to
 // left behind it; it stays lit while the work is done again and fades as the job heads forward.
-// Only `process-fix-lit` and the job are written: never `process-fix` or step 3's `<li>`, whose
+// Only `process-fix-lit` and the job are written: never `process-fix` or step 4's `<li>`, whose
 // label's `z-10` a transform or an opacity would trap. The overlay is revealed with `clip-path`, as
 // the return's is (lib/processRelayTrail.ts), and faded with `opacity`. Below `lg` there is no
 // arch: the job goes back along the dotted fix line while it lights behind it

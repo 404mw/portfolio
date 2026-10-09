@@ -1,12 +1,9 @@
-// The footer's row (ui-spec §9.1): email, the filled social links, the link to the /rix playground
-// (its only entry, docs/pages/rix/ui-spec.md §0.1), then © year and name. The WhatsApp link goes
-// through `WhatsAppLink`, so its message follows an About pick.
-import Link from "next/link";
+// The footer's row (ui-spec §9.1): email, the filled social links, then © year and name. The
+// WhatsApp link goes through `WhatsAppLink`, so its message follows an About pick.
 import { ExternalLink } from "@/components/ExternalLink";
 import { WhatsAppLink } from "@/components/WhatsAppLink";
 import { footer, links } from "@/content/shared";
 import { currentYear } from "@/lib/currentYear";
-import { rixPath } from "@/lib/publishedRoutes";
 import { socialItems } from "@/lib/socialItems";
 import { container, focusRing } from "@/lib/styles";
 
@@ -39,9 +36,6 @@ export function FooterLinks() {
             ))}
           </ul>
         )}
-        <Link href={rixPath} className={socialLink}>
-          {footer.rixLink}
-        </Link>
         <p>
           © {currentYear()} {footer.copyrightName}
         </p>

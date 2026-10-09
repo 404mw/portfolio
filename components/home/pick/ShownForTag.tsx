@@ -1,6 +1,6 @@
 "use client";
 // The "Shown for: <card>" tag at the top of Agents and Process (ui-spec §0.6): it states the pick
-// and changes it in place. A native <details>: the summary is the disclosure button, and the six
+// and changes it in place. A native <details>: the summary is the disclosure button, and the five
 // cards open as a radio group in the flow under it (no overlay). Choosing one sets About's pick
 // (`setAboutPick`), so both sections, About's radio and the WhatsApp links follow, and
 // `holdInView` keeps the tag where it was while heights above it change (at once, and again when

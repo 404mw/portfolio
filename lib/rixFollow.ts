@@ -20,6 +20,12 @@ import { watchTargets } from "@/lib/rixTargetWatch";
 import { lookAt } from "@/lib/rixTargets";
 
 export type RixEyes = {
+  /**
+   * Caches his eye centre (page px) and scale again. It already runs at setup, on the root's resize
+   * and on a ScrollTrigger refresh; a caller whose Rix can move on the page without either (the
+   * footer's, when the page above him changes height) calls it too.
+   */
+  readonly measure: () => void;
   /** Per frame, while live: hand the eyes back after `POINTER_IDLE` without movement. */
   readonly frame: () => void;
   /** Eyes and lean back to the target or rest (`rix.onState` by default; a caller may compose it). */
@@ -123,6 +129,7 @@ export function rixEyes(rix: Rix, fine: boolean): RixEyes {
   }
 
   return {
+    measure,
     settle,
     frame: () => {
       if (rix.following && seconds() - lastMove > POINTER_IDLE) letGo();

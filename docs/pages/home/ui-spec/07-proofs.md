@@ -2,9 +2,11 @@
 
 Shared rules and parts (§0): [`../ui-spec.md`](../ui-spec.md). Page doc: [`../sections/07-proofs.md`](../sections/07-proofs.md).
 
-**Last Updated:** 2026-10-06 (the Exile takeover: three shots, new in-use numbers, Eva on the
-diagram's tiles; §7.2.1–§7.2.3 moved, unchanged, to [`07-proofs-bot.md`](07-proofs-bot.md);
-later, the spam diagram redrawn as the ink stage and moved to [`07-proofs-spam.md`](07-proofs-spam.md)).
+**Last Updated:** 2026-10-07 (Design Vault's two shots: a project has two or three shots, the
+two-shot layout stacks two 2:1 frames, light screenshots allowed. Before that, 2026-10-06: the
+Exile takeover: three shots, new in-use numbers, Eva on the diagram's tiles; §7.2.1–§7.2.3 moved,
+unchanged, to [`07-proofs-bot.md`](07-proofs-bot.md); later, the spam diagram redrawn as the ink
+stage and moved to [`07-proofs-spam.md`](07-proofs-spam.md)).
 
 ## 7. Proofs (the one question: have they built something real that people use?)
 
@@ -23,6 +25,13 @@ built yet).** (1) Exile shows three shots, not two, in the layout Design Vault u
 (§7.5). (3) The diagram's three tiles show Eva, Exile Bot's own mascot, and grow to 96 / 128px
 (§7.3.2, §7.6.1). Nothing else in the section changes. The choices made in the spec are open for
 review: §7.8 23–33.
+
+**2026-10-07 (the user's decisions on Design Vault's shots; static, not built yet).** (1) A
+project has two or three shots, not always three: three is the big 2:1 over two 4:3 details
+(Exile keeps exactly this), two is two 2:1 frames stacked (§7.3.1 part 3). (2) Design Vault has
+two, its Palettes and Fonts views, light-theme screenshots (§7.6). (3) Light screenshots are
+allowed: a shot's pixels are image content, not the site's theme. MARWIX-SKILLS (hidden) keeps
+three placeholder slots. Open for review: §7.8 38–39.
 
 ### 7.1 Section layout
 
@@ -191,13 +200,22 @@ The § numbers stay, so every "§7.2.1", "§7.2.2" and "§7.2.3" in this file po
   button lets the reader check it is live, it keeps its old place after the shots, and it stays
   an ink pill well above the one accent button (Book a call), so the two never compete. Exile →
   `links.exile` (still the only place exile.marwix.dev is linked).
-  - `TakeoverShots`, **one layout, three shots, for every project** (2026-10-06: Exile joins
-    Design Vault and MARWIX-SKILLS). Each frame `data-anim="takeover-shot" relative overflow-hidden rounded-3xl`:
-    `flex flex-col gap-5`, one `aspect-[2/1]`, then `grid gap-5 sm:grid-cols-2` of two
-    `aspect-[4/3]`. **The two-shot layout (a 2:1 beside a square) is removed,** from this spec and
-    from `TakeoverShots.tsx`: it has no user left (§7.8 23). Each shot's `position` now comes from
-    `lib/proofs.ts` (the slot's default, big `top` and details `center`, unless the shot sets its
-    own; Exile's three do, §7.6).
+  - `TakeoverShots`, **two layouts, picked from the project's shot count** (the user, 2026-10-07;
+    replaces 2026-10-06's "one layout, three shots, for every project"). Every frame is
+    `data-anim="takeover-shot" relative overflow-hidden rounded-3xl`, so the motion pass is the
+    same for both, and every image is a `SiteImage` with `placeholderTone="cream"`.
+    - **Three shots** (Exile; MARWIX-SKILLS's placeholders), unchanged: `flex flex-col gap-5`,
+      one `aspect-2/1` (`sizes="min(100vw, 1536px)"`), then `grid gap-5 sm:grid-cols-2` of two
+      `aspect-4/3` (§7.6 for their `sizes`).
+    - **Two shots** (Design Vault): `flex flex-col gap-5` of two `aspect-2/1` frames, each the full
+      column width with `sizes="min(100vw, 1536px)"`, the same frame as the three-shot big shot.
+      The same at every width, 360 to 4K: no side-by-side breakpoint.
+    - **Types, for `web-coder`:** `ProofShots<T>` becomes a tuple of two or three; a project's
+      shots and its `shotAlts` stay the same length (the length check in `lib/proofs.ts` stays),
+      and `TakeoverShots` draws the two-shot layout for two and the three-shot layout for three.
+    - Each shot's `position` comes from `lib/proofs.ts`: its slot's default unless the shot sets
+      its own (Exile's three do, §7.6). Defaults: three shots, big `top` and details `center`;
+      two shots, `top` for both.
 - **Part 4, `TakeoverTook`:** `<ul class="grid w-full gap-x-10 gap-y-7 sm:grid-cols-2">`, each
   `TakeoverItem` (no `number`) `<li data-anim="takeover-item" class="flex flex-col gap-2 border-t border-ink/15 pt-4">`:
   `<h4 class="font-display text-summary leading-[1.1] font-semibold tracking-[-0.02em] text-ink {condensed}">`
@@ -286,7 +304,8 @@ Moved and redrawn 2026-10-06 (the user's pick: the ink stage from `md`, one band
   **No new token** (part 5 uses only `ink`, `cream-muted`, `ink/15`, `text-summary`,
   `text-body-lg`, `text-meta` and the three fonts). **2026-10-06:** the Eva tiles use `ink` and
   `rounded-xl` only. The colours inside the Eva files are an image's pixels, like a screenshot's,
-  not tokens. No new token.
+  not tokens. No new token. **2026-10-07:** the two-shot layout uses `rounded-3xl` and the
+  existing spacing only; Design Vault's light pixels are image content, not tokens. No new token.
 - **Contrast:** `ink` on `cream` about 17:1; `cream-muted` on `cream` about 4.6:1 (eyebrows, took
   and lesson lines, lesson ordinals, step numbers, step lines, the status); `text` on `ink` above
   16:1; `muted` on `ink` about 6.9:1 (the panel's eyebrow); `on-accent` on `accent` about 9:1.
@@ -338,8 +357,9 @@ Characters a line are estimates from the type sizes, for the screen check to con
 | Info rows | label col 88 + 20 gap, values 212 | values 468 (max 576), under the intro | in the rail, values 321 | in the rail, values 391 |
 | IN USE numbers (Exile, `text-card`) | 30px | 35px | 44px | 44px |
 | Paragraphs (`text-lead`, max 576) | 17px in 320 | 17px in 576 | same | same |
-| Shots (every project, Exile included): big (2:1) | 320×160 | 706×353 | 1328×664 | 1536×768 |
-| Shots (every project, Exile included): details (4:3) | stacked, 320×240 each | 343×257 each | 654×490 each | 758×568 each |
+| Shots, three-shot layout (Exile): big (2:1) | 320×160 | 706×353 | 1328×664 | 1536×768 |
+| Shots, three-shot layout (Exile): details (4:3) | stacked, 320×240 each | 343×257 each | 654×490 each | 758×568 each |
+| Shots, two-shot layout (Design Vault, 2026-10-07): two 2:1, stacked, 20 apart | 320×160 each (340 tall in all) | 706×353 each | 1328×664 each | 1536×768 each |
 | Visit | 48 tall, hugs its text | same | same | same |
 | Took items | 1 column, 320 | 2 columns, 333 each | 2 columns in the content, 409 each | 479 each |
 | Took title (`text-summary`) / line (`text-body-lg`) | 20px / 16px | 22.6px / 16px | 26px / 16px | 26px / 16px |
@@ -373,8 +393,9 @@ headline has about 23 characters a line there, its tightest column with 360's 24
 headline is two lines, a 65-character one three. Info-row values 193 (the two stats may wrap to
 two rows); took items 280 each; the lessons list 576 of the 601 content column. The closing panel
 is 942 with an inner 830: line column 527 at 38px (about 33 characters a line) beside a 263 button
-column. At 640 (the details' first two-across width, content 589): the big shot 589×294, the
-details 284×213 each. The diagram at 1024: see [`07-proofs-spam.md`](07-proofs-spam.md) (Sizes).
+column. At 640 (the three-shot details' first two-across width, content 589): the big shot
+589×294, the details 284×213 each; the two-shot layout's frames are 589×294 each at every width
+from there to `lg`. The diagram at 1024: see [`07-proofs-spam.md`](07-proofs-spam.md) (Sizes).
 Screen check all of these, and the whole Exile takeover at 360 for length (about 5,100px
 since 2026-10-06).
 
@@ -418,7 +439,7 @@ optional key and can never be half there.
 | `.showcase.returnLine` | Why it is safe to leave alone: the stop lifts on its own, so a false alarm undoes itself | two lines at 768, about 58 characters a line |
 | `.meansForYou.default` | **New.** Part 7's closing line, which is also its heading, for no pick, "Not sure yet" and no JavaScript: what this project means for a reader, in the shared voice. One line; Book a call follows it | 30–44px display: about 22 characters a line at 360, 42 from 768. A 65-character line is three lines on a phone and two from tablet |
 | `.meansForYou.{service-business,online-store,discord,software-builder,website}` | **New.** The same line for each About card, in that card's tone (`docs/04-voice.md`), traced to "What the user can do for a business: shown by Exile Bot" or "What the user builds". Never offers spam protection, never a number. A key left out falls back to `default` | as `default` |
-| `.shotAlts[]` | What's on each takeover screenshot, within the facts: **three for every project** (2026-10-06: Exile gains a third, and its three files are in, so all three can be written). Exile: `[0]` the Exile Bot website's home page, with a calculation result card; `[1]` the owner dashboard's home view; `[2]` the dashboard's spam and raid protection settings, with protection on. Nothing read off a shot: no number, no community's name, no ID (§7.6) | a sentence each |
+| `.shotAlts[]` | What's on each takeover screenshot, within the facts: **one per shot, two or three per project** (2026-10-07; Exile three, Design Vault two, MARWIX-SKILLS three markers). Exile: `[0]` the Exile Bot website's home page, with a calculation result card; `[1]` the owner dashboard's home view; `[2]` the dashboard's spam and raid protection settings, with protection on. Design Vault (**changed 2026-10-07**, now two): `[0]` its Palettes view, a grid of saved colour palettes, each card showing its swatches and the colours' names; `[1]` its Fonts view, a grid of saved fonts, each card a preview of the typeface over its name. Nothing read off a shot: no number, no community's name, no ID, no font's or colour's name, no hex value, no date (§7.6) | a sentence each |
 | `.visitLabel` | Visit button text | one line at 360 |
 | `proofs.takeover.proof` / `.close` / `.escHint` / `.next` | "Project", "Close", "Esc", "Next project" | 2 words each |
 | `proofs.takeover.rowLabels.whatItIs` / `.built` / `.inUse` | WHAT IT IS / BUILT / IN USE | fits the 88px label column |
@@ -429,7 +450,7 @@ optional key and can never be half there.
 - **Retired:** `.summary`. Its jobs go to `.intro` (what it is and does), `.whatIBuilt.body` (what
   it does for its users) and, for Exile, `.showcase.*` (the spam protection). ~~`exile.shotAlts[2]`
   goes with its shot.~~ **2026-10-06:** `exile.shotAlts[2]` is back, with the third shot.
-  **Removed earlier:** `.cardShotAlt`.
+  **2026-10-07:** `designVault.shotAlts[2]` goes with its shot. **Removed earlier:** `.cardShotAlt`.
 - **Eva's tiles have no content slot** (2026-10-06): the three images are decorative, with an
   empty alt (§7.6.1). No key is added for them.
 - **Design Vault** has no `whatILearned` (the user, 2026-10-05: skipped for now), so its takeover
@@ -440,8 +461,8 @@ optional key and can never be half there.
   `shotAlts` markers.
 - **One shape for all three:** a `ProofProject` type (required `tag`, `title`, `cardLine`,
   `proofLine`, `rows`, `intro`, `problem` `{headline, body}`, `whatIBuilt` `{headline, body}`,
-  `meansForYou.default`, `shotAlts` (a tuple of three since 2026-10-06), `visitLabel`; optional
-  `whatItTook` `{headline, items}`,
+  `meansForYou.default`, `shotAlts` (a tuple of two or three since 2026-10-07, as long as the
+  project's shots), `visitLabel`; optional `whatItTook` `{headline, items}`,
   `whatILearned` `{headline, items}`, `showcase` `{headline, status, body, steps, returnLabel, returnLine}`,
   and the five card keys of `meansForYou`) that `content/home.ts` satisfies. `whatILearned` is
   typed `ProofLearned`, the same shape as `ProofTook` (`{ headline, items: readonly ProofTitledLine[] }`)
@@ -451,19 +472,19 @@ optional key and can never be half there.
 
 The card has **no image** (its banner is CSS, its bot inline SVG). The diagram's steps and return
 line are markup; since 2026-10-06 its three tiles hold images (§7.6.1). Every screenshot is in a
-takeover's part 3, in `TakeoverShots`; no other part has one (part 5 has none). **Every project
-has three shots** (the user, 2026-10-06: Exile shows three, reversing 2026-09-28's "its third slot
-is the diagram"). **Re-add** `exileShot3` to `lib/images.ts`; shots and alts stay equal-length
-tuples per project, now always three, so they can't drift.
+takeover's part 3, in `TakeoverShots`; no other part has one (part 5 has none). **A project has
+two or three shots** (the user, 2026-10-07; replaces 2026-10-06's "every project has three"):
+Exile three, Design Vault two, MARWIX-SKILLS three placeholders. **Remove** `designVaultShot3`
+from `lib/images.ts`. Shots and alts stay equal-length tuples per project, so they can't drift.
 
 | Name (`lib/images.ts`) | Shows (alt-text meaning) | Where | Ratio | Crop | `sizes` |
 |---|---|---|---|---|---|
 | `exileShot1` | The Exile Bot website's home page, with a calculation result card | big | 2:1 | `object-cover object-center` | `min(100vw, 1536px)` |
 | `exileShot2` | Exile Bot's owner dashboard, its home view: what is running and the most used commands | detail | 4:3 | `object-cover object-top` | `(min-width:1536px) 760px, (min-width:640px) 50vw, 100vw` |
 | `exileShot3` | The dashboard's spam and raid protection settings, with protection on | detail | 4:3 | `object-cover object-left` | as `exileShot2` |
-| `designVaultShot1` | The library | big | 2:1 | `object-cover object-top` | `min(100vw, 1536px)` |
-| `designVaultShot2`, `designVaultShot3` | A colour palette; a font view | details | 4:3 | `object-cover object-center` | `(min-width:1536px) 760px, (min-width:640px) 50vw, 100vw` |
-| `marwixSkillsShot1`–`3` | to come with its facts | big, details | 2:1, 4:3, 4:3 | as Design Vault | as Design Vault |
+| `designVaultShot1` | Design Vault's Palettes view: a grid of saved colour palettes, each card showing its swatches and the colours' names | two-shot, first | 2:1 | `object-cover object-top` | `min(100vw, 1536px)` |
+| `designVaultShot2` | Design Vault's Fonts view: a grid of saved fonts, each card a preview of the typeface over its name | two-shot, second | 2:1 | `object-cover object-top` | `min(100vw, 1536px)` |
+| `marwixSkillsShot1`–`3` | to come with its facts | big, details | 2:1, 4:3, 4:3 | the three-shot slot defaults (big `top`, details `center`) | as Exile's big and details |
 
 `placeholderTone="cream"` on all. 1648 is where the 1536 column stops growing (1536 + two 56px
 gutters). An alt says what is on the screen and stays inside the facts: no number read off a
@@ -494,17 +515,36 @@ calculation shot: the home page shows a result card. Pixel positions are read of
   map (`left: "object-left"`; constitution §9, extend). What it loses is the page's plain-words
   summary, so this is the user's call (§7.8 33).
 - **Per-shot position:** `lib/proofs.ts` holds a shot's position beside its name. A shot without
-  one keeps its slot's default (big `top`, details `center`), so Design Vault is unchanged.
+  one keeps its slot's default (three shots: big `top`, details `center`; two shots: `top` for
+  both), so Design Vault sets none.
 - **`exileShot3` puts spam protection in part 3,** ahead of the showcase (part 6) that introduces
   it. That is the user's call (§7.8 20); its alt names the page and adds no claim.
+
+**Design Vault's two files (the user, 2026-10-07).** Light-theme screenshots, used as supplied,
+not cropped first. Sources are in `temp/project-images/design-vault/` and go to
+`public/images/design-vault/`. Both are about 2:1, so the frame cuts almost nothing and `top`
+(the slot default) shows no difference from `center`.
+
+| Name | Source → file | Source | The frame keeps | The frame cuts |
+|---|---|---|---|---|
+| `designVaultShot1` | `DV_palettes.png` → `palettes.webp` | 1907×947 (2.01:1) | the full height and the middle 1894px: the app bar, the Palettes title, the search row, six whole palette cards and the tops of three more | about 6px at each side, empty page margin |
+| `designVaultShot2` | `DV_fonts.png` → `fonts.webp` | 1906×948 (2.01:1) | the full height and the middle 1896px: the app bar, the Fonts title, the search and licence row, three whole font cards and three more cut above their foot | 5px at each side, empty page margin |
+
+- **The alts read nothing off the shots:** no palette's or colour's name, no hex value, no font's
+  name, weight or date, though the shots show them. The Fonts alt leaves out the licence each
+  card shows: the facts say the vault keeps fonts, not their licences (§7.8 39).
+- **At 360 the frames are 320×160:** the palette swatches and font previews read as shapes, the
+  card text does not. The shots show the thing; the paragraph beside them says it. Screen check.
+- **`lib/images.ts`:** the files go in the entries' `dark` key, which names the site theme the
+  image is shown in (the only one in v1), not the shot's own colours.
 
 **Source sizes (new 2026-10-06, so an under-sized file is caught before it ships).** A slot is
 largest from 1648 up, 4K included. `next/image` never enlarges a file, so one under the minimum
 is stretched by the browser at 4K. The size that counts is the part of the file the frame keeps.
 
-| Slot | Largest drawn | Minimum kept area (1×) | Target (2×) | Exile's files |
+| Slot | Largest drawn | Minimum kept area (1×) | Target (2×) | Files supplied |
 |---|---|---|---|---|
-| Big shot, 2:1 | 1536×768 | 1536×768 | 3072×1536 | `exileShot1` 1456×728: **under the minimum** |
+| Big shot, 2:1 (both of the two-shot layout's frames too) | 1536×768 | 1536×768 | 3072×1536 | `exileShot1` 1456×728: **under the minimum**. `designVaultShot1` 1894×947 and `designVaultShot2` 1896×948 kept (2026-10-07): over the minimum, under the target, so both ship |
 | Detail shot, 4:3 | 758×568 | 760×570 | 1520×1140 | `exileShot2` 1920×1440: over the target. `exileShot3` 1268×951: over the minimum, under the target |
 | Eva tile, 1:1 (§7.6.1) | 128×128 | 384×384 (3×, for phones) | none | 520×520: passes |
 
@@ -513,7 +553,13 @@ is stretched by the browser at 4K. The size that counts is the part of the file 
   ships.
 - **A file's ratio decides its crop.** `object-cover` trims a wider file at the sides and a
   taller one at the top or bottom, by the shot's position. The frame is the only crop.
-- The shots are dark-theme screenshots in `rounded-3xl` frames on cream, as Design Vault's are.
+- **The shots are screenshots in `rounded-3xl` frames on cream:** Exile's are dark-theme, Design
+  Vault's light-theme (the user, 2026-10-07). A screenshot's pixels are image content, like Eva's
+  colours (§7.3.4), not the site's theme; constitution §5's "dark only" governs the site's theme
+  and is unchanged. **Edge risk, for the lead's screen check:** Design Vault's white app bar and
+  pale page sit close to `cream` in lightness, so the frames' rounded edges, and the 20px gap
+  between the two stacked shots, may barely read. Check at 360 and 1440. A hairline is proposed,
+  not decided (§7.8 38).
 
 #### 7.6.1 Eva on the diagram's tiles (new 2026-10-06; the Exile view only)
 
@@ -567,7 +613,9 @@ Superseded 2026-10-06 (the user's pick, the ink stage): the figures' files, size
   two-shot `sizes`), `lib/proofs.ts` (shot count per project, `ShotTriple` → a two-or-three tuple,
   `takeoverPartId(targetId, part)`), `lib/images.ts` (drop `exileShot3`), `lib/styles.ts` (add
   `takeoverText`, `monoPill`), `content/home.ts` (`copywriter`). (**Superseded in part
-  2026-10-06,** below: one shot layout, a three-tuple, `exileShot3` back.) **Reused unchanged:**
+  2026-10-06,** below: one shot layout, a three-tuple, `exileShot3` back. **Then 2026-10-07,**
+  below: two layouts again, a two-or-three tuple, the two-shot layout redrawn as two stacked 2:1
+  frames.) **Reused unchanged:**
   `TakeoverTopBar`, `TakeoverCloseLink`, `TakeoverInfoRows`, `TakeoverInfoRow`, `TakeoverStats`,
   `ProjectVisitLink`, `TakeoverNextLink`, `BookCallLink` (`hero`), `ChevronRightIcon`,
   `hooks/useShownSet.ts`, `hooks/useSwapFade.ts`, `lib/shownSet.ts`, `lib/aboutPick.ts`,
@@ -598,6 +646,20 @@ Superseded 2026-10-06 (the user's pick, the ink stage): the figures' files, size
     `ProofShots`), `lib/styles.ts`, every hook.
   - **Not these agents':** `docs/03-facts.md` (the two numbers) and the page docs
     (`page-doc-manager`, at the lead's word).
+- **Design Vault's shots (2026-10-07; static, nothing built), the files:**
+  - **Change (`web-coder`):** `components/home/proofs/TakeoverShots.tsx` (draws the layout the
+    count picks: two shots, two stacked 2:1 frames; three, as built; header comment);
+    `lib/proofs.ts` (`ProofShots<T>` a tuple of two or three; `proofShotNames.designVault` drops
+    `designVaultShot3`; slot defaults per layout, two shots `top` and `top`; `proofImages` maps
+    the names a project has instead of three fixed indexes; comments); `lib/images.ts`
+    (`designVaultShot1` → `/images/design-vault/palettes.webp`, `designVaultShot2` →
+    `/images/design-vault/fonts.webp`, delete `designVaultShot3`; its "three each" comment).
+  - **Add, in `public/images/design-vault/`:** `palettes.webp`, `fonts.webp` (§7.6).
+  - **Copy (`copywriter`, `content/home.ts`):** the two `designVault.shotAlts` (§7.5).
+  - **Unchanged:** `SiteImage.tsx`, `ImagePlaceholder.tsx`, `ProjectTakeover.tsx`,
+    `lib/proofProject.ts` (its `shotAlts` follows `ProofShots`), every hook. MARWIX-SKILLS keeps
+    three `null` slots. If §7.8 38 takes the hairline, only `TakeoverShots.tsx`'s frame class
+    changes.
 - **Motion (later), takeover and cards:** cards reveal on scroll (stagger 0.12s); hover lifts a card −8px. Open: the
   dialog's `clip-path` expands from the card's rect (`data-proof-card`) to full screen (0.75s), and
   `takeover-content` rises 40px and fades in after 0.35s. Close: clip back to the card (0.6s), then
@@ -619,7 +681,7 @@ Superseded 2026-10-06 (the user's pick, the ink stage): the figures' files, size
 | `takeover-intro`, `takeover-rows` | part 1's lead and rows wrapper | none new (above the fold on open) | n/a |
 | `takeover-part-head` | the wrapper around a part's eyebrow and headline (parts 2–7) | fades up 24px as its part enters the dialog's view | fade only |
 | `takeover-part-body`, `takeover-part-wide` | a part's content, its full-width slot | fade up 24px, 0.08s and 0.16s after the head | fade only |
-| `takeover-shot` | each shot's clipped frame (three on every project since 2026-10-06) | the image scales 1.06 → 1 inside the frame as it enters (the frame is the clip) | fade only |
+| `takeover-shot` | each shot's clipped frame (two or three per project since 2026-10-07; both layouts' frames carry it) | the image scales 1.06 → 1 inside the frame as it enters (the frame is the clip) | fade only |
 | `takeover-item` (was `takeover-took-item`) | each took item (part 4) and each lesson (part 5); scope by the part's `data-part` | fade up 16px, 0.08s apart, with the part's body; a lesson's ordinal moves with its item, never alone | fade only |
 | `spam-diagram` | the diagram | the trigger: plays once when it enters | all of it fades in together |
 | `spam-step`, `spam-tile` | each step; the wrapper around the tile slot (kept through the 2026-10-06 Eva swap) | steps light in order, 0.25s apart: the tile pops (scale 0.8 → 1), Eva with it and never on her own; its number, title and line fade up | no pop |
@@ -632,6 +694,10 @@ Superseded 2026-10-06 (the user's pick, the ink stage): the figures' files, size
   The bot ducks out of the way first (user's choice, 2026-10-06; replaces "the break-out is covered
   as the clip grows"), so nothing of it is ever outside the clip. `lib/takeoverClip.ts` and the
   title morph need no change.
+- **The title band (2026-10-07):** the title sits on an ink band (the column's classes, the
+  `<h2>`'s classes and one new first child change, superseding "Kept exactly as built" in §7.3 for
+  those), and the card banner morphs into the band on open and back on close, the title's colour
+  following it: [`07-proofs-band.md`](07-proofs-band.md).
 - **Motion (later), the bot:** the bot never follows into the takeover.
   - **Duck** (full motion; built, `lib/proofBotDuck.ts`): a plain click or Enter on a card first
     takes its `rise` to `y` +84 (below the floor) in 0.25s `power2.in`, then sets the hash, so the
@@ -666,7 +732,7 @@ Superseded 2026-10-06 (the user's pick, the ink stage): the figures' files, size
 `data-proof-card` and `proof-card-title` unchanged. Takeover: `takeover-content`, `takeover-bar`,
 `takeover-title` and `takeover-next-title` unchanged; the new ones are in the table above.
 
-### 7.8 Decided 2026-10-05 (the takeover), and 2026-10-06 (the Exile view; items 23–33 are open for review)
+### 7.8 Decided 2026-10-05 (the takeover), 2026-10-06 (the Exile view; items 23–33 are open for review) and 2026-10-07 (Design Vault's shots; items 38–39 are open for review)
 
 Part numbers below follow the renumbering of 2026-10-05, later (What I learned is part 5, the
 showcase part 6, the closing panel part 7).
@@ -750,9 +816,10 @@ subjects confirmed through the lead later that day):**
 **Settled in the spec from decisions 20–22 (open for the lead's and the user's review; specced
 with the first option of each):**
 
-23. **The two-shot layout is removed,** from the spec and from `TakeoverShots.tsx`, and
+23. ~~**The two-shot layout is removed,** from the spec and from `TakeoverShots.tsx`, and
     `ProofShots` becomes a tuple of three. Or: keep it unused for a later project (dead code
-    until then).
+    until then).~~ **Superseded by the user, 2026-10-07 (34):** a project has two or three shots,
+    and the two-shot layout returns, redrawn as two stacked 2:1 frames.
 24. ~~**Eva's crop: the tight set.** Or: the waist-up set, whose cut needs no checking but whose
     symbol is about a quarter smaller at the same tile (§7.6.1).~~ **Superseded by the user's pick,
     2026-10-06 (the ink stage):** the three 491px files in `public/images/exile/` are used as they
@@ -787,3 +854,29 @@ with the first option of each):**
     (the status boxes and Quick Overview) and adding a `left` position to `SiteImage`. Or: the
     user retakes the page in a narrower window, near 4:3, so it reflows and nothing is cut; or
     another slot or layout for this shot, which is the user's call and is not drawn here.
+
+**By the user, 2026-10-07 (Design Vault's shots; source `temp/project-images/design-vault/`):**
+
+34. **The shot count is per project: two or three.** Three is the big 2:1 over two 4:3 details
+    (Exile keeps exactly this); two is two 2:1 frames stacked at the full column width, the same
+    at every width (no side-by-side breakpoint). Supersedes 23.
+35. **Design Vault has two shots,** its Palettes view and its Fonts view, supplied as light-theme
+    files about 2:1 and anchored `top` (the slot default). `designVaultShot3` is removed. Both
+    are over the big slot's 1× minimum and under its 2× target, so both ship.
+36. **Light screenshots are allowed.** A shot's pixels are image content; constitution §5's
+    "dark only" governs the site's theme.
+37. **MARWIX-SKILLS (hidden) keeps three placeholder slots** for now.
+
+**Settled in the spec from decisions 34–37 (open for the lead's review):**
+
+38. **A hairline round the shot frames, if the pale shots lose their edge on cream.** Specced
+    without one; the lead decides after the screen check at 360 and 1440. **Recommended:** if
+    Design Vault's frames don't hold their edge, add `border border-ink/15` (the takeover's
+    existing hairline) to **every** shot frame, Exile's too, so the frames keep one look; against
+    the dark shots it barely shows. The border sits inside the frame's box (`border-box`), so the
+    2:1 and 4:3 ratios and the `data-anim` clip are unchanged, and the image is 2px smaller each
+    way. Or: no hairline, letting the swatches and cards give the frames their shape; or the
+    hairline on light shots only (a per-shot flag in `lib/proofs.ts`, and two frame looks).
+39. **The Fonts alt leaves out the licence** each card shows, because the facts say the vault
+    keeps fonts, not their licences. Or: add one line to `docs/03-facts.md` (the user's) so the alt
+    can say each font is kept with its licence.

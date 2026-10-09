@@ -5,7 +5,7 @@
 import type { BotColour } from "@/lib/processBots";
 
 /**
- * The cards' emblems (02a-about-options §2a.R2): `calendar`, `parcel`, `bubble`, `code`, `window`.
+ * The cards' emblems (02a-about-options §2a.R2): `calendar`, `parcel`, `bubble`, `code`.
  * `shield`, `send`, `report` and `envelope` are held by no card; they stay for the motion pass.
  */
 export type RixPropName =
@@ -13,7 +13,6 @@ export type RixPropName =
   | "parcel"
   | "bubble"
   | "code"
-  | "window"
   | "shield"
   | "send"
   | "report"
@@ -66,16 +65,6 @@ export const rixProps: Record<RixPropName, RixProp> = {
       { d: "M106 24H130V48H106Z", colour: "C" }, // tile
       { d: "M115 30L109 36L115 42L117 40L113 36L117 32Z", colour: "I" },
       { d: "M121 30L127 36L121 42L119 40L123 36L119 32Z", colour: "I" },
-    ],
-    pivots: [[118, 50]],
-  },
-  window: {
-    parts: [
-      { d: "M106 25H130V49H106Z", colour: "C" }, // frame
-      { d: "M106 25H130V31H106Z", colour: "I" }, // bar
-      { d: "M108.5 27h2v2h-2Z M112.5 27h2v2h-2Z M116.5 27h2v2h-2Z", colour: "C" }, // dots
-      { d: "M110 35h16v3h-16Z", colour: "D" },
-      { d: "M110 41h9v3h-9Z", colour: "D" },
     ],
     pivots: [[118, 50]],
   },

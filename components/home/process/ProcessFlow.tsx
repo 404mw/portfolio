@@ -2,9 +2,10 @@
 // Process' flow (ui-spec §5.1): the About pick's flow, five or six steps, `default` with no pick
 // and in the server markup. The "Shown for" tag and the sample-job caption, then the body, keyed
 // by set so a change remounts it inside the persistent wrapper (`data-set`, `data-count`,
-// `data-loops`): the steps (step 3 holding the fix loop back from step 4), the return to step 2,
-// and the relay's layer. From `lg` the 96px gap keeps the fix label, above the arch, clear of the
-// caption. A flow with no loops (§5.3b) draws neither loop and keeps the 48px gap. The body is
+// `data-loops`): the steps (step 3 holding the hand-off to a person, step 4 the fix loop back from
+// step 5), the return to step 2, and the relay's layer. From `lg` the 96px gap keeps the fix and
+// hand-off labels, above the row, clear of the caption. A flow with no loops (§5.3b) draws neither
+// loop nor the hand-off and keeps the 48px gap. The body is
 // `isolate`, so the relay layer's `z-1` stays inside it, below the loop label's `lg:z-10`. The
 // swap fades (`useSwapFade`, ui-spec §0.5): the caption and the body fade out, the flow changes,
 // and they fade back in; the tag stays as it is. Without JavaScript the tag hides.
@@ -60,6 +61,7 @@ export function ProcessFlow() {
           layout={layout}
           stepLabel={process.stepLabel}
           fixLabel={loops?.fixLabel}
+          handoffLabel={loops?.handoffLabel}
         />
         {loops && <ProcessReturn layout={layout} loopLabel={loops.loopLabel} />}
         <ProcessRelay emblem={emblem} />

@@ -6,15 +6,18 @@
 // - lib/processBotActs.ts: role acts, jumps, the hover/tap reaction, naps.
 // - lib/processBotEntrance.ts: the once-per-load drop onto the ground line.
 // - lib/processBotPointer.ts: pointer → look and lean.
-// - lib/processRelayPlan.ts: the relay's clock, which stop the job visits when (five or six stops,
-//   and the fix hop on every `FIX_EVERY`-th run of a flow that draws the fix loop).
+// - lib/processRelayPlan.ts: the relay's clock, which stop the job visits when (five or six stops),
+//   and the runs' cycle (`RUN_CYCLE`: a send to a person at step 3, a straight run, a fix run from
+//   step 5 back to step 4) in a flow that draws the hand-off and the fix loop.
 // - lib/processRelay.ts: the relay job run along the ground line (from `lg`; the shared story in
 //   lib/processRelayRun.ts, the hand-off out of step 1's hand in lib/processRelayHand.ts, the job's
-//   changes and exit in lib/processRelayJob.ts, the fix hop in lib/processRelayFix.ts, the lesson
+//   changes and exit in lib/processRelayJob.ts, the fix hop in lib/processRelayFix.ts, the send up
+//   the hand-off stem in lib/processRelayHandoff.ts, the lesson
 //   that rides the return in lib/processRelayLesson.ts, its trail and lit lines in
 //   lib/processRelayTrail.ts).
 // - lib/processRelayColumn.ts: the same run down the bot column (below `lg`, ui-spec §5.9), hopping
-//   ledge to ledge with each ledge and the dotted fix line lighting (lib/processRelayLedge.ts).
+//   ledge to ledge with each ledge and the dotted fix line lighting (lib/processRelayLedge.ts), the
+//   send dropping onto the hand-off marker (lib/processRelayHandoff.ts).
 // - lib/processBotCrew.ts: the one registry every bot animation and scheduler runs in.
 //
 // Full motion: all of it. The registry and the per-frame channel writer run only while the section
@@ -23,13 +26,13 @@
 // fade only, and every bot shows its static pose. The entrance's from-state is set here in JS only,
 // and skipped if the list is already scrolled past (once per page load, across matchMedia re-runs).
 // On unmount, a new flow (`set`) or any mode change everything is killed and every bot, the job and
-// its parts, the lesson and its parts, the ghosts, the lit overlays (ground, return and fix; below
-// `lg` each ledge's and the fix line's), chevron
+// its parts, the lesson and its parts, the ghosts, the lit overlays (ground, return, fix and
+// hand-off; below `lg` each ledge's and the fix line's), chevron
 // icons and arrowhead go back to the server markup exactly: hidden again, with the emblem held in
 // step 1's hand (it is a `data-bot` part, so `resetBot` shows it; the last bot's lesson hold is a
 // bot act, so `resetBot` puts its eyes back too). Crossing `lg` is a mode change: the run in the
 // old geometry is reverted and the new one starts on the usual first-run delay. A flow with no
-// loops has no return and no fix parts: the relay still runs, as a one-way pass.
+// loops has no return, no fix and no hand-off parts: the relay still runs, as a one-way pass.
 // Catch priority: the relay publishes each bot's next catches, so timed acts and naps keep clear of them.
 //
 // Tweens made later by handlers and schedulers are deliberately outside the matchMedia context (it
@@ -44,7 +47,6 @@ import { startLife, tap } from "@/lib/processBotLife";
 import {
   DROP_START,
   EYE_FOLLOW,
-  FIX_EVERY,
   FOLLOW_EASE,
   LEAN_FOLLOW,
   POINTER_IDLE,
@@ -73,7 +75,7 @@ import {
   measureColumn,
   type ColumnWaypoints,
 } from "@/lib/processRelayColumn";
-import { catchTimes, fixStop, relayPlan, type Visit } from "@/lib/processRelayPlan";
+import { catchTimes, fixStop, relayPlan, runKind, sendStop, type Visit } from "@/lib/processRelayPlan";
 import type { RelayCues, RunOptions } from "@/lib/processRelayRun";
 import { watchLive } from "@/lib/watchLive";
 
@@ -307,14 +309,18 @@ function fullMotion({ root, list, bots, entered, wide, fine }: FullOptions): () 
     tick(live);
   });
 
-  // The relay's clock: the flow's stops in step order, and on every `FIX_EVERY`-th run (2, 4, 6…)
-  // the fix hop, in a flow that draws the fix loop (never one with `data-loops="off"`).
+  // The relay's clock: the flow's stops in step order, on the runs' cycle from the first run (send,
+  // straight, fix, and again): the send in a flow that draws the hand-off, the fix hop in one that
+  // draws the fix loop (never in one with `data-loops="off"`, whose runs are all straight).
   const roles = bots.map((bot) => bot.role);
   const fixAt = relay?.fix || column?.fixes ? fixStop(roles) : null;
+  const sendAt = relay?.handoff || column?.handoff ? sendStop(roles) : null;
   // The hop back's length is the geometry's: below `lg` the longer way along the dotted fix line.
   const back = column ? columnBack(column).duration : undefined;
-  const planFor = (run: number): readonly Visit[] =>
-    relayPlan(roles, fixAt !== null && run % FIX_EVERY === FIX_EVERY - 1 ? fixAt : null, back);
+  const planFor = (run: number): readonly Visit[] => {
+    const kind = runKind(run, sendAt, fixAt);
+    return relayPlan(roles, kind === "fix" ? fixAt : null, back, kind === "send" ? sendAt : null);
+  };
 
   // Catch priority: each bot's next catch is a run start plus one of its arrivals in that run's
   // plan (the work step and the check are caught twice on a fix run), on one clock at every width.
@@ -357,7 +363,7 @@ function fullMotion({ root, list, bots, entered, wide, fine }: FullOptions): () 
     const visits = planFor(runs);
     const run = oneRun({ visits, first: runs === 0 });
     if (run) {
-      // The plan counts only for a run that plays: the fix hop falls on every second real run.
+      // The plan counts only for a run that plays: the cycle moves on real runs only.
       runAt = crew.now();
       catches = catchTimes(visits, bots.length);
       runs += 1;

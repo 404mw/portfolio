@@ -1,6 +1,8 @@
 // List demo, finished state (ui-spec §4.4): three people, each row turned to done. The done pill
 // reads the row's own label where it has one, else the shared one. The "new" pills are in the
-// markup but hidden; the motion pass swaps them for the done pill.
+// markup but hidden; the motion pass swaps them for the done pill. A list with an `action` closes
+// with its receipt (§4.10), after the last pill: where the results went.
+import { DemoActionLine } from "@/components/home/agents/DemoActionLine";
 import { DemoStatusPill } from "@/components/home/agents/DemoStatusPill";
 import type { LeadsDemoContent } from "@/lib/agents";
 import { metaLabel } from "@/lib/styles";
@@ -8,8 +10,8 @@ import { metaLabel } from "@/lib/styles";
 type LeadsDemoProps = { readonly demo: LeadsDemoContent };
 
 export function LeadsDemo({ demo }: LeadsDemoProps) {
-  const { rows, statusNew, statusDone } = demo;
-  return (
+  const { rows, statusNew, statusDone, action } = demo;
+  const list = (
     <ul className="flex flex-col gap-2.5">
       {rows.map((row, index) => (
         <li
@@ -39,5 +41,12 @@ export function LeadsDemo({ demo }: LeadsDemoProps) {
         </li>
       ))}
     </ul>
+  );
+  if (action === undefined) return list;
+  return (
+    <div className="flex flex-col gap-2.5">
+      {list}
+      <DemoActionLine action={action} order={rows.length * 2 + 1} />
+    </div>
   );
 }

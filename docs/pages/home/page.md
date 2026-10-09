@@ -1,8 +1,10 @@
 # Home
 
-**Last Updated:** 2026-10-06
+**Last Updated:** 2026-10-08
 
-> **Status:** In build. All nine sections are built; the per-card redesign of About, Agents and
+> **Status:** In build. Round 2 (2026-10-08: Agents' action line, Process recast around control) is in build by web-coder; its motion pass follows. Copy round 1 (2026-10-08, plain words for everyday business owners) is in
+> Hero, Marquee, About, Agents, Web and Contact; Agents now opens with a heading and lead; lint,
+> `tsc` and build green and lead-checked (360, 768, 1440, 3840, reduced motion). All nine sections are built; the per-card redesign of About, Agents and
 > Process is built (2026-10-03): the About pick sets Agents' offers and Process' flow. The motion
 > pass for Agents and Process (relay, demo sequences, swap fade) is built and lead-checked
 > (2026-10-04); Process' phone ledges and Agents' new Discord demos are built and lead-checked
@@ -10,7 +12,8 @@
 > takeover is rebuilt static as up to seven parts and lead-checked (2026-10-05). Open: the user's calls on
 > copy and the ledges, the takeover's motion pass (parts 5 and 6 and the `useTakeoverMotion`
 > re-test), the code-auditor pass on the Exile Bot three-shot round (before the push), and the
-> screen re-check below.
+> open items below. The site-wide font swap (Acosta, IBM Plex Sans, IBM Plex Mono) and its size
+> retune are built and lead-checked in Edge (2026-10-07; Safari, Firefox and real devices not yet).
 
 **The one question:** Can they help me?
 
@@ -20,13 +23,16 @@ plus that section's file only.
 
 ## Sections
 
+Rows are in render order (Nav, Hero, Marquee, About, Agents, ...); the numbers and file names are
+kept as they were, so Marquee (3) renders before About (2a).
+
 | # | Section | The one question it answers | Facts source | Status | Doc |
 |---|---|---|---|---|---|
 | 1 | Nav | Where can I go, and how do I book a call? | `docs/03-facts.md` → Contact | Built, motion done | `sections/01-nav.md` |
-| 2 | Hero | Who is this? | `docs/03-facts.md` → Who | Built, motion done | `sections/02-hero.md` |
-| 2a | About | Can he help someone like me? | `docs/03-facts.md` → Who (more needed) | Built, per-card pick (six cards); the Rix playground is built at /rix | `sections/02a-about.md` |
-| 3 | Marquee | (transition, no claim) | none | Built, motion done | `sections/03-marquee.md` |
-| 4 | Agents | What can their agents handle for my business? | `docs/03-facts.md` → What the user builds | Built per card; swimlane orchestra, phone stepper, entrance, auto-advance, demo replays and swap fade run | `sections/04-agents.md` |
+| 2 | Hero | Who is this? | `docs/03-facts.md` → Who | Built, motion done; round 1 copy in (side line, tag) | `sections/02-hero.md` |
+| 3 | Marquee | (transition, no claim) | none | Built, motion done; seven job items (2026-10-08) | `sections/03-marquee.md` |
+| 2a | About | Can he help someone like me? | `docs/03-facts.md` → Who (more needed) | Built, per-card pick (five cards); new heading and plain intro lines (2026-10-08); the Rix playground is built at /rix | `sections/02a-about.md` |
+| 4 | Agents | What can their agents handle for my business? | `docs/03-facts.md` → What the user builds | Built per card; heading and lead in the sticky column, phone stepper, entrance, auto-advance, demo replays and swap fade run; orchestra in the developer set only; round 1 copy in | `sections/04-agents.md` |
 | 5 | Process | How do they work? | `docs/03-facts.md` → How the user works | Built per card; bot life, crew relay and swap fade run | `sections/05-process.md` |
 | 6 | Web | Can they build my website end-to-end? | `docs/03-facts.md` → What the user can build | Built, motion done | `sections/06-web.md` |
 | 7 | Projects (formerly Proofs) | Have they built something real that people use? | `docs/03-facts.md` → Work that is live | Built, motion done | `sections/07-proofs.md` |
@@ -35,13 +41,17 @@ plus that section's file only.
 
 ## Current State (site-wide)
 
-All nine sections are built statically; section detail lives in `sections/`. Build, lint and tsc
-are green (lead's production-build check, 2026-10-03: 360, 768, 1024, 1440 and 3840 have no
-sideways scroll, no tap target under 44px and no console errors). Every title column pins from
+All nine sections are built statically; section detail lives in `sections/`. Lint, `tsc` and the
+production build are green (lead check, 2026-10-08; the orphan `AgentPointerPanel.tsx` is gone).
+That check (headless Chromium, reduced motion, 360, 768, 1440, 3840) found no sideways scroll, no
+page errors and no overflowing leaf text in hero, about and agents. There is no separate lead screen
+check of the five-card About board's layout (rows of 2, 2, 1 on phones; 3, 2 from `md`). Last
+full production-build check (lead, 2026-10-03): 360, 768, 1024, 1440 and 3840 had no sideways
+scroll, no tap target under 44px and no console errors. Every title column pins from
 `lg` except Proofs and Process (neither pins). Type tokens are rem-based (zoom-safe). Counting is
 wired (Umami Cloud).
 
-The About pick (the checked radio in About's group) is the one source for three sections: About's
+The About pick (the checked radio in About's group, five cards) is the one source for three sections: About's
 ack and Rix's emblem, Agents' offers and panels, and Process' five- or six-step flow. Agents and
 Process swap with a fade (0.15s out, 0.25s in, opacity only, the same under reduced motion) from one
 shared store (`lib/shownSet.ts`), so they and the bots change in one commit
@@ -75,6 +85,26 @@ cream and accent surfaces). Text-colour classes set an inherited `--selection-te
 that `::selection` reads, so the nearest class wins at any depth; checked and pressed states have
 their own selectors, and hover-only or opacity-suffixed colours inherit the parent's. The
 favicon is served from `app/icon.svg` and `app/apple-icon.png` (the mascot mark).
+
+Fonts (built 2026-10-07, uncommitted): display is Acosta (`assets/fonts/acosta.otf`, 400 only, no
+axes, letters and digits only), body IBM Plex Sans (variable), labels and meta IBM Plex Mono
+(400/500), loaded in `lib/fonts.ts`. Display punctuation falls through the `--font-display` stack to
+IBM Plex Sans Bold (`displayPunct`, local static 700 file); Acosta's automatic fallback is off. The
+`condensed` helpers and the weight classes on display text are gone. Display size tokens are about
+1.8x smaller than under Bricolage, tracking normal, leading 1.0 to 1.15 (footer mark 0.9,
+`--text-footer-mark` 17.5vw, `--text-hero` `clamp(2.4375rem, 1.25rem + 5.278vw, 7rem)` so MUHAMMAD
+clears the portrait); the About poster card title steps `text-body` / `md:text-summary` /
+`lg:text-card`; both sharing images use Acosta. Lead-checked 2026-10-07 on the dev server (Edge via
+Playwright): lint and build pass; `/` and `/rix` at 360, 768, 1440 and 3840 under reduced motion
+have no sideways scroll, no console errors and no display text wider than its box (section headings
+on two lines, row and card titles on one); step and row titles for the Discord, software-builder,
+online-store and service-business sets fit at 360, 1024 and 1440; full motion at 360 and 1440: the
+Exile Bot takeover opens and closes in the right end state and the footer reveal completes. Not
+checked: Safari, Firefox, real devices, the Design Vault takeover, the takeover's Next slide.
+
+Footer Rix (2026-10-07, built, static and motion, lead-checked): Rix stands on the footer's top
+hairline as the only entry to `/rix`, and calls the visitor with typed lines; browser checks beyond
+Edge are open. See `sections/09-footer.md`.
 
 Built and verified 2026-09-26: the Proofs section is renamed Proofs → Projects in every visible
 word (nav link, section label, the hero's "See projects" button, the takeover top bar) and its
@@ -138,7 +168,7 @@ sideways scroll, no console errors, no clipped text in the chart. See `sections/
 
 Process' Discord flow is the one flow with no loops: five steps (Mentioned, Your tone, Remembers,
 Connected, Always on), no return and no fix loop (`hasLoops` / `flowLoops` in `lib/processFlows.ts`,
-`data-loops="off"`); the other five flows keep both loops. Agents' Discord "Member questions" demos
+`data-loops="off"`); the other four flows keep both loops. Agents' Discord "Member questions" demos
 use an @mention and a reply that recalls a past chat, and "Custom commands" shows Server, Sheets and
 Twitch; "Welcome and roles" is a ticking checklist and "Moderation" a three-person list with a done
 pill per row. Lead-checked 2026-10-04 on a production build at 360 to 3840: lint and build pass, no
@@ -168,6 +198,19 @@ Built and lead-checked 2026-10-06: under full motion a plain click or Enter on a
 ducks its bot below the banner floor, then opens the takeover; bots stay down while any takeover is
 open and rise back after. Lint and build pass; checked in Edge at 1440. See `sections/07-proofs.md`.
 
+SEO pass (2026-10-07, built, not deployed): every page gets a canonical link through
+`pageMetadata` (`alternates.canonical` is the page's own path; `app/page.tsx` passes `path: "/"`);
+`app/sitemap.ts` stamps each published route with the build date; `/` renders one JSON-LD graph
+(`StructuredData`: a WebSite node and a Person node, strings from `content/shared.ts` and
+`lib/site.ts` only; the person's role and description are `structured`, in the third person on
+purpose); and Agents and Process each server-render all four card sets in a `hidden` wrapper
+(`AgentsAllOffers`: title and line; `ProcessAllFlows`: caption and steps), built from `about.replies`
+through `pickSet` (`lib/cardSets.ts`), so crawlers and AI models can read offers that otherwise
+appear only after a pick, without showing or being read twice. Home `meta.title` is "Muhammad Waqas | AI
+Agents and Automations" (`content/home.ts`). Checked only in the built HTML: the canonical on `/` and `/rix`,
+the JSON-LD parses, the four sets' text is present, and the hidden wrappers are `display: none` by
+Tailwind's `[hidden]` rule. Not checked in a browser, and not yet on the live site.
+
 ## Key Files (site-wide)
 
 - `app/page.tsx` — renders the nine sections in order, then the takeover layer
@@ -182,9 +225,15 @@ open and rise back after. Lint and build pass; checked in Edge at 1440. See `sec
   `docs/01-design-system.md`, `docs/03-facts.md` — the static-then-GSAP rules, tokens/type scale, the allow list
 - `temp/claude-design/Portfolio Redesign v3.dc.html` — reference layout/behaviour (local, gitignored;
   missing on disk 2026-10-03, see Open Questions)
+- `lib/fonts.ts`, `app/layout.tsx`, `app/globals.css` (`--font-display`, `--font-body`,
+  `--font-mono`), `app/opengraph-image.tsx`, `app/rix/opengraph-image.tsx`, `assets/fonts/acosta.otf`
+  (and `assets/fonts/ibm-plex-sans-latin-700.woff2`) — the site's fonts (2026-10-07 decision; Acosta,
+  IBM Plex Sans, IBM Plex Mono, Plex Sans Bold for display punctuation)
 - `lib/styles.ts` — shared style helpers: the takeover's cream-side tokens (`pillInk`,
   `focusRingOnCream`, `metaLabelOnCream`) and the split/sticky-title helpers (`splitColumns`,
-  `splitGrid` adds `lg:items-start`, `stickyTitle` `lg:sticky lg:top-30 lg:self-start`)
+  `splitGrid` adds `lg:items-start`, `stickyTitle` `lg:sticky lg:top-30 lg:self-start`) and
+  `slantDrop` (`[--slant-drop:5.2408vw]`, the hero's 3° cut and the marquee under it; a plain CSS
+  custom property, not a design token)
 - `lib/aboutPick.ts`, `lib/aboutMemory.ts`, `lib/holdInView.ts`, `lib/shownSet.ts`,
   `hooks/useShownSet.ts`, `hooks/useSwapFade.ts`, `hooks/useShownForMotion.ts`,
   `hooks/useAboutRemember.ts`, `hooks/useCloseOnLeave.ts`, `components/home/pick/` (including
@@ -197,6 +246,10 @@ open and rise back after. Lint and build pass; checked in Edge at 1440. See `sec
 - `lib/track.ts`, `lib/analytics.ts`, `components/Analytics.tsx` — the one Book a call tracking
   key and the Umami Cloud counting setup (script only loads once `NEXT_PUBLIC_UMAMI_WEBSITE_ID`
   is set, and only counts on `marwix.dev`)
+- `lib/pageMetadata.ts`, `lib/structuredData.ts`, `components/StructuredData.tsx` — the SEO pass:
+  each page's canonical link, and the home page's JSON-LD (the site and the person)
+- `lib/cardSets.ts` — the About cards that have their own set (every reply whose `pickSet` is not
+  `default`), with labels; feeds Agents' and Process' hidden all-sets lists
 - `lib/listNumber.ts` — a list row's two-digit number from its zero-based index, shared by
   numbered rows across sections
 - `lib/gsap.ts` — the one place GSAP and its plugins (`ScrollTrigger`, `useGSAP`) are registered;
@@ -220,9 +273,24 @@ open and rise back after. Lint and build pass; checked in Edge at 1440. See `sec
 
 ## Decisions (site-wide)
 
+- 2026-10-08 — User's calls: the shared voice is written first for everyday business owners who know AI only as a chat box (ChatGPT); developer and Discord content stays inside their own cards. "AI agent" stays, defined once in Agents by comparison with ChatGPT, then the copy talks in jobs; tone is calm proof (their job done, they stay in charge), no grand claims. Round 1: words plus Agents' heading and bridge line; round 2: demos show the action taken (a "Done" receipt) and Process is recast around control, one question "Can I trust it with my customers?" (decided and in build). `docs/04-voice.md` gained the chat-box reader line and rules 15-17 (show the job done; define "AI agent" once; builders' words only in the software-builder card); `docs/03-facts.md` gained "What an AI agent is", around-the-clock lines for service business and online store, and the new default set line. See `sections/02-hero.md`, `02a-about.md`, `03-marquee.md`, `04-agents.md`, `05-process.md`, `06-web.md`, `08-contact.md`.
+- 2026-10-07 — User's call: the entry to `/rix` moves from a footer-row link to a second Rix standing on the footer's top line; see `sections/09-footer.md`.
+- 2026-10-07 — User's call: the fonts change for the whole site: display text (name, headings, big display text, the MARWIX wordmark, the sharing images) is Acosta (single weight, local `assets/fonts/acosta.otf`, Befonts, commercial use allowed), body is IBM Plex Sans, labels and meta are IBM Plex Mono; replaces Bricolage Grotesque, Geist and Geist Mono. Why: the user chose Acosta from five candidates; IBM Plex beat Space Grotesk because its capital I reads as a lowercase l ("AI" looks like "Al"). Acosta is about twice as wide as condensed Bricolage, so size tokens, tracking and leading were retuned the same day (see `docs/01-design-system.md`).
+- 2026-10-07 — User's call: display punctuation renders in IBM Plex Sans Bold (a local static 700 file, `displayPunct`) because Acosta has letters and digits only.
+- 2026-10-07 — User-approved SEO pass: `marwix.dev` (no www) is the site's main address (set in Vercel; `www` still needs its redirect); every page gets a canonical link through `lib/pageMetadata.ts`; the sitemap carries a last-changed date; the home page carries JSON-LD (the site and the person, from `content/shared.ts` → `structured`, `footer.copyrightName` and `links`, facts-file claims only); home `meta.title` is set so a search for the name has something to match (now "Muhammad Waqas | AI Agents and Automations", the user's edit in `content/home.ts`). Why: the live site had no canonical, no structured data, and gave search engines an address that redirected.
+- 2026-10-07 — Skipped on purpose in the SEO pass: an FAQ section (the common questions are barred by the facts file), `llms.txt`, and any new route (constitution §2).
+- 2026-10-07 — User's call: every project takeover gets a permanent ink band behind its title, and
+  the card's ink banner morphs into it on open (reverse on close). See `sections/07-proofs.md`.
+- 2026-10-07 — User's call: the About card "I need a website" is removed (it isn't a profession, so
+  it doesn't answer "What do you do?"); About has five cards and four audiences, and Web serves
+  anyone who needs a website. See `sections/02a-about.md`.
+- 2026-10-07 — User's call (mockup option "A1"): the Marquee strip moves from below About to
+  between Hero and About (Hero → Marquee → About → Agents → …), sitting under the hero's 3° slanted
+  bottom edge; same angle at every width. Built and lead-checked 2026-10-07 (360 to 3840: no
+  sideways scroll, no console errors; reduced motion and Safari unchecked). See
+  `sections/02-hero.md` and `sections/03-marquee.md`.
 - 2026-09-24 — Reset to the v3 reference design; one page at `/`, projects opening in a
-  full-screen takeover, not on their own routes. Violet accent (not v3's lime), Bricolage
-  Grotesque display, v3 greys mapped onto existing tokens.
+  full-screen takeover, not on their own routes. Violet accent (not v3's lime), v3 greys mapped onto existing tokens.
 - 2026-09-24 — Static build first; a GSAP pass adds motion afterwards; each spec element carries a
   "Motion (later)" note. Spacing tokens `--spacing-gutter`/`--spacing-section` added (user's yes);
   the spec's other choices are accepted as written in `ui-spec.md`.
@@ -235,7 +303,7 @@ open and rise back after. Lint and build pass; checked in Edge at 1440. See `sec
   Hero → Marquee → Agents (both variants) → Process → Web → Proofs+takeover → Contact → Footer,
   reviewed by the user each time; from batch 1 (Hero+Marquee) on, given the 2026-09-30 ship date,
   it moved to user-approved batches of 2–3 sections (batch 2: Agents A+B + Process).
-- 2026-09-24 — Type tokens: the home `meta.description` matches `hero.sideLine`'s wording; big
+- 2026-09-24 — Type tokens: big
   section headings use slightly looser letter spacing; the 8 fluid type tokens use rem bounds and
   a rem + vw middle so text grows with zoom/font-size settings (WCAG 1.4.4).
 - 2026-09-24 — Every Book a call link uses one tracking key (`lib/track.ts`); visits and Book a
@@ -291,6 +359,7 @@ open and rise back after. Lint and build pass; checked in Edge at 1440. See `sec
   time that value is seen in a visit; a "Shown for: …" tag on Agents and Process opens an in-flow
   list of the six cards and switches in place; the tag is hidden without JavaScript, where both
   sections show the default set; Rix's tantrum still deselects.
+- 2026-10-07 — User's call: About's fifth card is labelled "Just exploring" (was "Not sure yet"); Contact's brief option keeps "Not sure yet". See `sections/02a-about.md`.
 - 2026-10-05 — User's call: Rix on About is livelier and talks more (`ui-spec/00-rix.md` rev 4),
   and card picks are locked from a tantrum's start until the forgive ends; home no longer allows
   "a pick is never blocked". See `sections/02a-about.md`.
@@ -340,15 +409,32 @@ open and rise back after. Lint and build pass; checked in Edge at 1440. See `sec
 
 - **To do (user):** create a free Umami Cloud account, add the website marwix.dev and send the
   lead its website ID; it's set as `NEXT_PUBLIC_UMAMI_WEBSITE_ID` in Vercel and needs a redeploy.
+- **To do (user):** in Vercel, set `www.marwix.dev` to redirect to `marwix.dev` (it currently
+  serves the page too).
+- **To do (user):** add the site to Google Search Console (Domain property; the user adds the TXT
+  record in Cloudflare themselves, constitution §10) and Bing Webmaster Tools, then submit the
+  sitemap, after the SEO pass is deployed.
 - **Choice:** constitution §13's ship date (2026-09-30) has passed; the user decides the new one.
 - **Choice:** the reference design file `temp/claude-design/Portfolio Redesign v3.dc.html` is
   missing on disk (constitution §5 names it); the user restores it or says to drop it.
-- **Roll-up:** section-specific open questions remain in `sections/02-hero.md` (4),
-  `sections/02a-about.md` (7), `sections/04-agents.md` (16), `sections/05-process.md` (23),
-  `sections/07-proofs.md` (21), `sections/08-contact.md` (1) and `sections/09-footer.md` (3). The
+- **Roll-up:** section-specific open questions remain in `sections/02-hero.md` (5),
+  `sections/02a-about.md` (10), `sections/03-marquee.md` (1), `sections/04-agents.md` (18),
+  `sections/05-process.md` (25), `sections/07-proofs.md` (34), `sections/08-contact.md` (1) and `sections/09-footer.md` (3). The
   pre-deploy check reads this roll-up and every section file; the page ships with none open
   anywhere.
-- **To build:** screen re-check of `/` and `/rix` after the motion pass (pending). `/rix` is built
-  (doc: `docs/pages/rix/page.md`).
+- **To build:** `lib/takeoverTitleMorph.ts` still carries logic for Bricolage's `opsz`/`wdth` axes
+  and em letter spacing that no longer does anything; it works, but gsap-animator should trim it.
+- **To do (user):** delete `assets/fonts/GeistMono-ExtraBold.ttf` and
+  `assets/fonts/GeistMono-OFL.txt`, which nothing reads now (the project's hook lets only the user
+  delete files).
+- **To do (user):** `.claude/skills/design-tokens/SKILL.md` and `.claude/agents/ui-designer.md`
+  still name the old fonts.
+- **To build:** the ui-spec files still quote the old sizes and fonts (e.g. `ui-spec.md`
+  `condensedMark`, `ui-spec/09-footer.md` "25vw", `ui-spec/00-rix.md`, `docs/pages/rix/ui-spec.md`);
+  ui-designer updates them.
+- **Choice:** the hero portrait is taller on phones and tablets than before (about 100px at 360)
+  because the name block above it is shorter: keep, or bring back the old size.
+- **To build:** Safari, Firefox and real-device check of the new fonts, plus the Design Vault
+  takeover and the takeover's Next slide, which the 2026-10-07 check did not cover.
 - **Fact:** the About copy (`content/home.ts` → `about`) is still SAMPLE (see
   `sections/02a-about.md`).

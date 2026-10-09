@@ -14,7 +14,7 @@ type ProofBannerProps = {
 export function ProofBanner({ targetId, prop }: ProofBannerProps) {
   return (
     <div aria-hidden="true" className="relative m-2.5 aspect-[2.2/1]">
-      <InkStageGround glow="floor" className="inset-0 rounded-xl" />
+      <InkStageGround glow="floor" anim="proof-banner" className="inset-0 rounded-xl" />
       <div
         data-anim="proof-bot-layer"
         className="pointer-events-none absolute inset-0 [clip-path:inset(-120%_-60%_0_-60%)]"

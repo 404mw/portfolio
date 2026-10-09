@@ -3,7 +3,8 @@
 // `rix-walker`, the hydrated `about-rix` button, its host bot SVG with the emotes, the quip anchor
 // and quip, the props and the acks), holds what Rix is doing, and puts everything back exactly as
 // server-rendered on teardown (the pick lock's `data-locked` and `aria-disabled` included, R6A.9).
-// The bot's own rig is Process's (lib/processBotRig.ts), reused.
+// The bot's own rig is Process's (lib/processBotRig.ts), reused. The footer's light Rix
+// (ui-spec/09-footer.md §9.4) finds its own parts (lib/footerRixParts.ts) and shares the state.
 import { stripPickLock } from "@/lib/aboutPickLock";
 import type { gsap } from "@/lib/gsap";
 import { animTargets } from "@/lib/motion";
@@ -22,7 +23,8 @@ export type RixParts = {
   readonly stage: HTMLElement;
   /** The walk's only writer (its `x`); it carries the button, so the focus ring travels along. */
   readonly walker: HTMLElement;
-  readonly button: HTMLButtonElement;
+  /** What the visitor presses: the `about-rix` button, or the footer Rix's link (lib/footerRixParts.ts). */
+  readonly button: HTMLElement;
   readonly svg: SVGSVGElement;
   /** The quip's outer span: motion sets its `data-side`. */
   readonly anchor: HTMLElement;
@@ -153,14 +155,6 @@ export function findRixParts(root: HTMLElement): RixParts | null {
     });
     if (Object.keys(parts).length > 0) emoteParts[name] = parts;
   });
-  const eyeRects = Array.from(svg.querySelectorAll<SVGRectElement>('[data-bot="eye"]')).map(
-    (rect): EyeRect => [
-      Number(rect.getAttribute("x")),
-      Number(rect.getAttribute("y")),
-      Number(rect.getAttribute("width")),
-      Number(rect.getAttribute("height")),
-    ],
-  );
   return {
     root,
     stage,
@@ -173,8 +167,20 @@ export function findRixParts(root: HTMLElement): RixParts | null {
     acks: animTargets(root, "about-ack"),
     emotes,
     emoteParts,
-    eyeRects,
+    eyeRects: eyeRectsOf(svg),
   };
+}
+
+/** Each eye rect of the bot in `svg` as drawn now: `x`, `y`, `width`, `height`. */
+export function eyeRectsOf(svg: SVGSVGElement): EyeRect[] {
+  return Array.from(svg.querySelectorAll<SVGRectElement>('[data-bot="eye"]')).map(
+    (rect): EyeRect => [
+      Number(rect.getAttribute("x")),
+      Number(rect.getAttribute("y")),
+      Number(rect.getAttribute("width")),
+      Number(rect.getAttribute("height")),
+    ],
+  );
 }
 
 /** The reply index checked in group `name`, or null. */

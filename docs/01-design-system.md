@@ -1,6 +1,6 @@
 # Design system
 
-**Last Updated:** 2026-09-25
+**Last Updated:** 2026-10-07
 
 The look of `marwix.dev`. Layout and behaviour follow the reference design
 (`temp/claude-design/Portfolio Redesign v3.dc.html`); **colours and type come only from this
@@ -36,13 +36,15 @@ reference's dark grey list rows) is `muted` at reduced opacity only where it isn
 
 ## Type
 
-All three families are on Google Fonts; they load with `next/font` in `lib/fonts.ts`.
+All families load with `next/font` in `lib/fonts.ts`: Acosta and the punctuation face from local
+files in `assets/fonts/`, the two IBM Plex families from Google Fonts.
 
 | Role | Family | Weight | Notes |
 |---|---|---|---|
-| Name, headings, big display text | Bricolage Grotesque | 500–800 | Variable, `opsz` and `wdth` axes. Condensed with `font-variation-settings: 'wdth' 80` (75 for the footer wordmark). Hero name uppercase. Tight leading 0.82–0.95, tracking −0.015 to −0.045em |
-| Body | Geist | 400 / 500 / 600 | 15px / 1.55 base |
-| Labels, meta, wordmark | Geist Mono | 400 / 500 / 800 | Section labels uppercase with 0.06em tracking |
+| Name, headings, big display text, the MARWIX wordmark (page and sharing images) | Acosta | 400 only | Local `assets/fonts/acosta.otf` (Befonts: commercial use allowed). One weight, no axes: display text carries no weight class. Very wide (about 0.9em per character; cap height 0.85em). Hero name uppercase. Letter spacing normal. Leading 1.0 for one-line titles and the hero, 1.05 for section headings and rows, 1.15 for smaller titles, 0.9 for the footer wordmark |
+| Punctuation inside display text | IBM Plex Sans Bold | 700 only | Acosta holds letters and digits only. Any other character in display text falls through the `--font-display` stack to a bold-only local family (`assets/fonts/ibm-plex-sans-latin-700.woff2`, OFL), so it renders bold at any requested weight |
+| Body | IBM Plex Sans | 400 / 500 / 600 | Variable. 15px / 1.55 base |
+| Labels, meta | IBM Plex Mono | 400 / 500 | Section labels uppercase with 0.06em tracking |
 
 ### Text-size tokens
 
@@ -59,16 +61,21 @@ scale with browser zoom and the font-size setting; the fixed px tokens scale wit
 | `--text-body-lg` | `16px` | Descriptions under rows and steps, chat bubbles |
 | `--text-lead` | `17px` | Lead lines under headings |
 | `--text-summary` | `clamp(1.25rem, 1.106rem + 0.64vw, 1.625rem)` | The takeover's summary paragraph |
-| `--text-step` | `32px` | Process step titles |
-| `--text-card` | `clamp(1.875rem, 1.589rem + 1.27vw, 2.75rem)` | Proof card titles |
-| `--text-row` | `clamp(2.125rem, 1.596rem + 2.35vw, 3.625rem)` | Agent list rows and web step rows |
-| `--text-marquee` | `40px` | The marquee strip |
-| `--text-heading-sm` | `clamp(2.5rem, 1.773rem + 3.23vw, 5rem)` | The web section heading |
-| `--text-heading` | `clamp(2.75rem, 1.661rem + 4.84vw, 6.5rem)` | Section headings (how I work, proofs) |
-| `--text-heading-xl` | `clamp(3.25rem, 1.997rem + 5.57vw, 7.75rem)` | The contact heading |
-| `--text-takeover` | `clamp(3.5rem, 1.592rem + 8.48vw, 10.5rem)` | The takeover's project title |
-| `--text-hero` | `clamp(4.5rem, 2rem + 11.11vw, 13.75rem)` | The hero name |
-| `--text-footer-mark` | `25vw` | The giant footer wordmark |
+| `--text-step` | `24px` | Process step titles, takeover part titles |
+| `--text-card` | `clamp(1.5625rem, 1.354rem + 0.926vw, 2.25rem)` | Proof card titles, the About prompt and (from `lg`) its cards |
+| `--text-row` | `clamp(1.375rem, 1.172rem + 0.904vw, 2.75rem)` | Agent list rows and web step rows |
+| `--text-marquee` | `28px` | The marquee strip |
+| `--text-heading-sm` | `clamp(1.5625rem, 1.224rem + 1.506vw, 3.5rem)` | The About and Web section headings |
+| `--text-heading` | `clamp(1.875rem, 1.167rem + 3.148vw, 4.5rem)` | Section headings (how I work, projects) |
+| `--text-heading-xl` | `clamp(1.875rem, 1.536rem + 1.506vw, 4rem)` | The contact heading |
+| `--text-takeover` | `clamp(2.125rem, 1.083rem + 4.63vw, 6.25rem)` | The takeover's project title |
+| `--text-hero` | `clamp(2.4375rem, 1.25rem + 5.278vw, 7rem)` | The hero name |
+| `--text-footer-mark` | `17.5vw` | The giant footer wordmark |
+
+The display sizes are set so that, in Acosta, the hero name fits a 360px phone, each section
+heading sets on two lines in its column, and row and card titles stay on one line. A heading
+token's size follows its column's width, not its name: `heading-xl` sits in a half-width column,
+so it is smaller than `heading` on desktop.
 
 ## Layout
 
@@ -105,3 +112,14 @@ Section-by-section layout lives in `docs/pages/home/ui-spec.md`.
 - 2026-09-24 — Fluid type tokens moved to rem bounds with a rem + vw middle (user's yes). Reason:
   pure-vw type doesn't grow with browser zoom (WCAG 1.4.4). Sizes at 360px and at the max are
   unchanged; mid widths are slightly larger.
+- 2026-10-07 — Fonts changed for the whole site (user's yes). Display is Acosta, replacing
+  Bricolage Grotesque; body is IBM Plex Sans, replacing Geist; labels and meta are IBM Plex Mono,
+  replacing Geist Mono. The wordmark moves from Geist Mono 800 to Acosta, on the page and in both
+  sharing images. Reason: the user chose Acosta from five candidates; IBM Plex was picked over
+  Space Grotesk because Space Grotesk's capital I reads as a lowercase l ("AI" looks like "Al").
+  Acosta has no punctuation, so display punctuation comes from IBM Plex Sans Bold (user's yes).
+  Acosta is about 1.8 times as wide as condensed Bricolage, so ten display size tokens were
+  retuned from measured renders (`step`, `card`, `row`, `marquee`, `heading-sm`, `heading`,
+  `heading-xl`, `takeover`, `hero`, `footer-mark`); display letter spacing is now normal, display
+  weight classes and the `wdth` width settings are gone, and leading is looser (1.0–1.15).
+  `summary` and the body-size tokens are unchanged. No token was added or removed.

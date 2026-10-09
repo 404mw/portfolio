@@ -1,14 +1,14 @@
 // One process step (ui-spec §5.2): its bot (holding the job on step 1), the ledge it stands on
 // (below `lg`, ProcessLedge, §5.9), the chevron to the next step (from `lg`, not on the last
 // step), then the step label, title and line. A row below `lg`, a column from `lg`. The `<li>` is
-// `relative` at every width (no z-index) so the ledge, the chevron and step 3's fix loop are
-// placed against it. Nothing here is interactive.
+// `relative` at every width (no z-index) so the ledge, the chevron, step 3's hand-off and step 4's
+// fix loop are placed against it. Nothing here is interactive.
 import type { ReactNode } from "react";
 import { ProcessBot } from "@/components/home/process/ProcessBot";
 import { ProcessLedge } from "@/components/home/process/ProcessLedge";
 import { ChevronRightIcon } from "@/components/icons/ChevronRightIcon";
 import type { BotPose, BotRole } from "@/lib/processBots";
-import { condensed, metaLabel } from "@/lib/styles";
+import { metaLabel } from "@/lib/styles";
 
 type ProcessStepProps = {
   /** Its index, for `data-step`. */
@@ -22,7 +22,7 @@ type ProcessStepProps = {
   readonly line: string;
   /** What the bot holds (step 1: the flow's emblem). */
   readonly children?: ReactNode;
-  /** The `<li>`'s last child, after the text (step 3: the fix loop). */
+  /** The `<li>`'s last child, after the text (step 3: the hand-off; step 4: the fix loop). */
   readonly after?: ReactNode;
 };
 
@@ -58,7 +58,7 @@ export function ProcessStep({
       <div data-anim="reveal" className="flex flex-col gap-2 lg:gap-2.5 lg:pt-7.5">
         <p className={`${metaLabel} uppercase tracking-[0.06em]`}>{label}</p>
         <h3
-          className={`font-display font-semibold text-step leading-[1.05] tracking-[-0.02em] text-balance wrap-break-word text-text ${condensed}`}
+          className={`font-display text-step leading-[1.15] text-balance wrap-break-word text-text`}
         >
           {title}
         </h3>

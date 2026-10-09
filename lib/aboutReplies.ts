@@ -45,7 +45,6 @@ export const aboutReplyProp: Readonly<Record<AboutReply["key"], RixPropName | nu
   "online-store": "parcel",
   discord: "bubble",
   "software-builder": "code",
-  website: "window",
   "not-sure": null,
 };
 

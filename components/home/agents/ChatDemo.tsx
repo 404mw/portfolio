@@ -2,8 +2,10 @@
 // messages, so either side can open it (the reminder opens with the agent). Each bubble starts
 // with its speaker's name for screen readers, so the turn isn't carried by side and colour alone.
 // Before each agent message sits its typing dots, in the markup but hidden until the motion pass.
-// Every part carries its place in the sequence (`data-demo-order`).
+// One entry is the action taken (§4.10): the receipt, on neither side, at the point the job got
+// done. Every part carries its place in the sequence (`data-demo-order`).
 import { Fragment } from "react";
+import { DemoActionLine } from "@/components/home/agents/DemoActionLine";
 import { TypingBubble } from "@/components/TypingBubble";
 import { agents } from "@/content/home";
 import type { ChatDemoContent } from "@/lib/agents";
@@ -15,7 +17,7 @@ const themBubble =
 type ChatDemoProps = { readonly demo: ChatDemoContent };
 
 export function ChatDemo({ demo }: ChatDemoProps) {
-  // Each message's place in the sequence: an agent message comes after its typing dots.
+  // Each entry's place in the sequence: an agent message comes after its typing dots.
   const orders = demo.messages.reduce<number[]>((list, message, index) => {
     const before = index === 0 ? 0 : list[index - 1];
     return [...list, before + (message.from === "agent" ? 2 : 1)];
@@ -23,7 +25,9 @@ export function ChatDemo({ demo }: ChatDemoProps) {
   return (
     <div className="flex flex-col gap-3.5">
       {demo.messages.map((message, index) =>
-        message.from === "them" ? (
+        message.from === "action" ? (
+          <DemoActionLine key={index} action={message} order={orders[index]} />
+        ) : message.from === "them" ? (
           <p key={index} data-demo-order={orders[index]} className={themBubble}>
             <span className="sr-only">{demo.asker} </span>
             {message.text}

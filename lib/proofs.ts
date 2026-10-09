@@ -50,10 +50,10 @@ export function proofTarget(key: ProofKey) {
 export type ProofStat = { readonly value: string; readonly label: string };
 
 /**
- * A takeover's shots, or their alt texts, in order (ui-spec §7.6): always three, the big shot,
- * then two details.
+ * A takeover's shots, or their alt texts, in order (ui-spec §7.3.1 part 3, §7.6): two or three.
+ * Two: two 2:1 shots, stacked. Three: the big 2:1 shot, then two 4:3 details.
  */
-export type ProofShots<T> = readonly [T, T, T];
+export type ProofShots<T> = readonly [T, T] | readonly [T, T, T];
 
 /** The edge of a shot its frame keeps when it crops (ui-spec §7.6). */
 export type ProofShotPosition = "top" | "center" | "left";
@@ -61,13 +61,16 @@ export type ProofShotPosition = "top" | "center" | "left";
 /** One shot: its image name and the edge its frame keeps. */
 export type ProofShot = { readonly name: ImageName; readonly position: ProofShotPosition };
 
+/** One shot with its alt text, as a takeover draws it. */
+export type ProofShotWithAlt = ProofShot & { readonly alt: string };
+
 /**
  * Each project's shots. A project's count must equal its `shotAlts` count in content/home.ts, so
  * shots and alts can't drift apart.
  */
 const proofShotNames = {
   exile: ["exileShot1", "exileShot2", "exileShot3"],
-  designVault: ["designVaultShot1", "designVaultShot2", "designVaultShot3"],
+  designVault: ["designVaultShot1", "designVaultShot2"],
   marwixSkills: ["marwixSkillsShot1", "marwixSkillsShot2", "marwixSkillsShot3"],
 } as const satisfies {
   readonly [K in ProofKey]: ProofShots<ImageName> & {
@@ -75,25 +78,47 @@ const proofShotNames = {
   };
 };
 
-/** Each slot's default position: the big shot keeps its top, the details their centre. */
-const slotPositions: ProofShots<ProofShotPosition> = ["top", "center", "center"];
+/**
+ * Each slot's default position, by shot count. Two: both keep their top. Three: the big shot
+ * keeps its top, the details their centre.
+ */
+const slotPositions = {
+  2: ["top", "top"],
+  3: ["top", "center", "center"],
+} as const satisfies { readonly [N in 2 | 3]: ProofShots<ProofShotPosition> & { readonly length: N } };
 
-/** The projects whose shots set their own positions; the others keep the slot defaults. */
-const proofShotPositions: { readonly [K in ProofKey]?: ProofShots<ProofShotPosition> } = {
+/** The projects whose shots set their own positions, one per shot; the others keep the slot defaults. */
+const proofShotPositions: {
+  readonly [K in ProofKey]?: ProofShots<ProofShotPosition> & {
+    readonly length: (typeof proofShotNames)[K]["length"];
+  };
+} = {
   exile: ["center", "top", "left"],
 };
 
+/**
+ * Pairs two equal-length shot tuples item by item, keeping the tuple's length in its type. Their
+ * lengths are tied at compile time above; a mismatch that slips past fails the build.
+ */
+function zipShots<A, B, R>(a: ProofShots<A>, b: ProofShots<B>, join: (a: A, b: B) => R): ProofShots<R> {
+  if (a.length === 2 && b.length === 2) return [join(a[0], b[0]), join(a[1], b[1])];
+  if (a.length === 3 && b.length === 3) return [join(a[0], b[0]), join(a[1], b[1]), join(a[2], b[2])];
+  throw new Error("A project's shots, positions and alt texts must be the same length (lib/proofs.ts).");
+}
+
 /** A project's images (ui-spec §7.6), all in its takeover's part 3. */
 export function proofImages(key: ProofKey): { readonly shots: ProofShots<ProofShot> } {
-  const names = proofShotNames[key];
-  const positions = proofShotPositions[key] ?? slotPositions;
-  return {
-    shots: [
-      { name: names[0], position: positions[0] },
-      { name: names[1], position: positions[1] },
-      { name: names[2], position: positions[2] },
-    ],
-  };
+  const names: ProofShots<ImageName> = proofShotNames[key];
+  const positions = proofShotPositions[key] ?? slotPositions[names.length];
+  return { shots: zipShots(names, positions, (name, position) => ({ name, position })) };
+}
+
+/** A takeover's shots paired with their alt texts by index (content/home.ts → `shotAlts`). */
+export function proofShotsWithAlts(
+  shots: ProofShots<ProofShot>,
+  alts: ProofShots<string>,
+): ProofShots<ProofShotWithAlt> {
+  return zipShots(shots, alts, (shot, alt) => ({ ...shot, alt }));
 }
 
 /** A takeover's parts, in order (ui-spec §7.3): the `data-part` values. */

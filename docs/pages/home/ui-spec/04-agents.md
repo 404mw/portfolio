@@ -628,6 +628,9 @@ Lead offer first. Every offer is a line in `docs/03-facts.md` → What the user 
   `checklist` also shows one person's steps in order (Discord row 2: the member is the title,
   the lines are what happens to them), so that panel has no initials circle.
 
+**2026-10-08:** the action line (a receipt row saying what the agent did and where it went) is
+specced in its own file, `04-agents-action.md` (§4.10, choices 39–48).
+
 ### 4.9 Choices
 
 **Decided by the user, 2026-10-03:**

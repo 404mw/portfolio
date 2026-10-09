@@ -2,12 +2,16 @@
 // same parts in the same order for every project: what it is, the problem, what I built, what it
 // took, what I learned and the showcase (only when the project has them), what this means for
 // you, then Next.
-// Every part is a direct child of the column, a sibling of the title, so the open, close and Next
+// The column is a flex column. Its first child is the head (`TakeoverHead`,
+// ui-spec/07-proofs-sticky-band.md): the title on its permanent ink band, as one box that sticks
+// under the top bar only while the motion's condense runs.
+// Every part is a direct child of the column, a sibling of the head, so the open, close and Next
 // motion (hooks/useTakeoverMotion.ts) moves them all. Without JS, `:target` shows it; with JS,
 // hooks/useHashTakeover.ts opens it as a modal from the hash and `:target` is switched off
 // (`data-takeover-js` on <html>), so only the `open` state shows it.
 import { ProjectVisitLink } from "@/components/home/proofs/ProjectVisitLink";
 import { SpamDiagram } from "@/components/home/proofs/SpamDiagram";
+import { TakeoverHead } from "@/components/home/proofs/TakeoverHead";
 import { TakeoverIntro } from "@/components/home/proofs/TakeoverIntro";
 import { TakeoverLearned } from "@/components/home/proofs/TakeoverLearned";
 import { TakeoverMeans } from "@/components/home/proofs/TakeoverMeans";
@@ -28,7 +32,7 @@ import {
   takeoverTitleId,
   type ProofKey,
 } from "@/lib/proofs";
-import { condensed, container, takeoverText } from "@/lib/styles";
+import { container, takeoverText } from "@/lib/styles";
 
 type ProjectTakeoverProps = {
   readonly projectKey: ProofKey;
@@ -52,14 +56,8 @@ export function ProjectTakeover({ projectKey }: ProjectTakeoverProps) {
       <div data-anim="takeover-content">
         <TakeoverTopBar number={proofNumber(projectKey)} tag={project.tag} />
         <div className="px-gutter">
-          <div className={`${container} flex flex-col gap-10 pt-10 md:gap-14 md:pt-16 lg:gap-18 lg:pt-22`}>
-            <h2
-              id={titleId}
-              data-anim="takeover-title"
-              className={`font-display text-takeover leading-[0.88] font-semibold tracking-[-0.045em] text-ink ${condensed}`}
-            >
-              {project.title}
-            </h2>
+          <div className={`${container} flex flex-col gap-10 pt-gutter md:gap-14 lg:gap-18`}>
+            <TakeoverHead id={titleId} title={project.title} />
             <TakeoverIntro intro={project.intro} rows={project.rows} />
             <TakeoverPart
               part="problem"

@@ -6,15 +6,18 @@ edits it whenever they want. **The user's edits are final:** before changing any
 
 ## The reader
 
-Someone who might hire the user, one of five audiences (constitution §3): a service business, an
-online store, a Discord server owner, a software builder or someone who needs a website. Only the
-software builder is technical. Someone sent them the link. They skim each section
+Someone who might hire the user, one of four audiences (constitution §3): a service business, an
+online store, a Discord server owner or a software builder. Only the software builder is
+technical. Someone sent them the link. They skim each section
 for 3–5 seconds and decide whether to keep going. Every section answers **one question**, the
 question in its page doc.
 
+The shared voice is written first for a business owner who has used AI only as a chat box, like
+ChatGPT. AI that takes actions for them is new to them (the user, 2026-10-08).
+
 ## Tone per card
 
-The shared page keeps one voice, written so all five audiences follow it. A picked card's own
+The shared page keeps one voice, written so all four audiences follow it. A picked card's own
 content (its acknowledgement, its offers and demos in Agents, its flow in Process, its WhatsApp
 message, and the closing line of each project's takeover) takes that audience's tone. The rest of
 a project's takeover is shared and reads the same for everyone. Every rule below still applies to
@@ -26,8 +29,7 @@ every card.
 | Online store | Plain and practical: orders, deliveries, customers. |
 | Discord | Casual, in a server owner's words: members, mods, roles, channels. |
 | Software builder | Peer to peer, one builder to another: app, feature, ship, review, production. No tool, model or stack names. |
-| I need a website | Plain: visitors, enquiries, the site. |
-| Not sure yet, or no pick | The shared voice. |
+| Just exploring, or no pick | The shared voice. |
 
 ## Rules you can check
 
@@ -52,6 +54,13 @@ every card.
     uppercased by CSS, not typed in capitals.
 13. **The button always says "Book a call".**
 14. **Hunt for one compressed line under 12 words per page,** the line a reader would remember.
+15. **Show the job done, not the chat.** Say what got done (booked, replied, reminded, passed to
+    you), not that an agent exists.
+16. **Define "AI agent" once.** The Agents bridge line defines it by comparison with ChatGPT.
+    Elsewhere in the shared voice, say the job and use "agent" sparingly.
+17. **Builders' words stay in the software-builder card's own content:** agent workflow,
+    specialized or specialist, enforced, end-to-end, ship, production, pipeline, sync, connected
+    tools, orchestration. Never assume the reader has a team.
 
 ## Length
 

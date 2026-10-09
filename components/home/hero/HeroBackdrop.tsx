@@ -4,10 +4,14 @@
 // - Below `lg`, the pool follows the head under WAQAS.
 // - From `lg`, it's centred on the head of the portrait frame: a square of side
 //   S = 1.1·min(section height, 66vw) sitting on the section's bottom, its left edge at
-//   CR + 0.25em − 1.68S (CR = the column's right edge), and the head's centre about 47% across
-//   and 30% down it, so x = CR + 0.25em − 1.21S and y = H − 0.7S. The section's height H is
-//   clamp(40rem, 100svh, 75rem) (its `h-svh min-h-160 max-h-300`), written out in `left`
-//   because a horizontal percentage there would measure the width.
+//   CR + 0.45em − 1.68S (CR = the column's right edge), and the head's centre about 47% across
+//   and 30% down it, so x = CR + 0.45em − 1.21S and y = H − 0.7S. H is the height of the
+//   section's content box, clamp(40rem, 100svh, 75rem) (its `h-svh min-h-160 max-h-300`),
+//   written out in `left` because a horizontal percentage there would measure the width.
+// The backdrop also fills the strip the section adds under its content box for the slanted
+// bottom edge (`--slant-drop`, set on the section), so the network, vignette and grain run into
+// it. The pool sits in an inner box that ends where the content box does, so its vertical
+// percentages still measure H and it stays on the head.
 import { HeroGrain } from "@/components/home/hero/HeroGrain";
 import { HeroNetwork } from "@/components/home/hero/HeroNetwork";
 
@@ -15,7 +19,9 @@ export function HeroBackdrop() {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 text-hero">
       <HeroNetwork />
-      <div className="absolute top-[calc(39%+2rem+0.87em)] left-[calc(var(--spacing-gutter)+1.365em)] size-[5em] -translate-1/2 rounded-full bg-radial from-accent/15 to-transparent to-70% md:top-[calc(39%+5rem+0.87em)] lg:top-[calc(100%-0.77*min(100%,66vw))] lg:left-[calc(100%-max(var(--spacing-gutter),(100%-var(--container-site))/2)+0.25em-1.331*min(clamp(40rem,100svh,75rem),66vw))]" />
+      <div className="absolute inset-x-0 top-0 bottom-(--slant-drop)">
+        <div className="absolute top-[calc(39%+2rem+0.87em)] left-[calc(var(--spacing-gutter)+2.457em)] size-[9em] -translate-1/2 rounded-full bg-radial from-accent/15 to-transparent to-70% md:top-[calc(39%+5rem+0.87em)] lg:top-[calc(100%-0.77*min(100%,66vw))] lg:left-[calc(100%-max(var(--spacing-gutter),(100%-var(--container-site))/2)+0.45em-1.331*min(clamp(40rem,100svh,75rem),66vw))]" />
+      </div>
       <div className="absolute inset-0 bg-radial-[ellipse_at_center] from-transparent from-45% to-bg" />
       <HeroGrain />
     </div>

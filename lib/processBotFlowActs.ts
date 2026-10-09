@@ -1,5 +1,6 @@
 // The acts of the roles the per-card flows added (ui-spec §5.7 "new acts"): `intake` holds the job
-// out, then hands it on; `flag` raises its flag from lowered and waves it; `remind` swings its
+// out, then hands it on; `flag` raises its flag from lowered and waves it (on the relay: a look and
+// a nod for a routine job, the full raise for a send, §5.11e); `remind` swings its
 // bell; `ship` lifts its arrow up and to the right. Each in three lengths, like the builders' acts
 // (lib/processBotActs.ts): the timed act, the short one after a hover or tap, and the relay catch,
 // whose beat the relay job shares through `JOB_BEATS` and which fits inside the role's
@@ -63,9 +64,19 @@ export function intakeAct(bot: Bot, length: Length): gsap.core.Timeline {
  */
 const FLAG = { lowered: 30, over: -6, waves: [9, -7, 6, 0], wave: 0.18, short: [10, -8, 0], shortWave: 0.16 } as const;
 
-/** Flag: dips the flag, raises it (the top lands on `JOB_BEATS.flag.raise`) and waves it. */
+/**
+ * Flag: dips the flag, raises it (the top lands on `JOB_BEATS.flag.raise`) and waves it: the timed
+ * act, and the relay's send (ui-spec §5.11e), when the job lifts off on the raise for a person. On
+ * a routine relay catch it only looks at the job and nods it on, the flag staying up (the host's
+ * catch; the dip lands on `JOB_BEATS.flag.nod`, inside `RELAY_DWELL.flag`).
+ */
 export function flagAct(bot: Bot, length: Length): gsap.core.Timeline {
   const { ch, parts } = bot;
+  if (length === "catch") {
+    return actTimeline()
+      .to(ch, { look: endLook(bot, length), duration: 0.3, ease: "power2.out" }, 0)
+      .add(nod(bot), JOB_BEATS.flag.nod - 0.1);
+  }
   const tl = actTimeline();
   if (length === "short") {
     tl.to(ch, { mixR: 0, duration: 0.15, ease: "power2.out" }, 0);
@@ -75,7 +86,7 @@ export function flagAct(bot: Bot, length: Length): gsap.core.Timeline {
     return tl.to(ch, { mixR: 1, duration: 0.3, ease: "power2.inOut" }, 0.05 + FLAG.short.length * FLAG.shortWave);
   }
 
-  // Fits a relay stop (`RELAY_DWELL.flag`): the waves end at 1.27, the act at 1.7.
+  // The waves end at 1.27, the act at 1.7. On a send the job is gone from 0.5 (`RELAY_SEND`).
   const { raise } = JOB_BEATS.flag;
   tl.to(ch, { mixR: 0, duration: 0.2, ease: "power2.out" }, 0)
     .to(parts.tool, { rotation: FLAG.lowered, duration: 0.22, ease: "power2.inOut" }, 0)

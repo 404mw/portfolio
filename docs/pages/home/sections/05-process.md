@@ -1,8 +1,11 @@
 # Process
 
-**Last Updated:** 2026-10-05
+**Last Updated:** 2026-10-08
 
-> **Status:** In build. Process shows a five- or six-step flow per About card; the bots' life, the
+> **Status:** In build. Process shows a five- or six-step flow per About card (five flows: default
+> and four cards; the website flow was removed 2026-10-07; lint, `tsc` and the production build are
+> green, 2026-10-07; the SEO pass's hidden all-flows list is built, checked in the built HTML only,
+> not deployed); the bots' life, the
 > crew relay (rebuilt for five or six steps), the swap fade and the phone ledges (static and their
 > motion, the job hopping ledge to ledge) are built and lead-checked in headless Chromium
 > (2026-10-04, 2026-10-05; Safari, Firefox and real devices unchecked). Open: the user's calls on
@@ -19,7 +22,7 @@ four-step relay spec is `../ui-spec/05-process-relay-legacy.md`; the pick and th
 
 `ProcessSection` (server) stacks the label and heading above `ProcessFlow` at every width (no
 pinning), with `ProcessMotion` (renders nothing) after them. `ProcessFlow` (client) reads the shown
-set (`useShownSet`, the About pick through `pickSet`: `default` with no pick, for Not sure yet and in
+set (`useShownSet`, the About pick through `pickSet`: `default` with no pick, for Just exploring and in
 the server markup) and draws, in a wrapper carrying `data-set` and `data-count`: the "Shown for" tag
 (`ShownForTag`, sectionId `process`), the flow's sample-job caption (`process.flows[set].caption`),
 then a body keyed by set, so a pick remounts it. The body is `isolate` and holds `ProcessList`,
@@ -31,10 +34,10 @@ under reduced motion. The tag never fades. Without JavaScript the tag hides and 
 shows.
 
 Flows are `process.flows.<set>` in `content/home.ts` (caption, steps with title and line, and, for
-the five flows with loops, `loopLabel` and `fixLabel`). Default, online-store, discord and website
+the four flows with loops, `loopLabel` and `fixLabel`). Default, online-store and discord
 have five steps; service-business and software-builder have six. Bots per step are
 `lib/processFlows.ts` `flowRoles` (type-tied to the steps, so a step can't exist without its bot):
-five flows run intake, rules, team, check; then default, online-store and website add flag,
+four flows run intake, rules, team, check; then default and online-store add flag,
 service-business adds remind then flag, software-builder adds flag then ship. Discord is its own
 flow, a bot's behaviour and not a job run through checks: Mentioned, Your tone, Remembers,
 Connected, Always on (caption "Example: a member's @mention"), with bots intake, rules, update, ship,
@@ -166,6 +169,11 @@ hides.
   ProcessFixReturn (the fix loop, step 4 back to 3; dotted bracket below `lg`), ProcessLedge (the
   phone ledge under each bot below `lg`),
   ProcessRelay, ProcessJob, ProcessLesson, ProcessMotion
+- `components/home/process/ProcessAllFlows.tsx` — the `hidden` server-rendered list of every flow
+  (caption, step titles and lines), for search engines and AI models
+  (rendered by `ProcessSection` after `ProcessFlow`, outside it)
+- `lib/cardSets.ts` — the card sets and their labels, derived from `about.replies` through
+  `pickSet`
 - `components/home/pick/ShownForTag.tsx` — the "Shown for" tag (see `sections/02a-about.md`)
 - `hooks/useShownSet.ts` — the set the flow draws (the About pick through `pickSet`)
 - `lib/aboutPick.ts` — `pickSet`, the pick-to-set mapping
@@ -203,6 +211,9 @@ hides.
 
 ## Decisions
 
+- 2026-10-07 — SEO pass (user-approved): the same for flows: `ProcessAllFlows`, a `hidden` server-rendered block with each card's caption and step titles and lines, placed outside `ProcessFlow` so the swap fade's `lastElementChild` is unchanged.
+- 2026-10-07 — The website flow is removed with the About card "I need a website" (user's call, see
+  `02a-about.md`); five flows remain: default and four cards.
 - 2026-10-05 — User's request ("the object should go back from the dotted route instead of a step back"): below `lg` the fix run's job goes back along the dotted fix line (left off ledge 4, up the bracket, through the arrowhead into bot 3's hand, onto ledge 3) in 1.1s `power1.inOut` (`FIX_LINE_HOP`), with `process-fix-line-lit` lighting behind it, instead of rising straight up the bot column.
 - 2026-10-05 — User's call: below `lg` the phone track is cut. A short 2px `bg-line` ledge under every bot replaces the vertical rail, and the emblem hops ledge to ledge, each ledge lighting violet as it lands (built). The fix loop's ↰ icon becomes a dotted `accent` bracket on the left from step 4's bot up to step 3's bot, with the label "Breaks your rules? Redone." beside it. Nothing changes from `lg`. Spec: `ui-spec/05-process.md` §5.3a, §5.7, §5.9, choices 53–61; the old track spec is `ui-spec/05-process-track-legacy.md`.
 - 2026-10-03 — Process no longer shows one fixed "how I work" flow. Each About card gets its own
@@ -212,14 +223,11 @@ hides.
 - 2026-10-04 — The Discord flow has no check and no loops: it shows the bot's own behaviour in five
   steps (Mentioned, Your tone, Remembers, Connected, Always on), with no "Second check", fix return
   or bottom return loop, and `process.flows.discord` has no `loopLabel` or `fixLabel`; the other
-  five flows keep the check and both loops (user's reason: a Discord bot doesn't validate or loop;
+  four flows keep the check and both loops (user's reason: a Discord bot doesn't validate or loop;
   it stays in chat around the clock, answers mentions in a set tone, can remember past chats and
   connects to other apps). Its bots are intake, rules, update, ship, host (ui-spec §5.10); data is
   `hasLoops` and `flowLoops(set)` in `lib/processFlows.ts` and `data-loops` on the flow wrapper.
-- 2026-10-03 — Flows run five or six steps (ui-spec §5.10): service business and developer or team
-  six, the others five. Every flow but Discord starts intake, rules, team, check, then remind and
-  flag (service business), flag and ship (developer or team) or flag (the others). Wording is the
-  copywriter's.
+- 2026-10-08 — User's calls (spec `../ui-spec/05-process.md` §5.10, §5.11, choices 69–80, all first options): the one question becomes "Can I trust it with my customers?"; Process is recast with control first: label "You stay in charge", heading "Your rules run it. / You make the hard calls.", a new `process.lead` line. Order: job arrives, your rules, hard calls / to you (flag), done (team), checked (check, fix loop back to step 4), then remind / ship for six-step flows; software-builder reorders too in peer words; Discord unchanged. The hand-off is a dashed accent stem with a label from `lg` and a marker row with an arrow below `lg`, no person drawn; each looped flow gains `handoffLabel` ("To you", "To you or your staff", "To a person"). Supersedes the earlier step order, the "AI agents run / every job." heading and the `FIX_EVERY` fix-hop cadence. The online-store "complaints" line stands: the facts gained "Sensitive actions, like refunds and complaints, are passed to a person instead of being handled by an agent". Web-coder is building it.
 - 2026-10-03 — "Second check" is backed by the facts line "A separate agent checks the work before
   it goes out"; "flag" means anything unusual goes to a person, drawn as a bot raising a flag (no
   person is drawn); the return loop lands on step 2, "your rules".
@@ -247,9 +255,7 @@ hides.
 - 2026-10-04 — Discord's relay is a one-way pass (no lesson, no fix hop), 11.8s.
 - 2026-10-04 — Step 1's held emblem (`data-bot="prop"`) hides at the hand-off and returns when the
   next run starts; the job is the emblem travelling.
-- 2026-10-04 — The fix hop (the job going back over the arch from step 4 to step 3, which redoes its
-  act) plays on every second run (`FIX_EVERY = 2`), only in flows with loops, and adds 5.2s;
-  `process-fix-lit` lights with a `clip-path` reveal, like `process-return-lit`.
+- 2026-10-04 — The fix hop plays only in flows with loops; `process-fix-lit` lights with a `clip-path` reveal, like `process-return-lit` (the cadence is now `RUN_CYCLE`, see the 2026-10-08 line).
 - 2026-10-04 — The crew relay is back on (`RELAY_ON = true`; user: "do motion now"), rebuilt for five
   or six steps. The fixed 16.4s rhythm (`RELAY_EVERY`) is gone: the next run starts `RELAY_REST = 2`
   seconds after the last one ends, because run length now differs per flow. Discord's naps stay as
@@ -292,8 +298,9 @@ hides.
 
 ## Open Questions
 
-- **Choice:** the online-store "Flagged" step names "complaints" ("Refunds and complaints are
-  passed to you"), which `docs/03-facts.md` doesn't name; the user keeps it or the line changes.
+- **To build:** motion pass for the recast relay (spec `../ui-spec/05-process.md` §5.11e): gsap-animator adds the send run, `RUN_CYCLE` (send / straight / fix) replacing `FIX_EVERY`, and two flag catches.
+- **Review:** `handoffLabel` "To you or your staff" (20 characters) at 1024 six-across; fallback "You or your staff".
+- **Review:** the heading "Your rules run it. / You make the hard calls." is 9 words and may set on 3 lines at 360.
 - **Review:** Discord step 5 role: `host` (spec's first option) or `remind` (ui-spec §5.8 choice 39).
 - **Review:** Discord step 4 role: `ship` (first option) or a new plug role (choice 40).
 - **Review:** Discord step 3 role: `update` with its wrench (first option) or a book-only role

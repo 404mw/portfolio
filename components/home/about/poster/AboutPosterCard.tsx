@@ -4,7 +4,6 @@
 import { AboutPropGlyph } from "@/components/home/about/AboutPropGlyph";
 import { CheckIcon } from "@/components/icons/CheckIcon";
 import type { RixPropName } from "@/lib/rixProps";
-import { condensed } from "@/lib/styles";
 
 const cardStates =
   "border-line bg-band text-text peer-not-checked:hover:border-muted peer-not-checked:active:bg-line peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-text peer-checked:border-accent peer-checked:bg-accent peer-checked:text-on-accent";
@@ -35,7 +34,7 @@ export function AboutPosterCard({ index, value, label, prop, name }: AboutPoster
           <CheckIcon className="hidden size-4 group-has-checked/card:block" />
         </span>
         <span
-          className={`font-display text-summary font-semibold leading-[1.05] tracking-[-0.02em] text-balance md:text-card ${condensed}`}
+          className={`font-display text-body leading-[1.15] text-balance md:text-summary lg:text-card`}
         >
           {label}
         </span>
