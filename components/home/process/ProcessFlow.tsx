@@ -3,8 +3,9 @@
 // and in the server markup. The "Shown for" tag and the sample-job caption, then the body, keyed
 // by set so a change remounts it inside the persistent wrapper (`data-set`, `data-count`,
 // `data-loops`): the steps (step 3 holding the hand-off to a person, step 4 the fix loop back from
-// step 5), the return to step 2, and the relay's layer. From `wide` the 96px gap keeps the fix and
-// hand-off labels, above the row, clear of the caption. A flow with no loops (§5.3b) draws neither
+// step 5), the return to step 2, and the relay's layer. From `wide` the 160px gap keeps the
+// hand-off's label, the highest thing above the row (its top about 138px above the list), about
+// 22px clear of the caption. A flow with no loops (§5.3b) draws neither
 // loop nor the hand-off and keeps the 48px gap. The body is
 // `isolate`, so the relay layer's `z-1` stays inside it, below the loop label's `wide:z-10`. The
 // swap fades (`useSwapFade`, ui-spec §0.5): the caption and the body fade out, the flow changes,
@@ -46,7 +47,7 @@ export function ProcessFlow() {
       data-set={set}
       data-count={steps.length}
       data-loops={loops ? "on" : "off"}
-      className={`flex flex-col gap-8 ${loops ? "wide:gap-24" : "wide:gap-12"}`}
+      className={`flex flex-col gap-8 ${loops ? "wide:gap-40" : "wide:gap-12"}`}
     >
       <div className="flex flex-col gap-3">
         <ShownForTag sectionId={sectionIds.process} />

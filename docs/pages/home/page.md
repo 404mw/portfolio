@@ -1,6 +1,6 @@
 # Home
 
-**Last Updated:** 2026-10-09
+**Last Updated:** 2026-10-10 (showcase diagram motion built; MARWIX-SKILLS takeover screen-checked)
 
 > **Status:** In build. Round 2 (Agents' "Done" receipt line and Process recast around control, with
 > their motion) is built (2026-10-08) and lead-checked (2026-10-09: lint, `tsc` and build pass; no
@@ -111,7 +111,8 @@ checked: Safari, Firefox, real devices, the Design Vault takeover, the takeover'
 Home sharing image and description (2026-10-09, built, build and lint green, not deployed; the lead
 checked the rendered PNG from the build output, not in a browser): `app/opengraph-image.tsx` is
 rebuilt to `ui-spec.md` §0.7. It draws the wordmark (`components/og/OgWordmark.tsx`, shared with
-`/rix`, whose image looks unchanged), the name in two violet Acosta 72px lines (`hero.firstName`,
+`/rix`; M and W in the accent, letters from `lib/wordmarkLetters.ts`, built 2026-10-09 and not
+deployed; `ui-spec.md` §0.7 and rix `ui-spec.md` still say W only, ui-designer updates them), the name in two violet Acosta 72px lines (`hero.firstName`,
 `hero.lastName`), the role line (`meta.ogLine`), the floor line, Rix (`RixOgFigure`, unchanged, 340x220
 at x 620) with an offer bubble over his head (`components/og/OgSpeechBubble.tsx`, text
 `meta.ogBubble` "Need bookings handled?", no tick), and the address `marwix.dev`
@@ -121,8 +122,8 @@ use IBM Plex Sans 400 from `assets/fonts/ibm-plex-sans-latin-400.woff` (Fontsour
 already in `assets/fonts/`). `alt` is `meta.ogAlt` (describes the offer). `content/home.ts`
 `meta.description` is rewritten (every audience, 141 characters); `meta.ogLine`, `meta.ogBubble` and
 `meta.ogAlt` are new. `lib/ogFonts.ts` reads the OG font files and returns the ImageResponse
-fonts; `lib/site.ts` `siteAddress(path)` returns the address string. The `/rix` image renders
-byte-identical to before (PNGs compared).
+fonts; `lib/site.ts` `siteAddress(path)` returns the address string. Apart from the wordmark's M, the
+`/rix` image rendered byte-identical to before the redesign (PNGs compared, before the wordmark change).
 
 Footer Rix (2026-10-07, built, static and motion, lead-checked): Rix stands on the footer's top
 hairline as the only entry to `/rix`, and calls the visitor with typed lines; browser checks beyond
@@ -159,12 +160,21 @@ tokens only) in place of the card screenshot (`components/home/proofs/ProofBanne
 sideways scroll at eight widths from 360 to 3840 and that 360/768/1440/3840 match the approved
 sample. See `sections/07-proofs.md`.
 
-Built and verified 2026-09-28: MARWIX-SKILLS is temporarily hidden, card and takeover, behind one
-flag (`hiddenProofs` in `lib/proofs.ts`); its content and code stay. With two projects shown
-(Exile, Design Vault), the cards sit two across from `md` up at full width, no empty third slot.
-Build and lint are green; the lead confirmed no sideways scroll at eight widths from 360 to 3840.
-See `sections/07-proofs.md` for an open build question from this change (arm/card clearance at
-1440/3840, with the larger two-card bot).
+Built 2026-10-09: MARWIX-SKILLS is shown again, card and takeover (`hiddenProofs = []` in
+`lib/proofs.ts`; the flag stays). Three cards in the grid (`md:grid-cols-2 lg:grid-cols-3`), no
+screenshots (its takeover has no shots block), and its copy names Claude Code under the amended
+constitution §7.4. Build and lint are green. See `sections/07-proofs.md`.
+
+Built 2026-10-10: MARWIX-SKILLS' takeover has all seven parts (part 3 without shots) and a Rix
+showcase; the diagram is the shared `ShowcaseDiagram` (Exile unchanged). Lead's screen check at
+360/768/1024/1440/3840: no sideways scroll; step titles one line at every width; takeover height
+about 4,780 / 3,650 / 3,520 / 3,470 / 3,490px; Exile renders as before. Not committed or pushed. See
+`sections/07-proofs.md`.
+
+Built 2026-10-10: the showcase diagram's GSAP motion (`components/home/proofs/ShowcaseMotion.tsx`,
+`hooks/useShowcaseMotion.ts`, `lib/showcaseSequence.ts`, `lib/showcaseFlourish.ts`,
+`lib/showcaseMotion.ts`; `lib/onceInView.ts` gained optional `{ root, rootMargin }`). tsc, lint and
+build green; the lead's browser check is pending. See `sections/07-proofs.md`.
 
 Built and verified 2026-09-28: the proof card bots are animated with GSAP (ui-spec §7.7) — they rise
 with their card's reveal, lean +4° and play their prop's act on hover, and breathe/drift/blink/follow
@@ -172,8 +182,7 @@ the pointer while idle, reusing the Process bots' numbers and registry; they pau
 hidden tab or while a takeover is open. Reduced motion: no movement, each bot fades in with its
 card. Build and lint are green, no console errors; the lead confirmed the rise, hover acts, a
 takeover open/close, reduced motion and no sideways scroll at 360/767/1440/3840 (headless
-Chromium), and noted the hover lean sharpens the existing Exile/Design Vault arm-clearance question
-at 1440. See `sections/07-proofs.md`.
+Chromium), and noted the hover lean pushes Exile's arm to Design Vault's card at 1440 (moot while three cards are shown). See `sections/07-proofs.md`.
 
 Built and verified 2026-09-28: the proof card bots' depth is now one continuous extrusion —
 one flat-shaded side quad per depth-facing edge (`lib/proofBotExtrude.ts`) — replacing the stacked
@@ -305,6 +314,16 @@ Not checked in a browser.
 
 ## Decisions (site-wide)
 
+- 2026-10-10 — The showcase diagram (Exile and MARWIX-SKILLS) plays once per takeover open as it enters the dialog's own scroll view: the wrapper fades in, steps light 0.6s apart with the figure rising from the floor (yPercent 40 → 0, `back.out(1.3)`) and the text fading up, Rix's prop flourishes once (palette tilt, caret blinks twice, picture dip), links draw, then the return wipes in (Exile U right-to-left; MARWIX loop on step 3); ends ~3s, inline styles cleared; reverts on close/Next. Reduced motion: the wrapper fade only. User said "go ahead and do motion as well"; the caret `data-prop-part` hook on `ProcessEmblem` was approved with it. Departures from the spec (step spacing 0.6s, no eye blink, rectangular-clip loop draw, `<li>` fades without moving, an on-screen diagram plays at once) are listed in `sections/07-proofs.md`.
+- 2026-10-10 — Showcase step titles are single verbs, "Plans" / "Writes" / "Makes" (user approved; Exile's single-verb pattern; the long ones wrapped to 3 lines at 360). See `sections/07-proofs.md`.
+- 2026-10-10 — Rev 2 (`ui-spec/07-proofs-spam.md`, "Rix holds the prop"): showcase-only hold via a nested SVG viewport (`rixShowcaseHold`), prop at 1.5×, viewBox `-4 8 140 84`, all poses `idle`, peaks break out 25/34/42 from md, phone still inside the band; the shared prop slot (About, Process, footer, /rix) is unchanged (user said "do both").
+- 2026-10-10 — User's call: MARWIX-SKILLS is "rich just like exile's entry", Rix in place of Eva's three tiles; it gains What it took (4), What I learned (3) and a Showcase (plans the look → writes the prompt → makes the image, with a one-edit return loop on step 3). Still no screenshots. See `sections/07-proofs.md`.
+- 2026-10-10 — The user approved new MARWIX-SKILLS facts with no numbers (`docs/03-facts.md`, MARWIX-SKILLS blocks).
+- 2026-10-10 — The diagram is generalized, not forked: `Spam*` → `Showcase*`, per-project data in `showcaseDiagrams` (Exile `image` kind, MARWIX `rix` kind); Exile renders unchanged.
+- 2026-10-10 — The user's yes: Rix may stand on the ink stage (`ui-spec/00-rix.md` R1.1 amended).
+- 2026-10-10 — Built on the specced first options of `ui-spec/07-proofs-spam.md` Review 1–9 (peaks-only break-out, phone Rix inside band, loop return, three new props palette/prompt/picture, poses act/act/idle); the user said earlier "just build it and show me something, ill update later".
+
+- 2026-10-09 — User's call: the MARWIX wordmark in both sharing images (home and /rix) shows the M and the W in the accent, like the footer wordmark (ui-spec §9.1); `components/og/OgWordmark.tsx` now builds its letters from `lib/wordmarkLetters.ts`, so the footer and the images share one rule.
 - 2026-10-09 — User's call after the pre-push audit: Rix's bubble on the home sharing image is an offer, not a done message, and has no tick (`meta.ogBubble` "Need bookings handled?"; `meta.ogAlt` describes the offer). Why: constitution §7.5 exempts sample/done content only inside the Agents demo panels and Process flows; a ticked "Customer booked in" beside the name read as delivered work. Supersedes the done-message part of the earlier 2026-10-09 sharing-image decision.
 - 2026-10-09 — User's call: home `meta.description` is rewritten because it was outdated and incomplete (it named only service-business jobs); it now names every audience: service businesses, online stores and Discord servers, plus websites and web apps (software builders left out for length), first person, ending on Book a call. `meta.title` is unchanged. Copywriter wrote it in `content/home.ts`.
 - 2026-10-09 — User's call: the home sharing image (`app/opengraph-image.tsx`) is redesigned from the wordmark alone to the wordmark, the name (violet, from `hero.firstName`/`lastName`), a role line (`meta.ogLine`), the address, and Rix on a floor line with a speech bubble saying a job is done (`meta.ogBubble`); alt from `meta.ogAlt`. Only the home image changes; /rix's stays. The user delegated the detailed calls to the lead ("be creative, decide for me"): name in `accent`, Rix mid-right and smaller so he survives a square crop, IBM Plex Sans 400 for the role line, bubble and address (a new static font file, since the OG builder can't read WOFF2), and the bubble itself (bubble superseded by the decision above: an offer, no tick). Spec: `ui-spec.md` §0.7 (decisions 44–49).
@@ -380,9 +399,7 @@ Not checked in a browser.
 - 2026-09-28 — User's choice: proof cards are redesigned on one template — an "Ink stage" banner
   with a 3D ProcessBot (holding a per-project prop) replaces the card screenshot, with one proof
   line added below the card line. See `sections/07-proofs.md`.
-- 2026-09-28 — User's choice: MARWIX-SKILLS is hidden temporarily (card and takeover) behind one
-  flag; content and code stay. Two shown projects sit two across from `md` up, full width, no empty
-  third slot. See `sections/07-proofs.md`.
+- 2026-10-09 — User's calls: MARWIX-SKILLS comes back (card and takeover) as the user's own Claude Code toolkit, image generation leading, whole repo covered, not a website or browser app, free and open source with the GitHub Visit link; five new facts lines approved in `docs/03-facts.md`; it ships without screenshots for now (no shots block in its takeover, this project only); Claude Code is named in its block only, under the amended constitution §7.4; nothing is pushed until the user says so. Built. See `sections/07-proofs.md`.
 - 2026-10-02 — The user amended constitution §2 to allow one extra route, `/rix`: a public Rix
   playground with its own page doc at `docs/pages/rix/`.
 - 2026-10-01 — Launch is on hold until the new About section (see `sections/02a-about.md`) is
@@ -457,6 +474,7 @@ Not checked in a browser.
   sitemap (`https://marwix.dev/sitemap.xml`).
 - **To do (lead, after Search Console):** run Google's Rich Results Test on the live JSON-LD,
   LinkedIn Post Inspector on the sharing preview, and PageSpeed Insights on phone.
+- **Choice:** the user's review of `ui-spec/07-proofs-spam.md` Review 1–9 and its rev 2 items (see `sections/07-proofs.md`).
 - **To check (lead):** the redesigned home sharing image is built but not deployed; after the deploy, refresh LinkedIn's cache with Post Inspector, and check the image in a square-cropped preview (WhatsApp).
 - **To do:** `docs/01-design-system.md` Type section says IBM Plex loads from Google Fonts; it doesn't mention the local static `assets/fonts/ibm-plex-sans-latin-400.woff` the home sharing image uses (audit LOW, 2026-10-09).
 - **To build:** `docs/pages/rix/ui-spec.md` §0.5 is stale (says Geist Mono 800 and 72px; code uses Acosta at 64px); ui-designer updates it.
@@ -465,7 +483,7 @@ Not checked in a browser.
   missing on disk (constitution §5 names it); the user restores it or says to drop it.
 - **Roll-up:** section-specific open questions remain in `sections/02-hero.md` (5),
   `sections/02a-about.md` (10), `sections/03-marquee.md` (1), `sections/04-agents.md` (20),
-  `sections/05-process.md` (25), `sections/07-proofs.md` (34), `sections/08-contact.md` (1) and `sections/09-footer.md` (3). The
+  `sections/05-process.md` (27), `sections/07-proofs.md` (40; the showcase motion browser check is among them), `sections/08-contact.md` (1) and `sections/09-footer.md` (3). The
   pre-deploy check reads this roll-up and every section file; the page ships with none open
   anywhere.
 - **To build:** `lib/takeoverTitleMorph.ts` still carries logic for Bricolage's `opsz`/`wdth` axes
@@ -478,7 +496,7 @@ Not checked in a browser.
 - **To build:** the ui-spec files still quote the old sizes and fonts (e.g. `ui-spec.md`
   `condensedMark`, `ui-spec/09-footer.md` "25vw", `ui-spec/00-rix.md`, `docs/pages/rix/ui-spec.md`);
   ui-designer updates them.
-- **To build:** `ui-spec/05-process.md` (§5.4 Sizes and elsewhere: "across from 1024", `lg:` names) and `ui-spec/04-agents.md` (`AgentPointerPanel`, kind `pointer`, `agents.pointer.*`, removed 2026-10-07; the sync packet loop, replaced 2026-10-09) are out of date; ui-designer updates them (see `sections/05-process.md`, `04-agents.md`).
+- **To build:** `ui-spec/05-process.md` (§5.4 Sizes and elsewhere: "across from 1024", `lg:` names; §5.1 gap, the count table needing `handoffBox`, §5.11c, §5.11d and §5.11e still describe the hand-off's upward stem, replaced 2026-10-10 by an elbow) and `ui-spec/04-agents.md` (`AgentPointerPanel`, kind `pointer`, `agents.pointer.*`, removed 2026-10-07; the sync packet loop, replaced 2026-10-09) are out of date; ui-designer updates them (see `sections/05-process.md`, `04-agents.md`).
 - **Choice:** the hero portrait is taller on phones and tablets than before (about 100px at 360)
   because the name block above it is shorter: keep, or bring back the old size.
 - **To build:** Safari, Firefox and real-device check of the new fonts, plus the Design Vault

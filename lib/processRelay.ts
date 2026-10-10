@@ -5,8 +5,9 @@
 // (lib/processRelayJob.ts), and on each hop a trail of ghosts, a lit ground segment and a chevron
 // flash follow it (lib/processRelayTrail.ts). On a fix run the check sends it back over the fix
 // arch to the work step (step 4) and takes it again (lib/processRelayFix.ts). On a send run the
-// flag bot (step 3) sends it to a person: it climbs the hand-off stem and fades behind the label as
-// the stem lights (lib/processRelayHandoff.ts), and the run ends there. After the last bot's change
+// flag bot (step 3) sends it to a person: it climbs the hand-off elbow, rounds its corner and rides
+// it right to the arrowhead, fading behind the label as the elbow lights
+// (lib/processRelayHandoff.ts), and the run ends there. After the last bot's change
 // the job is done: it slides right to the ground line's end, trailed as on a hop, pops once and
 // fades out there (never past the line, so never a sideways scroll).
 //
@@ -60,7 +61,7 @@ import {
   lessonSplit,
   type LessonParts,
 } from "@/lib/processRelayLesson";
-import { climbStem, findStem, measureStem, type StemParts, type StemWaypoints } from "@/lib/processRelayHandoff";
+import { findElbow, measureElbow, sendUpElbow, type ElbowParts, type ElbowWaypoints } from "@/lib/processRelayHandoff";
 import { lessonTaker } from "@/lib/processRelayPlan";
 import { runVisits, type Course, type RelayCues, type RunOptions } from "@/lib/processRelayRun";
 import {
@@ -129,8 +130,8 @@ export type RelayParts = {
   readonly back: ReturnParts | null;
   /** The fix arch, or null in a flow with no loops: then no run is a fix run. */
   readonly fix: FixParts | null;
-  /** The hand-off stem, or null in a flow with no loops: then no run is a send run. */
-  readonly handoff: StemParts | null;
+  /** The hand-off elbow, or null in a flow with no loops: then no run is a send run. */
+  readonly handoff: ElbowParts | null;
 };
 
 /** Every waypoint, in the relay layer's coordinates. */
@@ -158,8 +159,8 @@ export type RelayWaypoints = {
     /** The fix-lit overlay's left edge. */
     readonly left: number;
   } | null;
-  /** The hand-off stem, or null with none. */
-  readonly handoff: StemWaypoints | null;
+  /** The hand-off elbow, or null with none. */
+  readonly handoff: ElbowWaypoints | null;
 };
 
 /**
@@ -197,7 +198,7 @@ export function relayParts(root: HTMLElement, stops: readonly RelayStop[]): Rela
         ? { box: returnBox, lit: returnLit, arrowhead: returnBox.firstElementChild, lesson: findLesson(lesson) }
         : null,
     fix: fixBox && fixLit ? { box: fixBox, lit: fixLit } : null,
-    handoff: findStem(root),
+    handoff: findElbow(root),
   };
 }
 
@@ -256,7 +257,7 @@ export function measureRelay(parts: RelayParts): RelayWaypoints {
           left: inLayer(parts.fix.lit.getBoundingClientRect().left, 0).x,
         }
       : null,
-    handoff: parts.handoff ? measureStem(parts.handoff, layer) : null,
+    handoff: parts.handoff ? measureElbow(parts.handoff, layer) : null,
   };
 }
 
@@ -412,13 +413,14 @@ export function relayRun(
   const last = runVisits(tl, job, visits, cues, course);
   if (!last) return tl;
 
-  // A send: the flag bot sends the job to a person, up the stem; the run ends there.
+  // A send: the flag bot sends the job to a person, up the elbow and along it; the run ends there
+  // (the timeline's length, the light's fade included, is what the relay loop waits on).
   const sent = last.kind === "send" ? parts.handoff : null;
   const sentFrom = now.stops[last.stop];
   if (sent && now.handoff && sentFrom) {
     const fromStop = stop(last.stop);
-    const at = { from: sentFrom, stem: now.handoff, size: now.job };
-    climbStem(tl, job.job, ghosts, sent.lit, fromStop, () => waypoints().handoff, () => waypoints().job, at, last.leave);
+    const at = { from: sentFrom, elbow: now.handoff, size: now.job };
+    sendUpElbow(tl, job.job, ghosts, sent.lit, fromStop, () => waypoints().handoff, () => waypoints().job, at, last.leave);
     return tl;
   }
 

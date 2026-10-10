@@ -25,7 +25,8 @@ section's file only. Rix himself (the gap-eyes MW mascot) is defined in
 
 Built: `app/rix/page.tsx` renders Intro, Playground and Way back, with metadata from `content/rix.ts`
 through `lib/pageMetadata.ts` and a sharing image (`app/rix/opengraph-image.tsx`, `RixOgFigure`);
-the image's heading is set in Acosta 400 at 64px so it sets on two lines.
+the image's heading is set in Acosta 400 at 64px so it sets on two lines. Its wordmark
+(`components/og/OgWordmark.tsx`) shows M and W in the accent (built 2026-10-09, not deployed).
 `lib/publishedRoutes.ts` lists `/` and `/rix`, so `/rix` is in the sitemap. The entry is
 Rix standing on the footer's top hairline with a "Play with Rix" label, one link to `/rix`
 (`components/FooterRix.tsx`, `FooterRixLink.tsx`; hidden on `/rix`; see
@@ -48,6 +49,7 @@ re-check after it is pending.
 
 ## Decisions (site-wide)
 
+- 2026-10-09 — User's call: the MARWIX wordmark in both sharing images (home and /rix) shows the M and the W in the accent, like the footer wordmark (ui-spec §9.1); `components/og/OgWordmark.tsx` now builds its letters from `lib/wordmarkLetters.ts`, so the footer and the images share one rule. See `docs/pages/home/page.md`.
 - 2026-10-07 — Site fonts change to Acosta (display), IBM Plex Sans (body) and IBM Plex Mono (labels), including this page's sharing image; see `docs/pages/home/page.md`.
 - 2026-10-03: /rix motion: sections reveal on data-anim="reveal" (fade only under reduced motion); walk buttons use a ramped, stride-locked walk (WALK_FAR: cadence eased over 3 steps at each end, speed-matched at each plant with a 12% per-step push, lean into the start, speed-scaled bob); the quip sits above with an upward glance; patrol pause looks on the bare floor are pointer / out / a shelf end; a tossed prop lands on the floor line (TOSS.floorY) so no paint leaves the stage.
 - 2026-10-02 — `/rix` exists as the one extra route (constitution §2): a public Rix playground that

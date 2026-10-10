@@ -1,6 +1,6 @@
 # Constitution
 
-**Last Updated:** 2026-10-07
+**Last Updated:** 2026-10-09
 
 The non-negotiable rules for `marwix.dev`. Every implementation decision is checked against them.
 They exist to stop scope creep, unsupported claims and rework.
@@ -96,6 +96,8 @@ or helpful it seems. In particular:
 4. **Outcomes, not tech.** No tech-stack lists and no tool, model or vendor names, on any card.
    The one exception is sample content inside a demo panel, which may name an everyday product a
    reader already uses (such as "instagram DM" or "Sheets").
+   A second exception: a Proofs project built for a named tool may name that tool in its own card
+   and takeover, only as the facts file names it (MARWIX-SKILLS: Claude Code).
    The software-builder card's own content may use the words builders use for their work (app,
    feature, ship, review, production); everything else stays in plain words.
 5. **Demo panels and flows are illustrations.** The Agents section's demo panels and the Process

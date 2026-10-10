@@ -1,6 +1,6 @@
 # Process
 
-**Last Updated:** 2026-10-09
+**Last Updated:** 2026-10-10
 
 > **Status:** In build. Round 2 (recast around control: new heading, lead, step order, hand-off at
 > step 3, send / straight / fix relay) is built and lead-checked (lint, `tsc`, build; no sideways
@@ -103,9 +103,25 @@ step 2 (`lessonTaker`: the rules bot). Discord is a one-way pass: no lesson and 
 no fixed rhythm: the next run starts `RELAY_REST` (2s) after the last one ends. Runs cycle send →
 straight → fix (`RUN_CYCLE` in `lib/processBotMotion.ts`; a flow without the loop skips what it
 lacks). Hand-off: `components/home/process/ProcessHandoff.tsx` at step 3 (`HANDOFF_STEP = 2`),
-labelled by `handoffLabel`; from `wide` a dashed stem going up, below `wide` a marker row with an arrow.
-On a send run the flag bot raises its flag and the job climbs the stem
-(`lib/processRelayHandoff.ts`), or drops onto the marker on phones. Run lengths, default flow at
+labelled by `handoffLabel`; below `wide` a marker row with an arrow (unchanged). From `wide` it draws
+an elbow: a dashed 2px accent line from the flag's pole (left 110px in step 3's `<li>`, from 16px below
+the list's top) up to 112px above the list's top, a 16px rounded corner, then right to the ground
+line's end, ending in a ChevronRight arrowhead whose tip is at the list's right end. The label sits
+above the right end, right-aligned to the tip, on a `bg` mask at `z-10` (about 118-138px above the
+list). The right edge depends on the step count: `handoffBox` in `lib/processLayout.ts` (5 steps
+`wide:right-[calc(-200%_-_4rem)]`, 6 steps `wide:right-[calc(-300%_-_6rem)]`), passed by `ProcessList`.
+`process-handoff-lit` is the same box with a solid left and top border, hidden at rest. From `wide`,
+in flows with loops, `ProcessFlow`'s gap above the list is 160px (was 96) so the label clears the
+"Example: one job" caption; Discord keeps 48px.
+On a send run the flag bot raises its flag. From `wide` the job climbs the vertical leg
+(`HANDOFF_CLIMB` 0.8s `power1.in`, drifting onto the leg over the first half), rounds the corner, rides
+the horizontal leg at a constant 640px/s (`HANDOFF_RUN` in `lib/processBotMotion.ts`: speed 640, fade
+0.3, hold 0.6) to the arrowhead and fades over the last 0.3s; the ghosts follow the whole path and fade
+with it (`ghostFollow` in `lib/processRelayTrail.ts` takes an optional fade-out time). The lit overlay
+lights in two clip-path phases (up the leg, then along the top), holds 0.6s, and fades over
+`FIX_LIT_FADE`. The path is measured on setup and resize (`findElbow`, `measureElbow`, `sendUpElbow` in
+`lib/processRelayHandoff.ts`). Below `wide` the job drops onto the marker (`dropToMark`, unchanged).
+Run lengths, default flow at
 1440: send 7.48s, straight 15.23s, fix 20.45s; Discord about 11.8s (older measures for the six-step
 flows are stale). Reduced motion has no relay.
 
@@ -148,7 +164,7 @@ fix line's ends. A step with no lit overlay just doesn't light. Under reduced mo
 or lights (the relay runs only under full motion). Without the exit drop, Discord's phone run ends
 about 0.35–0.5s sooner than its 11.8s; the other flows' phone run lengths are not re-measured.
 
-Lead check 2026-10-09 (Claude in Chrome, exact-size iframes, :3000 dev server; lint, `tsc` and build pass): 360, 768, 1024, 1279 and 1439 are stacked, and at 1024 the "To you" marker sits under step 3's line with no overlap once the reveal settles. At 1440 the five-step flows are across with a 32px gap; service-business and software-builder are six across with a 25px minimum title gap, "Your standards" fits, and the stem, fix loop and lesson clear the text. At 3840 it is six across with a 32px gap. No sideways scroll at any width checked. With JavaScript off (1440) every section and all text shows. The browser extension disconnected before the animation frame capture.
+Lead check 2026-10-09 (Claude in Chrome, exact-size iframes, :3000 dev server; lint, `tsc` and build pass): 360, 768, 1024, 1279 and 1439 are stacked, and at 1024 the "To you" marker sits under step 3's line with no overlap once the reveal settles. At 1440 the five-step flows are across with a 32px gap; service-business and software-builder are six across with a 25px minimum title gap, "Your standards" fits, and the old stem (replaced 2026-10-10 by the elbow), fix loop and lesson clear the text. At 3840 it is six across with a 32px gap. No sideways scroll at any width checked. With JavaScript off (1440) every section and all text shows. The browser extension disconnected before the animation frame capture.
 
 Lead check 2026-10-05 (production build, headless Chromium): lint, tsc and build green. Static at
 360, 768, 1024, 1440 and 3840, for three sets: ledges flush under the feet (x 18–88), the fix line
@@ -185,9 +201,10 @@ hides.
   ProcessFixReturn (the fix loop, step 5 back to 4; dotted bracket below `wide`), ProcessLedge (the
   phone ledge under each bot below `wide`),
   ProcessRelay, ProcessJob, ProcessLesson, ProcessMotion
-- `components/home/process/ProcessHandoff.tsx` — the hand-off at step 3 (dashed stem from `wide`,
-  marker row with an arrow below); `lib/processRelayHandoff.ts` — the flag raise and the job's climb
-  or drop on a send run
+- `components/home/process/ProcessHandoff.tsx` — the hand-off at step 3 (dashed elbow with an
+  arrowhead from `wide`, marker row with an arrow below); `lib/processRelayHandoff.ts` — the flag
+  raise and the job's ride along the elbow, or drop onto the marker, on a send run; `handoffBox` in
+  `lib/processLayout.ts`; `HANDOFF_RUN` in `lib/processBotMotion.ts`
 - `components/home/process/ProcessAllFlows.tsx` — the `hidden` server-rendered list of every flow
   (caption, step titles and lines), for search engines and AI models
   (rendered by `ProcessSection` after `ProcessFlow`, outside it)
@@ -230,6 +247,7 @@ hides.
 
 ## Decisions
 
+- 2026-10-10 — User's call (drawing, defaults accepted): from `wide` the hand-off at step 3 becomes an elbow, a dashed accent line rising from the flag bot above the fix loop's label, turning right and running to the end of the row with a right-pointing arrowhead, "To you" (`handoffLabel`) above its right end. It shows the job leaving the flow. Below `wide` the marker row stays. The job's motion follows the new path (climb up, then along to the arrowhead). Supersedes the short upward stem with the label above it from the 2026-10-08 decision and the 2026-10-09 wide-breakpoint line's hand-off wording.
 - 2026-10-09 — User's call: the Process flow goes side by side from `wide` (1440px, new token `--breakpoint-wide: 90rem`), not `lg` or `xl`; below 1440 it uses the stacked layout phones and tablets get (steps stacked, the hand-off a marker row with an arrow, the job dropping onto the marker). Why: "Your standards" (24px display) overflowed its 161px column at 1024, and at 1280 the six-step flows still ran it into "Hard calls" in a 168px column; from 1440 every flow fits (gap 25px; 1600 and 3840 clean). Six-step flows at 1440 and up use the 32px gap. Section heading spacing still changes at `lg`. Supersedes the `lg` breakpoint in the 2026-10-08 hand-off wording below.
 - 2026-10-09 — User's call: "rules" becomes "standards" across the home page, except the Discord demo's "#rules" channel: the step "Your rules" → "Your standards", the lead, and the loop and fix labels in every flow (landed in `content/home.ts`; facts file unchanged). Supersedes the "your rules" wording in the 2026-10-08 line below, which stays as history. See `../page.md`.
 - 2026-10-07 — SEO pass (user-approved): the same for flows: `ProcessAllFlows`, a `hidden` server-rendered block with each card's caption and step titles and lines, placed outside `ProcessFlow` so the swap fade's `lastElementChild` is unchanged.
@@ -248,7 +266,7 @@ hides.
   it stays in chat around the clock, answers mentions in a set tone, can remember past chats and
   connects to other apps). Its bots are intake, rules, update, ship, host (ui-spec §5.10); data is
   `hasLoops` and `flowLoops(set)` in `lib/processFlows.ts` and `data-loops` on the flow wrapper.
-- 2026-10-08 — User's calls (spec `../ui-spec/05-process.md` §5.10, §5.11, choices 69–80, all first options): the one question becomes "Can I trust it with my customers?"; Process is recast with control first: label "You stay in charge", a heading (since 2026-10-09 "Hard calls / come to you."), a new `process.lead` line. Order: job arrives, your rules, hard calls / to you (flag), done (team), checked (check, fix loop back to step 4), then remind / ship for six-step flows; software-builder reorders too in peer words; Discord unchanged. The hand-off is a dashed accent stem with a label from `lg` and a marker row with an arrow below `lg` (breakpoint now `wide`, see the first 2026-10-09 line), no person drawn; each looped flow gains `handoffLabel` ("To you", "To you or your staff", "To a person"). Supersedes the earlier step order, the "AI agents run / every job." heading and the `FIX_EVERY` fix-hop cadence. The online-store "complaints" line stands: the facts gained "Sensitive actions, like refunds and complaints, are passed to a person instead of being handled by an agent". Built.
+- 2026-10-08 — User's calls (spec `../ui-spec/05-process.md` §5.10, §5.11, choices 69–80, all first options): the one question becomes "Can I trust it with my customers?"; Process is recast with control first: label "You stay in charge", a heading (since 2026-10-09 "Hard calls / come to you."), a new `process.lead` line. Order: job arrives, your rules, hard calls / to you (flag), done (team), checked (check, fix loop back to step 4), then remind / ship for six-step flows; software-builder reorders too in peer words; Discord unchanged. The hand-off is drawn without a person (its shape: see the 2026-10-10 line); each looped flow gains `handoffLabel` ("To you", "To you or your staff", "To a person"). Supersedes the earlier step order, the "AI agents run / every job." heading and the `FIX_EVERY` fix-hop cadence. The online-store "complaints" line stands: the facts gained "Sensitive actions, like refunds and complaints, are passed to a person instead of being handled by an agent". Built.
 - 2026-10-09 — Lead's call (user delegated; audit copy fix): the default flow's step 3 line reads "Anything sensitive or unusual is passed to you, not handled by an agent." (was "...before any work starts"; the facts don't back that). Landed in `content/home.ts`. "To you or your staff" stays as voice (user approved, round 2); its width at 1440 is still an open question.
 - 2026-10-09 — User's call: the software-builder first step's "inside your team" stays; builders' words belong in that card (voice rule 17).
 - 2026-10-09 — Heading "Hard calls / **come to you.**" (second line accent) supersedes "Your rules run it. / You make the hard calls."; it sets on two lines at 360, 768, 1440 and 3840 and one at 1024.
@@ -320,6 +338,7 @@ hides.
 
 ## Open Questions
 
+- **To build:** browser check of the elbow hand-off pending (built 2026-10-10; lint, `tsc` and build green; the :3000 dev server was down): at 1440 and 3840 the line and label placement, the job's last ~70px passing partly under the label's mask, the corner speed change (510 to 640px/s), clearance from the fix label, the light phases.
 - **To build:** browser check pending: the Process animation run-through at 1440 and 3840, and the two spec-accepted overlaps (the job crossing the pennant for about 0.2s; in the stacked layout the lesson over the end of the dotted fix line).
 - **Review:** `handoffLabel` "To you or your staff" (service-business only) may be too long at 1440 six-across (width not measured); fallback "You or your staff".
 - **Review:** Discord step 5 role: `host` (spec's first option) or `remind` (ui-spec §5.8 choice 39).
@@ -358,4 +377,5 @@ hides.
 - **Choice:** below `wide` the job crosses in front of bots 4 and 3's legs and feet on the short legs
   to and from the fix line: accept (as built), or reroute.
 - **Choice:** the way back's 1.1s (`FIX_LINE_HOP`, as built), or closer to the old 0.8s.
+- **To build:** `ui-spec/05-process.md` is stale for the 2026-10-10 elbow hand-off: §5.1 (gap now 160px), the count table (needs `handoffBox`), the note that the hand-off needs no count-dependent class, §5.11c markup, §5.11d sizes, §5.11e motion; the ui-designer updates them.
 - **To build:** `ui-spec/05-process.md` is out of date (§5.4 Sizes and elsewhere: "across from 1024", `lg:` names; the breakpoint is `wide`, 1440); ui-designer updates it.

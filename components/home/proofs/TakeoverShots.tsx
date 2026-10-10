@@ -1,26 +1,25 @@
 // A takeover's screenshots (ui-spec §7.3.1 part 3, §7.6), in the layout its shot count picks.
+// It is only ever given two or three shots: a project with none (ui-spec §7.9) draws no
+// TakeoverShots at all, so this never renders an empty wrapper (ProjectTakeover decides).
 // Two shots: two 2:1 frames stacked, the same at every width. Three shots: one big 2:1 shot, then
-// two 4:3 details, side by side from `sm`. Each shot carries the edge its frame keeps
-// (lib/proofs.ts), and shots and alts are paired there by index, so they can't drift apart. Each
-// frame is the clip for the later reveal.
+// two 4:3 details, side by side from `sm`. Each shot carries the edge its frame keeps and its alt,
+// paired by index in lib/proofs.ts, so they can't drift apart. Each frame is the clip for the
+// later reveal.
 import { SiteImage } from "@/components/SiteImage";
-import { proofShotsWithAlts, type ProofShot, type ProofShots } from "@/lib/proofs";
+import type { ProofShots, ProofShotWithAlt } from "@/lib/proofs";
 
 type TakeoverShotsProps = {
-  readonly shots: ProofShots<ProofShot>;
-  readonly alts: ProofShots<string>;
+  readonly shots: ProofShots<ProofShotWithAlt>;
 };
 
 const frame = "relative overflow-hidden rounded-3xl";
 const wideSizes = "min(100vw, 1536px)";
 
-export function TakeoverShots({ shots, alts }: TakeoverShotsProps) {
-  const items = proofShotsWithAlts(shots, alts);
-
-  if (items.length === 2) {
+export function TakeoverShots({ shots }: TakeoverShotsProps) {
+  if (shots.length === 2) {
     return (
       <div className="flex flex-col gap-5">
-        {items.map(({ name, position, alt }) => (
+        {shots.map(({ name, position, alt }) => (
           <div key={name} data-anim="takeover-shot" className={`${frame} aspect-2/1`}>
             <SiteImage name={name} alt={alt} sizes={wideSizes} position={position} placeholderTone="cream" />
           </div>
@@ -29,7 +28,7 @@ export function TakeoverShots({ shots, alts }: TakeoverShotsProps) {
     );
   }
 
-  const [big, ...details] = items;
+  const [big, ...details] = shots;
 
   return (
     <div className="flex flex-col gap-5">

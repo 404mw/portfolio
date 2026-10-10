@@ -2,8 +2,12 @@
 
 Shared rules and parts (§0): [`../ui-spec.md`](../ui-spec.md). Page doc: [`../sections/07-proofs.md`](../sections/07-proofs.md).
 
-**Last Updated:** 2026-10-07 (Design Vault's two shots: a project has two or three shots, the
-two-shot layout stacks two 2:1 frames, light screenshots allowed. Before that, 2026-10-06: the
+**Last Updated:** 2026-10-10 (MARWIX-SKILLS gets parts 4, 5 and 6 with Rix on the showcase
+diagram: see [`07-proofs-spam.md`](07-proofs-spam.md), which wins where this file differs).
+Before that, 2026-10-09 (MARWIX-SKILLS goes live with no screenshots and its card is shown
+again: a project has no shots, two or three, and the grid is three across from `lg` again; §7.9,
+§7.8 40–46. Before that, 2026-10-07: Design Vault's two shots: a project has two or three shots,
+the two-shot layout stacks two 2:1 frames, light screenshots allowed. Before that, 2026-10-06: the
 Exile takeover: three shots, new in-use numbers, Eva on the diagram's tiles; §7.2.1–§7.2.3 moved,
 unchanged, to [`07-proofs-bot.md`](07-proofs-bot.md); later, the spam diagram redrawn as the ink
 stage and moved to [`07-proofs-spam.md`](07-proofs-spam.md)).
@@ -33,6 +37,12 @@ two, its Palettes and Fonts views, light-theme screenshots (§7.6). (3) Light sc
 allowed: a shot's pixels are image content, not the site's theme. MARWIX-SKILLS (hidden) keeps
 three placeholder slots. Open for review: §7.8 38–39.
 
+**2026-10-09 (the user's decision; static, not built yet).** (1) MARWIX-SKILLS goes live with no
+screenshots: its takeover has no shots block at all, for this project only. Exile (three shots)
+and Design Vault (two) stay exactly as they are. (2) Its card is shown again (`hiddenProofs` in
+`lib/proofs.ts` is empty), so the grid is three cards again. Supersedes the 2026-10-07 line above
+on MARWIX-SKILLS' placeholder slots. Spec: §7.9. Open for review: §7.8 42–46.
+
 ### 7.1 Section layout
 
 - Section frame (`sectionIds.proofs`), plus `overflow-x-clip` on the `<section>`: a local
@@ -40,10 +50,13 @@ three placeholder slots. Open for review: §7.8 38–39.
   Inner: `flex flex-col gap-12 md:gap-16`.
 - Header: `flex flex-wrap items-end justify-between gap-6`: left `flex flex-col gap-7`
   (`SectionLabel`, `SectionHeading size="heading"`); right `<p class="{metaLabel}">` with `proofs.hint`.
-- Grid: `<ul class="grid gap-x-12 gap-y-8 md:grid-cols-2 lg:grid-cols-3">`, one
-  `<li class="pt-[11.2%]">` per project, in the order Exile, Design Vault, MARWIX-SKILLS.
-  **The three cards are identical.** Phone: stacked. `md`: two across, MARWIX-SKILLS starts row two
-  at the same width, left-aligned. `lg` and up: three across.
+- Grid: `<ul class="grid gap-x-12 gap-y-8 {proofGridColumns}">` (`lib/proofs.ts`), one
+  `<li class="pt-[11.2%]">` per shown project, in the order Exile, Design Vault, MARWIX-SKILLS.
+  **Since 2026-10-09 all three are shown,** so `proofGridColumns` gives `md:grid-cols-2 lg:grid-cols-3`.
+  **The three cards are identical.** Phone: stacked. `md` up to `lg`: two across, MARWIX-SKILLS
+  alone on row two at the same width, left-aligned. `lg` and up: three across. (With only two
+  shown, `proofGridColumns` stays two across from `md`, no empty slot; that case is dormant while
+  `hiddenProofs` is empty.)
   - **Headroom:** the `li`'s top padding is 11.2% of the card's width (percent padding resolves
     against the grid area's width), which is the bot's top break-out (0.112 × banner width − 10px)
     plus a constant 12px, at every width. Clear space above each bot head: `gap-y-8` + 12 = 44px
@@ -122,7 +135,8 @@ The § numbers stay, so every "§7.2.1", "§7.2.2" and "§7.2.3" in this file po
   Parts 2 to 7 each open with a small mono label (the eyebrow, the same words on every project)
   over a short headline written for that project in the display face. **Exile has all seven
   parts; Design Vault has four** (1, 2, 3, 7: no took, no lessons, no showcase), so its takeover
-  is unchanged by part 5.
+  is unchanged by part 5. **MARWIX-SKILLS has all seven too** (2026-10-10,
+  [`07-proofs-spam.md`](07-proofs-spam.md)), and its part 3 still has no shots (2026-10-09, §7.9).
 
   ```
   dialog
@@ -133,9 +147,10 @@ The § numbers stay, so every "§7.2.1", "§7.2.2" and "§7.2.3" in this file po
       ├ TakeoverIntro   data-part="intro"    1 What it is: the intro line + TakeoverInfoRows (no eyebrow, no headline)
       ├ TakeoverPart    data-part="problem"  2 eyebrow, headline; one paragraph
       ├ TakeoverPart    data-part="built"    3 eyebrow, headline; one paragraph; wide: TakeoverShots, ProjectVisitLink
+      │                                        (no shots: no wide; ProjectVisitLink after the paragraph, §7.9)
       ├ TakeoverPart    data-part="took"     4 eyebrow, headline; TakeoverTook                       (only with `whatItTook`)
       ├ TakeoverPart    data-part="learned"  5 eyebrow, headline; TakeoverLearned                    (only with `whatILearned`)
-      ├ TakeoverPart    data-part="showcase" 6 eyebrow, headline; TakeoverShowcase; wide: SpamDiagram (only with `showcase`)
+      ├ TakeoverPart    data-part="showcase" 6 eyebrow, headline; TakeoverShowcase; wide: ShowcaseDiagram (only with `showcase`)
       ├ TakeoverMeans   data-part="means"    7 eyebrow, the closing line as its headline (TakeoverMeansLine), BookCallLink
       └ TakeoverNextLink                          (unchanged, last child)
   ```
@@ -199,12 +214,15 @@ The § numbers stay, so every "§7.2.1", "§7.2.2" and "§7.2.3" in this file po
   `ArrowUpRightIcon`). **Visit sits here, under the shots:** the shots show the thing and the
   button lets the reader check it is live, it keeps its old place after the shots, and it stays
   an ink pill well above the one accent button (Book a call), so the two never compete. Exile →
-  `links.exile` (still the only place exile.marwix.dev is linked).
+  `links.exile` (still the only place exile.marwix.dev is linked). **A project with no shots
+  (MARWIX-SKILLS, 2026-10-09) has no wide slot at all:** Visit is the body's last child, under the
+  paragraph (§7.9).
   - `TakeoverShots`, **two layouts, picked from the project's shot count** (the user, 2026-10-07;
-    replaces 2026-10-06's "one layout, three shots, for every project"). Every frame is
+    replaces 2026-10-06's "one layout, three shots, for every project"). A project with no shots
+    draws no `TakeoverShots` (2026-10-09, §7.9). Every frame is
     `data-anim="takeover-shot" relative overflow-hidden rounded-3xl`, so the motion pass is the
     same for both, and every image is a `SiteImage` with `placeholderTone="cream"`.
-    - **Three shots** (Exile; MARWIX-SKILLS's placeholders), unchanged: `flex flex-col gap-5`,
+    - **Three shots** (Exile), unchanged: `flex flex-col gap-5`,
       one `aspect-2/1` (`sizes="min(100vw, 1536px)"`), then `grid gap-5 sm:grid-cols-2` of two
       `aspect-4/3` (§7.6 for their `sizes`).
     - **Two shots** (Design Vault): `flex flex-col gap-5` of two `aspect-2/1` frames, each the full
@@ -213,6 +231,8 @@ The § numbers stay, so every "§7.2.1", "§7.2.2" and "§7.2.3" in this file po
     - **Types, for `web-coder`:** `ProofShots<T>` becomes a tuple of two or three; a project's
       shots and its `shotAlts` stay the same length (the length check in `lib/proofs.ts` stays),
       and `TakeoverShots` draws the two-shot layout for two and the three-shot layout for three.
+      **2026-10-09:** a project's shots and alts are `ProofShotSet<T>` (none, two or three);
+      `ProofShots<T>` stays the two-or-three tuple `TakeoverShots` draws (§7.9).
     - Each shot's `position` comes from `lib/proofs.ts`: its slot's default unless the shot sets
       its own (Exile's three do, §7.6). Defaults: three shots, big `top` and details `center`;
       two shots, `top` for both.
@@ -249,9 +269,9 @@ The § numbers stay, so every "§7.2.1", "§7.2.2" and "§7.2.3" in this file po
   stays in IN USE). A reader who sees only the headline and the diagram still knows it's real,
   running work (facts, 2026-10-05; confirmed by the user 2026-10-06).
   New `monoPill` in `lib/styles.ts` (a shape, not interactive): `inline-flex items-center gap-2 rounded-full px-3 py-2 font-mono text-meta leading-none font-medium tracking-[0.06em] uppercase`.
-  Wide = `SpamDiagram` (§7.3.2).
+  Wide = `ShowcaseDiagram` (§7.3.2).
 
-#### 7.3.2 The spam diagram (`SpamDiagram`, server; Exile's part 6; sample D in `temp/spam-diagram-samples.html`; tiles redrawn 2026-10-06)
+#### 7.3.2 The showcase diagram (`ShowcaseDiagram`, server; part 6 for Exile and MARWIX-SKILLS; sample D in `temp/spam-diagram-samples.html`; tiles redrawn 2026-10-06)
 
 Moved and redrawn 2026-10-06 (the user's pick: the ink stage from `md`, one band per step below it): [`07-proofs-spam.md`](07-proofs-spam.md), which supersedes this subsection.
 
@@ -306,6 +326,7 @@ Moved and redrawn 2026-10-06 (the user's pick: the ink stage from `md`, one band
   `rounded-xl` only. The colours inside the Eva files are an image's pixels, like a screenshot's,
   not tokens. No new token. **2026-10-07:** the two-shot layout uses `rounded-3xl` and the
   existing spacing only; Design Vault's light pixels are image content, not tokens. No new token.
+  **2026-10-09:** the no-shot part 3 uses only classes already in the part. No new token.
 - **Contrast:** `ink` on `cream` about 17:1; `cream-muted` on `cream` about 4.6:1 (eyebrows, took
   and lesson lines, lesson ordinals, step numbers, step lines, the status); `text` on `ink` above
   16:1; `muted` on `ink` about 6.9:1 (the panel's eyebrow); `on-accent` on `accent` about 9:1.
@@ -329,6 +350,8 @@ Moved and redrawn 2026-10-06 (the user's pick: the ink stage from `md`, one band
 
 Card width W; banner width B = W − 20. Every bot size is a fixed fraction of B (one scale).
 Characters a line are estimates from the type sizes, for the screen check to confirm.
+**The type rows below predate the 2026-10-07 font change (Acosta);** the card and takeover title
+sizes as the tokens set them now are in §7.9's Sizes.
 
 | Element | Phone 360 | Tablet 768 | Desktop 1440 | 4K 3840 |
 |---|---|---|---|---|
@@ -360,6 +383,7 @@ Characters a line are estimates from the type sizes, for the screen check to con
 | Shots, three-shot layout (Exile): big (2:1) | 320×160 | 706×353 | 1328×664 | 1536×768 |
 | Shots, three-shot layout (Exile): details (4:3) | stacked, 320×240 each | 343×257 each | 654×490 each | 758×568 each |
 | Shots, two-shot layout (Design Vault, 2026-10-07): two 2:1, stacked, 20 apart | 320×160 each (340 tall in all) | 706×353 each | 1328×664 each | 1536×768 each |
+| Shots, none (MARWIX-SKILLS, 2026-10-09) | no frame, no wide slot; §7.9 | same | same | same |
 | Visit | 48 tall, hugs its text | same | same | same |
 | Took items | 1 column, 320 | 2 columns, 333 each | 2 columns in the content, 409 each | 479 each |
 | Took title (`text-summary`) / line (`text-body-lg`) | 20px / 16px | 22.6px / 16px | 26px / 16px | 26px / 16px |
@@ -385,8 +409,10 @@ Characters a line are estimates from the type sizes, for the screen check to con
 | Next title (`text-heading`) | 44px | 64px | 96px | 104px |
 
 Widest stacked (767): card 706, banner 686×312, bot 388 tall, top break-out 67 (headroom 79),
-right break-out capped at 23. At 1024 the cards narrow from ~300 to 282 with the wider gap;
-screen check that MARWIX-SKILLS still only wraps at its hyphen.
+right break-out capped at 23. At 1024 the cards narrow from ~300 to 282 with the wider gap.
+**MARWIX-SKILLS' card title still wraps only at its hyphen** (re-checked 2026-10-09 against the
+Acosta sizes, §7.9): at 1024, its tightest text column (234), "MARWIX-" is about 179 wide. Screen
+check.
 
 Takeover at 1024 (the rail's first width, content 942): rail 301 + 40 + content 601. The part
 headline has about 23 characters a line there, its tightest column with 360's 24: a 45-character
@@ -425,11 +451,12 @@ optional key and can never be half there.
 | `.problem.headline` | **New.** Part 2's heading, written for this project: the problem in one line, the line a skimming reader takes away | 32px display: about 24 characters a line at 360 and in the 1024 rail, 33 at 1440. Two lines there is about 45 characters, three about 65 |
 | `.problem.body` | **New.** Part 2's paragraph: who had the problem and what they did before (Exile: "The problem it solved"; Design Vault: "Why it was built"). It adds to the headline, it doesn't repeat it | one short paragraph: about 68 characters a line from 768, 38 at 360 |
 | `.whatIBuilt.headline` | **New.** Part 3's heading: what changed for the people who use it, in one line | as `.problem.headline` |
-| `.whatIBuilt.body` | **New.** Part 3's paragraph, the words beside the screenshots. It takes over `summary`'s "what it does for its users" job | as `.problem.body` |
-| `.whatItTook.headline` | **New, optional block.** Part 4's heading: what building and running it took, in one line, in plain words. Absent for Design Vault and MARWIX-SKILLS: the part is not drawn | as `.problem.headline` |
+| `.whatIBuilt.body` | **New.** Part 3's paragraph, the words beside the screenshots. It takes over `summary`'s "what it does for its users" job. **For a project with no shots (MARWIX-SKILLS) it is the part's only content above Visit,** so it carries "what changed" alone (§7.9) | as `.problem.body` |
+| `.whatItTook.headline` | **New, optional block.** Part 4's heading: what building and running it took, in one line, in plain words. Absent for Design Vault: the part is not drawn. MARWIX-SKILLS has it (2026-10-10, four items) | as `.problem.headline` |
 | `.whatItTook.items[]` `{title, line}` | The capabilities, no tool or vendor name. Exile: four, in the facts' order (connecting outside services, the payment setup, hosting and upkeep, the website built alone) | title one line (about 27 characters at 1024); line two lines in a 280px column |
-| `.whatILearned.headline` | **New 2026-10-05, later; optional block.** Part 5's heading: what building this taught the user, said as what a client gets from it, in one line. Exile only; absent for Design Vault (skipped for now, the user) and MARWIX-SKILLS: the part is not drawn | as `.problem.headline` |
+| `.whatILearned.headline` | **New 2026-10-05, later; optional block.** Part 5's heading: what building this taught the user, said as what a client gets from it, in one line. Exile and MARWIX-SKILLS (2026-10-10, three items); absent for Design Vault (skipped for now, the user): the part is not drawn | as `.problem.headline` |
 | `.whatILearned.items[]` `{title, line}` | One lesson each, said as how the user works now (first person, present tense), never as a diary entry. `title`: the way of working; `line`: the proof from the facts. Exile: three, in the facts' order: builds the system first (the agent workflow that built and runs a live app); treats real people's data as a responsibility (only what it needs, EU servers with encrypted backups, deleted on request within 48 hours, policy and terms covering US law and the GDPR; never "GDPR compliant" or certified); keeps heavy pages fast (one public page carries 700+ images; never how). 48 hours and 700+ exactly as filled. No tool or vendor names | title one line at 360 beside its ordinal (about 30 characters); line two to three lines at 360 (about 80–120 characters), which is two lines in the 576 measure from 768. Longer lines are what make this part tall on a phone |
+| *Rows `.showcase.*` below are Exile's.* | MARWIX-SKILLS' showcase keys (`look`, `prompt`, `image`; its own status, body and return words) are in [`07-proofs-spam.md`](07-proofs-spam.md) (2026-10-10) | |
 | `.showcase.headline` | **New, optional block.** Part 6's heading: names the showcase in one line | as `.problem.headline` |
 | `.showcase.status` | **Changed 2026-10-06 (the user).** Part 6's state in a few words: the spam protection is live. **No number and no count of communities;** nothing here borrows the IN USE figures. The fact behind it is unchanged: it is active in the communities that use Exile Bot | one line at 360, about 34 characters |
 | `.showcase.body` | What the showcase is and why it is shown: Exile's spam protection, active in communities, as the automation showcase. With the steps and the return line, it takes over `summary`'s spam sentences. No count of communities here either | as `.problem.body` |
@@ -439,7 +466,7 @@ optional key and can never be half there.
 | `.showcase.returnLine` | Why it is safe to leave alone: the stop lifts on its own, so a false alarm undoes itself | two lines at 768, about 58 characters a line |
 | `.meansForYou.default` | **New.** Part 7's closing line, which is also its heading, for no pick, "Not sure yet" and no JavaScript: what this project means for a reader, in the shared voice. One line; Book a call follows it | 30–44px display: about 22 characters a line at 360, 42 from 768. A 65-character line is three lines on a phone and two from tablet |
 | `.meansForYou.{service-business,online-store,discord,software-builder,website}` | **New.** The same line for each About card, in that card's tone (`docs/04-voice.md`), traced to "What the user can do for a business: shown by Exile Bot" or "What the user builds". Never offers spam protection, never a number. A key left out falls back to `default` | as `default` |
-| `.shotAlts[]` | What's on each takeover screenshot, within the facts: **one per shot, two or three per project** (2026-10-07; Exile three, Design Vault two, MARWIX-SKILLS three markers). Exile: `[0]` the Exile Bot website's home page, with a calculation result card; `[1]` the owner dashboard's home view; `[2]` the dashboard's spam and raid protection settings, with protection on. Design Vault (**changed 2026-10-07**, now two): `[0]` its Palettes view, a grid of saved colour palettes, each card showing its swatches and the colours' names; `[1]` its Fonts view, a grid of saved fonts, each card a preview of the typeface over its name. Nothing read off a shot: no number, no community's name, no ID, no font's or colour's name, no hex value, no date (§7.6) | a sentence each |
+| `.shotAlts[]` | What's on each takeover screenshot, within the facts: **one per shot; none, two or three per project** (2026-10-09; Exile three, Design Vault two, **MARWIX-SKILLS none: `shotAlts: []`, no markers**). Exile: `[0]` the Exile Bot website's home page, with a calculation result card; `[1]` the owner dashboard's home view; `[2]` the dashboard's spam and raid protection settings, with protection on. Design Vault (**changed 2026-10-07**, now two): `[0]` its Palettes view, a grid of saved colour palettes, each card showing its swatches and the colours' names; `[1]` its Fonts view, a grid of saved fonts, each card a preview of the typeface over its name. Nothing read off a shot: no number, no community's name, no ID, no font's or colour's name, no hex value, no date (§7.6) | a sentence each |
 | `.visitLabel` | Visit button text | one line at 360 |
 | `proofs.takeover.proof` / `.close` / `.escHint` / `.next` | "Project", "Close", "Esc", "Next project" | 2 words each |
 | `proofs.takeover.rowLabels.whatItIs` / `.built` / `.inUse` | WHAT IT IS / BUILT / IN USE | fits the 88px label column |
@@ -450,19 +477,23 @@ optional key and can never be half there.
 - **Retired:** `.summary`. Its jobs go to `.intro` (what it is and does), `.whatIBuilt.body` (what
   it does for its users) and, for Exile, `.showcase.*` (the spam protection). ~~`exile.shotAlts[2]`
   goes with its shot.~~ **2026-10-06:** `exile.shotAlts[2]` is back, with the third shot.
-  **2026-10-07:** `designVault.shotAlts[2]` goes with its shot. **Removed earlier:** `.cardShotAlt`.
+  **2026-10-07:** `designVault.shotAlts[2]` goes with its shot. **2026-10-09:** the three
+  `marwixSkills.shotAlts` markers go; the key stays as `[]`. **Removed earlier:** `.cardShotAlt`.
 - **Eva's tiles have no content slot** (2026-10-06): the three images are decorative, with an
   empty alt (§7.6.1). No key is added for them.
 - **Design Vault** has no `whatILearned` (the user, 2026-10-05: skipped for now), so its takeover
   is unchanged: parts 1, 2, 3 and 7.
-- **MARWIX-SKILLS** (hidden behind `hiddenProofs`) keeps one shape with the others: `intro` from
-  its facts line; `problem.headline`, `problem.body`, `whatIBuilt.headline`, `whatIBuilt.body` and
-  `meansForYou.default` stay `[FILL: …]`; no `whatItTook`, no `whatILearned`, no `showcase`; three
-  `shotAlts` markers.
+- **MARWIX-SKILLS** (shown again 2026-10-09) keeps one shape with the others. Its `intro`, `rows`,
+  `problem`, `whatIBuilt`, `meansForYou.default` and `meansForYou["software-builder"]` are filled
+  in `content/home.ts` today (the BUILT / IN USE note in the rows line above is stale);
+  **`shotAlts: []`** (§7.9). **2026-10-10:** it also gets `whatItTook` (4), `whatILearned` (3) and
+  `showcase` (keys `look`, `prompt`, `image`), per [`07-proofs-spam.md`](07-proofs-spam.md). With
+  the three alt markers gone, no `[FILL:` marker is left on the project, so it can ship
+  (constitution §8).
 - **One shape for all three:** a `ProofProject` type (required `tag`, `title`, `cardLine`,
   `proofLine`, `rows`, `intro`, `problem` `{headline, body}`, `whatIBuilt` `{headline, body}`,
-  `meansForYou.default`, `shotAlts` (a tuple of two or three since 2026-10-07, as long as the
-  project's shots), `visitLabel`; optional `whatItTook` `{headline, items}`,
+  `meansForYou.default`, `shotAlts` (`ProofShotSet<string>` since 2026-10-09: none, two or three,
+  as long as the project's shots), `visitLabel`; optional `whatItTook` `{headline, items}`,
   `whatILearned` `{headline, items}`, `showcase` `{headline, status, body, steps, returnLabel, returnLine}`,
   and the five card keys of `meansForYou`) that `content/home.ts` satisfies. `whatILearned` is
   typed `ProofLearned`, the same shape as `ProofTook` (`{ headline, items: readonly ProofTitledLine[] }`)
@@ -473,9 +504,11 @@ optional key and can never be half there.
 The card has **no image** (its banner is CSS, its bot inline SVG). The diagram's steps and return
 line are markup; since 2026-10-06 its three tiles hold images (§7.6.1). Every screenshot is in a
 takeover's part 3, in `TakeoverShots`; no other part has one (part 5 has none). **A project has
-two or three shots** (the user, 2026-10-07; replaces 2026-10-06's "every project has three"):
-Exile three, Design Vault two, MARWIX-SKILLS three placeholders. **Remove** `designVaultShot3`
-from `lib/images.ts`. Shots and alts stay equal-length tuples per project, so they can't drift.
+none, two or three shots** (the user, 2026-10-09; before that two or three, 2026-10-07, and three,
+2026-10-06): Exile three, Design Vault two, MARWIX-SKILLS none. **Remove** `designVaultShot3`
+from `lib/images.ts` (done 2026-10-07). **2026-10-09: remove** `marwixSkillsShot1`–`3` from
+`lib/images.ts`, the last `null` shot entries; nothing else names them. Shots and alts stay
+equal-length tuples per project, so they can't drift.
 
 | Name (`lib/images.ts`) | Shows (alt-text meaning) | Where | Ratio | Crop | `sizes` |
 |---|---|---|---|---|---|
@@ -484,7 +517,7 @@ from `lib/images.ts`. Shots and alts stay equal-length tuples per project, so th
 | `exileShot3` | The dashboard's spam and raid protection settings, with protection on | detail | 4:3 | `object-cover object-left` | as `exileShot2` |
 | `designVaultShot1` | Design Vault's Palettes view: a grid of saved colour palettes, each card showing its swatches and the colours' names | two-shot, first | 2:1 | `object-cover object-top` | `min(100vw, 1536px)` |
 | `designVaultShot2` | Design Vault's Fonts view: a grid of saved fonts, each card a preview of the typeface over its name | two-shot, second | 2:1 | `object-cover object-top` | `min(100vw, 1536px)` |
-| `marwixSkillsShot1`–`3` | to come with its facts | big, details | 2:1, 4:3, 4:3 | the three-shot slot defaults (big `top`, details `center`) | as Exile's big and details |
+| ~~`marwixSkillsShot1`–`3`~~ | **Removed 2026-10-09:** MARWIX-SKILLS has no shots (§7.9) | n/a | n/a | n/a | n/a |
 
 `placeholderTone="cream"` on all. 1648 is where the 1536 column stops growing (1536 + two 56px
 gutters). An alt says what is on the screen and stays inside the facts: no number read off a
@@ -586,11 +619,12 @@ Superseded 2026-10-06 (the user's pick, the ink stage): the figures' files, size
 - **Takeover parts (2026-10-05), to add,** one part per file in `components/home/proofs/`:
   `TakeoverPart.tsx` (the frame of parts 2–6: eyebrow and headline, body, wide slot),
   `TakeoverIntro.tsx` (part 1), `TakeoverTook.tsx` (part 4) and `TakeoverItem.tsx` (one titled
-  line, parts 4 and 5), `TakeoverShowcase.tsx` (part 6's status and paragraph), `SpamDiagram.tsx`,
-  `SpamStep.tsx`, `SpamStepTile.tsx` (the swappable tile), `SpamReturn.tsx`, `TakeoverMeans.tsx`
+  line, parts 4 and 5), `TakeoverShowcase.tsx` (part 6's status and paragraph), the `Showcase*` diagram files
+  (`ShowcaseDiagram.tsx`, `ShowcaseStep.tsx`, `ShowcaseImageFigure.tsx`, `ShowcaseReturn.tsx`, …:
+  the list is in [`07-proofs-spam.md`](07-proofs-spam.md), 2026-10-10), `TakeoverMeans.tsx`
   (part 7's ink panel), `TakeoverMeansLine.tsx` (client: the closing line, part 7's `<h3>`).
   `components/icons/EyeIcon.tsx`, `AlertIcon.tsx`, `LockIcon.tsx` (deleted 2026-10-06, below).
-  `lib/spamDiagram.ts` (step keys and order). A `ProofProject` type beside the content it describes.
+  `lib/showcaseDiagram.ts` (was `lib/spamDiagram.ts`: step keys and order per project). A `ProofProject` type beside the content it describes.
 - **Part 5, What I learned (2026-10-05, later), the changes:**
   - **New:** `components/home/proofs/TakeoverLearned.tsx` (server; part 5's body: the `<ol>`,
     one `TakeoverItem` per lesson with its ordinal).
@@ -658,8 +692,10 @@ Superseded 2026-10-06 (the user's pick, the ink stage): the figures' files, size
   - **Copy (`copywriter`, `content/home.ts`):** the two `designVault.shotAlts` (§7.5).
   - **Unchanged:** `SiteImage.tsx`, `ImagePlaceholder.tsx`, `ProjectTakeover.tsx`,
     `lib/proofProject.ts` (its `shotAlts` follows `ProofShots`), every hook. MARWIX-SKILLS keeps
-    three `null` slots. If §7.8 38 takes the hairline, only `TakeoverShots.tsx`'s frame class
-    changes.
+    three `null` slots (superseded 2026-10-09: none, §7.9). If §7.8 38 takes the hairline, only
+    `TakeoverShots.tsx`'s frame class changes.
+- **MARWIX-SKILLS live without shots (2026-10-09; static, nothing built), the files:** §7.9
+  (Components).
 - **Motion (later), takeover and cards:** cards reveal on scroll (stagger 0.12s); hover lifts a card −8px. Open: the
   dialog's `clip-path` expands from the card's rect (`data-proof-card`) to full screen (0.75s), and
   `takeover-content` rises 40px and fades in after 0.35s. Close: clip back to the card (0.6s), then
@@ -680,13 +716,13 @@ Superseded 2026-10-06 (the user's pick, the ink stage): the figures' files, size
 | `takeover-part` + `data-part` | each part, a direct child of the column (`data-part` `learned` for part 5) | none new: the open's rise and the close's fade, as built | as built |
 | `takeover-intro`, `takeover-rows` | part 1's lead and rows wrapper | none new (above the fold on open) | n/a |
 | `takeover-part-head` | the wrapper around a part's eyebrow and headline (parts 2–7) | fades up 24px as its part enters the dialog's view | fade only |
-| `takeover-part-body`, `takeover-part-wide` | a part's content, its full-width slot | fade up 24px, 0.08s and 0.16s after the head | fade only |
-| `takeover-shot` | each shot's clipped frame (two or three per project since 2026-10-07; both layouts' frames carry it) | the image scales 1.06 → 1 inside the frame as it enters (the frame is the clip) | fade only |
+| `takeover-part-body`, `takeover-part-wide` | a part's content, its full-width slot (no wide slot in a part 3 without shots: Visit rides in the body, 2026-10-09) | fade up 24px, 0.08s and 0.16s after the head | fade only |
+| `takeover-shot` | each shot's clipped frame (two or three per project since 2026-10-07; both layouts' frames carry it; none in MARWIX-SKILLS since 2026-10-09) | the image scales 1.06 → 1 inside the frame as it enters (the frame is the clip) | fade only |
 | `takeover-item` (was `takeover-took-item`) | each took item (part 4) and each lesson (part 5); scope by the part's `data-part` | fade up 16px, 0.08s apart, with the part's body; a lesson's ordinal moves with its item, never alone | fade only |
-| `spam-diagram` | the diagram | the trigger: plays once when it enters | all of it fades in together |
-| `spam-step`, `spam-tile` | each step; the wrapper around the tile slot (kept through the 2026-10-06 Eva swap) | steps light in order, 0.25s apart: the tile pops (scale 0.8 → 1), Eva with it and never on her own; its number, title and line fade up | no pop |
-| `spam-link`, `spam-chevron` | the hairline (`origin-left`), the chevron's wrapper | the hairline draws (`scaleX` 0 → 1), then the chevron fades in, before the next step | shown at once |
-| `spam-return`, `spam-return-head`, `spam-pill` | the dashed line, its arrowhead, the pill | after step 3: from `md` the line wipes in right to left (`clip-path` inset), then the arrowhead and the pill pop; on a phone the box fades up | fade only |
+| `showcase-diagram` (was `spam-diagram`; hooks renamed 2026-10-10, [`07-proofs-spam.md`](07-proofs-spam.md)) | the diagram | the trigger: plays once when it enters | all of it fades in together |
+| `showcase-step`, `showcase-figure` (was `spam-tile`) | each step; the wrapper around the figure slot (Eva or Rix) | **Superseded 2026-10-10 by [`07-proofs-spam.md`](07-proofs-spam.md):** the figure rises from the floor (not a scale 0.8 → 1 pop), steps light 0.6s apart as built. Was: steps light in order, 0.25s apart: the figure pops (scale 0.8 → 1), Eva or Rix with it and never on her own; its number, title and line fade up | no pop |
+| `showcase-link`, `showcase-chevron` | the hairline (`origin-left`), the chevron's wrapper | the hairline draws (`scaleX` 0 → 1), then the chevron fades in, before the next step | shown at once |
+| `showcase-return`, `showcase-return-head`, `showcase-pill` | the dashed line, its arrowhead, the pill | after step 3: from `md` the line wipes in right to left (`clip-path` inset), then the arrowhead and the pill pop; on a phone the box fades up | fade only |
 | `takeover-means-line` | the closing line's `<h3>`, inside part 7's `takeover-part-head` | the pick's swap fade only (0.15s out, 0.25s in; `lib/shownSet.ts`); the reveal writes on the head around it | the same |
 | `takeover-book` | the wrapper around Book a call | fades up 24px, 0.08s after the panel's head | fade only |
 
@@ -732,7 +768,9 @@ Superseded 2026-10-06 (the user's pick, the ink stage): the figures' files, size
 `data-proof-card` and `proof-card-title` unchanged. Takeover: `takeover-content`, `takeover-bar`,
 `takeover-title` and `takeover-next-title` unchanged; the new ones are in the table above.
 
-### 7.8 Decided 2026-10-05 (the takeover), 2026-10-06 (the Exile view; items 23–33 are open for review) and 2026-10-07 (Design Vault's shots; items 38–39 are open for review)
+### 7.8 Decided 2026-10-05 (the takeover), 2026-10-06 (the Exile view; items 23–33 are open for review), 2026-10-07 (Design Vault's shots; items 38–39 are open for review) and 2026-10-09 (MARWIX-SKILLS live without shots; items 42–46 are open for review)
+
+2026-10-10 (MARWIX-SKILLS' rich takeover, Rix on the showcase diagram): its choices are Review 1–9 in [`07-proofs-spam.md`](07-proofs-spam.md), open for review.
 
 Part numbers below follow the renumbering of 2026-10-05, later (What I learned is part 5, the
 showcase part 6, the closing panel part 7).
@@ -859,13 +897,15 @@ with the first option of each):**
 
 34. **The shot count is per project: two or three.** Three is the big 2:1 over two 4:3 details
     (Exile keeps exactly this); two is two 2:1 frames stacked at the full column width, the same
-    at every width (no side-by-side breakpoint). Supersedes 23.
+    at every width (no side-by-side breakpoint). Supersedes 23. (Widened 2026-10-09 to none, two
+    or three, 40.)
 35. **Design Vault has two shots,** its Palettes view and its Fonts view, supplied as light-theme
     files about 2:1 and anchored `top` (the slot default). `designVaultShot3` is removed. Both
     are over the big slot's 1× minimum and under its 2× target, so both ship.
 36. **Light screenshots are allowed.** A shot's pixels are image content; constitution §5's
     "dark only" governs the site's theme.
-37. **MARWIX-SKILLS (hidden) keeps three placeholder slots** for now.
+37. ~~**MARWIX-SKILLS (hidden) keeps three placeholder slots** for now.~~ **Superseded by the
+    user, 2026-10-09 (40):** MARWIX-SKILLS has no shots.
 
 **Settled in the spec from decisions 34–37 (open for the lead's review):**
 
@@ -880,3 +920,118 @@ with the first option of each):**
 39. **The Fonts alt leaves out the licence** each card shows, because the facts say the vault
     keeps fonts, not their licences. Or: add one line to `docs/03-facts.md` (the user's) so the alt
     can say each font is kept with its licence.
+
+**By the user, 2026-10-09 (MARWIX-SKILLS goes live):**
+
+40. **MARWIX-SKILLS goes live without screenshots.** Its takeover has no shots block at all, for
+    this project only. Exile (three shots) and Design Vault (two) stay exactly as they are.
+    Supersedes 37, and for MARWIX-SKILLS the 2026-09-24 page-doc decision that it "gets takeover
+    shots like the others". A project now has none, two or three shots.
+41. **The MARWIX-SKILLS card is shown again:** `hiddenProofs` in `lib/proofs.ts` becomes `[]`. The
+    grid is three cards (§7.1); MARWIX-SKILLS is 03 of 03, and Next wraps from it to Exile.
+
+**Settled in the spec from decisions 40–41 (open for the lead's review):**
+
+42. **No shots means part 3 closes up; nothing fills the space.** The part keeps its frame
+    (hairline, eyebrow, headline, paragraph) and drops the wide slot entirely; Visit moves into
+    the body, 24px under the paragraph. Not chosen: (b) Visit alone in the wide slot, which from
+    `lg` puts it under the rail, a column away from the paragraph it backs, after an `mt-3` row
+    with nothing above it; (c) a stand-in visual (an ink stage with the puzzle bot, or a drawn
+    "skill at work"), which is new content outside the facts (constitution §12) and would echo
+    the card rather than show the thing.
+43. **Data shape: an empty tuple, not an optional key.** `ProofShots<T>` stays the two-or-three
+    tuple `TakeoverShots` draws; a new `ProofShotSet<T>` (`readonly [] | ProofShots<T>`) types a
+    project's shot names and `shotAlts`, and MARWIX-SKILLS has `[]` on both sides, so the
+    existing `length` tie still checks them (a written alt with no shot, or a shot with no alt,
+    fails the type check). Not chosen: `shotAlts?` optional and no `proofShotNames` entry, like
+    the optional parts: the tie between the two files would need a conditional type, and a
+    missing key reads as forgotten where `[]` reads as decided.
+44. **Three cards at `md`: the third sits alone on row two, left-aligned, at the same width,**
+    as built before the hide (`proofGridColumns` unchanged). Not chosen: centre the lone card on
+    row two (one more class string, and the cards no longer share a left edge), or stack until
+    `lg` (cards 706 wide at 768, bots 388 tall).
+45. **The titles keep their one break chance.** Neither the card `<h3>` nor the takeover `<h2>`
+    may gain `wrap-break-word`, `break-words`, `break-all` or `hyphens-auto` (none has one today),
+    so "MARWIX-SKILLS" breaks only after its hyphen, at every width (§7.9). Where the card and
+    the takeover set it on different line counts (768 to about 1550), the built title morph
+    crossfades (0.15s), as for any project.
+46. **No new token, component or content slot.** The change is one flag, one type, three image
+    entries removed, one content array emptied, and Visit's place in part 3.
+
+### 7.9 MARWIX-SKILLS live, with no shots (the user, 2026-10-09; static, not built yet)
+
+This change's one question: **does a takeover with no screenshots still read as finished?** It
+does if part 3 closes up around what it has (eyebrow, headline, paragraph, Visit) and keeps no
+empty frame. Exile and Design Vault are unchanged. The v3 reference has no zero-shot case; this
+follows the takeover's own part pattern.
+
+- **The card is back.** `hiddenProofs = []`. Every consumer reads `shownProofKeys`, so the card,
+  its takeover, the numbers (MARWIX-SKILLS 03, the total 03), Next (Design Vault → MARWIX-SKILLS →
+  Exile) and `#marwix-skills` return with no other change. The grid is §7.1's; §7.4's card and bot
+  rows hold again. The two-shown arm-clearance note (page doc, Open Questions) doesn't apply while
+  three are shown: at 1440 a bot's right clears the next card by 28.
+- **Part 3 without shots.** `TakeoverPart` gets no `wide`: no `takeover-part-wide` div, no `mt-3`
+  row, no empty gap. `ProjectVisitLink` is the body's last child, after the paragraph; the body's
+  `flex flex-col items-start gap-6` puts it 24px under the last line. Below `lg`: eyebrow,
+  headline, paragraph, Visit in one column. From `lg`: head in the rail; paragraph and Visit beside
+  it, Visit's left edge on the paragraph's. The part is as tall as its words, like part 2 plus a
+  button.
+- **Why it doesn't look broken:** each part keeps the same hairline, eyebrow and headline, so a
+  headline skim finds no hole; the ink band at the top and the ink panel at the bottom frame the
+  takeover; the gap after part 3 is the usual 40 / 56 / 72. ~~MARWIX-SKILLS shows parts 1, 2, 3
+  and 7, like Design Vault.~~ **2026-10-10:** it shows all seven parts, like Exile.
+- **Takeover height:** ~~on a 4K window it may not scroll~~ **2026-10-10:** the takeover is now
+  about 5,000px at 360 (estimate) and always scrolls at 4K ([`07-proofs-spam.md`](07-proofs-spam.md)).
+  Screen check.
+- **Titles:** "MARWIX-SKILLS" has one break chance, after the hyphen (§7.8 45). Widths are
+  estimates: Acosta letters about 0.9em, the IBM Plex Sans Bold hyphen about 0.35em. At 360 the
+  takeover title is two lines, as Design Vault's is, so its condensed strip is the taller one
+  there (page doc, Open Questions).
+- **Motion (later):** nothing new. No wide slot means no `takeover-part-wide` and no `takeover-shot`
+  hooks; Visit moves with `takeover-part-body` (fade up 24px, 0.08s after the head). The parts'
+  reveal finds hooks per part and never assumes part 3 has a wide slot. Open, close, Next and the
+  card bot (puzzle, built) are unchanged.
+- **States:** Visit as §7.3.4 (`bg-ink text-cream`; hover `bg-accent text-on-accent`;
+  focus-visible 2px `outline-ink`, 2px offset; active `bg-accent/80`). Card as §7.2. Tab order
+  Close, Visit, Book a call, Next.
+- **Tokens:** `cream`, `ink`, `cream-muted`, `ink/15`, `text` (title on the band), `accent` and
+  `on-accent` (Visit hover, Book a call); `font-display` (Acosta), `font-body` (IBM Plex Sans),
+  `font-mono` (IBM Plex Mono); `text-card`, `text-takeover`, `text-step`, `text-lead`, `text-body`;
+  `rounded-3xl`, `rounded-full`. None new.
+- **Content slots:** `proofs.projects.marwixSkills.shotAlts` becomes `[]` (no alt: no shot). No new
+  slot. Every other MARWIX-SKILLS slot is already filled.
+- **Images:** none. `marwixSkillsShot1`–`3` leave `lib/images.ts`.
+- **Components (reuse; nothing new):**
+  - `lib/proofs.ts`: `hiddenProofs = []` (flag and comment stay); add `ProofShotSet<T>`;
+    `proofShotNames` typed with it, `marwixSkills: []`, the `length` tie to `shotAlts` unchanged;
+    `proofImages(key).shots` and `proofShotsWithAlts` return `ProofShotSet`; `zipShots` pairs two
+    empties to `[]` and still throws on any length mismatch; `slotPositions` and
+    `proofShotPositions` unchanged.
+  - `lib/proofProject.ts`: `shotAlts: ProofShotSet<string>`.
+  - `lib/images.ts`: delete `marwixSkillsShot1`–`3`.
+  - `ProjectTakeover.tsx`: the one place that decides. Shots → part 3's `wide` is `TakeoverShots`
+    then Visit, as built. None → no `wide`; Visit follows the paragraph in the children.
+  - `TakeoverShots.tsx`: still draws only two or three; it is never given none, so it never
+    renders an empty wrapper (header comment).
+  - `content/home.ts` (`copywriter`): `marwixSkills.shotAlts: []`. It lands with the type change,
+    or the type check fails.
+
+#### Sizes (§7.9; Acosta sizes from the current tokens)
+
+| Element | Classes (phone first) | Phone 360 | Tablet 768 | Desktop 1440 | 4K 3840 |
+|---|---|---|---|---|---|
+| Grid | `grid gap-x-12 gap-y-8 md:grid-cols-2 lg:grid-cols-3` (`proofGridColumns`) | 1 column | 2 across; MARWIX-SKILLS alone on row 2, left | 3 across | 3 across |
+| Card W / its text column (`px-6`) | `li` `pt-[11.2%]`; card unchanged | 320 / 272 | 329 / 281 | 411 / 363 | 480 / 432 |
+| Card title, MARWIX-SKILLS | `font-display text-card leading-none decoration-1 underline-offset-4 group-hover:underline` | 25px, about 279 whole: one line or "MARWIX-" (144) / "SKILLS" | 28.8px: two lines, "MARWIX-" 165 | 35px: two lines, "MARWIX-" 201 | 36px: one line, 401 |
+| Takeover title box (band − title margins) | `h2` unchanged: `mx-5 mt-5 mb-4 … md:mx-8 … lg:mx-12 …` | 280 | 643 | 1232 | 1440 |
+| Takeover title, MARWIX-SKILLS | `font-display text-takeover leading-none text-text` | 34px: two lines, "MARWIX-" 196 | 52.9px: one line, 590 | 84px: one line, 937 | 100px: one line, 1115 |
+| Part 3 frame, no shots | `TakeoverPart`, no `wide` | one column, 320 | one column, 706 | rail 429 + 40 + body 859 | rail 499 + 40 + body 997 |
+| Paragraph | `{takeoverText}` (`max-w-xl text-lead leading-normal text-pretty text-ink`) | 17px in 320 | 17px in 576 | 17px in 576 | 17px in 576 |
+| Visit, the body's last child | `{pillInk} min-h-12 gap-2 self-start px-6 text-body font-semibold` | 48 tall, about 240 wide, 24 under the paragraph | same | same, left edge on the paragraph's | same |
+| Part 3 height (hairline to Visit's foot) | | about 520 | about 370 | about 300 | about 300 |
+| Gap to part 7 | column `gap-10 md:gap-14 lg:gap-18` | 40 | 56 | 72 | 72 |
+| Whole MARWIX-SKILLS takeover | Stale since 2026-10-10 (parts 4–6 added): about 5,000 at 360, always scrolls at 4K; other widths not re-estimated ([`07-proofs-spam.md`](07-proofs-spam.md)) | about 5,000 | not re-estimated | not re-estimated | scrolls |
+
+Tightest card column is 1024 (234, "MARWIX-" 179); the takeover title flips from one line to two
+near 580 (box 475 at 560, 549 at 640). Heights and widths are estimates for the screen check at
+360, 768, 1024, 1440 and 3840.

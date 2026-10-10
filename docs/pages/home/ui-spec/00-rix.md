@@ -3,7 +3,7 @@
 Shared rules (§0): [`../ui-spec.md`](../ui-spec.md). Rig and Process constants: [`05-process.md`](05-process.md) §5.6–5.7.
 About options and the built O4 play: [`02a-about-options.md`](02a-about-options.md). Page doc: [`../sections/02a-about.md`](../sections/02a-about.md).
 
-**Last Updated:** 2026-10-05 (rev 4). Rev 2: the user's decisions of 2026-10-02 (alive and
+**Last Updated:** 2026-10-10 (R1.1: Rix may stand on the ink stage too; R1.2: showcase hold row). 2026-10-05 (rev 4). Rev 2: the user's decisions of 2026-10-02 (alive and
 playful; talk is eyes and body; B walks the shelf; idle plays; named emotions; one source for Rix),
 then R12 resolved, P1–P3 approved and P4 dropped, and the poke-mood ladder (R6A). **Rev 3:** the
 user's feedback after trying Rix on `/dev` (R12 rows 12–15): pixel glyphs for the emotions (R3.2),
@@ -74,7 +74,7 @@ doesn't change, apart from the hooks in R1.3 and the lock classes in R6A.9. No n
   positive `scaleX` (0.92), so it isn't a mirror.
 - **Flat token fills only:** no strokes, gradients, filters or blur, and no colour outside
   `botFills`. Glyphs are `fill-muted`, or `fill-accent` for `hearts` and `grawlix` only.
-- **He stands only on `bg`.** The eye holes are `fill-bg`, so he never stands on `band` or `cream`.
+- **He stands only on `bg` or the ink stage.** The eye holes are `fill-bg`, so he never stands on `band` or `cream` (the user, 2026-10-10: the showcase diagram, `07-proofs-spam.md`).
 
 ### R1.2 Geometry (viewBox `-30 -18 170 110`; 1 unit = box width ÷ 170)
 
@@ -85,6 +85,7 @@ doesn't change, apart from the hooks in R1.3 and the lock classes in R6A.9. No n
 | Feet | tips 26 90 / 72 92; the box bottom (y 92) is the ground. Walking offsets `x` ±`footReach` (at most ±12, the flee), always inside the box | `foot-left`, `foot-right` |
 | Arms | L rect −4..6, R rect 94..104, y 50–56; shoulders 6 53 / 94 53. + rotation: left arm up, right arm down | `arm-left`, `arm-right` |
 | Prop slot | right hand, x 106–130, y 23–50; centre 118 36.5 | `prop`, pivot `PROP_PIVOT` 118 50; spin pivot `TOSS.origin` 118 36.5 |
+| Showcase hold (07-proofs-spam only) | the prop drawn at 1.5× in a nested viewport at x 100, y 35, 36×36 (viewBox 106 26 24 24), pose `idle`; the shared slot is unchanged elsewhere | `rixShowcaseHold` (`lib/showcaseFigures.ts`) |
 | Left-hand catch | the prop slot moved x −134 (x −28..−4) | juggle only |
 | Emote slot | x 86–128, y −16..2, up-right of the head. Hearts rise to y −24; the pick's burst sits over the prop (x 103–133, y 4–24) | `emote` (R3.2) |
 | zzz | x 88–126, y −18..6, rising to y −28 | `z` ×3 (Process paths) |

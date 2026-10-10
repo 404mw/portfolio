@@ -31,7 +31,9 @@ export function ProcessList({ steps, emblem, layout, stepLabel, fixLabel, handof
     if (fixLabel !== undefined && index === FIX_STEP) {
       return <ProcessFixReturn fixBox={layout.fixBox} label={fixLabel} />;
     }
-    if (handoffLabel !== undefined && index === HANDOFF_STEP) return <ProcessHandoff label={handoffLabel} />;
+    if (handoffLabel !== undefined && index === HANDOFF_STEP) {
+      return <ProcessHandoff handoffBox={layout.handoffBox} label={handoffLabel} />;
+    }
     return undefined;
   };
   return (

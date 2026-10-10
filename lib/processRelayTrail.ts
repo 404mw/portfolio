@@ -47,8 +47,8 @@ export function straight(tl: gsap.core.Timeline, to: PointAt, timing: Timing = R
 
 /**
  * Ghost k (1–3) repeats the job's `move` from `from`, `GHOST_LAG` × k after `t`, smaller and fainter
- * (scaled about its bottom centre), fading in at its start and out as it catches up at the end,
- * `length` seconds later.
+ * (scaled about its bottom centre), fading in at its start and out over `out` as it catches up at
+ * the end, `length` seconds later.
  */
 export function ghostFollow(
   tl: gsap.core.Timeline,
@@ -57,6 +57,7 @@ export function ghostFollow(
   move: Mover,
   length: number,
   t: number,
+  out: number = GHOST_OUT,
 ) {
   ghosts.forEach((ghost, i) => {
     const start = t + GHOST_LAG * (i + 1);
@@ -66,7 +67,7 @@ export function ghostFollow(
       start,
     )
       .to(ghost, { opacity: GHOST_OPACITY[i] ?? 0, duration: GHOST_IN, ease: "none" }, start)
-      .to(ghost, { opacity: 0, duration: GHOST_OUT, ease: "none" }, start + length - GHOST_OUT);
+      .to(ghost, { opacity: 0, duration: out, ease: "none" }, start + length - out);
     move(ghost, start);
   });
 }

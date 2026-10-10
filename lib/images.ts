@@ -5,7 +5,7 @@ type ImageEntry = { readonly dark: string | null };
 
 export const images = {
   portrait: { dark: "/images/portrait.png" },
-  // Proofs (ui-spec §7.6): each project's takeover shots, two or three each.
+  // Proofs (ui-spec §7.6): each project's takeover shots: none, two or three each.
   exileShot1: { dark: "/images/exile/home.webp" },
   exileShot2: { dark: "/images/exile/dashboard.webp" },
   exileShot3: { dark: "/images/exile/spam-raid.webp" },
@@ -16,9 +16,6 @@ export const images = {
   // Design Vault's two shots (ui-spec §7.6): light-theme screenshots; `dark` names the site's theme.
   designVaultShot1: { dark: "/images/design-vault/palettes.webp" },
   designVaultShot2: { dark: "/images/design-vault/fonts.webp" },
-  marwixSkillsShot1: { dark: null },
-  marwixSkillsShot2: { dark: null },
-  marwixSkillsShot3: { dark: null },
 } as const satisfies Record<string, ImageEntry>;
 
 export type ImageName = keyof typeof images;

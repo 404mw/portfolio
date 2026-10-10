@@ -3,8 +3,8 @@
 // whole block or none of it. Words stay in content/home.ts.
 import { proofs } from "@/content/home";
 import type { AboutSet } from "@/lib/aboutPick";
-import type { ProofKey, ProofShots, ProofStat } from "@/lib/proofs";
-import type { SpamStepKey } from "@/lib/spamDiagram";
+import type { ProofKey, ProofShotSet, ProofStat } from "@/lib/proofs";
+import type { ShowcaseProject, ShowcaseStepKey } from "@/lib/showcaseDiagram";
 
 /** A part's headline beside its one paragraph (parts 2 and 3). */
 export type ProofPartText = { readonly headline: string; readonly body: string };
@@ -18,12 +18,12 @@ export type ProofTook = { readonly headline: string; readonly items: readonly Pr
 /** Part 5: what building it taught, each lesson said as how the user works now. Its own name, so it can change apart from part 4. */
 export type ProofLearned = { readonly headline: string; readonly items: readonly ProofTitledLine[] };
 
-/** Part 6: the showcase, its status, its paragraph and the diagram's words. */
-export type ProofShowcase = {
+/** Part 6: the showcase, its status, its paragraph and the diagram's words, keyed by its diagram's step keys. */
+export type ProofShowcase<K extends string = string> = {
   readonly headline: string;
   readonly status: string;
   readonly body: string;
-  readonly steps: Readonly<Record<SpamStepKey, ProofTitledLine>>;
+  readonly steps: Readonly<Record<K, ProofTitledLine>>;
   readonly returnLabel: string;
   readonly returnLine: string;
 };
@@ -31,7 +31,10 @@ export type ProofShowcase = {
 /** Part 7's closing line per set: `default` always, a card's own line when it has one. */
 export type ProofMeans = { readonly default: string } & { readonly [K in AboutSet]?: string };
 
-export type ProofProject = {
+/** A project's showcase: typed with its own diagram's step keys; a project with no diagram has none. */
+type ProofShowcaseOf<P extends ProofKey> = P extends ShowcaseProject ? ProofShowcase<ShowcaseStepKey<P>> : never;
+
+export type ProofProject<P extends ProofKey = ProofKey> = {
   readonly tag: string;
   readonly title: string;
   readonly cardLine: string;
@@ -47,14 +50,14 @@ export type ProofProject = {
   readonly whatIBuilt: ProofPartText;
   readonly whatItTook?: ProofTook;
   readonly whatILearned?: ProofLearned;
-  readonly showcase?: ProofShowcase;
+  readonly showcase?: ProofShowcaseOf<P>;
   readonly meansForYou: ProofMeans;
-  readonly shotAlts: ProofShots<string>;
+  readonly shotAlts: ProofShotSet<string>;
   readonly visitLabel: string;
 };
 
 /** Every project under the one shape: a project that drifts from it fails the type check here. */
-const projects: Readonly<Record<ProofKey, ProofProject>> = proofs.projects;
+const projects: { readonly [P in ProofKey]: ProofProject<P> } = proofs.projects;
 
 /** A project's content, with its optional parts typed as optional. */
 export function proofProject(key: ProofKey): ProofProject {

@@ -15,9 +15,9 @@ export type ProofKey = (typeof proofKeys)[number];
 /**
  * TEMPORARY HIDE FLAG. Projects listed here render no card and no takeover, drop out of the
  * numbering, the total and the Next wrap, and their hash opens nothing.
- * To bring MARWIX-SKILLS back: `export const hiddenProofs: readonly ProofKey[] = [];`
+ * Empty since 2026-10-09 (MARWIX-SKILLS is shown again): every project is on the page.
  */
-export const hiddenProofs: readonly ProofKey[] = ["marwixSkills"];
+export const hiddenProofs: readonly ProofKey[] = [];
 
 /** The projects on the page, in page order: every project minus the hidden ones. */
 export const shownProofKeys: readonly ProofKey[] = proofKeys.filter((key) => !hiddenProofs.includes(key));
@@ -50,10 +50,16 @@ export function proofTarget(key: ProofKey) {
 export type ProofStat = { readonly value: string; readonly label: string };
 
 /**
- * A takeover's shots, or their alt texts, in order (ui-spec §7.3.1 part 3, §7.6): two or three.
- * Two: two 2:1 shots, stacked. Three: the big 2:1 shot, then two 4:3 details.
+ * The shots a takeover draws, or their alt texts, in order (ui-spec §7.3.1 part 3, §7.6): two or
+ * three. Two: two 2:1 shots, stacked. Three: the big 2:1 shot, then two 4:3 details.
  */
 export type ProofShots<T> = readonly [T, T] | readonly [T, T, T];
+
+/**
+ * A project's shots, or their alt texts (ui-spec §7.9): none, two or three. None means its
+ * takeover's part 3 has no shots block at all.
+ */
+export type ProofShotSet<T> = readonly [] | ProofShots<T>;
 
 /** The edge of a shot its frame keeps when it crops (ui-spec §7.6). */
 export type ProofShotPosition = "top" | "center" | "left";
@@ -71,9 +77,9 @@ export type ProofShotWithAlt = ProofShot & { readonly alt: string };
 const proofShotNames = {
   exile: ["exileShot1", "exileShot2", "exileShot3"],
   designVault: ["designVaultShot1", "designVaultShot2"],
-  marwixSkills: ["marwixSkillsShot1", "marwixSkillsShot2", "marwixSkillsShot3"],
+  marwixSkills: [],
 } as const satisfies {
-  readonly [K in ProofKey]: ProofShots<ImageName> & {
+  readonly [K in ProofKey]: ProofShotSet<ImageName> & {
     readonly length: (typeof proofs.projects)[K]["shotAlts"]["length"];
   };
 };
@@ -97,27 +103,30 @@ const proofShotPositions: {
 };
 
 /**
- * Pairs two equal-length shot tuples item by item, keeping the tuple's length in its type. Their
- * lengths are tied at compile time above; a mismatch that slips past fails the build.
+ * Pairs two equal-length shot tuples item by item, keeping the tuple's length in its type; two
+ * empty ones pair to none. Their lengths are tied at compile time above; a mismatch that slips
+ * past fails the build.
  */
-function zipShots<A, B, R>(a: ProofShots<A>, b: ProofShots<B>, join: (a: A, b: B) => R): ProofShots<R> {
+function zipShots<A, B, R>(a: ProofShotSet<A>, b: ProofShotSet<B>, join: (a: A, b: B) => R): ProofShotSet<R> {
+  if (a.length === 0 && b.length === 0) return [];
   if (a.length === 2 && b.length === 2) return [join(a[0], b[0]), join(a[1], b[1])];
   if (a.length === 3 && b.length === 3) return [join(a[0], b[0]), join(a[1], b[1]), join(a[2], b[2])];
   throw new Error("A project's shots, positions and alt texts must be the same length (lib/proofs.ts).");
 }
 
-/** A project's images (ui-spec §7.6), all in its takeover's part 3. */
-export function proofImages(key: ProofKey): { readonly shots: ProofShots<ProofShot> } {
-  const names: ProofShots<ImageName> = proofShotNames[key];
+/** A project's images (ui-spec §7.6), all in its takeover's part 3: none, two or three. */
+export function proofImages(key: ProofKey): { readonly shots: ProofShotSet<ProofShot> } {
+  const names: ProofShotSet<ImageName> = proofShotNames[key];
+  if (names.length === 0) return { shots: [] };
   const positions = proofShotPositions[key] ?? slotPositions[names.length];
   return { shots: zipShots(names, positions, (name, position) => ({ name, position })) };
 }
 
 /** A takeover's shots paired with their alt texts by index (content/home.ts → `shotAlts`). */
 export function proofShotsWithAlts(
-  shots: ProofShots<ProofShot>,
-  alts: ProofShots<string>,
-): ProofShots<ProofShotWithAlt> {
+  shots: ProofShotSet<ProofShot>,
+  alts: ProofShotSet<string>,
+): ProofShotSet<ProofShotWithAlt> {
   return zipShots(shots, alts, (shot, alt) => ({ ...shot, alt }));
 }
 

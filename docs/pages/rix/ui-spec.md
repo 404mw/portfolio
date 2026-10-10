@@ -111,7 +111,8 @@ Each section's spec is its own file under `ui-spec/`; load this file plus the on
   `colors.bg`; he's at the rest look, so his silhouette is the logo. One glyph: `hearts` part 1
   (`lib/rixGlyphs.ts`), `colors.accent`.
 - **Left column** (x 80–560, top to bottom):
-  - at y 80, the wordmark (`footer.wordmark`) at 36px, `colors.text` with W in `colors.accent`
+  - at y 80, the wordmark (`footer.wordmark`) at 36px, `colors.text` with M and W in `colors.accent`
+    (as the footer, home §9.1; the user's call, 2026-10-09; `components/og/OgWordmark.tsx`, letters from `lib/wordmarkLetters.ts`)
   - at y 200, `intro.heading.lead` (`colors.text`) and `intro.heading.accent` (`colors.accent`) at
     72px, line height 1.0, at most 2 lines (the 20-character limit, §1)
   - at y 540, `marwix.dev/rix` (from `siteUrl` and the path) at 28px, `colors.muted` (6.9:1)

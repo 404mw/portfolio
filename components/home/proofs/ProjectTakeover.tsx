@@ -2,6 +2,9 @@
 // same parts in the same order for every project: what it is, the problem, what I built, what it
 // took, what I learned and the showcase (only when the project has them), what this means for
 // you, then Next.
+// Part 3 holds the project's shots then Visit in its wide slot; a project with no shots
+// (ui-spec §7.9) has no wide slot, and Visit follows the paragraph as the body's last child. This
+// file is the only place that decides.
 // The column is a flex column. Its first child is the head (`TakeoverHead`,
 // ui-spec/07-proofs-sticky-band.md): the title on its permanent ink band, as one box that sticks
 // under the top bar only while the motion's condense runs.
@@ -10,7 +13,7 @@
 // hooks/useHashTakeover.ts opens it as a modal from the hash and `:target` is switched off
 // (`data-takeover-js` on <html>), so only the `open` state shows it.
 import { ProjectVisitLink } from "@/components/home/proofs/ProjectVisitLink";
-import { SpamDiagram } from "@/components/home/proofs/SpamDiagram";
+import { ShowcaseDiagram } from "@/components/home/proofs/ShowcaseDiagram";
 import { TakeoverHead } from "@/components/home/proofs/TakeoverHead";
 import { TakeoverIntro } from "@/components/home/proofs/TakeoverIntro";
 import { TakeoverLearned } from "@/components/home/proofs/TakeoverLearned";
@@ -27,11 +30,13 @@ import {
   nextProofKey,
   proofImages,
   proofNumber,
+  proofShotsWithAlts,
   proofTarget,
   takeoverPartId,
   takeoverTitleId,
   type ProofKey,
 } from "@/lib/proofs";
+import { hasShowcaseDiagram } from "@/lib/showcaseDiagram";
 import { container, takeoverText } from "@/lib/styles";
 
 type ProjectTakeoverProps = {
@@ -42,7 +47,8 @@ export function ProjectTakeover({ projectKey }: ProjectTakeoverProps) {
   const project = proofProject(projectKey);
   const { id } = proofTarget(projectKey);
   const titleId = takeoverTitleId(id);
-  const images = proofImages(projectKey);
+  const shots = proofShotsWithAlts(proofImages(projectKey).shots, project.shotAlts);
+  const visit = <ProjectVisitLink href={links[projectKey]} label={project.visitLabel} />;
   const next = nextProofKey(projectKey);
   const labels = proofs.takeover.partLabels;
   const { whatItTook, whatILearned, showcase } = project;
@@ -73,13 +79,16 @@ export function ProjectTakeover({ projectKey }: ProjectTakeoverProps) {
               label={labels.whatIBuilt}
               headline={project.whatIBuilt.headline}
               wide={
-                <>
-                  <TakeoverShots shots={images.shots} alts={project.shotAlts} />
-                  <ProjectVisitLink href={links[projectKey]} label={project.visitLabel} />
-                </>
+                shots.length === 0 ? undefined : (
+                  <>
+                    <TakeoverShots shots={shots} />
+                    {visit}
+                  </>
+                )
               }
             >
               <p className={takeoverText}>{project.whatIBuilt.body}</p>
+              {shots.length === 0 && visit}
             </TakeoverPart>
             {whatItTook && (
               <TakeoverPart
@@ -101,14 +110,15 @@ export function ProjectTakeover({ projectKey }: ProjectTakeoverProps) {
                 <TakeoverLearned items={whatILearned.items} />
               </TakeoverPart>
             )}
-            {showcase && (
+            {showcase && hasShowcaseDiagram(projectKey) && (
               <TakeoverPart
                 part="showcase"
                 headlineId={takeoverPartId(id, "showcase")}
                 label={labels.showcase}
                 headline={showcase.headline}
                 wide={
-                  <SpamDiagram
+                  <ShowcaseDiagram
+                    project={projectKey}
                     steps={showcase.steps}
                     returnLabel={showcase.returnLabel}
                     returnLine={showcase.returnLine}

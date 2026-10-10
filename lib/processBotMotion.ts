@@ -362,22 +362,32 @@ export const FIX_LIT_FADE = 0.6;
  */
 export const RELAY_SEND = { dwell: JOB_BEATS.flag.raise } as const;
 /**
- * From `wide`, the climb: the job rises from its stop up the hand-off stem (`process-handoff`) and
- * passes behind the label's `bg` mask at the arrowhead, `y` over the whole climb on `ease`; `x`
- * eases onto the stem's line between `drift` (shares of the climb), so it first rises straight up
- * in front of the pennant. It fades over its last `fade` seconds, and ends with its centre `under`
- * px above the stem's top (inside the label's mask). The lit overlay (`process-handoff-lit`) lights
- * bottom to top behind it, holds `hold` once the job is gone, then fades over `FIX_LIT_FADE`.
+ * From `wide`, the climb, the first part of the send up the hand-off elbow (`process-handoff`): the
+ * job rises from its stop up the elbow's vertical leg to where its rounded corner starts (about
+ * 204px), `y` over the whole climb on `ease`; `x` eases onto the leg's centre line between `drift`
+ * (shares of the climb), so it first rises straight up in front of the pennant. On `power1.in` it
+ * lifts off slowly and reaches the corner at about 510px/s, close to `HANDOFF_RUN`'s speed, so it
+ * carries on round the corner without a stop. The lit overlay (`process-handoff-lit`) lights the
+ * leg bottom to top behind it.
  */
 export const HANDOFF_CLIMB = {
-  duration: 0.9,
-  ease: "power2.inOut",
-  drift: [0.15, 0.55],
+  duration: 0.8,
+  ease: "power1.in",
+  drift: [0.1, 0.5],
   driftEase: "power1.inOut",
-  fade: 0.3,
-  under: 14,
-  hold: 0.6,
 } as const;
+/**
+ * From `wide`, the run, the send's second part: from the corner's start the job rounds the corner
+ * onto the elbow's horizontal leg and rides it right, its bottom on the line's top edge (like a stop
+ * on the ground line, so it never reaches down over the fix arch's label below), to the arrowhead,
+ * where its right edge stops at the tip (never past the list's end, so never a sideways scroll). At
+ * a constant `speed` (px per second; ease `none`, so the corner's two short legs and the long one
+ * are timed by their length): about 1.1–1.2s for the 700–760px at 1440. It fades over its last
+ * `fade` seconds, passing behind the label's `bg` mask at the arrowhead (the relay layer's `z-1` is
+ * under the label's `z-10`), the ghosts fading with it. The lit overlay lights left to right behind
+ * it, holds `hold` once the job is gone, then fades over `FIX_LIT_FADE`.
+ */
+export const HANDOFF_RUN = { speed: 640, fade: 0.3, hold: 0.6 } as const;
 /**
  * Below `wide`, the drop: the job falls straight down the bot column from ledge 3 onto the hand-off
  * marker (`process-handoff-mark`), its centre on the marker's, then slides `slide` px right

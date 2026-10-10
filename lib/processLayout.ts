@@ -17,6 +17,11 @@ export type FlowLayout = {
   readonly returnBox: string;
   /** The fix arch's right edge: from step 4's bot over to step 5's (one gap + 64px past step 4, `FIX_STEP`). */
   readonly fixBox: string;
+  /**
+   * The hand-off elbow's right edge: from step 3's column to the list's right end, the ground
+   * line's (the columns and gaps past step 3, `HANDOFF_STEP`), so its arrowhead's tip stops there.
+   */
+  readonly handoffBox: string;
 };
 
 export const flowLayouts: Record<FlowCount, FlowLayout> = {
@@ -25,11 +30,13 @@ export const flowLayouts: Record<FlowCount, FlowLayout> = {
     chevron: "wide:-right-6",
     returnBox: "wide:col-start-2 wide:col-span-3 wide:ml-15.5 wide:-mr-24",
     fixBox: "wide:-right-24",
+    handoffBox: "wide:right-[calc(-200%_-_4rem)]",
   },
   6: {
     grid: "wide:grid-cols-6 wide:gap-x-8",
     chevron: "wide:-right-6",
     returnBox: "wide:col-start-2 wide:col-span-4 wide:ml-15.5 wide:-mr-24",
     fixBox: "wide:-right-24",
+    handoffBox: "wide:right-[calc(-300%_-_6rem)]",
   },
 };

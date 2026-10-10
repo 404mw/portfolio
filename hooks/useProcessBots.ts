@@ -12,7 +12,7 @@
 // - lib/processRelay.ts: the relay job run along the ground line (from `wide`; the shared story in
 //   lib/processRelayRun.ts, the hand-off out of step 1's hand in lib/processRelayHand.ts, the job's
 //   changes and exit in lib/processRelayJob.ts, the fix hop in lib/processRelayFix.ts, the send up
-//   the hand-off stem in lib/processRelayHandoff.ts, the lesson
+//   the hand-off elbow in lib/processRelayHandoff.ts, the lesson
 //   that rides the return in lib/processRelayLesson.ts, its trail and lit lines in
 //   lib/processRelayTrail.ts).
 // - lib/processRelayColumn.ts: the same run down the bot column (below `wide`, ui-spec §5.9), hopping

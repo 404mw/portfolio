@@ -34,7 +34,8 @@ every card.
 ## Rules you can check
 
 1. **Plain words.** Write what the reader would say. "Answers your customers' messages," not
-   "LLM-powered support agent." No tech stack, no framework names, no vendor names.
+   "LLM-powered support agent." No tech stack, no framework names, no vendor names, except the
+   exceptions in constitution §7.4.
 2. **About the reader's problem first.** Say what changes for them. The user appears as the one
    who does it, not as the subject of praise.
 3. **Fact, then what it means.** "Built and run alone since March 2026. It's still running."

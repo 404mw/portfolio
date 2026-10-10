@@ -746,33 +746,107 @@ export const proofs = {
       ],
       visitLabel: "Visit Design Vault",
     },
+    // Facts → MARWIX-SKILLS, with its 2026-10-10 blocks (what it took, what it taught, how the
+    // image skills work). Claude Code is the only tool named (constitution §7.4). No numbers at
+    // all, by the user's choice: no counts of skills, looks or steps. Each idea is said once: the
+    // three image steps live in the showcase, "stops to ask" in part 5, the client tie in part 7.
     marwixSkills: {
-      tag: "AI tools",
+      tag: "Claude Code plugin",
       title: "MARWIX-SKILLS",
-      cardLine: "Tools that help people build with AI.",
-      proofLine: "Free and open source, anyone can use it",
+      cardLine: "Lets Claude Code make images for the web and find why a database query is slow.",
+      proofLine: "Free to use, after months in my own work",
       rows: {
-        whatItIs: "A free, open-source set of tools for building with AI.",
-        built: "[FILL: MARWIX-SKILLS built]",
-        inUse: "[FILL: MARWIX-SKILLS in use]",
+        whatItIs: "A plugin of agent skills that run inside Claude Code.",
+        built: "By me alone. MIT licence.",
+        inUse: "In my own work for months, then released free and open source.",
       },
-      intro: "MARWIX-SKILLS is a set of free, open-source tools for people building with AI.",
+      intro:
+        "MARWIX-SKILLS is for people building with AI. Its skills let Claude Code make images for the web and find why a database query is slow.",
       problem: {
-        headline: "[FILL: MARWIX-SKILLS problem headline]",
-        body: "[FILL: MARWIX-SKILLS problem body]",
+        headline: "Claude Code can't make an image on its own.",
+        body: "It needs an image model for that, and each model has its own strengths and weaknesses. Each one also needs a different way of prompting.",
       },
       whatIBuilt: {
-        headline: "[FILL: MARWIX-SKILLS what I built headline]",
-        body: "[FILL: MARWIX-SKILLS what I built body]",
+        headline: "Now Claude Code makes the image, ready for the web.",
+        body: "The image skills take an image from a first idea to a file ready for the web, without leaving Claude Code. A query skill finds why a database query is slow, from the database's own query plan. Every skill follows the project's own docs and shows each decision it made.",
       },
+      // Facts → What building MARWIX-SKILLS took, in the facts' order.
+      whatItTook: {
+        headline: "A good image took more than a prompt.",
+        items: [
+          {
+            title: "A library of looks",
+            line: "The look skill offers looks that clearly differ, says why each one fits and names the risk of each.",
+          },
+          {
+            title: "A prompt for each image model",
+            line: "Each image model needs its own way of prompting, so the prompt is written for the model you choose.",
+          },
+          {
+            title: "Asks before it spends",
+            line: "Before any paid image, it tells you the cost and waits for your yes.",
+          },
+          {
+            title: "Tested before each release",
+            line: "Before each release, I check how the skills behave and that the right skill starts for the job.",
+          },
+        ],
+      },
+      // Facts → What building MARWIX-SKILLS taught the user, in the facts' order, said as how the
+      // user works now. Item 1's first sentence is the user's own words. "Point two ways" became
+      // "point different ways" (no numbers); "the guardrails" became the places it stops and checks.
+      whatILearned: {
+        headline: "Building these skills changed how I set up your agents.",
+        items: [
+          {
+            title: "I decide before the model does",
+            line: "Whatever you don't decide, the model decides. So the skills settle each choice with you first.",
+          },
+          {
+            title: "I set the size, camera and light",
+            line: "Image models compose by pattern and ignore physics, so cups float and shadows point different ways. For photo-like images, the look skill sets real sizes, the camera and the light.",
+          },
+          {
+            title: "I make it stop and ask",
+            line: "A skill that stops to ask you is working. The places where it stops and checks with you are the product.",
+          },
+        ],
+      },
+      // Facts → How the image skills work, in order. The return is a loop on step 3 (to: "last").
+      showcase: {
+        headline: "From a planned look to a finished image.",
+        status: "Used in my own work",
+        body: "The image skills run in order inside Claude Code, and each one picks up the last one's work. It's an example of a job split into steps, with a specialist for each.",
+        steps: {
+          look: {
+            title: "Plans",
+            line: "It plans the look with you and reads it back in plain lines.",
+          },
+          prompt: {
+            title: "Writes",
+            line: "It writes the prompt for the image model you chose.",
+          },
+          image: {
+            title: "Makes",
+            line: "It makes the image and converts it for the web.",
+          },
+        },
+        returnLabel: "One edit",
+        returnLine: "When an image comes out wrong, it fixes it with one edit instead of starting over.",
+      },
+      // The closing line rests on the facts' hand-off lines (How the user works; refunds and
+      // complaints). Discord falls back to default.
       meansForYou: {
-        default: "[FILL: MARWIX-SKILLS what this means for you]",
+        default:
+          "Like these skills, the agents I build for you ask you about anything unusual instead of guessing.",
+        "service-business":
+          "Like these skills, the agent that takes your bookings passes complaints and anything unusual to you instead of guessing.",
+        "online-store":
+          "Like these skills, the agent that answers your order questions passes refunds and anything unusual to you instead of guessing.",
+        "software-builder":
+          "My workflow runs like these skills: written rules, checks before anything ships, and a person for anything unusual. I can build your app or feature with it.",
       },
-      shotAlts: [
-        "[FILL: MARWIX-SKILLS takeover screenshot 1 alt text]",
-        "[FILL: MARWIX-SKILLS takeover screenshot 2 alt text]",
-        "[FILL: MARWIX-SKILLS takeover screenshot 3 alt text]",
-      ],
+      shotAlts: [],
       visitLabel: "Visit MARWIX-SKILLS",
     },
   },

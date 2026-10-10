@@ -1,12 +1,15 @@
 // Rix's props (ui-spec 02a-about-options §2a.O0.1): the small emblem he holds in his right hand
 // for each group, in the bots' viewBox (-30 -18 170 110), just right of the hand tip and inside
 // x ≤ 130. Flat token fills with 45° cuts. `flourish` names the part the pick act moves and
-// gives its pivot, so the motion never measures the SVG. Shared by RixProps and AboutPropGlyph.
+// gives its pivot, so the motion never measures the SVG. Shared by RixProps and AboutPropGlyph, and
+// (`palette`, `prompt`, `picture`) by the MARWIX-SKILLS showcase diagram (ui-spec/07-proofs-spam.md).
 import type { BotColour } from "@/lib/processBots";
 
 /**
  * The cards' emblems (02a-about-options §2a.R2): `calendar`, `parcel`, `bubble`, `code`.
  * `shield`, `send`, `report` and `envelope` are held by no card; they stay for the motion pass.
+ * `palette`, `prompt` and `picture` are held by no card: they are the MARWIX-SKILLS showcase's three
+ * steps (look, prompt, image), each topping out at y 26 or lower so the ink band's edge clears them.
  */
 export type RixPropName =
   | "calendar"
@@ -16,10 +19,13 @@ export type RixPropName =
   | "shield"
   | "send"
   | "report"
-  | "envelope";
+  | "envelope"
+  | "palette"
+  | "prompt"
+  | "picture";
 
 /** A flourish part's hook (`data-prop-part`); "whole" props flourish as one group. */
-export type RixPropPartHook = "tick" | "bar" | "flap";
+export type RixPropPartHook = "tick" | "bar" | "flap" | "caret";
 
 export type RixPropPart = {
   readonly d: string;
@@ -99,6 +105,34 @@ export const rixProps: Record<RixPropName, RixProp> = {
       { d: "M106 30H130L118 42Z", colour: "D", hook: "flap" },
     ],
     pivots: [[118, 30]],
+  },
+  palette: {
+    parts: [
+      { d: "M110 26H126L130 30V46L126 50H110L106 46V30Z", colour: "C" }, // slab
+      { d: "M111 31h6v6h-6Z", colour: "B" }, // swatches
+      { d: "M119 31h6v6h-6Z", colour: "M" },
+      { d: "M111 39h6v6h-6Z", colour: "D" },
+      { d: "M119 39h6v6h-6Z", colour: "I" },
+    ],
+    pivots: [[118, 50]],
+  },
+  prompt: {
+    parts: [
+      { d: "M106 28H130V48H106Z", colour: "C" }, // field
+      { d: "M109 32h15v3h-15Z", colour: "I" }, // typed lines
+      { d: "M109 38h9v3h-9Z", colour: "I" },
+      { d: "M120 37h3v6h-3Z", colour: "B", hook: "caret" },
+    ],
+    pivots: [[121.5, 40]],
+  },
+  picture: {
+    parts: [
+      { d: "M106 26H130V50H106Z", colour: "C" }, // frame
+      { d: "M109 29H127V47H109Z", colour: "I" }, // canvas
+      { d: "M109 47L117 39L121 43L124 40L127 43V47Z", colour: "M" }, // hills
+      { d: "M120 32h4v4h-4Z", colour: "B" }, // sun
+    ],
+    pivots: [[118, 50]],
   },
 };
 

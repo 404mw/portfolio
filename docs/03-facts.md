@@ -75,7 +75,38 @@ What building Exile Bot taught the user (the user, 2026-10-05; shown in its take
 
 **MARWIX-SKILLS**
 - Free, open-source tools for people building with AI.
+- A Claude Code plugin of agent skills the user created and uses in their own work: they run inside
+  Claude Code, not as a website or browser app (the user, 2026-10-09).
+- Why it was built (the user, 2026-10-09): Claude Code can't generate images on its own. Each image
+  model has its own strengths and weaknesses, and each needs a different way of prompting.
+- The image part is three skills: one decides how an image should look, one writes the prompt for
+  the image model chosen, and one generates the image and converts it for the web.
+- A query skill finds why a database query is slow from the database's own query plan.
+- Each skill follows the project's own docs, shows every decision it made, and stops to ask instead
+  of guessing.
+- Built by the user alone; used on the user's own work for months before release. MIT licence.
 - Link: `https://github.com/404mw/MARWIX-SKILLS`
+
+What building MARWIX-SKILLS took (the user, 2026-10-10; from the user's public repo; no numbers):
+- **A library of looks to choose from.** The look skill offers three looks that clearly differ,
+  says why each one fits and names the risk of each.
+- **A prompt for each image model.** Each image model gets a prompt written its own way.
+- **Asks before it spends.** Before any paid image, it states the cost and waits for a yes.
+- **Tested before each release.** Checks on how the skills behave, and on whether the right skill
+  starts.
+
+What building MARWIX-SKILLS taught the user (the user, 2026-10-10; no numbers):
+- **Whatever you don't decide, the model decides.** The user's own words.
+- **Image models compose by pattern, not physics.** That's why their cups float and their shadows
+  point two ways. So for photo-like images, the look skill sets real sizes, the camera and the
+  light.
+- **A skill that stops to ask is working.** The guardrails are the product.
+
+How the image skills work, in order (the user, 2026-10-10; for the showcase):
+1. Plans the look with you and reads it back in plain lines.
+2. Writes the prompt for the image model chosen.
+3. Makes the image and converts it for the web.
+- When an image comes out wrong, it fixes it with one edit instead of starting over.
 
 **How the user works**
 - Runs the work through a team of AI agents that follow written rules and check their own work.

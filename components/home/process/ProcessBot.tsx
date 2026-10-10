@@ -47,14 +47,19 @@ type ProcessBotProps = {
   readonly className?: string;
   /** Extra SVG parts drawn last inside `upper` (Rix's props on About); Process passes none. */
   readonly children?: ReactNode;
+  /** The drawn window; the shared rig box when absent. The showcase's Rix crops to his own bounds. */
+  readonly viewBox?: string;
 };
 
-export function ProcessBot({ role, pose, className = processSize, children }: ProcessBotProps) {
+/** The shared rig box every bot is drawn in. */
+const rigViewBox = "-30 -18 170 110";
+
+export function ProcessBot({ role, pose, className = processSize, children, viewBox = rigViewBox }: ProcessBotProps) {
   const rig = botRig(role, pose);
   const draw = (shapes: readonly BotShape[]) => shapes.map((shape, index) => renderShape(shape, index, pose));
   return (
     <svg
-      viewBox="-30 -18 170 110"
+      viewBox={viewBox}
       aria-hidden="true"
       focusable="false"
       data-anim="process-bot"
